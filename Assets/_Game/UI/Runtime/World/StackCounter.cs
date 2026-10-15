@@ -7,6 +7,7 @@ namespace UltimoMiglio.UI.World
     /// Also hosts the rewarded buff chip (icon + timer) next to the stack. Capacity comes from gameplay/data.</summary>
     public class StackCounter : WorldAnchoredElement
     {
+        protected override bool UseProximity => false;
         Label countL, buffL; VisualElement buff;
         public event System.Action BecameFull;
         bool wasFull;
