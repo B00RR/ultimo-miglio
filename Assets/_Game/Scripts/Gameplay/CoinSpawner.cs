@@ -30,6 +30,7 @@ namespace UltimoMiglio.Gameplay
         }
         void Update()
         {
+            if (!GameRoot.Ready) return;
             var nina = GameRoot.I.Nina ? GameRoot.I.Nina.transform.position : Vector3.one * 1e5f;
             for (int i = _live.Count - 1; i >= 0; i--)
             {

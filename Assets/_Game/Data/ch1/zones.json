@@ -36,5 +36,19 @@
       "costRef": "robots.nonno.levels"
     }
   ],
-  "padPaymentPersistent": true
+  "padPaymentPersistent": true,
+  "zoneIds": [
+    "arrivi",
+    "shelfTerracotta",
+    "bancone",
+    "coinDrop",
+    "cassa",
+    "cassaforte",
+    "padHireNonno",
+    "padZaino",
+    "padScarpe",
+    "padInsegna",
+    "padNonnoUpgrade",
+    "padWallBancone"
+  ]
 }

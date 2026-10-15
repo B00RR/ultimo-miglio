@@ -27,7 +27,7 @@ namespace UltimoMiglio.UI.Bridge
 
         void Start()
         {
-            var gr = GameRoot.I; if (!gr || !Hud) { enabled = false; return; }
+            var gr = GameRoot.I; if (!GameRoot.Ready || !Hud) { enabled = false; return; }
             var data = Resources.Load<ChapterDataAsset>("Ch1Data");
             if (data) Hud.Config = new ChapterDataHudConfig(data.Data);
             gr.Changed += Refresh;

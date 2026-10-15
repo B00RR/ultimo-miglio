@@ -90,3 +90,13 @@ Note:
 - Turno di notte (cap 3) e totem (cap 4) sono inclusi già ora per completezza; nel cap 1 restano bloccati.
 - Assist: lo sconto sulla tranche parte dal cap 4 (nel cap 1 la tranche resta 8.400 LN); il tetto offline in Assist è il 12%.
 - Distanza scaffali↔Bancone al cap 1 = 9 + 0,4×1 = 9,4 m.
+
+## Golden path cap 1 (`playthrough_expected.json`)
+Generato da `qa/playthrough_ch1.py`, che usa la stessa logica di `qa/econ_sim_v3.py`. Parametri: eff 1,0, nessun offline (run continua in editor), onboarding di 04_UI §4. Rigenera con `python3 qa/playthrough_ch1.py`, poi ricopia il file in `unity/Assets/_Game/Data/ch1/`.
+- `milestones[]`: `id`, `tSec`, `toleranceSec`, `cumulativeEarnedLnApprox`.
+- `purchases[]`: acquisti della politica "miglior valore per LN" (`pad`, `label`, `costLn`, `level`, `t`, `toleranceSec` = max(15 s, 15%)).
+- `debtDeposits[]`: versamenti alla Cassaforte. Il primo è a 240 s (60% del portafoglio), poi uno ogni 60 s.
+- `checkpoints[]`: stato ogni 60 s (LN cumulate, portafoglio, versato, livelli).
+- `chapterEnd`: fine capitolo a eff 1,0 / 1,2 / 0,85, con finestra di 2.400 s.
+- `botSteps[]` e `loops`: azioni del bot (`moveTo` + `zoneId` da `zones.json` → `zoneIds`, `holdOnZoneSec`).
+- Tolleranze: onboarding ±5-15 s; acquisti ±15%; fine capitolo ±120 s (copre eff 0,85-1,2).

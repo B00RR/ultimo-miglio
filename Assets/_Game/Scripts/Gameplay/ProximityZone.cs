@@ -19,6 +19,7 @@ namespace UltimoMiglio.Gameplay
 
         void Update()
         {
+            if (!GameRoot.Ready) return;
             OnIdleUpdate();
             if (!Nina) return;
             if (_active && _active != this && _active.Nina) return;

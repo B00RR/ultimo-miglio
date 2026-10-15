@@ -12,6 +12,7 @@ namespace UltimoMiglio.Gameplay
         public CustomerQueue Owner;
         void Update()
         {
+            if (!GameRoot.Ready || !Owner) return;
             var d = Target - transform.position; d.y = 0;
             if (d.sqrMagnitude > 0.0025f) { transform.position += Vector3.ClampMagnitude(d.normalized * Speed * Time.deltaTime, d.magnitude); transform.rotation = Quaternion.LookRotation(d); }
             else if (Leaving) Owner.Recycle(this);
