@@ -57,20 +57,20 @@ namespace UltimoMiglio.Gameplay
             if (_banner != null || !_hud || _hud.Root == null) return;
             _banner = new VisualElement { name = "tutorial-banner", pickingMode = PickingMode.Ignore };
             var st = _banner.style;
-            st.position = Position.Absolute; st.left = Length.Percent(50); st.bottom = Length.Percent(6); st.translate = new Translate(Length.Percent(-50), 0);
-            st.maxWidth = Length.Percent(86); st.minWidth = 360; st.flexDirection = FlexDirection.Row; st.alignItems = Align.Center;
+            st.position = Position.Absolute; st.left = Length.Percent(50); st.top = 312; st.translate = new Translate(Length.Percent(-50), 0); // banda medio-alta: mai sopra joystick/bottoni
+            st.width = Length.Percent(88); st.maxWidth = 1092; st.maxHeight = 364; st.overflow = Overflow.Hidden; st.flexDirection = FlexDirection.Row; st.alignItems = Align.Center;
             st.paddingLeft = 22; st.paddingRight = 28; st.paddingTop = 14; st.paddingBottom = 14;
             st.backgroundColor = new Color(1f, 0.96f, 0.88f, 0.97f);
             st.borderTopLeftRadius = st.borderTopRightRadius = st.borderBottomLeftRadius = st.borderBottomRightRadius = 28;
             st.borderLeftWidth = st.borderRightWidth = st.borderTopWidth = st.borderBottomWidth = 4;
             st.borderLeftColor = st.borderRightColor = st.borderTopColor = st.borderBottomColor = new Color(0.27f, 0.18f, 0.12f);
             var face = new Label("ADA") { pickingMode = PickingMode.Ignore };
-            var fs = face.style; fs.width = 64; fs.height = 64; fs.marginRight = 16; fs.backgroundColor = new Color(0.78f, 0.33f, 0.24f);
-            fs.borderTopLeftRadius = fs.borderTopRightRadius = fs.borderBottomLeftRadius = fs.borderBottomRightRadius = 32; fs.color = Color.white;
-            fs.unityTextAlign = TextAnchor.MiddleCenter; fs.fontSize = 18; fs.unityFontStyleAndWeight = FontStyle.Bold; fs.flexShrink = 0;
+            var fs = face.style; fs.width = 80; fs.height = 80; fs.marginRight = 16; fs.backgroundColor = new Color(0.78f, 0.33f, 0.24f);
+            fs.borderTopLeftRadius = fs.borderTopRightRadius = fs.borderBottomLeftRadius = fs.borderBottomRightRadius = 40; fs.color = Color.white;
+            fs.unityTextAlign = TextAnchor.MiddleCenter; fs.fontSize = 24; fs.unityFontStyleAndWeight = FontStyle.Bold; fs.flexShrink = 0;
             var col = new VisualElement { pickingMode = PickingMode.Ignore }; col.style.flexShrink = 1;
-            var who = new Label(Speaker) { pickingMode = PickingMode.Ignore }; who.style.color = new Color(0.78f, 0.33f, 0.24f); who.style.fontSize = 20; who.style.unityFontStyleAndWeight = FontStyle.Bold;
-            _bannerText = new Label { pickingMode = PickingMode.Ignore }; _bannerText.style.color = new Color(0.23f, 0.16f, 0.12f); _bannerText.style.fontSize = 30; _bannerText.style.whiteSpace = WhiteSpace.Normal;
+            var who = new Label(Speaker) { pickingMode = PickingMode.Ignore }; who.style.color = new Color(0.78f, 0.33f, 0.24f); who.style.fontSize = 30; who.style.unityFontStyleAndWeight = FontStyle.Bold;
+            _bannerText = new Label { pickingMode = PickingMode.Ignore }; _bannerText.style.color = new Color(0.23f, 0.16f, 0.12f); _bannerText.style.fontSize = 44; _bannerText.style.whiteSpace = WhiteSpace.Normal;
             col.Add(who); col.Add(_bannerText); _banner.Add(face); _banner.Add(col);
             _hud.Root.Add(_banner);
         }

@@ -51,8 +51,18 @@ namespace UltimoMiglio.UI.World
             if (!visible) return;
             var p = UltimoMiglio.UI.SafeAreaUtil.ScreenToPanel(Element.panel, sp);
             // clamp inside the panel (USS centers with translate -50% -100%): never cut at the screen edges
-            var pr = Element.panel.visualTree.layout; float w = Element.layout.width, h = Element.layout.height, m = 12f;
-            if (!float.IsNaN(w) && pr.width > 0) { p.x = Mathf.Clamp(p.x, w * 0.5f + m, Mathf.Max(w * 0.5f + m, pr.width - w * 0.5f - m)); p.y = Mathf.Clamp(p.y, h + m, Mathf.Max(h + m, pr.height - m)); }
+            // HUD v2: clamp to the SAFE area with 8 dp margin; near the top edge flip the card below the anchor.
+            var pr = Element.panel.visualTree.layout; float w = Element.layout.width, h = Element.layout.height, m = 8f;
+            var safe = hud && hud.SafeRoot != null ? hud.SafeRoot.resolvedStyle : null;
+            float sl = safe != null ? safe.paddingLeft : 0f, st = safe != null ? safe.paddingTop : 0f, sr = safe != null ? safe.paddingRight : 0f, sb = safe != null ? safe.paddingBottom : 0f;
+            bool flip = false;
+            if (!float.IsNaN(w) && pr.width > 0)
+            {
+                p.x = Mathf.Clamp(p.x, sl + w * 0.5f + m, Mathf.Max(sl + w * 0.5f + m, pr.width - sr - w * 0.5f - m));
+                if (p.y - h < st + m) { flip = true; p.y = Mathf.Min(p.y + h + 2f * m, pr.height - sb - m); } // would cross the top: hang below
+                p.y = Mathf.Clamp(p.y, st + h + m, Mathf.Max(st + h + m, pr.height - sb - m));
+            }
+            Element.EnableInClassList("world-anchored--flipped", flip);
             Element.style.left = p.x; Element.style.top = p.y;
         }
     }

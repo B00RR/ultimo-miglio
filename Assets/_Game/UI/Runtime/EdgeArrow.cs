@@ -13,7 +13,7 @@ namespace UltimoMiglio.UI
         [SerializeField] HudController hud;
         [SerializeField] Camera cam;
         [SerializeField] Transform nina;
-        [SerializeField] float marginDp = 24f;
+        [SerializeField] float marginDp = 64f;
         [SerializeField] float markerHeight = 2.2f;
         [SerializeField] bool showMarkerWhenVisible = true;
 
