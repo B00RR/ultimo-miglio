@@ -10,25 +10,16 @@ namespace UltimoMiglio.Gameplay
     public sealed class DepotCameraFit : MonoBehaviour
     {
         public CinemachineCamera Cm; public Transform Nina;
-        public float Margin = 3.0f, TopHud = 0.16f, BottomHud = 0.06f, MinOrtho = 5.5f;
+        public float Margin = 1.5f, TopHud = 0.16f, BottomHud = 0.06f, MinOrtho = 5.5f;
         readonly List<Vector3> _pts = new();
         int _w, _h;
 
         void Start()
         {
-            foreach (var t in FindObjectsByType<Transform>(FindObjectsSortMode.None))
-            {
-                var n = t.name;
-                bool key = n.StartsWith("Zona_") || n.StartsWith("Pad_") || n.StartsWith("Shelf") || n.StartsWith("Scaffal") || n == "CounterSlot" || n == "NONNO";
-                if (!key) continue;
-                _pts.Add(t.position);
-                foreach (var r in t.GetComponentsInChildren<Renderer>()) { var b = r.bounds; _pts.Add(b.min); _pts.Add(b.max); _pts.Add(new Vector3(b.min.x, 0, b.max.z)); _pts.Add(new Vector3(b.max.x, 0, b.min.z)); }
-            }
             if (Nina) _pts.Add(Nina.position);
             var tut = FindAnyObjectByType<TutorialManager>();
             if (tut) foreach (var t in new[] { tut.Arrivi, tut.Scaffale, tut.Bancone, tut.Monete, tut.PadZaino, tut.PadNonno }) if (t) { _pts.Add(t.position + new Vector3(-1.5f, 0, -1.5f)); _pts.Add(t.position + new Vector3(1.5f, 0, 1.5f)); }
-            var arr = FindAnyObjectByType<ArrivalsZone>();
-            if (arr) foreach (var r in arr.GetComponentsInChildren<Renderer>(true)) { _pts.Add(r.bounds.min); _pts.Add(r.bounds.max); }
+            foreach (var z in FindObjectsByType<ProximityZone>(FindObjectsSortMode.None)) { _pts.Add(z.transform.position + new Vector3(-1.5f, 0, -1.5f)); _pts.Add(z.transform.position + new Vector3(1.5f, 0, 1.5f)); }
             if (Cm) Cm.Follow = null;
             Fit();
         }
