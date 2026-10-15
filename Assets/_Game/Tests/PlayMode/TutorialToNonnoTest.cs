@@ -42,7 +42,6 @@ public class TutorialToNonnoTest
                 .First(p => p.Kind == UpgradeKind.NonnoHire);
             Assert.IsNotNull(arr); Assert.IsNotNull(ban); Assert.IsNotNull(padN);
 
-            // Objective text must be available from TutorialManager (HUD row mirrors it)
             float paint = 0;
             while ((TutorialManager.I == null || string.IsNullOrEmpty(TutorialManager.I.CurrentObjectiveText)) && paint < 5f)
             { paint += Time.unscaledDeltaTime; yield return null; }
@@ -53,12 +52,10 @@ public class TutorialToNonnoTest
             float t0 = Time.time;
             while (eco.S.CustomersServed < servesNeeded && Time.time - t0 < 180f)
             {
-                // Pick at Arrivi
                 yield return Go(n, arr.transform.position);
                 float a = Time.time;
                 while (n.Stack.Count < Mathf.Min(2, n.Stack.Capacity) && Time.time - a < 8f) yield return null;
 
-                // Deposit at least one on a shelf (tutorial Scaffali) then go Bancone (auto-pull if empty)
                 if (shelves.Length > 0)
                 {
                     yield return Go(n, shelves[0].transform.position);
@@ -75,11 +72,20 @@ public class TutorialToNonnoTest
             Assert.GreaterOrEqual(eco.S.CustomersServed, servesNeeded, "could not serve customers");
             Assert.GreaterOrEqual(eco.S.Wallet, 10.0 - 0.01, $"wallet {eco.S.Wallet} after {eco.S.CustomersServed} serves — need ≥10 LN");
 
-            // Hire NONNO on pad
-            yield return Go(n, padN.transform.position);
+            // Hire NONNO: cammina sul pad e resta in trigger (teleport CC non genera OnTriggerEnter)
+            yield return EnterPad(n, padN);
             float h = Time.time;
-            while (eco.S.NonnoLevel < 0 && eco.S.Wallet > 0.01 && Time.time - h < 40f) yield return null;
-            Assert.GreaterOrEqual(eco.S.NonnoLevel, 0, "NONNO not hired");
+            double wStart = eco.S.Wallet;
+            while (eco.S.NonnoLevel < 0 && Time.time - h < 60f)
+            {
+                if (!padN.Occupied)
+                    yield return EnterPad(n, padN);
+                else
+                    n.ScriptedInput = Vector3.zero;
+                yield return null;
+            }
+            Assert.GreaterOrEqual(eco.S.NonnoLevel, 0,
+                $"NONNO not hired wallet={eco.S.Wallet} (was {wStart}) padPaid={eco.S.PadPaid[(int)UpgradeKind.NonnoHire]} occupied={padN.Occupied}");
 
             var bot = Object.FindAnyObjectByType<NonnoRobot>();
             Assert.IsNotNull(bot);
@@ -107,20 +113,55 @@ public class TutorialToNonnoTest
         yield return new WaitForSeconds(s);
     }
 
-    static IEnumerator Go(NinaController n, Vector3 target)
+    /// <summary>Entra nel collider del pad con movimento reale (niente solo teleport).</summary>
+    static IEnumerator EnterPad(NinaController n, UpgradePad pad)
+    {
+        var target = pad.transform.position;
+        // avvicinati da fuori, poi entra
+        var approach = target + Vector3.back * 1.2f;
+        yield return Go(n, approach, allowTeleport: true);
+        yield return Go(n, target, allowTeleport: false);
+        // micro-passi per garantire OnTriggerEnter del CharacterController
+        for (int i = 0; i < 12 && !pad.Occupied; i++)
+        {
+            var d = target - n.transform.position; d.y = 0;
+            n.ScriptedInput = (d.sqrMagnitude > 0.0001f ? d.normalized : Vector3.forward) * 1.001f;
+            yield return null;
+        }
+        n.ScriptedInput = Vector3.zero;
+        float dwell = Time.time;
+        while (!pad.Occupied && Time.time - dwell < 2f) yield return null;
+    }
+
+    static IEnumerator Go(NinaController n, Vector3 target, bool allowTeleport = true)
     {
         target.y = n.transform.position.y;
-        float start = Time.time, last = Time.time, best = float.MaxValue;
+        float last = Time.time, best = float.MaxValue;
         while (true)
         {
             var d = target - n.transform.position; d.y = 0;
-            if (d.magnitude < 0.3f) break;
+            if (d.magnitude < 0.25f) break;
             if (d.magnitude < best - 0.05f) { best = d.magnitude; last = Time.time; }
-            if (Time.time - last > 3f)
+            if (allowTeleport && Time.time - last > 3f)
             {
                 var cc = n.GetComponent<CharacterController>();
                 cc.enabled = false; n.transform.position = target; cc.enabled = true;
+                Physics.SyncTransforms();
+                // passo fuori+dentro per riattivare i trigger dopo teleport
+                n.ScriptedInput = Vector3.forward * 1.001f;
+                yield return null;
+                n.ScriptedInput = Vector3.back * 1.001f;
+                yield return null;
                 break;
+            }
+            if (!allowTeleport && Time.time - last > 8f)
+            {
+                // ultimo tentativo: teleport vicino e cammina
+                var cc = n.GetComponent<CharacterController>();
+                var near = target + Vector3.back * 0.8f; near.y = target.y;
+                cc.enabled = false; n.transform.position = near; cc.enabled = true;
+                Physics.SyncTransforms();
+                last = Time.time; best = float.MaxValue; allowTeleport = true;
             }
             n.ScriptedInput = d.normalized * 1.001f;
             yield return null;
