@@ -32,7 +32,7 @@ for mat in bpy.data.materials:
 idx=0
 CLOSE=os.environ.get("UM_CLOSE")=="1"   # primo piano busto/giacca per Cheer
 if CLOSE:
-    cam.ortho_scale=0.95; d=Vector((0.35,-1.6,0.35)).normalized(); co.location=Vector((0,0,1.12))+d*8; co.rotation_euler=(-d).to_track_quat('-Z','Y').to_euler()
+    cam.ortho_scale=1.25; d=Vector((0.45,-1.6,0.25)).normalized(); co.location=Vector((0,0,1.18))+d*8; co.rotation_euler=(-d).to_track_quat('-Z','Y').to_euler()
 JOBS=[(rig,nacts,["Cheer"] if CLOSE else ["Idle","Walk","Run","Carry_Idle","Carry_Walk","Deliver","Cheer"])]+([(bot,bacts,["Idle","Drive","Lift","Drop","Happy"])] if bot and not os.environ.get("UM_NOBOT") else [])
 for R,acts,order in JOBS:
   for o in sc.objects:
