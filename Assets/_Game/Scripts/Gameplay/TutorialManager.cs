@@ -57,6 +57,8 @@ namespace UltimoMiglio.Gameplay
         void EnsureObjective()
         {
             if (_objective != null || !_hud || _hud.Root == null) return;
+            _objective = _hud.Root.Q<Label>("tutorial-objective");
+            if (_objective != null) return; // HUD v3 (#39)
             _objective = new Label { name = "tut-objective", pickingMode = PickingMode.Ignore };
             var st = _objective.style;
             st.position = Position.Absolute; st.left = Length.Percent(50); st.top = 8; st.translate = new Translate(Length.Percent(-50), 0);
