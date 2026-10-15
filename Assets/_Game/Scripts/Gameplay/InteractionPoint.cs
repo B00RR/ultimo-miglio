@@ -13,7 +13,7 @@ namespace UltimoMiglio.Gameplay
     public sealed class InteractionPoint : MonoBehaviour
     {
         public PoiKind Kind; public string Label; public Texture2D Icon; public Font LabelFont;
-        public float Radius = 1.1f; public bool HasCard; public UpgradePad Pad; public UltimoMiglio.VFX.UM_PadFillRing Ring;
+        public float Radius = 1.1f; public bool HasCard; public UpgradePad Pad; public UltimoMiglio.VFX.UM_PadFillRing Ring; public UltimoMiglio.VFX.UM_PadIcon PadIcon;
         public static readonly Color Blu = new(0.369f, 0.498f, 0.525f), Verde = new(0.56f, 0.79f, 0.66f), Giallo = new(0.957f, 0.769f, 0.188f), Ink = new(0.231f, 0.165f, 0.125f);
 
         Transform _rim, _fill, _beacon; Material _fillMat, _beaconMat; Color _col;
@@ -49,6 +49,7 @@ namespace UltimoMiglio.Gameplay
         void EnsureChip()
         {
             if (_chip != null) return;
+            if (GetComponent<UltimoMiglio.UI.World.PadTag>() || PadIcon) return;
             if (!_hud) _hud = FindFirstObjectByType<UltimoMiglio.UI.HudController>();
             if (!_hud || _hud.Root == null) return;
             _cam = Camera.main;
@@ -94,9 +95,15 @@ namespace UltimoMiglio.Gameplay
             if (_chip == null || !_cam) return;
             if (Pad && GameRoot.Ready && Kind == PoiKind.Acquisto) { var eco = GameRoot.I.Eco; double left = eco.Cost(Pad.Kind) - eco.S.PadPaid[(int)Pad.Kind]; if (!double.IsInfinity(left)) _text.text = Mathf.CeilToInt((float)left).ToString(); }
             var nina = GameRoot.I ? GameRoot.I.Nina : null;
-            if (nina) UltimoMiglio.UI.World.WorldAnchoredElement.Focus = nina.transform;
             bool near = nina && (nina.transform.position - transform.position).sqrMagnitude < 9f;
             if (Ring && !Pad) Ring.SetProgress(near ? 1f : 0f);
+            if (PadIcon) PadIcon.SetPlayerNear(near);
+            var tag = GetComponent<UltimoMiglio.UI.World.PadTag>();
+            if (tag)
+            {
+                bool shelf = GetComponent<Shelf>() != null;
+                tag.enabled = avail && (!shelf || _active || near);
+            }
             Vector3 sp = _cam.WorldToScreenPoint(transform.position + Vector3.up * (2.0f + 0.15f * Mathf.Sin(Time.time * 2.4f + _phase)));
             bool show = avail && !(HasCard && near) && sp.z > 0 && sp.x > 0 && sp.x < Screen.width && sp.y > 0 && sp.y < Screen.height;
             _chip.style.display = show ? DisplayStyle.Flex : DisplayStyle.None;

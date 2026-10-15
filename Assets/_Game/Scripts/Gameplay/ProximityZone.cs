@@ -9,6 +9,8 @@ namespace UltimoMiglio.Gameplay
         public int Priority; public float DwellSec = 0.5f, TickSec = 0.1f;
         public UltimoMiglio.UI.ZoneFillRing Ring;
         static ProximityZone _active;
+        public static ProximityZone Active => _active;
+        public bool Occupied => Nina;
         protected NinaController Nina { get; private set; }
         protected float Dwell { get; private set; }
         float _acc; bool _started;
@@ -26,13 +28,21 @@ namespace UltimoMiglio.Gameplay
             _active = this;
             Dwell += Time.deltaTime;
             if (Dwell < DwellSec) { if (Ring) Ring.SetFill(Dwell / DwellSec); return; }
-            if (!_started) { _started = true; OnZoneStart(); }
+            if (!_started) { _started = true; OnZoneStart(); NotifyCard(true); }
             _acc += Time.deltaTime;
             while (_acc >= TickSec) { _acc -= TickSec; OnZoneTick(Dwell - DwellSec); }
         }
         protected virtual void OnIdleUpdate() { }
         protected virtual void OnZoneStart() { }
-        protected virtual void OnZoneExit() { if (Ring) Ring.Drain(); }
+        protected virtual void OnZoneExit() { if (Ring) Ring.Drain(); NotifyCard(false); }
+        void NotifyCard(bool on)
+        {
+            foreach (var mb in GetComponents<MonoBehaviour>())
+            {
+                var m = mb.GetType().GetMethod("ShowOnPad", new[] { typeof(bool) });
+                if (m != null) { m.Invoke(mb, new object[] { on }); return; }
+            }
+        }
         protected abstract void OnZoneTick(float activeSec);
     }
 }
