@@ -216,7 +216,9 @@ for name,N,cyc in CLIPS:
     src.animation_data.action=bpy.data.actions["SRC_"+name]
     act=bpy.data.actions.new(name); arm.animation_data.action=act
     for f in range(N+1):
-        sc.frame_set(f); Mn={}
+        # Walk/Run/Carry_Walk sorgente camminava "all'indietro" (piede d'appoggio scivolava verso -Y = in avanti):
+        # campioniamo il ciclo a ritroso, cosi' il piede piantato scivola verso +Y (dietro) mentre lei guarda -Y (= +Z in Unity)
+        sc.frame_set((N-f)%N if name in ("Walk","Run","Carry_Walk") else f); Mn={}
         for n in order:
             b=ad.bones[n]; sp=src.pose.bones.get(n)
             if sp is None:   # ossa extra (coda): pose a riposo qui, simulazione secondaria dopo
@@ -236,6 +238,32 @@ for name,N,cyc in CLIPS:
             pb=arm.pose.bones[n]; pb.rotation_mode='QUATERNION'; pb.matrix_basis=basis
             pb.keyframe_insert("location",frame=f); pb.keyframe_insert("rotation_quaternion",frame=f); pb.keyframe_insert("scale",frame=f)
     act.use_fake_user=True; act.frame_range=(0,N); act.use_frame_range=True; act.use_cyclic=cyc
+# --- Carry: entrambe le mani sotto la pila di pacchi davanti al petto, piccolo rimbalzo (IK analitica 2 ossa)
+import math
+def _aim(pb,dirw,up_hint=None):
+    M=pb.matrix.copy(); y=M.to_3x3().col[1].normalized(); q=y.rotation_difference(dirw.normalized())
+    R=(q.to_matrix()@M.to_3x3()); pb.matrix=Matrix.LocRotScale(M.translation,R.to_quaternion(),None); bpy.context.view_layer.update()
+def carry_arms(act,N,steps):
+    arm.animation_data.action=act; cr=ad.bones["Chest"].matrix_local
+    for f in range(N+1):
+        sc.frame_set(f); C=arm.pose.bones["Chest"].matrix@cr.inverted()
+        bounce=0.014*math.sin(2*math.pi*steps*f/N)
+        for sd,sx in (("Left",1),("Right",-1)):
+            a_=arm.pose.bones[sd+"Arm"]; fa=arm.pose.bones[sd+"ForeArm"]; h=arm.pose.bones[sd+"Hand"]
+            l1=(ad.bones[sd+"ForeArm"].head_local-ad.bones[sd+"Arm"].head_local).length
+            l2=(ad.bones[sd+"Hand"].head_local-ad.bones[sd+"ForeArm"].head_local).length
+            S=a_.matrix.translation.copy(); T=C@Vector((0.11*sx,-0.23,1.08+bounce))
+            d=T-S; L=min(d.length,(l1+l2)*0.995); dn=d.normalized()
+            x=(l1*l1-l2*l2+L*L)/(2*L); hgt=math.sqrt(max(0.0,l1*l1-x*x))
+            pole=(C.to_3x3()@Vector((0.6*sx,0.2,-1.0))); pole=(pole-dn*pole.dot(dn)).normalized()
+            E=S+dn*x+pole*hgt
+            _aim(a_,E-S); _aim(fa,S+dn*L-E)
+            _aim(h,C.to_3x3()@Vector((-0.25*sx,-1.0,0.15)))   # mani piatte in avanti, palmi su a sorreggere
+            for pb in (a_,fa,h):
+                for k in ("location","rotation_quaternion","scale"): pb.keyframe_insert(k,frame=f)
+for nm,stp in (("Carry_Idle",2),("Carry_Walk",2)):
+    act=bpy.data.actions[nm]; carry_arms(act,int(act.frame_range[1]),stp)
+print("UM_CARRY arms posed")
 # --- coda: follow-through/overlap simulato (molla smorzata in world space, 2 segmenti), poi baked.
 # Vincoli: resta dietro la testa (y locale testa >= rest*0.6), max 0.7 rad dal riposo, non scende sotto il bordo zaino.
 def sim_pony(act,N,cyc):
