@@ -1,0 +1,15 @@
+/* Ultimo Miglio - HUD v2 design tokens. Units = dp (ResponsivePanel dp mode: 1080x2400 → 2,63 px/dp). Use ONLY these in HudV2.uss. */
+:root {
+    --c-terracotta: #C8633B; --c-terracotta-dk: #8E3F22;
+    --c-sun: #F4C430; --c-mint: #8FC9A8; --c-lemon: #F7E26B;
+    --c-paper: #F3E3C3; --c-ink: #3B2A20; --c-walnut: #7A4A2E;
+    --c-teal: #5E7F86; --c-teal-dk: #3E5A61;
+    --c-paper-glass: rgba(243, 227, 195, 0.30); --c-ink-glass: rgba(59, 42, 32, 0.55);
+    --bw: 3px; --lip: 5px; --r-pill: 26px; --r-btn: 16px; --r-phone: 18px; --r-note: 14px;
+    --sp-1: 4px; --sp-2: 8px; --sp-3: 12px; --sp-4: 16px;
+    --fs-num: 26px; --fs-room: 17px; --fs-body: 17px; --fs-name: 20px; --fs-btn: 18px; --fs-pad-title: 15px; --fs-pad-price: 20px; --fs-chip: 15px;
+    --font-round: url("project://database/Assets/_Game/UI/Fonts/Fredoka-Bold.ttf");
+    --font-round-semi: url("project://database/Assets/_Game/UI/Fonts/Fredoka-SemiBold.ttf");
+    color: var(--c-ink);
+    font-size: var(--fs-body);
+}
