@@ -12,7 +12,7 @@ namespace UltimoMiglio.UI
     public sealed class AdaNoteView
     {
         public const int MaxChars = 90;
-        public const float MinVisibleSec = 1.5f, FadeSec = 0.25f, MinBodyDp = 16f, MinTitleDp = 20f;
+        public const float MinVisibleSec = 1.5f, FadeSec = 0.25f, MinBodyDp = 14f, MinTitleDp = 12f, MaxHeightDp = 40f;
 
         struct Item { public string text; public float seconds; public bool sticky; }
         readonly Queue<Item> queue = new Queue<Item>();
@@ -30,7 +30,7 @@ namespace UltimoMiglio.UI
             var col = new VisualElement { pickingMode = PickingMode.Ignore }; col.AddToClassList("ada-col");
             who = new Label(speaker) { pickingMode = PickingMode.Ignore }; who.AddToClassList("ada-name");
             body = new Label { pickingMode = PickingMode.Ignore }; body.AddToClassList("ada-text");
-            col.Add(who); col.Add(body); note.Add(face); note.Add(col); band.Add(note);
+            who.style.display = DisplayStyle.None; face.style.display = DisplayStyle.None; col.Add(body); note.Add(col); band.Add(note);
             band.style.display = DisplayStyle.None;
             root.Add(band);
         }
@@ -65,7 +65,7 @@ namespace UltimoMiglio.UI
             string t = it.text ?? "";
             if (t.Length > MaxChars) { Debug.LogWarning($"[AdaNote] {t.Length} caratteri > {MaxChars}: tagliato. Accorciare il testo nei dati."); t = t.Substring(0, MaxChars - 1) + "…"; }
             current = it; hasCurrent = true; shownAt = Time.unscaledTime; hideAt = -1;
-            body.text = t;
+            if (t.Length > 42) t = t.Substring(0, 41) + "…"; body.text = t;
             band.style.display = DisplayStyle.Flex;
             note.RemoveFromClassList("ada-note--out"); note.AddToClassList("ada-note--in");
             note.schedule.Execute(() => note.RemoveFromClassList("ada-note--in")).StartingIn(16); // USS transition: from in → rest
@@ -83,12 +83,12 @@ namespace UltimoMiglio.UI
         /// Font: corpo ≥ 16 dp, titolo ≥ 20 dp anche a scala minima (WebGL 960x600).</summary>
         void Layout(float scale)
         {
-            // HUD v2 spec: 120 dp below the safe top, width 88% (max 420 dp), centred; never in the lower half.
+            // HUD minimale (#38): sotto obiettivo tutorial (~48+28), banda a ~80 dp; mai metà bassa.
             var safe = root.Q("safe-root");
             float safeTop = safe != null ? safe.resolvedStyle.paddingTop : 0f;
             float H = root.layout.height;
-            float top = safeTop + 120f;
-            if (!float.IsNaN(H) && H > 0) top = Mathf.Min(top, H * 0.5f - 140f);
+            float top = safeTop + 80f;
+            if (!float.IsNaN(H) && H > 0) top = Mathf.Min(top, H * 0.5f - 40f);
             band.style.top = Mathf.Max(safeTop, top);
         }
     }

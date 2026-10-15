@@ -57,7 +57,7 @@ namespace UltimoMiglio.UI.Bridge
             Hud.ShowCollectPopup(new Vector2(sp.x, sp.y), net, (float)GameRoot.I.Eco.TollFraction);
         }
         void OnMora(bool on) { if (on) Hud.ShowPedaggio((float)GameRoot.I.Eco.TollFraction); else Hud.HidePedaggio(); }
-        void OnDay(int day) { if (safeOpen) ShowSafe(); }
+        void OnDay(int day) { Hud.SetDay(day); if (safeOpen) ShowSafe(); }
         void OnBulloni(double total) { lastWallet = double.NaN; Refresh(); }
 
         bool safeOpen;
@@ -91,6 +91,7 @@ namespace UltimoMiglio.UI.Bridge
         {
             var gr = GameRoot.I; var s = gr.Eco.S;
             if (s.Wallet != lastWallet) { if (!double.IsNaN(lastWallet) && s.Wallet > lastWallet) Hud.PulseCurrency(); lastWallet = s.Wallet; Hud.SetCurrencies(s.Wallet, s.Bulloni); }
+            Hud.SetDay(gr.Eco.CalendarDay);
 
             if (!toastShown) { toastShown = true; if (s.CassaLn >= 1) Hud.ShowOfflineToast(System.Math.Floor(s.CassaLn)); }
 
