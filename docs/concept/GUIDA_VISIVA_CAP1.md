@@ -109,3 +109,10 @@ Nonna Ada guida il tutorial del capitolo 1 (ritratto nel dialogo HUD), ma **non 
 
 ## 11. Camera
 Isometrica **3/4 dall'alto**, **portrait**; Nina deve restare leggibile (silhouette, casco arancio) al centro dell'inquadratura.
+
+## Aggiornamento: Nonna Ada (tavola v01, chiude il buco di §8)
+![Nonna Ada](img/sheet_nonna_ada_v01.jpg)
+Nonna Ada, fondatrice di Vela & Figli, circa 75 anni, piccola e robusta. Ha lo chignon bianco fermato da una matita, occhiali tondi in ottone con catenella, cardigan terracotta #C8633B su camicetta menta #8FC9A8, grembiule noce #7A4A2E con attrezzi e il libro mastro, e una spilla a forma di faro. Ritratto di dialogo circolare: usare il busto in alto a destra. La variante "foto d'epoca" serve per ricordi e flashback. Le scritte nella tavola sono in inglese e vanno ignorate: fa fede questo testo.
+
+## Decisione confermata da DevOn (16/10)
+Ombre leggermente fresche ammesse come tinta lieve nelle zone d'ombra, mai blu o viola. Saturazione +10-15% approvata.
