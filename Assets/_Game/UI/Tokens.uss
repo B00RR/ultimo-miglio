@@ -1,13 +1,13 @@
-/* Ultimo Miglio - HUD v2 design tokens. Units = dp (ResponsivePanel dp mode: 1080x2400 → 2,63 px/dp). Use ONLY these in HudV2.uss. */
+/* Ultimo Miglio - HUD tokens (minimale #38). Units = dp. */
 :root {
     --c-terracotta: #C8633B; --c-terracotta-dk: #8E3F22;
     --c-sun: #F4C430; --c-mint: #8FC9A8; --c-lemon: #F7E26B;
     --c-paper: #F3E3C3; --c-ink: #3B2A20; --c-walnut: #7A4A2E;
     --c-teal: #5E7F86; --c-teal-dk: #3E5A61;
     --c-paper-glass: rgba(243, 227, 195, 0.30); --c-ink-glass: rgba(59, 42, 32, 0.55);
-    --bw: 3px; --lip: 5px; --r-pill: 26px; --r-btn: 16px; --r-phone: 18px; --r-note: 14px;
-    --sp-1: 4px; --sp-2: 8px; --sp-3: 12px; --sp-4: 16px;
-    --fs-num: 26px; --fs-room: 17px; --fs-body: 17px; --fs-name: 20px; --fs-btn: 18px; --fs-pad-title: 15px; --fs-pad-price: 20px; --fs-chip: 15px;
+    --bw: 2px; --lip: 4px; --r-pill: 20px; --r-btn: 14px; --r-phone: 12px; --r-note: 12px;
+    --sp-1: 4px; --sp-2: 8px; --sp-3: 10px; --sp-4: 12px;
+    --fs-num: 18px; --fs-room: 13px; --fs-body: 13px; --fs-name: 14px; --fs-btn: 16px; --fs-pad-title: 12px; --fs-pad-price: 14px; --fs-chip: 13px;
     --font-round: url("project://database/Assets/_Game/UI/Fonts/Fredoka-Bold.ttf");
     --font-round-semi: url("project://database/Assets/_Game/UI/Fonts/Fredoka-SemiBold.ttf");
     color: var(--c-ink);

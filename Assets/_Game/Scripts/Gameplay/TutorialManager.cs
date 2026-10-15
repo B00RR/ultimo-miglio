@@ -20,7 +20,8 @@ namespace UltimoMiglio.Gameplay
 
         public Step Current { get; private set; }
         Vector3 _startPos; int _shelfBase, _servedBase; double _walletBase; float _endT;
-        Transform _marker, _markerArrow; VisualElement _banner; Label _bannerText;
+        Transform _marker, _markerArrow; VisualElement _banner; Label _bannerText, _objective;
+        static readonly string[] Objectives = { "Muoviti", "Vai agli Arrivi", "Metti sullo scaffale", "Porta al Bancone", "Raccogli le monete", "Compra lo Zaino", "Assumi NONNO" };
         UltimoMiglio.UI.EdgeArrow _edge; UltimoMiglio.UI.HudController _hud;
 
         void Awake() { I = this; }
@@ -52,6 +53,24 @@ namespace UltimoMiglio.Gameplay
             }
         }
 
+
+        void EnsureObjective()
+        {
+            if (_objective != null || !_hud || _hud.Root == null) return;
+            _objective = _hud.Root.Q<Label>("tutorial-objective");
+            if (_objective != null) return; // HUD v3 (#39)
+            _objective = new Label { name = "tut-objective", pickingMode = PickingMode.Ignore };
+            var st = _objective.style;
+            st.position = Position.Absolute; st.left = Length.Percent(50); st.top = 8; st.translate = new Translate(Length.Percent(-50), 0);
+            st.fontSize = 18; st.unityFontStyleAndWeight = FontStyle.Bold; st.color = new Color(0.23f, 0.16f, 0.12f);
+            st.backgroundColor = new Color(1f, 0.96f, 0.88f, 0.92f);
+            st.paddingLeft = 14; st.paddingRight = 14; st.paddingTop = 6; st.paddingBottom = 6;
+            st.borderTopLeftRadius = st.borderTopRightRadius = st.borderBottomLeftRadius = st.borderBottomRightRadius = 14;
+            st.borderLeftWidth = st.borderRightWidth = st.borderTopWidth = st.borderBottomWidth = 3;
+            st.borderLeftColor = st.borderRightColor = st.borderTopColor = st.borderBottomColor = new Color(0.23f, 0.16f, 0.12f);
+            st.unityTextAlign = TextAnchor.MiddleCenter; st.maxHeight = 40;
+            _hud.Root.Add(_objective);
+        }
         void EnsureBanner()
         {
             if (_banner != null || !_hud || _hud.Root == null) return;
@@ -103,7 +122,9 @@ namespace UltimoMiglio.Gameplay
         {
             if (!GameRoot.Ready) return;
             EnsureBanner();
-            if (_bannerText != null) { var txt = CurrentText; if (_bannerText.text != txt) _bannerText.text = txt ?? ""; if (_banner != null) _banner.style.display = txt == null ? DisplayStyle.None : DisplayStyle.Flex; }
+            EnsureObjective();
+            if (_objective != null) { _objective.text = Current < Step.Fine && (int)Current < Objectives.Length ? Objectives[(int)Current] : (Current == Step.Fine ? "Deposito aperto!" : ""); _objective.style.display = Current <= Step.Fine ? DisplayStyle.Flex : DisplayStyle.None; }
+            if (_banner != null) _banner.style.display = DisplayStyle.None; // demo: obiettivo in alto, niente banner grande
             var t = Target();
             if (_marker && t) { _marker.position = new Vector3(t.position.x, 0, t.position.z); _markerArrow.localPosition = new Vector3(0, 1.4f + Mathf.Abs(Mathf.Sin(Time.time * 4f)) * 0.4f, 0); var cam = Camera.main; if (cam) _markerArrow.rotation = Quaternion.LookRotation(Vector3.ProjectOnPlane(cam.transform.forward, Vector3.up)); _marker.GetChild(0).localScale = new Vector3(1.4f, 0.01f, 1.4f) * (1f + 0.12f * Mathf.Sin(Time.time * 5f)); }
             var eco = GameRoot.I.Eco; var nina = GameRoot.I.Nina;

@@ -26,14 +26,16 @@ namespace UltimoMiglio.Gameplay
         {
             _col = KindColor; _phase = Random.value * 6f;
             var sh = Shader.Find("Universal Render Pipeline/Unlit");
-            Material M(Color c) { var m = new Material(sh); m.SetColor("_BaseColor", c); return m; }
-            _rim = Disc("POI_Rim", M(Ink), new Vector3(Radius * 2f + 0.25f, 0.06f, Radius * 2f + 0.25f), 0.04f);
+            Material M(Color c) { var m = new Material(sh); m.SetColor("_BaseColor", c); if (m.HasProperty("_Color")) m.SetColor("_Color", c); return m; }
+            _rim = Disc("POI_Rim", M(Ink), new Vector3(Radius * 2.35f, 0.08f, Radius * 2.35f), 0.035f);
             _fillMat = M(_col);
-            _fill = Disc("POI_Fill", _fillMat, new Vector3(Radius * 2f, 0.07f, Radius * 2f), 0.06f);
+            _fillMat.color = new Color(_col.r, _col.g, _col.b, 0.28f); _fill = Disc("POI_Fill", _fillMat, new Vector3(Radius * 2.1f, 0.09f, Radius * 2.1f), 0.055f);
             _beaconMat = M(Color.Lerp(_col, Color.white, 0.35f));
             _beacon = Disc("POI_Beacon", _beaconMat, new Vector3(0.18f, 2.2f, 0.18f), 2.2f);
             _beacon.gameObject.SetActive(false);
             _tut = FindAnyObjectByType<TutorialManager>();
+            if (PadIcon) PadIcon.SetVisible(false);
+            var pt = GetComponent<UltimoMiglio.UI.World.PadTag>(); if (pt) pt.enabled = false;
         }
 
         Transform Disc(string n, Material m, Vector3 s, float y)
@@ -49,7 +51,8 @@ namespace UltimoMiglio.Gameplay
         void EnsureChip()
         {
             if (_chip != null) return;
-            if (GetComponent<UltimoMiglio.UI.World.PadTag>() || PadIcon) return;
+            var hideTag = GetComponent<UltimoMiglio.UI.World.PadTag>(); if (hideTag) hideTag.enabled = false;
+            return; // demo: niente chip flottanti, solo pad a terra
             if (!_hud) _hud = FindFirstObjectByType<UltimoMiglio.UI.HudController>();
             if (!_hud || _hud.Root == null) return;
             _cam = Camera.main;
@@ -88,7 +91,7 @@ namespace UltimoMiglio.Gameplay
             float sc = big * (1f + amp * k);
             _rim.localScale = new Vector3((Radius * 2f + 0.25f) * sc, 0.06f, (Radius * 2f + 0.25f) * sc);
             _fill.localScale = new Vector3(Radius * 2f * sc, 0.07f, Radius * 2f * sc);
-            _fillMat.SetColor("_BaseColor", Color.Lerp(_col, Color.white, (_active ? 0.45f : 0.18f) * k)); // "emission" pulse
+            var fill = Color.Lerp(_col, Color.white, (_active ? 0.35f : 0.12f) * k); fill.a = _active ? 0.55f : 0.32f; _fillMat.SetColor("_BaseColor", fill); if (_fillMat.HasProperty("_Color")) _fillMat.SetColor("_Color", fill); // "emission" pulse
             if (_active) { _beacon.localScale = new Vector3(0.18f, 2.2f + 0.3f * k, 0.18f); _beaconMat.SetColor("_BaseColor", Color.Lerp(_col, Color.white, 0.3f + 0.4f * k)); }
 
             EnsureChip();
@@ -97,7 +100,7 @@ namespace UltimoMiglio.Gameplay
             var nina = GameRoot.I ? GameRoot.I.Nina : null;
             bool near = nina && (nina.transform.position - transform.position).sqrMagnitude < 9f;
             if (Ring && !Pad) Ring.SetProgress(near ? 1f : 0f);
-            if (PadIcon) PadIcon.SetPlayerNear(near);
+            if (PadIcon) { PadIcon.SetVisible(false); PadIcon.SetPlayerNear(near); }
             var tag = GetComponent<UltimoMiglio.UI.World.PadTag>();
             if (tag)
             {
