@@ -1,4 +1,4 @@
-<ui:UXML xmlns:ui="UnityEngine.UIElements"><Style src="project://database/Assets/_Game/UI/USS/DioramaSolare.uss" />
+<ui:UXML xmlns:ui="UnityEngine.UIElements"><Style src="project://database/Assets/_Game/UI/USS/DioramaSolare.uss" /><Style src="project://database/Assets/_Game/UI/Tokens.uss" /><Style src="project://database/Assets/_Game/UI/USS/HudV2.uss" />
     <ui:VisualElement picking-mode="Ignore" style="align-items: center;">
         <ui:VisualElement class="panel cassa-card" picking-mode="Ignore">
             <ui:VisualElement class="row" picking-mode="Ignore"><ui:VisualElement class="icon icon--sm icon-coin" picking-mode="Ignore" /><ui:Label name="cassa-amount" text="0 / 0" picking-mode="Ignore" /></ui:VisualElement>
