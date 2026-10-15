@@ -4,7 +4,7 @@
 #currency-pill { height: 40px; min-width: 96px; max-width: 100%; padding: 0 10px; border-radius: 20px; border-width: 2px;
     border-color: var(--c-ink); background-color: var(--c-paper); flex-wrap: nowrap; align-items: center; }
 .currency { margin-right: var(--sp-2); }
-.currency:last-child { margin-right: 0; }
+.day-group { margin-right: 0; }
 .currency .icon, #currency-pill .icon { width: 22px; height: 22px; }
 .currency-value { font-size: 18px; -unity-font-definition: url("project://database/Assets/_Game/UI/Fonts/Fredoka-Bold.ttf"); -unity-font-style: normal; letter-spacing: 0; margin-left: 4px; color: var(--c-ink); }
 .day-value { font-size: 14px; -unity-font-definition: url("project://database/Assets/_Game/UI/Fonts/Fredoka-SemiBold.ttf"); color: var(--c-ink); margin: 0; padding: 0; white-space: nowrap; }
@@ -25,7 +25,7 @@
 #settings-button, .settings-btn { width: 40px; height: 40px; border-radius: 12px; background-color: var(--c-sun); border-width: 2px; border-color: var(--c-ink); align-items: center; justify-content: center; margin-right: 6px; }
 #settings-button .icon, .settings-btn .icon { width: 20px; height: 20px; }
 .icon-gear { background-image: url("project://database/Assets/_Game/UI/Icons/ic_gear.png"); -unity-background-image-tint-color: var(--c-ink); }
-.tutorial-objective { position: absolute; left: 8px; right: 96px; top: 48px; height: 28px; max-height: 28px; padding: 2px 10px;
+.tutorial-objective { position: absolute; left: 8px; right: 96px; top: 48px; height: 28px; max-height: 28px; padding: 2px 10px; display: flex;
     border-radius: 12px; border-width: 2px; border-color: var(--c-ink); background-color: var(--c-paper);
     font-size: 13px; -unity-font-definition: url("project://database/Assets/_Game/UI/Fonts/Fredoka-SemiBold.ttf"); color: var(--c-ink);
     white-space: nowrap; text-overflow: ellipsis; overflow: hidden; -unity-text-align: middle-left; }
