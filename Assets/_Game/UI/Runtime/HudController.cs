@@ -99,6 +99,7 @@ namespace UltimoMiglio.UI
         void Update()
         {
             if (!TryBind()) return;
+            EnsureAda(); MirrorTutorialBanner();
             if (Screen.safeArea != lastSafeArea || lastScreen.x != Screen.width || lastScreen.y != Screen.height)
                 RefreshSafeArea(false);
         }
@@ -107,6 +108,9 @@ namespace UltimoMiglio.UI
         {
             lastSafeArea = Screen.safeArea; lastScreen = new Vector2Int(Screen.width, Screen.height);
             SafeAreaUtil.ApplyPadding(SafeRoot);
+            // HUD v2: room label 76 dp below the safe top (absolute offsets start at the padding-box edge)
+            var tc = Root?.Q(className: "top-center");
+            if (tc != null && SafeRoot != null) tc.style.top = SafeRoot.resolvedStyle.paddingTop + 76f;
         }
 
         // ---------------- Permanent overlay ----------------
@@ -177,9 +181,45 @@ namespace UltimoMiglio.UI
         public void ShowRoomLabel(string roomName)
         {
             if (roomLabel == null) return;
-            roomLabel.text = roomName;
+            roomLabel.text = FormatRoom(roomName);
             if (roomCo != null) StopCoroutine(roomCo);
             roomCo = StartCoroutine(ShowFor(roomPill, roomLabelSeconds));
+        }
+
+        /// <summary>"Bancone · 12" → "BANCONE · 12"; over 22 chars the part after " · " wraps to a 2nd line (never an ellipsis).</summary>
+        public static string FormatRoom(string name)
+        {
+            if (string.IsNullOrEmpty(name)) return "";
+            string t = name.ToUpperInvariant();
+            int i = t.LastIndexOf(" · ", System.StringComparison.Ordinal);
+            if (t.Length > 22 && i > 0) t = t.Substring(0, i) + "\n" + t.Substring(i + 3);
+            return t;
+        }
+
+        // ---------------- Nonna Ada notes (HUD v2) ----------------
+        AdaNoteView adaNote; ResponsivePanel responsive; VisualElement legacyBanner; string lastAdaText;
+        /// <summary>One note at a time, queued (UI_SPEC_BIGLIETTI). sticky = stays until CompleteAdaNote().</summary>
+        public void ShowAdaNote(string text, bool sticky = true, float seconds = 0f) { EnsureAda(); adaNote?.Show(text, sticky, seconds); lastAdaText = text; }
+        public void EnqueueAdaNote(string text, float seconds) { EnsureAda(); adaNote?.Enqueue(text, seconds); }
+        public void CompleteAdaNote() { adaNote?.Complete(); lastAdaText = null; }
+        void EnsureAda() { if (adaNote == null && Root != null) { adaNote = AdaNoteView.Attach(Root); responsive = GetComponent<ResponsivePanel>(); } }
+
+        /// <summary>TutorialManager (Gameplay) still builds an inline-styled "tutorial-banner" at the bottom: hide it and
+        /// mirror its text into the v2 note (upper band). No Gameplay file changes needed.</summary>
+        void MirrorTutorialBanner()
+        {
+            if (legacyBanner == null) legacyBanner = Root.Q("tutorial-banner");
+            if (legacyBanner == null) { adaNote?.Tick(responsive ? responsive.Scale : 1f); return; }
+            bool on = legacyBanner.resolvedStyle.display != DisplayStyle.None && legacyBanner.style.display != DisplayStyle.None;
+            string txt = null;
+            if (on) { var labels = legacyBanner.Query<Label>().ToList(); if (labels.Count > 0) txt = labels[labels.Count - 1].text; }
+            legacyBanner.style.visibility = Visibility.Hidden; // keep its display logic, never draw it
+            if (txt != lastAdaText)
+            {
+                if (string.IsNullOrEmpty(txt)) CompleteAdaNote();
+                else { if (lastAdaText != null) adaNote?.Complete(); ShowAdaNote(txt); }
+            }
+            adaNote?.Tick(responsive ? responsive.Scale : 1f);
         }
 
         public void ShowToast(string text, float seconds = -1)

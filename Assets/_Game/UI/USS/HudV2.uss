@@ -1,0 +1,93 @@
+/* HUD v2 verticale (1080x2400, safe area). Loaded after DioramaSolare.uss; units = dp; values from Tokens.uss. Issue #30. */
+.top-bar { padding: var(--sp-3) var(--sp-3) 0 var(--sp-3); }
+.top-left { max-width: 60%; }
+
+/* --- pillola valute: 52 dp, padding-x 14, raggio 26, bordo 3, icona 28, numero 26 Fredoka Bold, gap 12, min 120 --- */
+#currency-pill { height: 52px; min-width: 120px; max-width: 100%; padding: 0 14px; border-radius: var(--r-pill); border-width: var(--bw);
+    border-color: var(--c-ink); background-color: var(--c-paper); flex-wrap: nowrap; align-items: center; }
+.currency { margin-right: var(--sp-3); }
+.currency:last-child { margin-right: 0; }
+.currency .icon, #currency-pill .icon { width: 28px; height: 28px; }
+.currency-value { font-size: var(--fs-num); -unity-font-definition: url("project://database/Assets/_Game/UI/Fonts/Fredoka-Bold.ttf"); -unity-font-style: normal; letter-spacing: 0; margin-left: 6px; color: var(--c-ink); }
+.icon-coin { -unity-background-image-tint-color: var(--c-terracotta); }
+.icon-bolt { -unity-background-image-tint-color: var(--c-teal); }
+
+/* --- chip Pedaggio: 32 dp, testo 15, 8 dp sotto la pillola --- */
+#toll-chip { height: 32px; margin-top: var(--sp-2); padding: 0 var(--sp-3) 0 var(--sp-2); border-radius: 16px; border-width: var(--bw); border-color: var(--c-ink); background-color: var(--c-teal); }
+#toll-chip .icon { width: 18px; height: 18px; }
+#toll-value { font-size: var(--fs-chip); -unity-font-definition: url("project://database/Assets/_Game/UI/Fonts/Fredoka-Bold.ttf"); color: var(--c-paper); margin-left: var(--sp-1); }
+.toll-tag { font-size: 13px; padding: 0 6px; border-width: 2px; background-color: var(--c-teal); color: var(--c-paper); }
+
+/* --- toast sotto le pillole --- */
+#toast { height: 32px; margin-top: var(--sp-2); padding: 0 var(--sp-3); border-width: 0; border-radius: 16px; background-color: var(--c-ink); }
+#toast-text { font-size: var(--fs-chip); color: var(--c-paper); -unity-font-definition: url("project://database/Assets/_Game/UI/Fonts/Fredoka-SemiBold.ttf"); }
+
+/* --- pulsante telefono 3D: 60x60, raggio 18, bordo 3, labbro 5, icona 30, badge 22, margine 12 --- */
+#phone-button { width: 60px; height: 60px; margin-left: var(--sp-3); border-radius: var(--r-phone); border-width: var(--bw); border-bottom-width: 8px; /* 3 + lip 5 */
+    border-color: var(--c-ink); background-color: var(--c-terracotta); transition-property: scale, translate, border-bottom-width; transition-duration: 0.08s; }
+#phone-button:active { translate: 0 4px; border-bottom-width: 4px; }
+#phone-button .icon { width: 30px; height: 30px; -unity-background-image-tint-color: var(--c-paper); }
+.badge { top: -7px; right: -7px; min-width: 22px; height: 22px; border-radius: 11px; border-width: 2px; border-color: var(--c-ink); background-color: var(--c-sun); color: var(--c-ink); font-size: 12px; padding: 0 4px; -unity-font-definition: url("project://database/Assets/_Game/UI/Fonts/Fredoka-Bold.ttf"); }
+.key-hint { bottom: -18px; left: -10px; right: -10px; font-size: 11px; -unity-text-outline-width: 1px; }
+
+/* --- etichetta stanza: 76 dp sotto il top sicuro, h 36, testo 17 bold maiuscolo, padding 16, min 140, mai ellissi --- */
+.top-center { top: 76px; }
+.um-portrait .top-center { top: 76px; }
+#room-pill { min-height: 36px; min-width: 140px; max-width: 88%; padding: 4px var(--sp-4); border-radius: 18px; border-width: var(--bw); border-color: var(--c-ink); background-color: var(--c-paper); justify-content: center; }
+#room-pill .icon { width: 18px; height: 18px; }
+#room-name { font-size: var(--fs-room); -unity-font-definition: url("project://database/Assets/_Game/UI/Fonts/Fredoka-Bold.ttf"); white-space: normal; text-overflow: clip; overflow: visible; -unity-text-align: middle-center; margin-left: 6px; letter-spacing: 1px; }
+
+/* --- biglietto di Nonna Ada: 120 dp sotto il top sicuro, 88% (max 420), padding 16, raggio 14, bordo 3, nome 20 #8E3F22, corpo 17 / 1.3, max 2 righe, h max 140 --- */
+.ada-band { position: absolute; left: 0; right: 0; flex-direction: row; justify-content: center; }
+.ada-note { width: 88%; max-width: 420px; max-height: 140px; overflow: hidden; flex-direction: row; align-items: center;
+    padding: var(--sp-4); border-radius: var(--r-note); border-width: var(--bw); border-bottom-width: 6px; border-color: var(--c-ink); background-color: var(--c-paper);
+    transition-property: opacity, translate, scale; transition-duration: 0.2s, 0.2s, 0.12s; }
+.ada-note--in, .ada-note--out { opacity: 0; translate: 0 -8px; }
+.ada-note--nudge { scale: 1.04 1.04; }
+.ada-face { width: 40px; height: 40px; border-radius: 20px; background-color: var(--c-terracotta); border-width: 2px; border-color: var(--c-ink); color: var(--c-paper);
+    font-size: 12px; -unity-font-definition: url("project://database/Assets/_Game/UI/Fonts/Fredoka-Bold.ttf"); -unity-text-align: middle-center; margin-right: var(--sp-3); flex-shrink: 0; }
+.ada-col { flex-shrink: 1; flex-grow: 1; min-width: 0; }
+.ada-name { font-size: var(--fs-name); -unity-font-definition: url("project://database/Assets/_Game/UI/Fonts/Fredoka-Bold.ttf"); color: var(--c-terracotta-dk); }
+.ada-text { font-size: var(--fs-body); color: var(--c-ink); white-space: normal; max-height: 45px; /* 2 righe × 17 × 1.3 */ -unity-paragraph-spacing: 0; }
+
+/* --- pulsanti chunky (CTA): 56 dp, raggio 16, labbro 5, testo 18 --- */
+.cta, .chunky { height: 56px; border-radius: var(--r-btn); border-width: var(--bw); border-bottom-width: 8px; border-color: var(--c-ink); background-color: var(--c-terracotta);
+    color: #FFF9EE; font-size: var(--fs-btn); -unity-font-definition: url("project://database/Assets/_Game/UI/Fonts/Fredoka-Bold.ttf"); -unity-text-align: middle-center; }
+.cta:active, .chunky:active { translate: 0 4px; border-bottom-width: 4px; }
+
+/* --- etichette pad nel mondo: 128-200 dp, padding 10, titolo 15 bold su 2 righe, prezzo 20, barra 8 --- */
+.pad-card { min-width: 128px; max-width: 200px; padding: 10px; border-radius: 14px; border-width: var(--bw); border-color: var(--c-ink); background-color: var(--c-paper); }
+#pad-title { font-size: var(--fs-pad-title); -unity-font-definition: url("project://database/Assets/_Game/UI/Fonts/Fredoka-Bold.ttf"); white-space: normal; text-overflow: clip; -unity-text-align: middle-center; letter-spacing: 0; max-width: 180px; }
+#pad-price { font-size: var(--fs-pad-price); -unity-font-definition: url("project://database/Assets/_Game/UI/Fonts/Fredoka-Bold.ttf"); letter-spacing: 0; }
+#pad-lock { font-size: var(--fs-pad-title); }
+.pad-card .progress { width: 100%; min-width: 108px; height: 8px; margin-top: 6px; border-width: 2px; border-radius: 4px; }
+.pad-card .icon { width: 20px; height: 20px; }
+.world-anchored--flipped { translate: -50% 0; }
+
+/* --- altre etichette nel mondo, popup, stack --- */
+.cassa-card { padding: 8px 12px; border-radius: 14px; border-width: var(--bw); }
+#cassa-amount { font-size: var(--fs-pad-price); -unity-font-definition: url("project://database/Assets/_Game/UI/Fonts/Fredoka-Bold.ttf"); }
+#cassa-state { font-size: 11px; }
+#cassa-x2 { font-size: 13px; margin-top: 4px; padding: 2px 10px; }
+.stack-pill { font-size: 16px; padding: 2px 10px; border-width: var(--bw); -unity-font-definition: url("project://database/Assets/_Game/UI/Fonts/Fredoka-Bold.ttf"); }
+#buff-chip { padding: 2px 8px; }
+.collect-amount { font-size: 20px; -unity-font-definition: url("project://database/Assets/_Game/UI/Fonts/Fredoka-Bold.ttf"); -unity-text-outline-width: 1.5px; }
+
+/* --- scheda Cassaforte, joystick (raggio 56 dp), freccia --- */
+.bottom-dock { bottom: 24px; }
+#safe-card { width: 92%; max-width: 420px; padding: 14px 16px; border-radius: 18px; border-width: var(--bw); }
+#safe-toll { padding: 4px 8px; margin-bottom: 8px; margin-right: 28px; border-radius: 10px; }
+#safe-toll-text { font-size: 12px; }
+#safe-title { font-size: 20px; -unity-font-definition: url("project://database/Assets/_Game/UI/Fonts/Fredoka-Bold.ttf"); }
+#safe-day { font-size: 13px; }
+#safe-installment { font-size: 15px; margin-top: 4px; }
+.progress { height: 10px; border-radius: 5px; border-width: 2px; margin-top: 6px; }
+#safe-progress-text { font-size: 13px; }
+#safe-close { top: 6px; right: 8px; width: 32px; height: 32px; font-size: 22px; }
+#safe-card .icon { width: 22px; height: 22px; }
+#joystick-base { width: 112px; height: 112px; border-radius: 56px; border-width: 2px; background-color: var(--c-paper-glass); border-color: var(--c-ink-glass); }
+#joystick-knob { width: 54px; height: 54px; border-radius: 27px; border-width: var(--bw); background-color: var(--c-terracotta); border-color: var(--c-ink); }
+#edge-arrow-head { width: 40px; height: 40px; border-radius: 20px; border-width: var(--bw); }
+#edge-arrow-head .icon { width: 24px; height: 24px; }
+#edge-arrow-label { margin-top: 4px; padding: 2px 10px; font-size: 13px; border-width: 2px; }
+#target-marker { width: 20px; height: 20px; border-radius: 10px; border-width: 2px; }
