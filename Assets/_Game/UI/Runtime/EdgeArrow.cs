@@ -69,11 +69,7 @@ namespace UltimoMiglio.UI
             arrow.style.left = p.x; arrow.style.top = p.y;
             float ang = Mathf.Atan2(-dir.y, dir.x) * Mathf.Rad2Deg; // panel y is down
             if (arrowHead != null) arrowHead.style.rotate = new Rotate(new Angle(ang));
-            if (arrowLabel != null)
-            {
-                float dist = nina ? Vector3.Distance(nina.position, target.position) : 0f;
-                arrowLabel.text = targetName + (nina ? " · " + Mathf.RoundToInt(dist) + " m" : "");
-            }
+            if (arrowLabel != null) arrowLabel.style.display = DisplayStyle.None; // QA v2: arrow only, no ARRIVI/BANCONE · Xm chip
             Show(arrow, true);
         }
 

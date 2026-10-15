@@ -19,6 +19,7 @@ namespace UltimoMiglio.Gameplay
         public float EndSeconds = 6f;
 
         public Step Current { get; private set; }
+        public string CurrentObjectiveText => Current < Step.Fine && (int)Current < Objectives.Length ? Objectives[(int)Current] : (Current == Step.Fine ? "Deposito aperto!" : "");
         Vector3 _startPos; int _shelfBase, _servedBase; double _walletBase; float _endT;
         Transform _marker, _markerArrow; VisualElement _banner; Label _bannerText, _objective;
         static readonly string[] Objectives = { "Muoviti", "Vai agli Arrivi", "Metti sullo scaffale", "Porta al Bancone", "Raccogli le monete", "Assumi NONNO", "Compra lo Zaino" };
@@ -115,7 +116,7 @@ namespace UltimoMiglio.Gameplay
             StepChanged?.Invoke(s);
             var t = Target();
             if (_edge) { if (t) _edge.SetTarget(t, s.ToString().ToUpper()); else _edge.Clear(); }
-            if (_marker) _marker.gameObject.SetActive(t);
+            if (_marker) _marker.gameObject.SetActive(false); // QA v2: no world waypoint if edge arrow exists
         }
 
         static int ShelfTotal() { int n = 0; foreach (var sh in FindObjectsByType<Shelf>(FindObjectsSortMode.None)) n += sh.Count; return n; }
@@ -132,10 +133,10 @@ namespace UltimoMiglio.Gameplay
             if (!GameRoot.Ready) return;
             EnsureBanner();
             EnsureObjective();
-            if (_objective != null) { _objective.text = Current < Step.Fine && (int)Current < Objectives.Length ? Objectives[(int)Current] : (Current == Step.Fine ? "Deposito aperto!" : ""); _objective.style.display = Current <= Step.Fine ? DisplayStyle.Flex : DisplayStyle.None; }
+            if (_objective != null) { _objective.text = CurrentObjectiveText; _objective.style.display = Current <= Step.Fine ? DisplayStyle.Flex : DisplayStyle.None; _objective.BringToFront(); }
             if (_banner != null) _banner.style.display = DisplayStyle.None; // demo: obiettivo in alto, niente banner grande
             var t = Target();
-            if (_marker && t) { _marker.position = new Vector3(t.position.x, 0, t.position.z); _markerArrow.localPosition = new Vector3(0, 1.4f + Mathf.Abs(Mathf.Sin(Time.time * 4f)) * 0.4f, 0); var cam = Camera.main; if (cam) _markerArrow.rotation = Quaternion.LookRotation(Vector3.ProjectOnPlane(cam.transform.forward, Vector3.up)); _marker.GetChild(0).localScale = new Vector3(1.4f, 0.01f, 1.4f) * (1f + 0.12f * Mathf.Sin(Time.time * 5f)); }
+            if (_marker) _marker.gameObject.SetActive(false);
             var eco = GameRoot.I.Eco; var nina = GameRoot.I.Nina;
             bool done = Current switch
             {
@@ -143,7 +144,8 @@ namespace UltimoMiglio.Gameplay
                 Step.Arrivi => nina && nina.Stack.Count >= Mathf.Min(3, nina.Stack.Capacity),
                 Step.Scaffali => ShelfTotal() > _shelfBase,
                 Step.Bancone => eco.S.CustomersServed > _servedBase,
-                Step.Monete => eco.S.Wallet > _walletBase + 0.01,
+                // LN già accreditati su Bancone.Serve (CollectActive); monete a terra = Burst VFX
+                Step.Monete => eco.S.Wallet > 0.01,
                 Step.Zaino => eco.S.Zaino >= 1,
                 Step.Nonno => eco.S.NonnoLevel >= 0,
                 Step.Fine => (_endT += Time.deltaTime) > EndSeconds,
