@@ -10,21 +10,23 @@ namespace UltimoMiglio.VFX
     {
         [Header("Grading in-shader (attivo quando il post e' spento)")]
         public bool forceInShaderGrade = false;
-        [Range(0.5f, 1.5f)] public float exposure = 1.04f;
-        [Range(0.8f, 1.5f)] public float contrast = 1.14f;
-        [Range(0.5f, 1.8f)] public float saturation = 1.18f;
-        [Range(0f, 1f)] public float glow = 0.35f;
-        public Color lift = new Color(0.10f, 0.09f, 0.20f);   // ombre profonde fresche (viola)
+        [Range(0.5f, 1.5f)] public float exposure = 1.03f;
+        [Range(0.8f, 1.5f)] public float contrast = 1.18f;
+        [Range(0.5f, 1.8f)] public float saturation = 1.12f;
+        [Range(0f, 1f)] public float glow = 0.30f;
+        public Color lift = new Color(0.353f, 0.290f, 0.333f); // #5A4A55 valore minimo volumi (guida §2), niente viola
         [Header("Vignetta a terra (world-space)")]
         public Transform focus;                                // Nina o centro stanza; vuoto = questo transform
         public float innerRadius = 4.5f, range = 6f;
-        [Range(0f, 1f)] public float vignetteDark = 0.35f;
-        public Color vignetteColor = new Color(0.62f, 0.52f, 0.66f); // si scurisce verso il viola, non il grigio
+        [Range(0f, 1f)] public float vignetteDark = 0.25f;
+        public Color vignetteColor = new Color(0.62f, 0.471f, 0.451f); // #9E7873: bordi verso l'ombra calda, mai viola/grigio
         [Header("Cielo")]
         public Camera targetCamera;
         public Material skyMaterial;                           // UltimoMiglio/FX/SkyGradient (M_FX_Sky)
-        public Color skyTopDay = new Color(0.47f, 0.69f, 0.88f), skyHorizonDay = new Color(0.99f, 0.86f, 0.67f), skyBottomDay = new Color(0.96f, 0.78f, 0.62f);
-        public Color skyTopSunset = new Color(0.45f, 0.42f, 0.70f), skyHorizonSunset = new Color(1f, 0.66f, 0.45f), skyBottomSunset = new Color(0.93f, 0.55f, 0.45f);
+        // v2.1 (#48): niente azzurro. Giorno crema #F3E3C3 -> pesca #F6D7B0 -> tufo #E9D2A8
+        public Color skyTopDay = new Color(0.953f, 0.890f, 0.765f), skyHorizonDay = new Color(0.965f, 0.843f, 0.690f), skyBottomDay = new Color(0.914f, 0.824f, 0.659f);
+        // Tramonto: albicocca #E8B48A -> arancia #E8913A -> pesca #F4B88E (niente viola)
+        public Color skyTopSunset = new Color(0.910f, 0.706f, 0.541f), skyHorizonSunset = new Color(0.910f, 0.569f, 0.227f), skyBottomSunset = new Color(0.957f, 0.722f, 0.557f);
 
         static readonly int GradeId = Shader.PropertyToID("_UM_Grade"), ExpId = Shader.PropertyToID("_UM_Exposure"),
             ConId = Shader.PropertyToID("_UM_Contrast"), SatId = Shader.PropertyToID("_UM_Saturation"), GlowId = Shader.PropertyToID("_UM_Glow"),

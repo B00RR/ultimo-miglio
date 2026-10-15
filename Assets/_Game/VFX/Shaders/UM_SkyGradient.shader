@@ -3,9 +3,9 @@ Shader "UltimoMiglio/FX/SkyGradient"
 {
     Properties
     {
-        _Top ("Top", Color) = (0.47,0.69,0.88,1)
-        _Horizon ("Horizon", Color) = (0.99,0.86,0.67,1)
-        _Bottom ("Bottom", Color) = (0.96,0.78,0.62,1)
+        _Top ("Top (crema, mai azzurro)", Color) = (0.953,0.89,0.765,1)
+        _Horizon ("Horizon", Color) = (0.965,0.843,0.69,1)
+        _Bottom ("Bottom", Color) = (0.914,0.824,0.659,1)
         _HorizonY ("Horizon (0..1)", Range(0,1)) = 0.45
         _Soft ("Softness", Range(0.01,1)) = 0.35
     }
