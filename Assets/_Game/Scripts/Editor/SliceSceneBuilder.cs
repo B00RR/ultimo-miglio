@@ -46,7 +46,7 @@ namespace UltimoMiglio.EditorTools
             // --- GameRoot + audio + FX
             var root = new GameObject("GameRoot").AddComponent<GameRoot>();
             var audio = BuildAudio(root.transform);
-            var fxGo = new GameObject("FxPlayer"); fxGo.transform.SetParent(root.transform);
+            var fxGo = new GameObject("UM_FX"); fxGo.transform.SetParent(root.transform);
             var fx = fxGo.AddComponent<UM_FxPlayer>();
             GameObject VP(string n) => AssetDatabase.LoadAssetAtPath<GameObject>($"Assets/_Game/VFX/Prefabs/{n}.prefab");
             fx.packagePop = VP("fx_package_pop"); fx.coins = VP("fx_coins"); fx.upgrade = VP("fx_upgrade");
@@ -169,6 +169,7 @@ namespace UltimoMiglio.EditorTools
             WireHud(hudGo, hud, joy, camera, nina.transform, cassa.transform);
             TryRun("UltimoMiglio.VFX.EditorTools.UM_LightingSetup", "Setup");
             TryRun("UltimoMiglio.VFX.EditorTools.UM_PostProcessBuilder", "BuildAll");
+            TryRun("UltimoMiglio.VFX.EditorTools.UM_VfxSceneSetup", "Setup");
             if (!Object.FindAnyObjectByType<Light>()) { var l = new GameObject("Sun").AddComponent<Light>(); l.type = LightType.Directional; l.transform.rotation = Quaternion.Euler(50, -35, 0); l.color = UM_Palette.Sole; }
 
             // --- blockout reference (05_3D_PIPELINE), hidden
