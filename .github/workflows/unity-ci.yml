@@ -70,6 +70,8 @@ jobs:
         with:
           unityVersion: ${{ env.UNITY_VERSION }}
           testMode: all
+          # Immagine con modulo WebGL: gli script Editor usano UnityEditor.WebGL
+          customImage: unityci/editor:ubuntu-6000.3.26f1-webgl-3
           artifactsPath: test-results
           githubToken: ${{ secrets.GITHUB_TOKEN }}
           checkName: Test Unity
