@@ -121,3 +121,11 @@ Voci più recenti in alto. Formato: `AAAA-MM-GG HH:MM` (Europe/Rome) — [commit
 - 2026-10-15 12:55 — [8e08315](https://github.com/B00RR/ultimo-miglio/commit/8e08315b5b3178ce41972f37c02d973b39e67ecd) — main: Unity 6 project skeleton + ch1 vertical slice code (EconomyCore+tests, gameplay, audio, data import, build/capture scripts, Unity-MCP plugin)
 
 - **VFX v2.0** (15/10 16:30, ramo `vfx-v2`): shader toon premium (ombre colorate, AO, cielo a gradiente, grading in-shader con post OFF su WebGL), effetto acquisto `Fx.Purchase`, consegna più grande. Materiali/prefab da generare con *Ultimo Miglio/VFX/Setup Scene*. Non ancora compilato (compila il Tech Lead nella build).
+
+## Aggiornamento 17:10 — HUD v2 verticale (UI, issue #30, branch ui/hud-v2-portrait)
+- HUD in unità dp (ResponsivePanel: portrait min(W/411,H/914) → 2,63 a 1080x2400; landscape H/600), solo documento HUD.
+- Nuovi `Assets/_Game/UI/Tokens.uss` + `USS/HudV2.uss`: pillola valute, chip Pedaggio, telefono 3D, etichetta stanza (no ellissi, a capo >22 car.), card pad 128–200 dp, biglietto Ada, pulsanti chunky.
+- Biglietto di Nonna Ada in AdaNoteView (coda, 1 alla volta, 120 dp sotto top sicuro, mai metà bassa); il banner di TutorialManager viene rispecchiato e nascosto (Gameplay non toccato).
+- Etichette pad clampate nella safe area (margine 8 dp) con flip vicino ai bordi.
+- Font Fredoka (SIL OFL 1.1, Google Fonts) in `UI/Fonts` — licenza in `LICENSE_Fredoka_OFL.txt`; da registrare in LICENZE_ASSET.md.
+- **Non compilato in Unity** (solo check dotnet sui DLL UnityEngine). Da verificare dal Tech Lead.
