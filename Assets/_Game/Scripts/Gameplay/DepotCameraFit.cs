@@ -10,7 +10,7 @@ namespace UltimoMiglio.Gameplay
     public sealed class DepotCameraFit : MonoBehaviour
     {
         public CinemachineCamera Cm; public Transform Nina;
-        public float Margin = 1.0f, TopHud = 0.16f, BottomHud = 0.06f, MinOrtho = 5.5f;
+        public float Margin = 3.0f, TopHud = 0.16f, BottomHud = 0.06f, MinOrtho = 5.5f;
         readonly List<Vector3> _pts = new();
         int _w, _h;
 
@@ -25,12 +25,17 @@ namespace UltimoMiglio.Gameplay
                 foreach (var r in t.GetComponentsInChildren<Renderer>()) { var b = r.bounds; _pts.Add(b.min); _pts.Add(b.max); _pts.Add(new Vector3(b.min.x, 0, b.max.z)); _pts.Add(new Vector3(b.max.x, 0, b.min.z)); }
             }
             if (Nina) _pts.Add(Nina.position);
+            var tut = FindAnyObjectByType<TutorialManager>();
+            if (tut) foreach (var t in new[] { tut.Arrivi, tut.Scaffale, tut.Bancone, tut.Monete, tut.PadZaino, tut.PadNonno }) if (t) { _pts.Add(t.position + new Vector3(-1.5f, 0, -1.5f)); _pts.Add(t.position + new Vector3(1.5f, 0, 1.5f)); }
+            var arr = FindAnyObjectByType<ArrivalsZone>();
+            if (arr) foreach (var r in arr.GetComponentsInChildren<Renderer>(true)) { _pts.Add(r.bounds.min); _pts.Add(r.bounds.max); }
             if (Cm) Cm.Follow = null;
             Fit();
         }
 
         void LateUpdate() { if (Screen.width != _w || Screen.height != _h) Fit(); }
 
+        static Vector2 c0(Vector2 a, Vector2 b) => (a + b) * 0.5f;
         public void Fit()
         {
             _w = Screen.width; _h = Screen.height;
@@ -48,6 +53,7 @@ namespace UltimoMiglio.Gameplay
             float usable = 1f - TopHud - BottomHud;
             float halfH = (mx.y - mn.y) * 0.5f / usable, halfW = (mx.x - mn.x) * 0.5f / aspect;
             float ortho = Mathf.Max(MinOrtho, halfH, halfW);
+            Debug.Log($"[CamFit] pts={_pts.Count} aspect={aspect:F2} ortho={ortho:F1} c={c0(mn,mx)}");
             // shift centre so the reserved HUD bands are outside the depot
             var c = new Vector2((mn.x + mx.x) * 0.5f, (mn.y + mx.y) * 0.5f + ortho * (TopHud - BottomHud));
             var lens = Cm.Lens; lens.OrthographicSize = ortho; Cm.Lens = lens;
