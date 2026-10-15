@@ -127,6 +127,7 @@ MonoBehaviour:
   landscapeShortSideRef: 1200
   minScale: 0.42
   maxScale: 2.5
+  dpUnits: 0
 --- !u!114 &6359808862508143165
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -213,6 +214,7 @@ MonoBehaviour:
   landscapeShortSideRef: 1200
   minScale: 0.42
   maxScale: 2.5
+  dpUnits: 0
 --- !u!114 &2416898518661643464
 MonoBehaviour:
   m_ObjectHideFlags: 0
