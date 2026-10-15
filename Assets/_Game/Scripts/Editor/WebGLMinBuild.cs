@@ -18,7 +18,18 @@ namespace UltimoMiglio.EditorTools
                 if (rd) { rd.renderingMode = UnityEngine.Rendering.Universal.RenderingMode.Forward; EditorUtility.SetDirty(rd); } }
             var gs = AssetDatabase.LoadAllAssetsAtPath("ProjectSettings/GraphicsSettings.asset")[0]; var so = new SerializedObject(gs);
             var arr = so.FindProperty("m_AlwaysIncludedShaders");
-            foreach (var n in new[] { "UltimoMiglio/ToonDiorama", "Universal Render Pipeline/Lit", "Universal Render Pipeline/Unlit" }) { var sh = Shader.Find(n); if (!sh) continue; bool has = false; for (int i = 0; i < arr.arraySize; i++) if (arr.GetArrayElementAtIndex(i).objectReferenceValue == sh) has = true; if (!has) { arr.InsertArrayElementAtIndex(arr.arraySize); arr.GetArrayElementAtIndex(arr.arraySize - 1).objectReferenceValue = sh; } }
+            foreach (var n in new[] {
+                "UltimoMiglio/ToonDiorama",
+                "UltimoMiglio/UI/ZoneRing",
+                "UltimoMiglio/FX/RingFill",
+                "UltimoMiglio/FX/SkyGradient",
+                "Universal Render Pipeline/Lit",
+                "Universal Render Pipeline/Unlit",
+                "Universal Render Pipeline/Particles/Unlit",
+                "Hidden/CoreSRP/CoreCopy",
+                "Hidden/Universal Render Pipeline/StencilDitherMaskSeed",
+                "Hidden/Universal/HDRDebugView",
+            }) { var sh = Shader.Find(n); if (!sh) continue; bool has = false; for (int i = 0; i < arr.arraySize; i++) if (arr.GetArrayElementAtIndex(i).objectReferenceValue == sh) has = true; if (!has) { arr.InsertArrayElementAtIndex(arr.arraySize); arr.GetArrayElementAtIndex(arr.arraySize - 1).objectReferenceValue = sh; } }
             so.ApplyModifiedProperties();
             AssetDatabase.SaveAssets();
             { var t = System.AppDomain.CurrentDomain.GetAssemblies().Select(a => a.GetType("UltimoMiglio.UI.EditorTools.HudSetup")).FirstOrDefault(x => x != null); t?.GetMethod("BuildAll")?.Invoke(null, null); Debug.Log("[WebGLMin] HudSetup ran=" + (t != null)); }

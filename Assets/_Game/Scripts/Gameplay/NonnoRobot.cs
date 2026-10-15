@@ -2,8 +2,10 @@ using UnityEngine;
 
 namespace UltimoMiglio.Gameplay
 {
+    // Run before NavMeshAgent.OnEnable soft-fails on WebGL without baked mesh
     /// <summary>NONNO forklift without NavMeshAgent (WebGL has no baked NavMesh at runtime).
     /// Pure Transform movement: Arrivals → shelf restock + Bancone self-service.</summary>
+    [DefaultExecutionOrder(-1000)]
     public sealed class NonnoRobot : MonoBehaviour
     {
         public ArrivalsZone Arrivals; public Shelf[] Shelves; public Bancone Bancone; public CustomerQueue Queue;
@@ -12,6 +14,16 @@ namespace UltimoMiglio.Gameplay
         public WorkState State { get; private set; }
         public int CarryCount => _carry;
         public bool IsWorking => GameRoot.Ready && GameRoot.I.Eco.S.NonnoLevel >= 0 && State != WorkState.Idle;
+
+
+        [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.BeforeSceneLoad)]
+        static void BootStripAgents()
+        {
+            // Prima del load scena: niente da fare su oggetti scena; AfterSceneLoad sotto.
+        }
+
+        [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.AfterSceneLoad)]
+        static void AfterSceneStripAgents() => StripAllNavMeshAgentsInScene();
 
         int _carry; Shelf _target; float _timer, _selfServeAcc; bool _announced; Vector3 _dest;
         static readonly int SpeedId = Animator.StringToHash("Speed"), LiftId = Animator.StringToHash("Lift"), DropId = Animator.StringToHash("Drop"), HappyId = Animator.StringToHash("Happy");
@@ -22,8 +34,7 @@ namespace UltimoMiglio.Gameplay
         {
             _renderers = GetComponentsInChildren<Renderer>(true);
             if (Animator) Animator.cullingMode = AnimatorCullingMode.AlwaysAnimate;
-            // Strip any leftover NavMeshAgent from older scenes/prefabs so Unity never logs "no valid NavMesh"
-            var ag = GetComponent("NavMeshAgent"); if (ag) Destroy(ag);
+            StripNavMeshAgents(gameObject);
         }
         void LateUpdate()
         {
@@ -82,5 +93,31 @@ namespace UltimoMiglio.Gameplay
             if (d.sqrMagnitude > 0.001f) transform.rotation = Quaternion.Slerp(transform.rotation, Quaternion.LookRotation(d), 12f * Time.deltaTime);
             return false;
         }
+
+        /// <summary>Remove any NavMeshAgent on this hierarchy. Never enable AI pathfinding on WebGL.</summary>
+        public static void StripNavMeshAgents(GameObject root)
+        {
+            if (!root) return;
+            foreach (var c in root.GetComponentsInChildren<Component>(true))
+            {
+                if (c == null) continue;
+                var tn = c.GetType().Name;
+                if (tn != "NavMeshAgent") continue;
+                if (c is Behaviour b) b.enabled = false;
+                Destroy(c);
+            }
+        }
+        public static void StripAllNavMeshAgentsInScene()
+        {
+            // Una sola passata su tutti i Component (anche inattivi). Nessuna API UnityEngine.AI.
+            foreach (var c in Object.FindObjectsByType<Component>(FindObjectsInactive.Include, FindObjectsSortMode.None))
+            {
+                if (c == null) continue;
+                if (c.GetType().Name != "NavMeshAgent") continue;
+                if (c is Behaviour b) b.enabled = false;
+                Object.Destroy(c);
+            }
+        }
+
     }
 }

@@ -90,6 +90,7 @@ namespace UltimoMiglio.EditorTools
             }
             if (!custGo) { custGo = Prim(PrimitiveType.Capsule, "Customer", null, Vector3.zero, new Vector3(0.5f, 0.8f, 0.5f), chars, UM_Palette.Menta); Object.DestroyImmediate(custGo.GetComponent<Collider>()); }
             var cust = SavePrefab(custGo, "Customer").AddComponentPrefab<Customer>();
+            NonnoRobot.StripNavMeshAgents(cust.gameObject);
 
             // --- Nina
             var nina = new GameObject("Nina"); nina.transform.position = new Vector3(0, 0, 0);
@@ -155,6 +156,7 @@ namespace UltimoMiglio.EditorTools
             }
             // No NavMeshAgent: WebGL bake is missing at runtime ("Failed to create agent..."). NONNO walks with Transform.
             var bot = nonno.AddComponent<NonnoRobot>(); bot.Arrivals = arrivals; bot.Shelves = shelves; bot.Bancone = bancone; bot.Queue = queue; bot.Animator = nonnoAnim;
+            NonnoRobot.StripNavMeshAgents(nonno); // editor+runtime: mai NavMeshAgent su NONNO
 
             // --- NavMesh
             var surf = floor.AddComponent<NavMeshSurface>(); surf.collectObjects = CollectObjects.All; surf.useGeometry = NavMeshCollectGeometry.PhysicsColliders;
