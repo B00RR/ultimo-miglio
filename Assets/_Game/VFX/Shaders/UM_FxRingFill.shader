@@ -6,7 +6,7 @@ Shader "UltimoMiglio/FX/RingFill"
     {
         _Color ("Fill Color", Color) = (0.957, 0.769, 0.188, 1)
         _TrackColor ("Track Color", Color) = (0.231, 0.165, 0.125, 0.35)
-        _GlowColor ("Edge Glow", Color) = (0.969, 0.886, 0.42, 1)
+        _GlowColor ("Edge Glow", Color) = (1, 0.957, 0.839, 1)
         _Fill ("Fill", Range(0,1)) = 0
         _Pulse ("Pulse", Range(0,1)) = 0
         _Flash ("Flash", Range(0,1)) = 0

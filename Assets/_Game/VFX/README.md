@@ -124,3 +124,11 @@ Con Unity-MCP attivo: `script-update-or-create` per i `.cs`, `script-execute` pe
 - Nuovo effetto `fx_purchase` → `UM_FxPlayer.Play(UM_FxPlayer.Fx.Purchase, pos)`.
 - `fx_package_deliver` più grande (coriandoli +40%, anello 2.3 m, stella 1.0).
 - **Materiali e prefab si generano in Unity**: menu *Ultimo Miglio/VFX/Build FX Prefabs + Materials* e poi *Ultimo Miglio/VFX/Setup Scene* (`UM_VfxSceneSetup.Setup`), che cabla UM_FX (FxPlayer + LookSettings) e UM_DayCycle sul sole. Salvare la scena.
+
+## v2.1 – Colori UI/UX esatti
+- Pacco / `Fx.PackagePickup` = teal `#5E7F86` (particelle + anello a terra nuovo).
+- Moneta / `Fx.Purchase` e riempimento durante il pagamento = sole `#F4C430`.
+- Cliente / `Fx.PackageDeliver` = terracotta `#C8633B` (coriandoli 60% terracotta + crema, anello terracotta).
+- Upgrade = sole `#F4C430` (alternativa `UM_Palette.UiMenta` `#8FC9A8`).
+- `UM_PadFillRing.kind` (`Purchase`/`Upgrade`/`Pickup`/`Delivery`) e `SetKind(kind)`: imposta il colore UI su pulsazione e riempimento (via MaterialPropertyBlock, un solo materiale). Default `Purchase` = sole.
+- Costanti in `UM_Palette`: `UiPacco`, `UiSole`, `UiCliente`, `UiMenta`. Rigenerare i prefab (*Ultimo Miglio/VFX/Build FX Prefabs + Materials*).
