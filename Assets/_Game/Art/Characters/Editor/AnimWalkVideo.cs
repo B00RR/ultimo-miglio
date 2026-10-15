@@ -27,6 +27,12 @@ public static class AnimWalkVideo {
       if (useAM) { AnimationMode.BeginSampling(); AnimationMode.SampleAnimationClip(go, c, t); AnimationMode.EndSampling(); } };
     Debug.Log("WALKVID animator avatar=" + animr.avatar + " human=" + (animr.avatar ? animr.avatar.isHuman : false) + " clips=" + string.Join(",", clips.Keys));
     RenderSettings.ambientMode = UnityEngine.Rendering.AmbientMode.Flat; RenderSettings.ambientLight = new Color(0.65f, 0.6f, 0.55f);
+    // In batchmode senza player loop lo SkinnedMeshRenderer non ri-skinna prima di Camera.Render():
+    // le ossa si muovono ma la mesh resta ferma. Per il video: proxy statico aggiornato con BakeMesh a ogni frame.
+    var smrs = go.GetComponentsInChildren<SkinnedMeshRenderer>(); var proxies = new System.Collections.Generic.List<(SkinnedMeshRenderer, Mesh, Transform)>();
+    foreach (var smr in smrs) { var pm = new Mesh(); var px = new GameObject("proxy_" + smr.name); px.AddComponent<MeshFilter>().sharedMesh = pm;
+      px.AddComponent<MeshRenderer>().sharedMaterials = smr.sharedMaterials; smr.enabled = false; proxies.Add((smr, pm, px.transform)); }
+    System.Action bake = () => { foreach (var (smr, pm, px) in proxies) { smr.BakeMesh(pm, true); px.SetPositionAndRotation(smr.transform.position, smr.transform.rotation); } };
     var lg = new GameObject("L"); var li = lg.AddComponent<Light>(); li.type = LightType.Directional; li.intensity = 1.3f; lg.transform.rotation = Quaternion.Euler(50, -30, 0);
     var cam = new GameObject("C").AddComponent<Camera>(); cam.clearFlags = CameraClearFlags.SolidColor; cam.backgroundColor = new Color(0.95f, 0.87f, 0.71f); cam.fieldOfView = 30;
     var rt = new RenderTexture(640, 640, 24); cam.targetTexture = rt; var tex = new Texture2D(640, 640, TextureFormat.RGB24, false);
@@ -46,7 +52,7 @@ public static class AnimWalkVideo {
           var c = new Vector3(0, 0.85f, z);
           if (view == "side") { cam.transform.position = c + new Vector3(5.5f, 0.6f, 0); }
           else { cam.transform.position = c + new Vector3(0.8f, 0.8f, 5.5f); }
-          cam.transform.LookAt(c); cam.Render();
+          bake(); cam.transform.LookAt(c); cam.Render();
           RenderTexture.active = rt; tex.ReadPixels(new Rect(0, 0, 640, 640), 0, 0); tex.Apply(); RenderTexture.active = null;
           File.WriteAllBytes($"{outDir}/{idx:D4}_{view}_{clipName}.png", tex.EncodeToPNG()); idx++;
         }
