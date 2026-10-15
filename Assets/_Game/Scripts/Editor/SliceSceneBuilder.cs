@@ -36,8 +36,12 @@ namespace UltimoMiglio.EditorTools
             // --- floor + walls
             var floor = Box("Floor", null, new Vector3(0, -0.05f, 0), new Vector3(18, 0.1f, 22), world, UM_Palette.Pavimento);
             floor.isStatic = true;
-            Box("Wall_N", null, new Vector3(0, 1.2f, 11), new Vector3(18, 2.4f, 0.3f), world, UM_Palette.Tufo).isStatic = true;
-            Box("Wall_W", null, new Vector3(-9, 1.2f, 0), new Vector3(0.3f, 2.4f, 22), world, UM_Palette.Tufo).isStatic = true;
+            // --- invisible boundary on all 4 sides (Nina can never leave the map)
+            foreach (var (n, c, sz) in new[] { ("Bound_N", new Vector3(0, 1.5f, 11.15f), new Vector3(18.6f, 3, 0.3f)), ("Bound_S", new Vector3(0, 1.5f, -11.15f), new Vector3(18.6f, 3, 0.3f)),
+                                               ("Bound_E", new Vector3(9.15f, 1.5f, 0), new Vector3(0.3f, 3, 22.6f)), ("Bound_W", new Vector3(-9.15f, 1.5f, 0), new Vector3(0.3f, 3, 22.6f)) })
+            { var b = new GameObject(n); b.transform.position = c; b.AddComponent<BoxCollider>().size = sz; b.isStatic = true; }
+            var kitOk = DepotKit.Build(world);
+            if (kitOk) floor.GetComponent<Renderer>().enabled = false;
 
             // --- GameRoot + audio + FX
             var root = new GameObject("GameRoot").AddComponent<GameRoot>();
@@ -84,6 +88,7 @@ namespace UltimoMiglio.EditorTools
                 var p = arrPos + new Vector3((i - 1) * 2.2f, 0, -dArr);
                 var body = Box($"Scaffale_{(char)('A' + i)}", null, p + new Vector3(0, 0.9f, -0.6f), new Vector3(1.8f, 1.8f, 0.5f), world, UM_Palette.Legno);
                 body.AddComponent<NavMeshObstacle>().carving = true;
+                if (kitOk && DepotKit.Place("Kit/prop_shelf_2m", null, body.transform.position - new Vector3(0, 0.9f, 0), 0, false)) body.GetComponent<Renderer>().enabled = false;
                 Box("Code", body.transform, new Vector3(0, 0.55f, 0.52f), new Vector3(0.9f, 0.08f, 0.1f), world, cols[i]);
                 shelves[i] = Zone<Shelf>($"Zona_Scaffale_{(char)('A' + i)}", p + new Vector3(0, 0, 0.6f), new Vector3(1.8f, 1, 1.2f), cols[i], props);
                 shelves[i].Color = (ParcelColor)i; shelves[i].Count = 4;
@@ -91,7 +96,8 @@ namespace UltimoMiglio.EditorTools
             }
             var shelfC = arrPos + new Vector3(0, 0, -dArr);
             var banPos = shelfC + new Vector3(dBan * 0.8f, 0, -dBan * 0.6f); // 9.4 m
-            Box("Bancone_Mesh", null, banPos + new Vector3(0, 0.5f, -0.9f), new Vector3(2.4f, 1f, 0.7f), world, UM_Palette.Terracotta).AddComponent<NavMeshObstacle>().carving = true;
+            var banMesh = Box("Bancone_Mesh", null, banPos + new Vector3(0, 0.5f, -0.9f), new Vector3(2.4f, 1f, 0.7f), world, UM_Palette.Terracotta); banMesh.AddComponent<NavMeshObstacle>().carving = true;
+            if (kitOk && DepotKit.Place("Kit/prop_counter_2m", null, banPos + new Vector3(0, 0, -0.9f), 0, false)) { banMesh.GetComponent<Renderer>().enabled = false; DepotKit.Place("Kit/prop_register", null, banPos + new Vector3(0.6f, 1.0f, -0.9f), 0, false, true); DepotKit.Place("ThirdParty/Props/prop_tp_lemon", null, banPos + new Vector3(-0.5f, 1.0f, -0.9f), 0, false, true); }
             var bancone = Zone<Bancone>("Zona_Bancone", banPos, new Vector3(2.4f, 1, 1.2f), UM_Palette.Terracotta, props);
             var coins = new GameObject("Coins").AddComponent<CoinSpawner>(); coins.CoinPrefab = coin; bancone.Coins = coins;
             var queue = new GameObject("CustomerQueue").AddComponent<CustomerQueue>(); queue.Prefab = cust;
@@ -258,7 +264,7 @@ namespace UltimoMiglio.EditorTools
         static AudioManager BuildAudio(Transform parent)
         {
             var am = new GameObject("AudioManager").AddComponent<AudioManager>(); am.transform.SetParent(parent);
-            AudioClip C(string n) => AssetDatabase.LoadAssetAtPath<AudioClip>($"Assets/Audio/{(n.StartsWith("mus_") ? "Music" : "SFX")}/{n}.ogg");
+            AudioClip C(string n) => AssetDatabase.LoadAssetAtPath<AudioClip>($"Assets/_Game/Audio/{n}.ogg") ?? AssetDatabase.LoadAssetAtPath<AudioClip>($"Assets/Audio/{(n.StartsWith("mus_") ? "Music" : "SFX")}/{n}.ogg");
             AudioClip[] R(string pfx, int n) => Enumerable.Range(1, n).Select(i => C($"{pfx}_{i:00}")).Where(c => c).ToArray();
             am.MusicStems = new[] { C("mus_day_vela_e_figli_base"), C("mus_day_vela_e_figli_perc"), C("mus_day_vela_e_figli_mel") };
             am.MusicFull = C("mus_day_vela_e_figli_full");

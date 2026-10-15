@@ -50,7 +50,10 @@ namespace UltimoMiglio.UI.World
             Element.style.display = visible ? DisplayStyle.Flex : DisplayStyle.None;
             if (!visible) return;
             var p = UltimoMiglio.UI.SafeAreaUtil.ScreenToPanel(Element.panel, sp);
-            Element.style.left = p.x; Element.style.top = p.y; // USS centers with translate -50% -100%
+            // clamp inside the panel (USS centers with translate -50% -100%): never cut at the screen edges
+            var pr = Element.panel.visualTree.layout; float w = Element.layout.width, h = Element.layout.height, m = 12f;
+            if (!float.IsNaN(w) && pr.width > 0) { p.x = Mathf.Clamp(p.x, w * 0.5f + m, Mathf.Max(w * 0.5f + m, pr.width - w * 0.5f - m)); p.y = Mathf.Clamp(p.y, h + m, Mathf.Max(h + m, pr.height - m)); }
+            Element.style.left = p.x; Element.style.top = p.y;
         }
     }
 }

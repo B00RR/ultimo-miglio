@@ -1,0 +1,206 @@
+{
+  "source": "04_UI §4 + 01 v3.3 + playthrough_expected.json",
+  "chapter": 1,
+  "fallback": {
+    "idleSecBeforeHint": 5,
+    "hint": "manoFantasma+freccia",
+    "skipTutorialAvailableAfterStep": "combo"
+  },
+  "steps": [
+    {
+      "id": "coldOpen",
+      "tSec": 0,
+      "durationSec": 15,
+      "trigger": "sceneStart",
+      "hud": "hidden",
+      "textKeys": [
+        "onb.cold.letterAda",
+        "onb.cold.letterOmni"
+      ],
+      "camera": "discesaQuartiere",
+      "skippable": false
+    },
+    {
+      "id": "move",
+      "tSec": 15,
+      "toleranceSec": 5,
+      "trigger": "coldOpenEnd",
+      "completeWhen": "walkedM>=1.5",
+      "textKeys": [
+        "onb.move.card"
+      ],
+      "hint": "manoFantasmaJoystick"
+    },
+    {
+      "id": "pickUp",
+      "tSec": 30,
+      "toleranceSec": 10,
+      "trigger": "moveDone",
+      "spawn": "furgoneScaricaArrivi:5",
+      "target": "arrivi",
+      "completeWhen": "stack==5",
+      "textKeys": [
+        "onb.pick.max"
+      ]
+    },
+    {
+      "id": "deposit",
+      "tSec": 50,
+      "toleranceSec": 10,
+      "trigger": "stackFull",
+      "target": "shelfTerracotta",
+      "completeWhen": "shelfStock>=5",
+      "textKeys": [
+        "onb.deposit.hint"
+      ]
+    },
+    {
+      "id": "firstCustomer",
+      "tSec": 70,
+      "toleranceSec": 15,
+      "trigger": "depositDone",
+      "spawn": "cliente:vipMammaRosa",
+      "target": "bancone",
+      "arrow": "edgeArrow",
+      "completeWhen": "customersServed>=1",
+      "textKeys": [
+        "onb.cust.first",
+        "onb.coins.walk"
+      ],
+      "showHud": [
+        "pillolaValute"
+      ]
+    },
+    {
+      "id": "coins",
+      "tSec": 75,
+      "toleranceSec": 15,
+      "trigger": "firstCustomerServed",
+      "target": "coinDrop",
+      "completeWhen": "coinsCollected>0"
+    },
+    {
+      "id": "zainoPad",
+      "tSec": 83,
+      "toleranceSec": 20,
+      "trigger": "walletLn>=40",
+      "target": "padZaino",
+      "label": "ZAINO LV 1 · 40 LN",
+      "optional": true,
+      "completeWhen": "zainoLevel>=1",
+      "textKeys": [
+        "onb.zaino.hint"
+      ],
+      "note": "Nessuna pausa: il pad si accende appena il portafoglio arriva a 40 LN; nel golden path viene comprato a 1:23"
+    },
+    {
+      "id": "combo",
+      "tSec": 100,
+      "toleranceSec": 15,
+      "trigger": "t>=100",
+      "spawn": "cliente:normale x2 ravvicinati",
+      "completeWhen": "comboMultiplier>=1.2",
+      "textKeys": [
+        "onb.combo"
+      ],
+      "note": "Con passo +0,1 la combo mostra x1,1 → x1,2 (04_UI scrive x1,2 → x1,4: da allineare)"
+    },
+    {
+      "id": "hireNonno",
+      "tSec": 130,
+      "toleranceSec": 5,
+      "trigger": "t>=130",
+      "target": "padHireNonno",
+      "label": "ASSUMI NONNO · 50 LN",
+      "completeWhen": "nonnoHired",
+      "textKeys": [
+        "onb.nonno.bark"
+      ],
+      "unlocks": [
+        "phoneApp:Flotta"
+      ],
+      "note": "Nel golden path il portafoglio ha già ≥50 LN a 130 s; se mancano LN, il pad resta acceso e la freccia punta alle monete"
+    },
+    {
+      "id": "phone",
+      "tSec": 165,
+      "toleranceSec": 10,
+      "trigger": "nonnoHired+35s",
+      "ui": "iconaTelefonoVibra",
+      "completeWhen": "messageRead",
+      "textKeys": [
+        "onb.civetta.msg1",
+        "onb.civetta.reply",
+        "onb.civetta.msg2"
+      ],
+      "unlocks": [
+        "phoneApp:Messaggi"
+      ]
+    },
+    {
+      "id": "ordersApp",
+      "tSec": 210,
+      "toleranceSec": 10,
+      "trigger": "t>=210",
+      "ui": "appOrdini",
+      "completeWhen": "mostraLaStradaTapped",
+      "textKeys": [
+        "onb.orders.special",
+        "onb.flotta.hint"
+      ],
+      "unlocks": [
+        "phoneApp:Ordini"
+      ]
+    },
+    {
+      "id": "cassaPass",
+      "tSec": 235,
+      "toleranceSec": 10,
+      "trigger": "enRouteCassaforte",
+      "target": "cassa",
+      "completeWhen": "passedOver",
+      "note": "0 LN in run continua; serve a mostrare la Cassa"
+    },
+    {
+      "id": "debtCard",
+      "tSec": 240,
+      "toleranceSec": 10,
+      "trigger": "t>=240",
+      "call": "viktor",
+      "target": "cassaforte",
+      "completeWhen": "firstDeposit",
+      "card": {
+        "day": 3,
+        "yearDays": 365,
+        "tranche": 1,
+        "trancheLn": 8400,
+        "dueDay": 24
+      },
+      "textKeys": [
+        "onb.viktor.call1",
+        "onb.viktor.call2",
+        "onb.debt.pedaggioHint"
+      ],
+      "note": "Primo versamento = 60% del portafoglio (~176 LN nel golden path)"
+    },
+    {
+      "id": "wallPad",
+      "tSec": 270,
+      "toleranceSec": 10,
+      "trigger": "firstDeposit+30s",
+      "target": "padWallBancone",
+      "label": "APRI MURO · …",
+      "completeWhen": "shown",
+      "textKeys": [
+        "onb.wall.goal"
+      ],
+      "permission": "notificheAndroid13"
+    },
+    {
+      "id": "freePlay",
+      "tSec": 300,
+      "trigger": "wallPadShown",
+      "note": "Fine onboarding. Bottega sbloccabile da 5:00. Nessun totem prima del cap 4."
+    }
+  ]
+}

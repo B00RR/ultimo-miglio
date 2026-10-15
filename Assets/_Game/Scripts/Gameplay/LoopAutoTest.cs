@@ -13,9 +13,17 @@ namespace UltimoMiglio.Gameplay
         public static string Result; public float TimeoutSec = 400f; public int Teleports;
         NinaController N; EconomyCore E;
 
-#if UNITY_WEBGL && !UNITY_EDITOR
+#if !UNITY_EDITOR
         [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.AfterSceneLoad)]
-        static void Boot() { if (Application.absoluteURL.Contains("autotest")) new GameObject("LoopAutoTest").AddComponent<LoopAutoTest>(); }
+        static void Boot()
+        {
+            var args = System.Environment.GetCommandLineArgs();
+            bool auto = Application.absoluteURL.Contains("autotest") || System.Array.IndexOf(args, "-autotest") >= 0;
+            if (!auto) return;
+            var go = new GameObject("LoopAutoTest"); go.AddComponent<LoopAutoTest>();
+            int ci = System.Array.IndexOf(args, "-captureDir"); if (ci >= 0 && ci + 1 < args.Length) go.AddComponent<FrameCapture>().Dir = args[ci + 1];
+            AudioManager.Unlocked = true;
+        }
 #endif
         void Log(string m) => Debug.Log($"[LoopTest] t={Time.time:0.0} {m} | stack={N?.Stack.Count} wallet={E?.S.Wallet:0.##} served={E?.S.CustomersServed} zaino={E?.S.Zaino} padPaid={E?.S.PadPaid[(int)UpgradeKind.Zaino]:0.##} cost={E?.Cost(UpgradeKind.Zaino):0.##}");
 

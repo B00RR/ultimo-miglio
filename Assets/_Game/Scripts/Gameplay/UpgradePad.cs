@@ -10,6 +10,8 @@ namespace UltimoMiglio.Gameplay
         public UpgradeKind Kind; public GameObject ShowWhenAvailable; public float UnlockAtActiveSec;
         public System.Action<UpgradeKind> Completed;
         public UltimoMiglio.UI.World.UpgradePadCard Card;
+        Transform _padVis; float _pulse; Vector3 _padBase = Vector3.zero;
+        void LateUpdate() { if (!_padVis) return; if (_padBase == Vector3.zero) _padBase = _padVis.localScale; _pulse = Mathf.MoveTowards(_pulse, 0, Time.deltaTime * 6f); _padVis.localScale = _padBase * (1f + 0.08f * Mathf.Sin(_pulse * Mathf.PI)); }
         bool _paying; Renderer[] _renderers; Collider _col; int _avail = -1;
         void Awake() { _renderers = GetComponentsInChildren<Renderer>(true); _col = GetComponent<Collider>(); }
         protected override void OnIdleUpdate()
@@ -25,6 +27,7 @@ namespace UltimoMiglio.Gameplay
             if (eco.S.Wallet <= 0) { StopLoop(); return; }
             if (!_paying) { _paying = true; AudioManager.I?.StartUpgradeLoop(); }
             bool done = eco.PadTick(Kind, t);
+            if (!_padVis) _padVis = transform.Find("Pad"); if (_padVis) { _pulse = 1f; }
             if (Ring) Ring.SetFill((float)eco.PadFill(Kind));
             if (done) { StopLoop(); AudioManager.I?.Play(AudioManager.Sfx.UpgradeComplete); UM_FxPlayer.Play(UM_FxPlayer.Fx.Upgrade, transform.position); Completed?.Invoke(Kind); Nina.Cheer(); }
         }

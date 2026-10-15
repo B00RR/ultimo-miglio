@@ -9,7 +9,8 @@ namespace UltimoMiglio.Gameplay
     public sealed class CoinSpawner : MonoBehaviour
     {
         public GameObject CoinPrefab; public float MagnetRadius = 1.6f, MagnetSpeed = 9f, LnPerCoin = 2f; public int MergeAbove = 50;
-        sealed class Coin { public Transform T; public double Ln; public bool Real; public float Age; public Vector3 Vel; }
+        sealed class Coin { public Transform T; public double Ln; public bool Real; public float Age; public Vector3 Vel; public float HudT = -1; public Vector3 HudFrom; }
+        UltimoMiglio.UI.HudController _hud; bool _hudLooked;
         readonly List<Coin> _live = new(); readonly Stack<Transform> _pool = new();
         int _pickupSfx;
 
@@ -38,11 +39,23 @@ namespace UltimoMiglio.Gameplay
                 if (c.Age < 0.5f) { c.Vel.y -= 12f * Time.deltaTime; c.T.position += c.Vel * Time.deltaTime; if (c.T.position.y < 0.1f) { c.T.position = new Vector3(c.T.position.x, 0.1f, c.T.position.z); c.Vel = Vector3.zero; } }
                 c.T.Rotate(0, 360 * Time.deltaTime, 0);
                 var d = nina + Vector3.up * 0.8f - c.T.position;
-                if (c.Age > 0.5f && (d.sqrMagnitude < MagnetRadius * MagnetRadius || !c.Real))
+                if (c.HudT < 0 && c.Age > 0.5f && (d.sqrMagnitude < MagnetRadius * MagnetRadius || !c.Real))
                 {
                     c.T.position += d.normalized * Mathf.Min(d.magnitude, MagnetSpeed * Time.deltaTime);
-                    if (d.sqrMagnitude < 0.09f)
+                    if (d.sqrMagnitude < 0.09f && c.HudT < 0) { c.HudT = 0; c.HudFrom = c.T.position; }
+                }
+                if (c.HudT >= 0)
+                {   // final leg: hop up and fly to the LN icon in the HUD, then credit + pulse
+                    c.HudT += Time.deltaTime / 0.45f; float u = Mathf.Clamp01(c.HudT);
+                    var cam = Camera.main; if (!_hudLooked) { _hudLooked = true; _hud = FindAnyObjectByType<UltimoMiglio.UI.HudController>(); }
+                    Vector3 dst = c.HudFrom + Vector3.up * 3f;
+                    if (cam && _hud) { var sp = _hud.CurrencyScreenPos(); dst = cam.ScreenToWorldPoint(new Vector3(sp.x, sp.y, 4f)); }
+                    c.T.position = Vector3.Lerp(c.HudFrom, dst, u * u) + Vector3.up * (Mathf.Sin(u * Mathf.PI) * 1.2f);
+                    c.T.localScale = Vector3.one * Mathf.Lerp(1f, 0.6f, u);
+                    if (u >= 1f)
                     {
+                        if (_hud) _hud.PulseCurrency();
+                        c.T.localScale = Vector3.one;
                         if (c.Real) GameRoot.I.Eco.CollectActive(c.Ln, c.T.position.ToWP());
                         if ((_pickupSfx++ & 1) == 0) AudioManager.I?.Play(AudioManager.Sfx.CoinPickup);
                         c.T.gameObject.SetActive(false); _pool.Push(c.T); _live.RemoveAt(i);

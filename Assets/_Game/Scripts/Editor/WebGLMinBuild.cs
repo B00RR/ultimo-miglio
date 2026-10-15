@@ -36,6 +36,7 @@ namespace UltimoMiglio.EditorTools
             Directory.CreateDirectory(outDir);
             var r = BuildPipeline.BuildPlayer(new BuildPlayerOptions { scenes = new[] { SliceSceneBuilder.ScenePath }, locationPathName = outDir, target = BuildTarget.WebGL, options = BuildOptions.None });
             if (r.summary.result == BuildResult.Succeeded) { File.Copy("Assets/_Game/Scripts/Editor/WebTemplate/index.html.txt", Path.Combine(outDir, "index.html"), true); if (Directory.Exists(Path.Combine(outDir, "TemplateData"))) Directory.Delete(Path.Combine(outDir, "TemplateData"), true); }
+            foreach (var st in r.steps) foreach (var msg in st.messages) if (msg.type == LogType.Error || msg.type == LogType.Exception) Debug.Log("[WebGLMin][err] step=" + st.name + " :: " + msg.content.Replace("\n", " | "));
             Debug.Log($"[WebGLMin] {r.summary.result} errors={r.summary.totalErrors} size={r.summary.totalSize}");
             EditorApplication.Exit(r.summary.result == BuildResult.Succeeded ? 0 : 1);
         }

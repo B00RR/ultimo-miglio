@@ -19,4 +19,21 @@ public class Ch1LoopTest
         Time.timeScale = 1f;
         Assert.AreEqual("PASS", LoopAutoTest.Result);
     }
+
+    [UnityTest, Timeout(300000)]
+    public IEnumerator Boundary_NinaCannotLeaveMap()
+    {
+        yield return SceneManager.LoadSceneAsync("Ch1_Deposito");
+        Time.timeScale = 3f;
+        while (!GameRoot.Ready || !GameRoot.I.Nina) yield return null;
+        var n = GameRoot.I.Nina;
+        var dirs = new[] { Vector3.forward, Vector3.right, Vector3.back, Vector3.left, new Vector3(1,0,1).normalized, new Vector3(-1,0,-1).normalized, new Vector3(1,0,-1).normalized, new Vector3(-1,0,1).normalized };
+        foreach (var d in dirs)
+        {
+            n.ScriptedInput = d; float t = 0; while (t < 10f) { t += Time.deltaTime; yield return null; }
+            var p = n.transform.position; Debug.Log($"[BoundTest] dir={d} pos={p}");
+            Assert.IsTrue(Mathf.Abs(p.x) < 9.2f && Mathf.Abs(p.z) < 11.2f && p.y > -0.5f, $"Nina outside map: {p}");
+        }
+        n.ScriptedInput = Vector3.zero; Time.timeScale = 1f;
+    }
 }
