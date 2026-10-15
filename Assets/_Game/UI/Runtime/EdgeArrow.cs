@@ -15,7 +15,7 @@ namespace UltimoMiglio.UI
         [SerializeField] Transform nina;
         [SerializeField] float marginDp = 64f;
         [SerializeField] float markerHeight = 2.2f;
-        [SerializeField] bool showMarkerWhenVisible = true;
+        [SerializeField] bool showMarkerWhenVisible = false; // QA #44: objective only in HUD top line
 
         Transform target; string targetName; string iconClass;
         VisualElement arrow, marker, arrowHead; Label arrowLabel;
@@ -55,11 +55,7 @@ namespace UltimoMiglio.UI
             if (onScreen)
             {
                 Show(arrow, false);
-                if (showMarkerWhenVisible && marker != null)
-                {
-                    var mp = SafeAreaUtil.ScreenToPanel(marker.panel, cam.WorldToScreenPoint(target.position + Vector3.up * markerHeight));
-                    marker.style.left = mp.x; marker.style.top = mp.y; Show(marker, true);
-                }
+                Show(marker, false); // QA #44: no floating waypoint mid-screen
                 return;
             }
             Show(marker, false);

@@ -20,22 +20,44 @@ namespace UltimoMiglio.Gameplay
         VisualElement _chip; Label _text; UltimoMiglio.UI.HudController _hud; Camera _cam; TutorialManager _tut;
         bool _active; float _phase;
 
+
+        void HideFloatingChips()
+        {
+            // QA #41: no floating Prendi/Scaffale/Pacchi chips — ground pads only
+            if (PadIcon) PadIcon.SetVisible(false);
+            var pt = GetComponent<UltimoMiglio.UI.World.PadTag>();
+            if (pt) { pt.enabled = false; Destroy(pt); }
+            for (int i = 0; i < transform.childCount; i++)
+            {
+                var c = transform.GetChild(i);
+                if (c.name == "PadTag" || c.name.StartsWith("PadIcon")) c.gameObject.SetActive(false);
+            }
+        }
+
         public Color KindColor => Kind == PoiKind.Prendi ? Blu : Kind == PoiKind.Consegna ? Verde : Giallo;
 
         void Start()
         {
+            HideFloatingChips();
             _col = KindColor; _phase = Random.value * 6f;
             var sh = Shader.Find("Universal Render Pipeline/Unlit");
             Material M(Color c) { var m = new Material(sh); m.SetColor("_BaseColor", c); if (m.HasProperty("_Color")) m.SetColor("_Color", c); return m; }
-            _rim = Disc("POI_Rim", M(Ink), new Vector3(Radius * 2.35f, 0.08f, Radius * 2.35f), 0.035f);
+            _rim = Disc("POI_Rim", M(Ink), new Vector3(Radius * 2.55f, 0.14f, Radius * 2.55f), 0.04f);
             _fillMat = M(_col);
-            _fillMat.color = new Color(_col.r, _col.g, _col.b, 0.28f); _fill = Disc("POI_Fill", _fillMat, new Vector3(Radius * 2.1f, 0.09f, Radius * 2.1f), 0.055f);
+            _col = Color.Lerp(_col, Color.white, 0.05f); _col = Saturate(_col, 1.35f);
+            _fillMat.color = new Color(_col.r, _col.g, _col.b, 0.40f); _fill = Disc("POI_Fill", _fillMat, new Vector3(Radius * 2.2f, 0.12f, Radius * 2.2f), 0.06f);
             _beaconMat = M(Color.Lerp(_col, Color.white, 0.35f));
             _beacon = Disc("POI_Beacon", _beaconMat, new Vector3(0.18f, 2.2f, 0.18f), 2.2f);
             _beacon.gameObject.SetActive(false);
             _tut = FindAnyObjectByType<TutorialManager>();
             if (PadIcon) PadIcon.SetVisible(false);
             var pt = GetComponent<UltimoMiglio.UI.World.PadTag>(); if (pt) pt.enabled = false;
+        }
+
+        static Color Saturate(Color c, float k)
+        {
+            Color.RGBToHSV(c, out float h, out float sat, out float v);
+            return Color.HSVToRGB(h, Mathf.Clamp01(sat * k), Mathf.Clamp01(v * 1.05f));
         }
 
         Transform Disc(string n, Material m, Vector3 s, float y)
@@ -89,9 +111,9 @@ namespace UltimoMiglio.Gameplay
             float t = Time.time * (_active ? 4.5f : 2.2f) + _phase, k = 0.5f + 0.5f * Mathf.Sin(t);
             float big = _active ? 1.18f : 1f, amp = _active ? 0.08f : 0.035f;
             float sc = big * (1f + amp * k);
-            _rim.localScale = new Vector3((Radius * 2f + 0.25f) * sc, 0.06f, (Radius * 2f + 0.25f) * sc);
-            _fill.localScale = new Vector3(Radius * 2f * sc, 0.07f, Radius * 2f * sc);
-            var fill = Color.Lerp(_col, Color.white, (_active ? 0.35f : 0.12f) * k); fill.a = _active ? 0.55f : 0.32f; _fillMat.SetColor("_BaseColor", fill); if (_fillMat.HasProperty("_Color")) _fillMat.SetColor("_Color", fill); // "emission" pulse
+            _rim.localScale = new Vector3((Radius * 2f + 0.45f) * sc, 0.12f, (Radius * 2f + 0.45f) * sc);
+            _fill.localScale = new Vector3(Radius * 2.05f * sc, 0.10f, Radius * 2.05f * sc);
+            var fill = Color.Lerp(_col, Color.white, (_active ? 0.35f : 0.12f) * k); fill.a = _active ? 0.55f : 0.40f; _fillMat.SetColor("_BaseColor", fill); if (_fillMat.HasProperty("_Color")) _fillMat.SetColor("_Color", fill); // "emission" pulse
             if (_active) { _beacon.localScale = new Vector3(0.18f, 2.2f + 0.3f * k, 0.18f); _beaconMat.SetColor("_BaseColor", Color.Lerp(_col, Color.white, 0.3f + 0.4f * k)); }
 
             EnsureChip();
@@ -101,12 +123,7 @@ namespace UltimoMiglio.Gameplay
             bool near = nina && (nina.transform.position - transform.position).sqrMagnitude < 9f;
             if (Ring && !Pad) Ring.SetProgress(near ? 1f : 0f);
             if (PadIcon) { PadIcon.SetVisible(false); PadIcon.SetPlayerNear(near); }
-            var tag = GetComponent<UltimoMiglio.UI.World.PadTag>();
-            if (tag)
-            {
-                bool shelf = GetComponent<Shelf>() != null;
-                tag.enabled = avail && (!shelf || _active || near);
-            }
+            var tag = GetComponent<UltimoMiglio.UI.World.PadTag>(); if (tag) tag.enabled = false;
             Vector3 sp = _cam.WorldToScreenPoint(transform.position + Vector3.up * (2.0f + 0.15f * Mathf.Sin(Time.time * 2.4f + _phase)));
             bool show = avail && !(HasCard && near) && sp.z > 0 && sp.x > 0 && sp.x < Screen.width && sp.y > 0 && sp.y < Screen.height;
             _chip.style.display = show ? DisplayStyle.Flex : DisplayStyle.None;

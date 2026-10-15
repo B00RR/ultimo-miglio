@@ -153,7 +153,7 @@ namespace UltimoMiglio.EditorTools
                 Box("Body", nonno.transform, new Vector3(0, 0.5f, 0), new Vector3(0.8f, 0.8f, 1f), chars, UM_Palette.TealOmni);
                 Box("Forks", nonno.transform, new Vector3(0, 0.15f, 0.7f), new Vector3(0.6f, 0.06f, 0.6f), chars, UM_Palette.ScuroCaldo);
             }
-            var agent = nonno.AddComponent<NavMeshAgent>(); agent.radius = 0.45f;
+            // No NavMeshAgent: WebGL bake is missing at runtime ("Failed to create agent..."). NONNO walks with Transform.
             var bot = nonno.AddComponent<NonnoRobot>(); bot.Arrivals = arrivals; bot.Shelves = shelves; bot.Bancone = bancone; bot.Queue = queue; bot.Animator = nonnoAnim;
 
             // --- NavMesh
@@ -213,20 +213,13 @@ namespace UltimoMiglio.EditorTools
                         rg.transform.localScale = Vector3.one * (ip.Radius / 0.95f);
                         var fr = rg.GetComponent<UltimoMiglio.VFX.UM_PadFillRing>(); if (fr) { fr.playCompleteBurst = false; fr.kind = ip.Kind == PoiKind.Consegna ? UltimoMiglio.VFX.UM_PadFillRing.Kind.Delivery : UltimoMiglio.VFX.UM_PadFillRing.Kind.Pickup; ip.Ring = fr; }
                     }
-                    var tagTpl = AssetDatabase.LoadAssetAtPath<UnityEngine.UIElements.VisualTreeAsset>("Assets/_Game/UI/UXML/PadTag.uxml");
-                    if (tagTpl)
-                    {
-                        var tag = z.gameObject.AddComponent<UltimoMiglio.UI.World.PadTag>();
-                        var so = new SerializedObject(tag); so.FindProperty("template").objectReferenceValue = tagTpl; so.ApplyModifiedPropertiesWithoutUndo();
-                        UltimoMiglio.UI.World.PadKind pk = ip.Kind == PoiKind.Prendi ? UltimoMiglio.UI.World.PadKind.Pacco : ip.Kind == PoiKind.Consegna ? UltimoMiglio.UI.World.PadKind.Cliente : UltimoMiglio.UI.World.PadKind.Moneta;
-                        double price = 0; if (z is UpgradePad up2 && GameRoot.I == null) { /* filled at runtime via SetPrice */ }
-                        tag.Set(pk, ip.Label, z is UpgradePad ? 1 : 0); // price>0 shows amount row; UpgradePad refreshes via Card
-                    }
+                    // QA #41: no PadTag / floating chips — ground pads only (InteractionPoint discs)
                     var padIcon = z.gameObject.AddComponent<UltimoMiglio.VFX.UM_PadIcon>();
                     padIcon.kindFromRing = true;
                     if (ip.Ring) padIcon.SetKind(ip.Ring.kind);
                     else padIcon.SetKind(ip.Kind == PoiKind.Prendi ? UltimoMiglio.VFX.UM_PadFillRing.Kind.Pickup : ip.Kind == PoiKind.Consegna ? UltimoMiglio.VFX.UM_PadFillRing.Kind.Delivery : UltimoMiglio.VFX.UM_PadFillRing.Kind.Purchase);
                     padIcon.AssignDefaultIcon();
+                    padIcon.SetVisible(false);
                     ip.PadIcon = padIcon;
                     var oldPad = z.transform.Find("Pad"); if (oldPad) { var r = oldPad.GetComponent<Renderer>(); if (r) r.enabled = false; }
                 }
@@ -245,7 +238,7 @@ namespace UltimoMiglio.EditorTools
             if (!hud) return;
             Set(joy, "cameraTransform", cam.transform);
             var arrow = hudGo.GetComponentInChildren<UltimoMiglio.UI.EdgeArrow>(true);
-            if (arrow) { Set(arrow, "cam", cam); Set(arrow, "nina", nina); var aso = new SerializedObject(arrow); var mp = aso.FindProperty("marginDp"); if (mp != null) { mp.floatValue = 110f; aso.ApplyModifiedPropertiesWithoutUndo(); } }
+            if (arrow) { Set(arrow, "cam", cam); Set(arrow, "nina", nina); var aso = new SerializedObject(arrow); var mp = aso.FindProperty("marginDp"); if (mp != null) mp.floatValue = 110f; var sm = aso.FindProperty("showMarkerWhenVisible"); if (sm != null) sm.boolValue = false; aso.ApplyModifiedPropertiesWithoutUndo(); }
             var sc = World<UltimoMiglio.UI.World.StackCounter>(nina.gameObject, hud, cam, "StackCounter.uxml", new Vector3(0, 2.2f, 0));
             UltimoMiglio.UI.World.CassaCard cc = null; // demo: niente schede grandi
             const string ringPath = "Assets/_Game/Art/Materials/M_ZoneRing.mat";
