@@ -13,8 +13,8 @@ MonoBehaviour:
   m_Name: URP_Mobile_Renderer
   m_EditorClassIdentifier: Unity.RenderPipelines.Universal.Runtime::UnityEngine.Rendering.Universal.UniversalRendererData
   debugShaders:
-    debugReplacementPS: {fileID: 4800000, guid: cf852408f2e174538bcd9b7fda1c5ae7, type: 3}
-    hdrDebugViewPS: {fileID: 4800000, guid: 573620ae32aec764abd4d728906d2587, type: 3}
+    debugReplacementPS: {fileID: 0}
+    hdrDebugViewPS: {fileID: 0}
     probeVolumeSamplingDebugComputeShader: {fileID: 7200000, guid: 53626a513ea68ce47b59dc1299fe3959, type: 3}
   probeVolumeResources:
     probeVolumeDebugShader: {fileID: 0}
@@ -52,4 +52,4 @@ MonoBehaviour:
   m_DepthAttachmentFormat: 0
   m_DepthTextureFormat: 0
   m_AccurateGbufferNormals: 0
-  m_IntermediateTextureMode: 1
+  m_IntermediateTextureMode: 0
