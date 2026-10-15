@@ -10,7 +10,7 @@ namespace UltimoMiglio.Gameplay
     /// Active in WebGL when URL contains "autotest", or added by the PlayMode test.</summary>
     public sealed class LoopAutoTest : MonoBehaviour
     {
-        public static string Result; public float TimeoutSec = 400f; public int Teleports;
+        public static string Result; public static readonly System.Collections.Generic.List<int> TutSteps = new(); public float TimeoutSec = 900f; public int Teleports;
         NinaController N; EconomyCore E;
 
 #if !UNITY_EDITOR
@@ -34,19 +34,23 @@ namespace UltimoMiglio.Gameplay
             N = GameRoot.I.Nina; E = GameRoot.I.Eco;
             if (E.S.Zaino > 0) { Log("save already has Zaino>0: resetting test target to next level"); }
             int zainoStart = E.S.Zaino;
+            TutSteps.Clear(); if (TutorialManager.I) TutSteps.Add((int)TutorialManager.I.Current); TutorialManager.StepChanged += s => { TutSteps.Add((int)s); Log("TUTORIAL -> " + s); };
             Log("START");
             var arr = FindAnyObjectByType<ArrivalsZone>(); var shelves = FindObjectsByType<Shelf>(FindObjectsSortMode.None).OrderBy(s => s.Color).ToArray();
             var picks = FindObjectsByType<ShelfPickup>(FindObjectsSortMode.None); var ban = FindAnyObjectByType<Bancone>();
-            var pad = FindObjectsByType<UpgradePad>(FindObjectsSortMode.None).First(p => p.Kind == UpgradeKind.Zaino);
+            var pads = FindObjectsByType<UpgradePad>(FindObjectsSortMode.None);
+            var padZ = pads.First(p => p.Kind == UpgradeKind.Zaino); var padN = pads.FirstOrDefault(p => p.Kind == UpgradeKind.NonnoHire);
             float t0 = Time.time; int cycle = 0;
-            while (E.S.Zaino == zainoStart && Time.time - t0 < TimeoutSec)
+            bool Goal() => E.S.Zaino > zainoStart && (padN == null || E.S.NonnoLevel >= 0);
+            while (!Goal() && Time.time - t0 < TimeoutSec)
             {
                 cycle++;
-                if (E.S.Wallet + E.S.PadPaid[(int)UpgradeKind.Zaino] >= E.Cost(UpgradeKind.Zaino) || (cycle > 1 && E.S.Wallet > 0))
+                var kind = E.S.Zaino == zainoStart ? UpgradeKind.Zaino : UpgradeKind.NonnoHire; var pad = kind == UpgradeKind.Zaino ? padZ : padN;
+                if (E.S.Wallet + E.S.PadPaid[(int)kind] >= E.Cost(kind) || (cycle > 1 && E.S.Wallet > 0))
                 {
-                    yield return Go(pad.transform.position, "Zaino pad");
-                    float w = Time.time; while (E.S.Zaino == zainoStart && E.S.Wallet > 0.001 && Time.time - w < 20) yield return null;
-                    Log("after pad"); if (E.S.Zaino != zainoStart) break;
+                    yield return Go(pad.transform.position, kind + " pad");
+                    float w = Time.time; while (!Goal() && E.S.Wallet > 0.001 && Time.time - w < 20) { if (kind == UpgradeKind.Zaino && E.S.Zaino > zainoStart) break; yield return null; }
+                    Log("after pad " + kind); if (Goal()) break; continue;
                 }
                 yield return Go(arr.transform.position, "Arrivals");
                 float a = Time.time; while (!N.Stack.Full && Time.time - a < 8) yield return null;
@@ -63,7 +67,9 @@ namespace UltimoMiglio.Gameplay
                 double w0 = E.S.Wallet; yield return Go(ban.transform.position + Vector3.right * 0.8f, "Coins"); yield return Wait(2.5f);
                 Log($"coins collected, wallet +{E.S.Wallet - w0:0.##}");
             }
-            Result = E.S.Zaino > zainoStart ? "PASS" : "FAIL";
+            if (TutorialManager.I) { float te = Time.time; while (TutorialManager.I.Current != TutorialManager.Step.Chiuso && Time.time - te < 15) yield return null; }
+            Result = Goal() ? "PASS" : "FAIL";
+            Log("tutorial steps: " + string.Join(",", TutSteps));
             Log($"{Result} cycles={cycle} teleports={Teleports}");
             N.ScriptedInput = Vector3.zero;
         }

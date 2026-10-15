@@ -51,7 +51,20 @@ namespace UltimoMiglio.EditorTools
             fx.packagePop = FindPrefab("Assets/_Game/VFX/Prefabs", "pop"); fx.coins = FindPrefab("Assets/_Game/VFX/Prefabs", "coin"); fx.upgrade = FindPrefab("Assets/_Game/VFX/Prefabs", "upgrade");
 
             // --- prefabs
-            var parcel = SavePrefab(Box("Parcel", null, Vector3.zero, Vector3.one * 0.3f, props, UM_Palette.Cartone), "Parcel");
+            var parcelFbx = AssetDatabase.LoadAssetAtPath<GameObject>("Assets/_Game/Art/Props/prop_parcel_box.fbx");
+            GameObject parcelGo;
+            if (parcelFbx)
+            {
+                parcelGo = new GameObject("Parcel"); var pm = (GameObject)PrefabUtility.InstantiatePrefab(parcelFbx); pm.transform.SetParent(parcelGo.transform, false);
+                var pb = pm.GetComponentsInChildren<Renderer>(); var bb = pb[0].bounds; foreach (var r in pb) bb.Encapsulate(r.bounds);
+                float k = 0.32f / Mathf.Max(bb.size.y, 0.01f); pm.transform.localScale *= Mathf.Min(k, 0.45f / Mathf.Max(bb.size.x, bb.size.z, 0.01f));
+                pm.transform.localPosition = new Vector3(0, -0.16f, 0);
+                foreach (var r in pm.GetComponentsInChildren<Renderer>()) r.sharedMaterials = System.Array.ConvertAll(r.sharedMaterials, _ => props);
+                foreach (var c in pm.GetComponentsInChildren<Collider>()) Object.DestroyImmediate(c);
+                PrefabUtility.UnpackPrefabInstance(pm, PrefabUnpackMode.Completely, InteractionMode.AutomatedAction);
+            }
+            else parcelGo = Box("Parcel", null, Vector3.zero, Vector3.one * 0.3f, props, UM_Palette.Cartone);
+            var parcel = SavePrefab(parcelGo, "Parcel");
             var coinMesh = new[] { "Assets/_Game/Art/FX/fx_coin.fbx", "Assets/_Game/Art/FX/fx_coin_lira.fbx" }.Select(AssetDatabase.LoadAssetAtPath<GameObject>).FirstOrDefault(g => g);
             var coinGo = coinMesh ? (GameObject)PrefabUtility.InstantiatePrefab(coinMesh) : Prim(PrimitiveType.Cylinder, "Coin", null, Vector3.zero, new Vector3(0.25f, 0.02f, 0.25f), props, UM_Palette.GialloSole);
             coinGo.name = "Coin"; foreach (var c in coinGo.GetComponentsInChildren<Collider>()) Object.DestroyImmediate(c);
@@ -109,6 +122,7 @@ namespace UltimoMiglio.EditorTools
             // --- pads (near the Cassa, 01 §3)
             var padRow = banPos + new Vector3(-1.5f, 0, 4.5f);
             Pad("Pad_Zaino", UpgradeKind.Zaino, padRow, 0, props);
+            Pad("Pad_AssumiNonno", UpgradeKind.NonnoHire, arrPos + new Vector3(3.2f, 0, 0.5f), 0, props); // onboarding: last step
 
             // --- NONNO
             var nonno = new GameObject("NONNO"); nonno.transform.position = arrPos + new Vector3(2.5f, 0, -2);
@@ -139,6 +153,14 @@ namespace UltimoMiglio.EditorTools
             // --- blockout reference (05_3D_PIPELINE), hidden
             var glb = AssetDatabase.LoadAssetAtPath<GameObject>("Assets/_Game/Art/Blockout/depot_blockout_v01.glb");
             if (glb) { var b = (GameObject)PrefabUtility.InstantiatePrefab(glb); b.name = "REF_Blockout_v01"; b.SetActive(false); }
+
+            // --- onboarding (Nonna Ada)
+            var tut = new GameObject("Tutorial").AddComponent<TutorialManager>(); tut.transform.SetParent(root.transform);
+            var tj = AssetDatabase.LoadAssetAtPath<TextAsset>("Assets/_Game/Data/ch1/onboarding_testi.json");
+            if (tj) { var td = JsonUtility.FromJson<TutTexts>(tj.text); tut.Speaker = td.speaker; tut.Texts = td.steps.Select(x => x.text).ToArray(); tut.EndText = td.fine; }
+            tut.Arrivi = arrivals.transform; tut.Scaffale = shelves[0].transform; tut.Bancone = bancone.transform;
+            tut.Monete = new GameObject("Tut_Monete").transform; tut.Monete.position = banPos + Vector3.right * 0.8f;
+            foreach (var pz in Object.FindObjectsByType<UpgradePad>(FindObjectsSortMode.None)) { if (pz.Kind == UpgradeKind.Zaino) tut.PadZaino = pz.transform; if (pz.Kind == UpgradeKind.NonnoHire) tut.PadNonno = pz.transform; }
 
             EditorSceneManager.SaveScene(scene, ScenePath);
             EditorBuildSettings.scenes = new[] { new EditorBuildSettingsScene(ScenePath, true) };
@@ -277,6 +299,8 @@ namespace UltimoMiglio.EditorTools
         }
     }
 
+    [System.Serializable] class TutStep { public string id, text; }
+    [System.Serializable] class TutTexts { public string speaker, fine; public TutStep[] steps; }
     static class PrefabExt
     {
         public static T AddComponentPrefab<T>(this GameObject prefab) where T : Component
