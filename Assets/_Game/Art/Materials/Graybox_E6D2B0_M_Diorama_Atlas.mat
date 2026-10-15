@@ -8,7 +8,7 @@ Material:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_Name: Graybox_E6D2B0_M_Diorama_Atlas
-  m_Shader: {fileID: 4800000, guid: f0fdaef682f487544a3ee705da4cce1c, type: 3}
+  m_Shader: {fileID: 4800000, guid: 7bbcfa11a36250595af1d7d7ee7536b6, type: 3}
   m_Parent: {fileID: 0}
   m_ModifiedSerializedProperties: 0
   m_ValidKeywords: []
@@ -31,6 +31,8 @@ Material:
     m_Ints: []
     m_Floats:
     - _Bands: 3
+    - _NoiseScale: 0.35
+    - _NoiseStrength: 0.06
     - _OutlineOn: 0
     - _OutlineWidth: 0.012
     - _RampOffset: 0

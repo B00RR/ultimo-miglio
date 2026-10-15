@@ -1,4 +1,5 @@
 // Ultimo Miglio - "Diorama Solare" toon shader (URP, mobile, SRP Batcher compatible)
+// WebGL2/GLES3 safe: target 3.0, no compute/geometry/tessellation, no SRV arrays, few keywords.
 // Single main light, stepped soft ramp (2-3 bands), warm shadow tint (never pure black), rim,
 // receives main-light shadows, fog. Optional inverted-hull outline pass (pass "SRPDefaultUnlit"):
 // Per-material toggle _OutlineOn; UM_QualityTier enables the pass only when _OutlineOn=1 AND tier Alto (else pass disabled = zero cost).
@@ -18,6 +19,9 @@ Shader "UltimoMiglio/ToonDiorama"
         _RimColor ("Rim Color (Crema)", Color) = (1,0.957,0.839,1)
         _RimPower ("Rim Power", Range(0.5,8)) = 3.5
         _RimStrength ("Rim Strength", Range(0,1)) = 0.25
+        [Header(World Variation)]
+        _NoiseStrength ("Floor/Wall Tint Variation (0=off)", Range(0,0.2)) = 0
+        _NoiseScale ("Variation Scale (1/m)", Range(0.05,2)) = 0.35
         [Header(Emission)]
         _EmissionColor ("Emission (night lamps)", Color) = (0,0,0,1)
         [Header(Outline)]
@@ -38,7 +42,7 @@ Shader "UltimoMiglio/ToonDiorama"
             half _Bands; half _RampSoftness; half _RampOffset;
             half4 _ShadowTint; half _ShadowStrength;
             half4 _RimColor; half _RimPower; half _RimStrength;
-            half4 _EmissionColor;
+            half4 _EmissionColor; half _NoiseStrength; half _NoiseScale;
             half4 _OutlineColor; half _OutlineWidth; half _OutlineOn;
         CBUFFER_END
         TEXTURE2D(_BaseMap); SAMPLER(sampler_BaseMap);
@@ -53,7 +57,7 @@ Shader "UltimoMiglio/ToonDiorama"
             #pragma vertex vert
             #pragma fragment frag
             #pragma multi_compile _ _MAIN_LIGHT_SHADOWS _MAIN_LIGHT_SHADOWS_CASCADE
-            #pragma multi_compile_fragment _ _SHADOWS_SOFT
+            #pragma multi_compile_fragment _ _SHADOWS_SOFT  // toon uses step() anyway; kept for URP keyword parity
             #pragma multi_compile _ _ADDITIONAL_LIGHTS_VERTEX _ADDITIONAL_LIGHTS
             #pragma multi_compile _ LIGHTMAP_ON
             #pragma multi_compile_fog
@@ -85,6 +89,14 @@ Shader "UltimoMiglio/ToonDiorama"
                 return o;
             }
 
+            float Hash21(float2 p) { p = frac(p * float2(123.34, 456.21)); p += dot(p, p + 45.32); return frac(p.x * p.y); }
+            half ValueNoise(float2 p)
+            {
+                float2 i0 = floor(p); float2 f = frac(p); f = f * f * (3.0 - 2.0 * f);
+                float a = Hash21(i0), b = Hash21(i0 + float2(1, 0)), c = Hash21(i0 + float2(0, 1)), d = Hash21(i0 + 1);
+                return (half)lerp(lerp(a, b, f.x), lerp(c, d, f.x), f.y);
+            }
+
             half Ramp(half ndl)
             {
                 half x = saturate(ndl * 0.5h + 0.5h + _RampOffset);   // half-lambert
@@ -99,22 +111,29 @@ Shader "UltimoMiglio/ToonDiorama"
             {
                 UNITY_SETUP_INSTANCE_ID(i);
                 half4 albedo = SAMPLE_TEXTURE2D(_BaseMap, sampler_BaseMap, i.uv) * _BaseColor;
+                // Cheap low-frequency world-space variation (2 value-noise octaves, ALU only, no texture). 0 = off.
+                if (_NoiseStrength > 0.001h)
+                {
+                    float2 p = i.positionWS.xz * _NoiseScale;
+                    half nv = ValueNoise(p) * 0.65h + ValueNoise(p * 2.7 + 17.3) * 0.35h;
+                    albedo.rgb *= 1.0h + (nv - 0.5h) * 2.0h * _NoiseStrength;
+                }
                 half3 n = normalize(i.normalWS);
                 float4 sc = TransformWorldToShadowCoord(i.positionWS);
                 Light L = GetMainLight(sc);
                 half ramp = Ramp(dot(n, L.direction));
-                half shadow = step(0.5h, L.shadowAttenuation);           // crisp toon shadow edge
+                half shadow = smoothstep(0.3h, 0.7h, L.shadowAttenuation); // toon edge, but keeps PCF filtering (no stair-stepping)
                 half lit = min(ramp, shadow);
                 half3 shadowCol = lerp(1.0h.xxx, _ShadowTint.rgb, _ShadowStrength);
-                half3 direct = lerp(shadowCol, 1.0h.xxx, lit) * L.color;
-                half3 ambient = SAMPLE_GI(i.uvLM, i.sh, n) * 0.35h;
+                half3 direct = lerp(shadowCol, 1.0h.xxx, lit) * L.color * 0.82h; // headroom: lit albedo stays ~palette hex in LDR
+                half3 ambient = SAMPLE_GI(i.uvLM, i.sh, n) * 0.25h;
                 half3 col = albedo.rgb * (direct + ambient);
                 #ifdef _ADDITIONAL_LIGHTS
                     uint cnt = GetAdditionalLightsCount();
                     for (uint li = 0u; li < cnt; ++li) {
                         Light a = GetAdditionalLight(li, i.positionWS);
-                        half d = step(0.1h, saturate(dot(n, a.direction)) * a.distanceAttenuation);
-                        col += albedo.rgb * a.color * d * 0.6h;
+                        half d = smoothstep(0.0h, 0.6h, saturate(dot(n, a.direction)) * a.distanceAttenuation); // v1.4: wide soft falloff, no hard pool edge
+                        col += albedo.rgb * a.color * d * 0.45h;
                     }
                 #endif
                 col += albedo.rgb * i.fogAndVL.xyz;

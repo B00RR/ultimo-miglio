@@ -126,7 +126,7 @@ namespace UltimoMiglio.EditorTools
             // --- camera + lighting + post
             var cam = new GameObject("Main Camera"); cam.tag = "MainCamera"; var camera = cam.AddComponent<Camera>();
             camera.clearFlags = CameraClearFlags.SolidColor; camera.backgroundColor = UM_Palette.Cielo;
-            var urpCam = cam.AddComponent<UnityEngine.Rendering.Universal.UniversalAdditionalCameraData>(); urpCam.renderPostProcessing = true;
+            var urpCam = cam.AddComponent<UnityEngine.Rendering.Universal.UniversalAdditionalCameraData>(); urpCam.renderPostProcessing = false;
             cam.AddComponent<AudioListener>();
             var rig = new GameObject("CameraRig").AddComponent<CameraRigSetup>(); rig.Target = nina.transform; rig.Build(camera);
             WireHud(hudGo, hud, joy, camera, nina.transform, cassa.transform);

@@ -26,12 +26,12 @@ namespace UltimoMiglio.VFX
             sun.type = LightType.Directional;
             float n = preset == Preset.Night ? 1f : blendToNight;
             Color dayCol = preset == Preset.Golden ? UM_Palette.GialloSole : UM_Palette.Sole;
-            float dayInt = preset == Preset.Golden ? 1.0f : 1.15f;
+            float dayInt = preset == Preset.Golden ? 0.95f : 1.05f;
 
             sun.color = Color.Lerp(dayCol, UM_Palette.LunaCalda, n);
             sun.intensity = Mathf.Lerp(dayInt, 0.5f, n); // night ~45-50% of day with ambient; lanterns = key light on characters
             transform.rotation = Quaternion.Slerp(Quaternion.Euler(sunEulerDay), Quaternion.Euler(sunEulerNight), n);
-            sun.shadows = LightShadows.Hard;          // toon: crisp edge; soft only on tier Alto (UM_QualityTier)
+            sun.shadows = LightShadows.Soft;          // PCF low; toon edge done in shader. UM_QualityTier disables on Base/Standard
             sun.shadowStrength = Mathf.Lerp(0.6f, 0.45f, n);
             sun.shadowBias = 0.05f; sun.shadowNormalBias = 0.4f;
 

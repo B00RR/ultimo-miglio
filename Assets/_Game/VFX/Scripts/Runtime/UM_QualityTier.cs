@@ -6,13 +6,16 @@ using UnityEngine.Rendering.Universal;
 
 namespace UltimoMiglio.VFX
 {
-    public enum UMTier { Base, Standard, Alto }
+    public enum UMTier { Base, Standard, Alto, Web }
 
     public static class UM_QualityTier
     {
         public static UMTier Current { get; private set; } = UMTier.Standard;
         /// Particle emission multiplier used by UM_FxFactory.
-        public static float ParticleScale => Current == UMTier.Base ? 0.5f : Current == UMTier.Standard ? 0.75f : 1f;
+        public static float ParticleScale => Current == UMTier.Base ? 0.5f : (Current == UMTier.Standard || Current == UMTier.Web) ? 0.75f : 1f;
+        /// Web: outline/shadows cheap variants allowed (desktop-class GPUs via WebGL2), DPR capped in the WebGL template.
+        public const float ShadowDistAlto = 26f, ShadowDistWeb = 24f;
+        static bool OutlineTier(UMTier t) => t == UMTier.Alto || t == UMTier.Web;
 
         public static void Apply(UMTier tier, Material[] toonMaterials = null)
         {
@@ -20,19 +23,28 @@ namespace UltimoMiglio.VFX
             var urp = GraphicsSettings.currentRenderPipeline as UniversalRenderPipelineAsset;
             if (urp != null)
             {
-                urp.renderScale = tier == UMTier.Base ? 0.6f : tier == UMTier.Standard ? 0.75f : 1f;
-                urp.shadowDistance = tier == UMTier.Alto ? 25f : 0f;  // 02_TECH: no shadows on Base/Standard
-                urp.msaaSampleCount = tier == UMTier.Alto ? 2 : 1;
+                urp.renderScale = tier == UMTier.Base ? 0.6f : tier == UMTier.Standard ? 0.75f : tier == UMTier.Web ? 0.9f : 1f;
+                // Shadow distance is measured from the camera: = camera distance + play-area depth. Assumes CameraRigSetup.Distance = 15 (see README).
+                urp.shadowDistance = tier == UMTier.Alto ? ShadowDistAlto : tier == UMTier.Web ? ShadowDistWeb : 0f;  // none on Base/Standard (02_TECH)
+                urp.shadowCascadeCount = 1;
+                if (tier == UMTier.Alto) urp.mainLightShadowmapResolution = 2048;
+                if (tier == UMTier.Web) urp.mainLightShadowmapResolution = 1024;
+                urp.msaaSampleCount = tier == UMTier.Alto ? 2 : 1;  // Web: MSAA off, FXAA
+                urp.supportsHDR = false;
             }
             var sun = RenderSettings.sun;
-            if (sun != null) sun.shadows = tier == UMTier.Alto ? LightShadows.Soft : LightShadows.None;
+            if (sun != null) sun.shadows = (tier == UMTier.Alto || tier == UMTier.Web) ? LightShadows.Soft : LightShadows.None; // soft = URP Low quality (4-tap) set in UM_LightingSetup
 
             if (toonMaterials != null)
                 foreach (var m in toonMaterials)
-                    if (m) m.SetShaderPassEnabled("SRPDefaultUnlit", tier == UMTier.Alto && m.HasProperty("_OutlineOn") && m.GetFloat("_OutlineOn") > 0.5f); // per-material toggle, Alto only
+                    if (m) m.SetShaderPassEnabled("SRPDefaultUnlit", OutlineTier(tier) && m.HasProperty("_OutlineOn") && m.GetFloat("_OutlineOn") > 0.5f); // per-material toggle, Alto only
 
             foreach (var v in Object.FindObjectsByType<Volume>(FindObjectsSortMode.None))
-                if (v.profile && v.profile.TryGet(out Bloom b)) b.active = tier != UMTier.Base;
+                if (v.profile && v.profile.TryGet(out Bloom b))
+                {
+                    b.active = tier != UMTier.Base;
+                    if (tier == UMTier.Web) { b.downscale.Override(BloomDownscaleMode.Quarter); b.maxIterations.Override(2); b.highQualityFiltering.Override(false); }
+                }
             foreach (var cam in Object.FindObjectsByType<Camera>(FindObjectsSortMode.None))
             {
                 var d = cam.GetUniversalAdditionalCameraData();

@@ -26,7 +26,11 @@ namespace UltimoMiglio.Gameplay
         void Awake()
         {
             I = this;
+#if UNITY_WEBGL && !UNITY_EDITOR
+            Application.targetFrameRate = -1;
+#else
             Application.targetFrameRate = 60;
+#endif
             EconomyConfig cfg;
             try { cfg = DataLoader.LoadChapter(1); }
             catch (Exception e) { Debug.LogError("[GameRoot] " + e.Message); enabled = false; return; }
