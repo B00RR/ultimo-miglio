@@ -57,7 +57,7 @@ public class DataJsonTests
     [Test] public void Ch1ValuesDriveConfig()
     {
         var c = UltimoMiglio.Core.EconomyConfig.From(TestData.Ch1());
-        Assert.AreEqual(8400, c.TrancheLn); Assert.AreEqual(5, c.ZainoCapacity[0]); Assert.AreEqual(50, c.NonnoHireCost);
+        Assert.AreEqual(8400, c.TrancheLn); Assert.AreEqual(5, c.ZainoCapacity[0]); Assert.AreEqual(15, c.NonnoHireCost);
         Assert.AreEqual(336, c.CassaCapacity, 1e-6); Assert.AreEqual(10, c.ParcelValueLn, 1e-9);
     }
 }

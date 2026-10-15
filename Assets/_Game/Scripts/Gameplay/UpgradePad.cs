@@ -29,7 +29,7 @@ namespace UltimoMiglio.Gameplay
             bool done = eco.PadTick(Kind, t);
             if (!_padVis) _padVis = transform.Find("Pad"); if (_padVis) { _pulse = 1f; }
             if (Ring) Ring.SetFill((float)eco.PadFill(Kind));
-            if (done) { StopLoop(); AudioManager.I?.Play(AudioManager.Sfx.UpgradeComplete); UM_FxPlayer.Play(UM_FxPlayer.Fx.Upgrade, transform.position); UM_FxPlayer.Play(UM_FxPlayer.Fx.UpgradeComplete, transform.position); Completed?.Invoke(Kind); Nina.Cheer(); }
+            if (done) { StopLoop(); AudioManager.I?.Play(AudioManager.Sfx.UpgradeComplete); UM_FxPlayer.Play(UM_FxPlayer.Fx.Upgrade, transform.position); UM_FxPlayer.Play(UM_FxPlayer.Fx.UpgradeComplete, transform.position); UM_FxPlayer.Play(UM_FxPlayer.Fx.Purchase, transform.position); Completed?.Invoke(Kind); Nina.Cheer(); }
         }
         protected override void OnZoneExit() { base.OnZoneExit(); StopLoop(); }
         void StopLoop() { if (_paying) { _paying = false; AudioManager.I?.StopUpgradeLoop(); } }
