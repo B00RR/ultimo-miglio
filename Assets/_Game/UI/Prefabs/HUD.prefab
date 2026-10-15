@@ -309,6 +309,6 @@ MonoBehaviour:
   hud: {fileID: 6359808862508143165}
   cam: {fileID: 0}
   nina: {fileID: 0}
-  marginDp: 24
+  marginDp: 64
   markerHeight: 2.2
   showMarkerWhenVisible: 1
