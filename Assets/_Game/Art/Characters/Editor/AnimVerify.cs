@@ -7,7 +7,8 @@ public static class AnimVerify {
   const string Dir = "Assets/_Game/Art/Characters/";
   static readonly (string name, bool human, string[] clips)[] Chars = {
     ("chr_nina_vela", true,  new[]{"Idle","Walk","Run","Carry_Idle","Carry_Walk","Deliver","Cheer"}),
-    ("bot_nonno",     false, new[]{"Idle","Drive","Lift","Drop","Happy"}) };
+    ("bot_nonno",     false, new[]{"Idle","Drive","Lift","Drop","Happy"}),
+    ("bot_tico",      false, new[]{"Idle","Move","Stamp","Happy"}) };
   public static void Run() {
     AssetDatabase.Refresh(ImportAssetOptions.ForceSynchronousImport);
     var sb = new StringBuilder(); bool ok = true;
@@ -37,7 +38,7 @@ public static class AnimVerify {
         if (desc.Contains("NULL")) ok = false;
         sb.AppendLine($"   state {st.state.name}: {desc}");
       }
-      Still(c.name, fbx, ctrl, c.clips[1]);
+      Still(c.name, fbx, ctrl, c.clips[1]); Still(c.name, fbx, ctrl, c.clips[2]);
     }
     sb.AppendLine(ok ? "RESULT OK" : "RESULT FAIL");
     Directory.CreateDirectory("Captures"); File.WriteAllText("Captures/anim_verify.txt", sb.ToString());
