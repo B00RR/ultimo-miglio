@@ -9,6 +9,7 @@
 | `tools/build_webgl.sh` | Lancia la build, log in `Logs/webgl_build.log`, output in `Builds/WebGL`. |
 | `tools/run_tests.sh` | Test EditMode/PlayMode, XML NUnit in `Logs/*-results.xml`, riepilogo in `Logs/test-summary.txt`. |
 | `tools/pr_comment.sh` | Legge XML + log della build e scrive/aggiorna **un solo** commento di esito sulla PR (`gh`). |
+| `tools/patch_index_mobile.sh` | Patch mobile dell'`index.html` (viewport senza zoom, touch-action/overscroll none, showBanner/errorHandler su console, niente alert); fallisce se non si applica. Usata dal deploy CI. |
 | `tools/deploy_pages.sh` | Copia la build (file sciolti, niente zip) sul repo `B00RR/ultimo-miglio-web`. |
 | `.github/workflows/unity-ci.yml` | CI con game-ci (test + build + commento). **Si attiva solo con la licenza Unity nei secret**, altrimenti viene saltata con un avviso. |
 
