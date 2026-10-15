@@ -83,12 +83,12 @@ namespace UltimoMiglio.UI
         /// Font: corpo ≥ 16 dp, titolo ≥ 20 dp anche a scala minima (WebGL 960x600).</summary>
         void Layout(float scale)
         {
-            // HUD v2 spec: 120 dp below the safe top, width 88% (max 420 dp), centred; never in the lower half.
+            // HUD minimale (#38): sotto obiettivo tutorial (~48+28), banda a ~80 dp; mai metà bassa.
             var safe = root.Q("safe-root");
             float safeTop = safe != null ? safe.resolvedStyle.paddingTop : 0f;
             float H = root.layout.height;
-            float top = safeTop + 120f;
-            if (!float.IsNaN(H) && H > 0) top = Mathf.Min(top, H * 0.5f - 140f);
+            float top = safeTop + 80f;
+            if (!float.IsNaN(H) && H > 0) top = Mathf.Min(top, H * 0.5f - 40f);
             band.style.top = Mathf.Max(safeTop, top);
         }
     }
