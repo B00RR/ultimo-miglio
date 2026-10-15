@@ -141,3 +141,24 @@ Con Unity-MCP attivo: `script-update-or-create` per i `.cs`, `script-execute` pe
 - Colori (correzione Lorenzo): Pickup teal `#5E7F86`; Delivery menta `#8FC9A8` (NO terracotta); Purchase sole `#F4C430`; Upgrade limone `#F7E26B` (distinto dalla consegna).
 - `UM_PadFillRing.ColorOf` e `fx_package_deliver` aggiornati (coriandoli menta + crema, anello menta).
 - Setup: aggiungere `UM_PadIcon` a ciascun pad; *Ultimo Miglio/VFX/Setup Scene* assegna le icone UI/UX presenti.
+
+## v2.1 — Issue #48: luce e palette «Diorama Solare» (senza post-processing)
+
+Riferimento: `docs/concept/GUIDA_VISIVA_CAP1.md` §2 Palette, §9 Illuminazione, §11 Camera. Tutto il look viene da luci, materiali e shader (WebGL: post OFF, niente magenta).
+
+**Da eseguire in Unity (una volta, scena gameplay aperta):** menu `Ultimo Miglio/VFX/Applica Look #48 (luce + palette + camera)` → salvare scena e asset.
+
+| Area | Prima | v2.1 |
+|---|---|---|
+| Sole | `#FFD08A` 1.3 | `#FFE6B8` 1.35, euler (50, −35) |
+| Ambient trilight | cielo `#9FBCD8` (azzurro) | cielo `#C9B4A6` / equatore `#D8B898` / terra `#9E7873` |
+| Tinta ombre (shader) | lavanda (0.55,0.50,0.72) | `#9E7873` + `_ShadowCool` 0.12 (lieve, mai blu/viola) |
+| Grading in-shader | sat 1.18, contr 1.14, lift viola | sat 1.12 (+12%), contr 1.18, lift `#5A4A55` |
+| Vignetta a terra | viola, 0.35 | `#9E7873`, 0.25 |
+| Cielo/fondo | top azzurro | crema `#F3E3C3` → pesca `#F6D7B0` → tufo `#E9D2A8`; tramonto `#E8B48A`/`#E8913A`/`#F4B88E` |
+| Pavimento | atlas arancio ×tint, celle 1 m | lastre 0,25 m: `#F3E3C3`/`#E8D3AC`/`#E9D2A8` per cella, var 0.04, fuga 0.12 (`_FloorBaseMix`=1) |
+| Ombre URP | 26 m, 1024 (Web), PCF Low, bias 1/1 | 30 m, 2048, 1 cascata, PCF Medium, bias 0.6/0.7, bordo shader `_ShadowSoft` 0.35 |
+| Camera | ortho portrait 13.5, distanza 40 m | ortho portrait 7 (landscape 6.5, min 5.5), distanza 20 m, pref `cam_zoom_v2` |
+| Nebbia | 45–140 m | 30–90 m dalla scena (= camera 20 m + 30..90) |
+
+Perché la scalettatura: la shadow map copre l'intervallo [near, shadowDistance] dalla camera; con la camera a 40 m e distanza 24 m le ombre erano quasi tutte nel vuoto/bordo e i texel enormi. Camera a 20 m + 30 m + 2048 → texel ~1,7 cm; il PCF Medium resta filtrato perché lo shader non binarizza più l'attenuazione (smoothstep 0.15–0.85).
