@@ -122,6 +122,15 @@ Voci più recenti in alto. Formato: `AAAA-MM-GG HH:MM` (Europe/Rome) — [commit
 
 - **VFX v2.0** (15/10 16:30, ramo `vfx-v2`): shader toon premium (ombre colorate, AO, cielo a gradiente, grading in-shader con post OFF su WebGL), effetto acquisto `Fx.Purchase`, consegna più grande. Materiali/prefab da generare con *Ultimo Miglio/VFX/Setup Scene*. Non ancora compilato (compila il Tech Lead nella build).
 
+## Aggiornamento 17:45 — Impostazioni + schede pad (UI, issue #35, branch `ui/impostazioni-e-schede-pad`)
+- **Impostazioni** (ingranaggio accanto al telefono): zoom −/+ con anteprima live, slider Musica/Suoni, Salva / Indietro.
+  - PlayerPrefs: `cam_zoom`, `vol_music`, `vol_sfx` (0–1).
+  - Chiama per reflection (UI non referenzia Gameplay): `DepotCameraFit.SetOrthoSize` / `GetOrthoSize`, `AudioManager.SetMusicVolume` / `SetSfxVolume` — **Tech Lead crea i metodi e collega in scena**.
+  - File: `UI/Runtime/SettingsController.cs`, `UI/UXML/Settings.uxml` (+ overlay in `Hud.uxml`), `UI/USS/Settings.uss`. Aggiungere `SettingsController` sul prefab HUD (stesso UIDocument).
+- **Schede pad** (`UpgradePadCard`): nascoste di default; `ShowOnPad(bool)` / `SetVisible(bool)` — una sola attiva (`ActiveCard`). Tech Lead: `ProximityZone` enter/exit → `ShowOnPad`. Card max 200 dp, contrasto ink su paper, Fredoka.
+- Branch da **main** (non da `ui/pad-leggibili` #34). Colori pad lasciati al merge Tech Lead.
+- **Non compilato in Unity**. Verifica statica brace-check; compile/test a cura Tech Lead.
+
 ## Aggiornamento 17:10 — HUD v2 verticale (UI, issue #30, branch ui/hud-v2-portrait)
 - HUD in unità dp (ResponsivePanel: portrait min(W/411,H/914) → 2,63 a 1080x2400; landscape H/600), solo documento HUD.
 - Nuovi `Assets/_Game/UI/Tokens.uss` + `USS/HudV2.uss`: pillola valute, chip Pedaggio, telefono 3D, etichetta stanza (no ellissi, a capo >22 car.), card pad 128–200 dp, biglietto Ada, pulsanti chunky.

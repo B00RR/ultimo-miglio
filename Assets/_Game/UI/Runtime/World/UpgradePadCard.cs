@@ -7,6 +7,9 @@ namespace UltimoMiglio.UI.World
     /// Hook: UpgradePad.OnPaymentProgress(paid,total) → SetProgress; prices come from the pad (data), never from here.</summary>
     public class UpgradePadCard : WorldAnchoredElement
     {
+        /// <summary>Una sola scheda pad attiva alla volta (ZAINO / A RITIRARE / upgrade).</summary>
+        public static UpgradePadCard ActiveCard { get; private set; }
+
         [SerializeField] string title = "ASSUMI NONNO";
         [SerializeField] string iconClass = "icon-robot";
         [SerializeField] ZoneFillRing padFill; // optional: pad fills with terracotta from below
@@ -14,11 +17,30 @@ namespace UltimoMiglio.UI.World
         Label titleL, priceL, lockL; VisualElement fill, icon;
         double paid, total; int lockedChapter;
 
+        void Awake()
+        {
+            // Visibile solo sul pad (Tech Lead: ProximityZone → ShowOnPad)
+            padProximityRequired = true;
+            padVisible = false;
+        }
+
         protected override void Bind(VisualElement e)
         {
             titleL = e.Q<Label>("pad-title"); priceL = e.Q<Label>("pad-price"); lockL = e.Q<Label>("pad-lock");
             fill = e.Q("pad-progress-fill"); icon = e.Q("pad-icon");
+            if (Element != null) Element.style.display = DisplayStyle.None;
             Refresh();
+        }
+
+        public override void ShowOnPad(bool on)
+        {
+            if (on)
+            {
+                if (ActiveCard != null && ActiveCard != this) ActiveCard.ShowOnPad(false);
+                ActiveCard = this;
+            }
+            else if (ActiveCard == this) ActiveCard = null;
+            base.ShowOnPad(on);
         }
 
         public void SetTitle(string t, string icon = null) { title = t; if (icon != null) iconClass = icon; Refresh(); }
