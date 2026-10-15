@@ -1,7 +1,7 @@
 # STATO PROGETTO — Ultimo Miglio
 
 > Punto di ingresso unico per chiunque (persona o agente) lavori su questo repo. Aggiornalo **nella stessa PR** in cui completi qualcosa.
-> Ultimo aggiornamento: 2026-10-15 16:25 (Europe/Rome).
+> Ultimo aggiornamento: 2026-10-15 18:15 (Europe/Rome).
 
 ## 1. Il gioco
 - **Ultimo Miglio**: gioco mobile **Android**, **Unity 6 (6000.3) URP**.
@@ -39,7 +39,7 @@
 - **Merge del ramo `animator`** (fix camminata): conflitto su `chr_nina_vela.fbx` e `bot_nonno.fbx`.
 - I **clienti sono ancora capsule** → sostituire con i personaggi del ramo animator.
 - **Costo NONNO troppo alto** → da abbassare.
-- Controllo sovrapposizioni HUD.
+- Controllo sovrapposizioni HUD → **HUD minimale** (issue #38, `ui/hud-minimale`).
 
 ## 6. DA FARE
 - Resto del gioco in **3–4 giorni**: capitoli 2+ con **un sistema gestionale per capitolo** (energia/corrente, contratti, rotte, officina, OmniFreight).
@@ -136,3 +136,10 @@ Voci più recenti in alto. Formato: `AAAA-MM-GG HH:MM` (Europe/Rome) — [commit
 - Enum `PadKind` da Inspector (Pacco/Moneta/Cliente), default dedotto in Reset (UpgradePad/CassaZone → Moneta, nome "banc/client/consegn" → Cliente, altrimenti Pacco).
 - Colori: pacco teal #5E7F86/#3E5A61, moneta sun #F4C430 + ink, cliente terracotta #C8633B/#8E3F22; ZoneFillRing ricolorato con lo stesso colore. Font Fredoka. Icone già presenti (ic_box, ic_coin, ic_customer, Lucide ISC): nessuna nuova risorsa.
 - **Non compilato in Unity** (dotnet non disponibile sulla macchina dell'agente). Da agganciare ai pad in scena dal Tech Lead.
+
+## Aggiornamento 18:15 — HUD minimale (UI, issue #38, branch ui/hud-minimale)
+- In vista: **LN + giorno**, obiettivo tutorial 1 riga, Ada **1 riga ≤40 dp**, joystick, telefono/settings **≤40 dp**.
+- Nascosti: room label, chip Pedaggio, badge, bulloni; PadTag solo sul pad; pad/cassa card ≤140 dp.
+- File: `Hud.uxml` (`hud--minimal`, `day-value`, `tutorial-objective`), `HudV2.uss`, `Tokens.uss`, `PadTag.uss`, `CassaCard.uxml`; binding in `HudController`/`HudGameBridge`/`AdaNoteView`/`PadTag`.
+- **Tech Lead @1080×2400:** LN+G leggibili, icone non bloccano, Ada non invade, una scheda pad alla volta.
+- **Conflitti attesi con PR #36** (ancora aperta): `Hud.uxml`, `HudV2.uss`, `STATO_PROGETTO.md`. Partiti da `main`.
