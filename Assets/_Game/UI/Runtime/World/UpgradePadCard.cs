@@ -7,6 +7,14 @@ namespace UltimoMiglio.UI.World
     /// Hook: UpgradePad.OnPaymentProgress(paid,total) → SetProgress; prices come from the pad (data), never from here.</summary>
     public class UpgradePadCard : WorldAnchoredElement
     {
+        protected override bool RequireOnPad => true;
+        public static UpgradePadCard ActiveCard { get; private set; }
+        public override void ShowOnPad(bool on)
+        {
+            if (on) { if (ActiveCard != null && ActiveCard != this) ActiveCard.ShowOnPad(false); ActiveCard = this; }
+            else if (ActiveCard == this) ActiveCard = null;
+            base.ShowOnPad(on);
+        }
         [SerializeField] string title = "ASSUMI NONNO";
         [SerializeField] string iconClass = "icon-robot";
         [SerializeField] ZoneFillRing padFill; // optional: pad fills with terracotta from below

@@ -37,6 +37,7 @@ namespace UltimoMiglio.UI
 
         /// <summary>Set by the bridge (ChapterDataHudConfig). Optional: every API also takes explicit values.</summary>
         public IHudConfig Config { get; set; }
+        public System.Action OnSettingsRequested;
         public VisualElement Root { get; private set; }
         public VisualElement SafeRoot { get; private set; }
 
@@ -67,6 +68,8 @@ namespace UltimoMiglio.UI
             tollChip = Root.Q("toll-chip");
             tollLabel = Root.Q<Label>("toll-value");
             phoneButton = Root.Q("phone-button");
+            var settingsButton = Root.Q("settings-button");
+            settingsButton?.RegisterCallback<ClickEvent>(_ => OnSettingsRequested?.Invoke());
             phoneBadge = Root.Q<Label>("phone-badge");
             roomPill = Root.Q("room-pill");
             roomLabel = Root.Q<Label>("room-name");

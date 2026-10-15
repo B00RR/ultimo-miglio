@@ -20,7 +20,9 @@ namespace UltimoMiglio.Gameplay
             if (_avail != (avail ? 1 : 0)) { _avail = avail ? 1 : 0; foreach (var r in _renderers) if (r) r.enabled = avail; _col.enabled = avail; } // was 2 GetComponent* per pad per frame
             if (Ring && !Nina) Ring.SetFill((float)eco.PadFill(Kind));
             if (FillRing) { FillRing.gameObject.SetActive(avail); if (avail) FillRing.SetProgress((float)eco.PadFill(Kind)); }
+            var icon = GetComponent<UM_PadIcon>(); if (icon) icon.SetPlayerNear(Nina);
             if (Card) { Card.gameObject.SetActive(avail); if (avail) Card.SetProgress(eco.S.PadPaid[(int)Kind], eco.Cost(Kind)); }
+            var tag = GetComponent<UltimoMiglio.UI.World.PadTag>(); if (tag) { tag.enabled = avail; if (avail) { double left = eco.Cost(Kind) - eco.S.PadPaid[(int)Kind]; if (!double.IsInfinity(left)) tag.SetPrice(System.Math.Max(0, left)); } }
         }
         protected override void OnZoneTick(float t)
         {

@@ -106,7 +106,7 @@
 
 /* ---------- world-anchored ---------- */
 .world-anchored { position: absolute; translate: -50% -100%; }
-.pad-card { padding: 18px 28px; align-items: center; min-width: 333px; max-width: 520px; border-radius: 44px; }
+.pad-card { padding: 18px 28px; align-items: center; min-width: 333px; max-width: 200px; border-radius: 44px; }
 #pad-title { font-size: 39px; white-space: normal; -unity-text-align: middle-center; -unity-font-style: bold; letter-spacing: 1px; }
 #pad-price { font-size: 40px; -unity-font-style: bold; letter-spacing: -1px; }
 #pad-lock { font-size: 28px; -unity-font-style: bold; color: var(--teal); }
