@@ -184,6 +184,54 @@ namespace UltimoMiglio.EditorTools
             tut.Monete = new GameObject("Tut_Monete").transform; tut.Monete.position = banPos + Vector3.right * 0.8f;
             foreach (var pz in Object.FindObjectsByType<UpgradePad>(FindObjectsSortMode.None)) { if (pz.Kind == UpgradeKind.Zaino) tut.PadZaino = pz.transform; if (pz.Kind == UpgradeKind.NonnoHire) tut.PadNonno = pz.transform; }
 
+            TryRun("UltimoMiglio.VFX.EditorTools.UM_FxPrefabBuilder", "BuildAll");
+            // --- punti di interazione stile My Little Universe (pad a terra + chip billboard)
+            {
+                Texture2D I(string n) => AssetDatabase.LoadAssetAtPath<Texture2D>($"Assets/_Game/UI/Icons/{n}.png");
+                var font = AssetDatabase.LoadAssetAtPath<Font>("Assets/_Game/UI/Fonts/Fredoka-Bold.ttf");
+                var ringPf = AssetDatabase.LoadAssetAtPath<GameObject>("Assets/_Game/VFX/Prefabs/fx_pad_fill_ring.prefab");
+                foreach (var z in Object.FindObjectsByType<ProximityZone>(FindObjectsSortMode.None))
+                {
+                    var ip = z.gameObject.AddComponent<InteractionPoint>(); ip.LabelFont = font;
+                    var bc = z.GetComponent<BoxCollider>(); ip.Radius = bc ? Mathf.Clamp(Mathf.Min(bc.size.x, bc.size.z) * 0.5f, 0.45f, 1.2f) : 0.9f;
+                    switch (z)
+                    {
+                        case ArrivalsZone _: ip.Kind = PoiKind.Prendi; ip.Label = "Pacchi"; ip.Icon = I("ic_box"); break;
+                        case ShelfPickup _: ip.Kind = PoiKind.Prendi; ip.Label = "Prendi"; ip.Icon = I("ic_box"); break;
+                        case Shelf _: ip.Kind = PoiKind.Consegna; ip.Label = "Scaffale"; ip.Icon = I("ic_down"); break;
+                        case Bancone _: ip.Kind = PoiKind.Consegna; ip.Label = "Bancone"; ip.Icon = I("ic_customer"); break;
+                        case CassaZone _: ip.Kind = PoiKind.Prendi; ip.Label = "Monete"; ip.Icon = I("ic_coin"); ip.HasCard = true; break;
+                        case UpgradePad up:
+                            ip.Kind = PoiKind.Acquisto; ip.Label = "0"; ip.Icon = I("ic_coin"); ip.HasCard = true; ip.Pad = up; ip.Radius = 0.95f;
+                            if (ringPf) { var rg = (GameObject)PrefabUtility.InstantiatePrefab(ringPf); rg.transform.SetParent(up.transform, false); rg.transform.localPosition = new Vector3(0, 0.1f, 0); up.FillRing = rg.GetComponent<UltimoMiglio.VFX.UM_PadFillRing>(); }
+                            break;
+                        default: ip.Kind = PoiKind.Prendi; ip.Label = z.name.Replace("Zona_", ""); break;
+                    }
+                    if (ringPf && !(z is UpgradePad))
+                    {
+                        var rg = (GameObject)PrefabUtility.InstantiatePrefab(ringPf); rg.transform.SetParent(z.transform, false); rg.transform.localPosition = new Vector3(0, 0.1f, 0);
+                        rg.transform.localScale = Vector3.one * (ip.Radius / 0.95f);
+                        var fr = rg.GetComponent<UltimoMiglio.VFX.UM_PadFillRing>(); if (fr) { fr.playCompleteBurst = false; fr.kind = ip.Kind == PoiKind.Consegna ? UltimoMiglio.VFX.UM_PadFillRing.Kind.Delivery : UltimoMiglio.VFX.UM_PadFillRing.Kind.Pickup; ip.Ring = fr; }
+                    }
+                    var tagTpl = AssetDatabase.LoadAssetAtPath<UnityEngine.UIElements.VisualTreeAsset>("Assets/_Game/UI/UXML/PadTag.uxml");
+                    if (tagTpl)
+                    {
+                        var tag = z.gameObject.AddComponent<UltimoMiglio.UI.World.PadTag>();
+                        var so = new SerializedObject(tag); so.FindProperty("template").objectReferenceValue = tagTpl; so.ApplyModifiedPropertiesWithoutUndo();
+                        UltimoMiglio.UI.World.PadKind pk = ip.Kind == PoiKind.Prendi ? UltimoMiglio.UI.World.PadKind.Pacco : ip.Kind == PoiKind.Consegna ? UltimoMiglio.UI.World.PadKind.Cliente : UltimoMiglio.UI.World.PadKind.Moneta;
+                        double price = 0; if (z is UpgradePad up2 && GameRoot.I == null) { /* filled at runtime via SetPrice */ }
+                        tag.Set(pk, ip.Label, z is UpgradePad ? 1 : 0); // price>0 shows amount row; UpgradePad refreshes via Card
+                    }
+                    var padIcon = z.gameObject.AddComponent<UltimoMiglio.VFX.UM_PadIcon>();
+                    padIcon.kindFromRing = true;
+                    if (ip.Ring) padIcon.SetKind(ip.Ring.kind);
+                    else padIcon.SetKind(ip.Kind == PoiKind.Prendi ? UltimoMiglio.VFX.UM_PadFillRing.Kind.Pickup : ip.Kind == PoiKind.Consegna ? UltimoMiglio.VFX.UM_PadFillRing.Kind.Delivery : UltimoMiglio.VFX.UM_PadFillRing.Kind.Purchase);
+                    padIcon.AssignDefaultIcon();
+                    ip.PadIcon = padIcon;
+                    var oldPad = z.transform.Find("Pad"); if (oldPad) { var r = oldPad.GetComponent<Renderer>(); if (r) r.enabled = false; }
+                }
+            }
+
             EditorSceneManager.SaveScene(scene, ScenePath);
             EditorBuildSettings.scenes = new[] { new EditorBuildSettingsScene(ScenePath, true) };
             AssetDatabase.SaveAssets();

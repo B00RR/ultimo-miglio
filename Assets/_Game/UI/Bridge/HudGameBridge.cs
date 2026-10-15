@@ -17,6 +17,7 @@ namespace UltimoMiglio.UI.Bridge
         public PhoneController Phone;
         public FloatingJoystick Joystick;
         public StackCounter StackCounter;   // world-anchored above Nina
+        SettingsPanel _settings; bool _settingsWired;
         public CassaCard CassaCard;         // world-anchored above the Cassa
         public EdgeArrow EdgeArrow;
         public Transform Cassa;             // for the offline edge arrow "Cassa · X LN"
@@ -32,6 +33,7 @@ namespace UltimoMiglio.UI.Bridge
             if (data) Hud.Config = new ChapterDataHudConfig(data.Data);
             gr.Changed += Refresh;
             if (Phone) Hud.PhoneButtonTapped += () => Phone.OpenPhone();
+            WireSettings();
             var eco = gr.Eco;
             eco.OnLnCredited += OnLn; eco.OnMoraChanged += OnMora; eco.DayChanged += OnDay; eco.BulloniChanged += OnBulloni;
             Hud.PedaggioTapped += ShowSafe;
@@ -72,6 +74,18 @@ namespace UltimoMiglio.UI.Bridge
             });
         }
         void SafeClosed() { safeOpen = false; }
+
+        void WireSettings()
+        {
+            if (_settingsWired || !Hud || Hud.Root == null) return;
+            _settings = gameObject.GetComponent<SettingsPanel>() ?? gameObject.AddComponent<SettingsPanel>();
+            _settings.Bind(Hud, Hud.Root);
+            Hud.OnSettingsRequested -= _settings.Toggle;
+            Hud.OnSettingsRequested += _settings.Toggle;
+            _settingsWired = true;
+        }
+
+        void Update() { if (!_settingsWired) WireSettings(); }
 
         void Refresh()
         {
