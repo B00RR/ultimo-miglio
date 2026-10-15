@@ -86,6 +86,12 @@ $UNITY -batchmode -projectPath "$PWD" -runTests -testPlatform PlayMode \
 ## 11. Cronologia
 Voci più recenti in alto. Formato: `AAAA-MM-GG HH:MM` (Europe/Rome) — [commit] — descrizione.
 
+- 2026-10-15 16:30 — (questo commit) — Producer: aggiornata la Cronologia.
+- 2026-10-15 16:26 — Producer: create 13 issue della milestone *Gioco completo* divise per ruolo (#13, #15–#26), etichetta `ruolo:build` creata; #7 e #12 assegnate a *Gioco completo*; commento di piano su #7.
+- 2026-10-15 16:24 — Producer: create le milestone [Capitolo 1 - 15/10 18:00](https://github.com/B00RR/ultimo-miglio/milestone/1) (#1–#6) e [Gioco completo](https://github.com/B00RR/ultimo-miglio/milestone/2).
+- 2026-10-15 16:2x — PR #11 (ramo animator → main) aperta: **in conflitto** su `chr_nina_vela.fbx` e `bot_nonno.fbx`; merge a cura del Tech Lead.
+- 2026-10-15 16:21 — [c54f667](https://github.com/B00RR/ultimo-miglio/commit/c54f667) — main: merge PR #10, sezione Cronologia.
+- 2026-10-15 16:20 — [643f1f9](https://github.com/B00RR/ultimo-miglio/commit/643f1f9) — main: merge PR #8, aggiunto STATO_PROGETTO.md (PR #9 chiusa come duplicato).
 - 2026-10-15 16:25 — [#8](https://github.com/B00RR/ultimo-miglio/pull/8) + #9 — Aggiunto STATO_PROGETTO.md; create etichette e issue #1–#7.
 - 2026-10-15 16:08 — [0c05198](https://github.com/B00RR/ultimo-miglio/commit/0c051984aef7a75dafc24616fa890cae5cc102b3) — ramo animator: Clienti v02: rig Humanoid di Nina riusato sui 6 clienti, pesi accessori rigidi, clip Idle/Walk/Wait_Impatient/Pay/Happy/Angry e controller condiviso chr_cliente
 - 2026-10-15 16:07 — [b03a3ad](https://github.com/B00RR/ultimo-miglio/commit/b03a3adc9324209f1ec95ac87aa57a0a0939cfbb) — ramo animator: Nina: Carry mani sotto la pila al petto, giacca Cheer senza schegge, soglie Speed in m/s
