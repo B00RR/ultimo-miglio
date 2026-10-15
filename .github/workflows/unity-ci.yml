@@ -22,7 +22,7 @@ env:
 
 jobs:
   licenza:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     outputs:
       ok: ${{ steps.c.outputs.ok }}
     steps:
@@ -42,7 +42,7 @@ jobs:
   test:
     needs: licenza
     if: needs.licenza.outputs.ok == 'true' && github.event_name != 'push'
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     steps:
       # L'immagine unityci/editor è molto grande: liberare spazio sul runner
       - uses: jlumbroso/free-disk-space@v1.3.1
@@ -82,7 +82,7 @@ jobs:
   commento:
     needs: [licenza, test]
     if: always() && github.event_name == 'pull_request'
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     steps:
       - uses: actions/checkout@v4
       - uses: actions/download-artifact@v4
@@ -105,7 +105,7 @@ jobs:
   build-deploy:
     needs: licenza
     if: needs.licenza.outputs.ok == 'true' && github.event_name != 'pull_request'
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     steps:
       # L'immagine unityci/editor è molto grande: liberare spazio sul runner
       - uses: jlumbroso/free-disk-space@v1.3.1
@@ -137,6 +137,8 @@ jobs:
         run: |
           test -f build/WebGL/index.html
           if ls build/WebGL/Build/*.br build/WebGL/Build/*.gz 2>/dev/null; then echo "::error::Build compressa"; exit 1; fi
+      - name: Patch mobile su index.html (come um-web/pubblica.sh USE_BUILD_INDEX=1)
+        run: tools/patch_index_mobile.sh build/WebGL/index.html
       - name: Deploy su GitHub Pages (B00RR/ultimo-miglio-web)
         uses: peaceiris/actions-gh-pages@v4
         with:
