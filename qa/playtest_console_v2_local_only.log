@@ -1,0 +1,8 @@
+Total messages: 89 (Errors: 2, Warnings: 2)
+Returning 4 messages for level "warning"
+
+[ERROR] Failed to load resource: the server responded with a status of 404 (File not found) @ http://127.0.0.1:8777/favicon.ico:0
+[WARNING] Unknown pseudo class "last-child" in StyleSheet HudV2
+ @ http://127.0.0.1:8777/Build/WebGL_min.framework.js:8
+[WARNING] Manual synchronization of Unity Application.persistentDataPath via JS_FileSystem_Sync() is deprecated and will be later removed in a future Unity version. The persistent data directory will be automatically synchronized instead on file modification. Pass config.autoSyncPersistentDataPath = true; to configuration in createUnityInstance() to opt in to the new behavior. @ http://127.0.0.1:8777/Build/WebGL_min.framework.js:8
+[ERROR] Failed to load resource: the server responded with a status of 404 (File not found) @ http://127.0.0.1:8777/favicon.ico:0
