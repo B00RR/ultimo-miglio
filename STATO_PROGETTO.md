@@ -1,7 +1,7 @@
 # STATO PROGETTO — Ultimo Miglio
 
 > Punto di ingresso unico per chiunque (persona o agente) lavori su questo repo. Aggiornalo **nella stessa PR** in cui completi qualcosa.
-> Ultimo aggiornamento: 2026-10-15 18:15 (Europe/Rome).
+> Ultimo aggiornamento: 2026-10-16 01:55 (Europe/Rome).
 
 ## 1. Il gioco
 - **Ultimo Miglio**: gioco mobile **Android**, **Unity 6 (6000.3) URP**.
@@ -33,13 +33,12 @@
 - Ramo `animator` (non ancora su main): Nina rig Humanoid 24 ossa + clip (camminata nel verso giusto, Carry, Cheer), NONNO v03 (rig Generic), TICO v02, 6 clienti con rig di Nina e controller `chr_cliente`, verifica anti‑compenetrazione.
 - Documentazione di design: bibbia, core loop, tech, UI, retention, sprint 1, gestionale, longevità, cap. 1 completo, protocollo Unity.
 
-## 5. IN CORSO (oggi 15/10)
-- **Consegna cap. 1 giocabile in WebGL entro le 17:45–18:00.**
-- Rifinitura tutorial Nonna Ada (7 passi) e game feel.
+## 5. IN CORSO (oggi 16/10)
+- **HUD fedele al concept** (issue #49, ramo `ui/49-hud`): superfici legno/cartone + token; telefono non montato nell'HUD minimo (decisione TL).
+- Ramo `fix-qa` parallelo (PR #45 area): HudV2/Ada clamp — da allineare dopo merge TL.
+- Rifinitura tutorial Nonna Ada e game feel.
 - **Merge del ramo `animator`** (fix camminata): conflitto su `chr_nina_vela.fbx` e `bot_nonno.fbx`.
 - I **clienti sono ancora capsule** → sostituire con i personaggi del ramo animator.
-- **Costo NONNO troppo alto** → da abbassare.
-- Controllo sovrapposizioni HUD → **HUD minimale** (issue #38, `ui/hud-minimale`).
 
 ## 6. DA FARE
 - Resto del gioco in **3–4 giorni**: capitoli 2+ con **un sistema gestionale per capitolo** (energia/corrente, contratti, rotte, officina, OmniFreight).
@@ -84,9 +83,22 @@ $UNITY -batchmode -projectPath "$PWD" -runTests -testPlatform PlayMode \
 3. Clona in una cartella tua, crea il ramo, lavora, lancia i test, apri la PR.
 4. Rispetta i vincoli della sezione 2 (italiano, WebGL, niente video, asset liberi adattati).
 
+
+## Aggiornamento 01:55 (16/10) — HUD superfici concept (UI, issue #49, branch ui/49-hud)
+- Token: `--c-wood` `#74503A`, `--c-walnut` `#7A4A2E`, `--c-paper-hi` `#E8D3AC`, `--c-outline` `#3B2F2A`, `--bw` 3px / `--bw-thick` 4px, radius toon.
+- Texture originali (procedurali / ritaglio concept): `UI/Textures/tex_wood_panel.png`, `tex_cardboard_panel.png`, `tex_ada_portrait.png` + `LICENSE_TEXTURES.txt`.
+- Applicato all'HUD minimo via `Tokens.uss` (`!important`): pillola LN/giorno, riga obiettivo, Ada note 1 riga — bordo outline 3–4 px, fill cartone.
+- `USS/LegnoCartone.uss` classi `.surface-wood` / `.surface-cardboard` / `.cta-terracotta` / `.ada-face--portrait` per wiring TL post `fix-qa`.
+- `USS/Phone.uss` + import in `Phone.uxml`: chrome legno/cartone per schermata telefono **futura** (non nell'HUD di gioco).
+- **Omesso:** telefono in HUD (alto o basso); CTA terracotta zona pollice (contraddice HUD minimo Lorenzo = solo LN, giorno, obiettivo, joystick, pad).
+- **Non toccati:** `Hud.uxml`, `HudV2.uss`, `HudController.cs`.
+- Rebase su `origin/fix-qa` abortito (conflitti add/add su gameplay/HudV2); i file di questa PR non si sovrappongono a HudV2 — TL allinea dopo merge fix-qa.
+- **Tech Lead verifica** a 1170×2532 / 1080×2400; **Unity non avviato** in questa PR.
+
 ## 11. Cronologia
 Voci più recenti in alto. Formato: `AAAA-MM-GG HH:MM` (Europe/Rome) — [commit] — descrizione.
 
+- 2026-10-16 01:55 — ramo `ui/49-hud` — UI: #49 superfici legno/cartone (Tokens + texture 9-slice + LegnoCartone.uss), Phone.uss per schermata futura (non montata in HUD), ritratto Ada texture per #41; **non** toccati Hud.uxml / HudV2.uss / HudController; CTA pollice omessa (HUD minimo); Unity non avviato.
 - 2026-10-15 16:35 — PR producer/regola-closes — Producer: regola `Closes #N` / `Refs #N` in *Come lavoriamo*, modello di PR `.github/pull_request_template.md`, corretti gli orari di due voci; aggiunte le parole chiave alle PR #11 e #14.
 - 2026-10-15 16:25 — [8e4e272](https://github.com/B00RR/ultimo-miglio/commit/8e4e272) — Producer: aggiornata la Cronologia.
 - 2026-10-15 16:26 — Producer: create 13 issue della milestone *Gioco completo* divise per ruolo (#13, #15–#26), etichetta `ruolo:build` creata; #7 e #12 assegnate a *Gioco completo*; commento di piano su #7.
