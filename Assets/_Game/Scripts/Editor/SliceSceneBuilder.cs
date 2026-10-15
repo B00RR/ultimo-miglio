@@ -213,6 +213,21 @@ namespace UltimoMiglio.EditorTools
                         rg.transform.localScale = Vector3.one * (ip.Radius / 0.95f);
                         var fr = rg.GetComponent<UltimoMiglio.VFX.UM_PadFillRing>(); if (fr) { fr.playCompleteBurst = false; fr.kind = ip.Kind == PoiKind.Consegna ? UltimoMiglio.VFX.UM_PadFillRing.Kind.Delivery : UltimoMiglio.VFX.UM_PadFillRing.Kind.Pickup; ip.Ring = fr; }
                     }
+                    var tagTpl = AssetDatabase.LoadAssetAtPath<UnityEngine.UIElements.VisualTreeAsset>("Assets/_Game/UI/UXML/PadTag.uxml");
+                    if (tagTpl)
+                    {
+                        var tag = z.gameObject.AddComponent<UltimoMiglio.UI.World.PadTag>();
+                        var so = new SerializedObject(tag); so.FindProperty("template").objectReferenceValue = tagTpl; so.ApplyModifiedPropertiesWithoutUndo();
+                        UltimoMiglio.UI.World.PadKind pk = ip.Kind == PoiKind.Prendi ? UltimoMiglio.UI.World.PadKind.Pacco : ip.Kind == PoiKind.Consegna ? UltimoMiglio.UI.World.PadKind.Cliente : UltimoMiglio.UI.World.PadKind.Moneta;
+                        double price = 0; if (z is UpgradePad up2 && GameRoot.I == null) { /* filled at runtime via SetPrice */ }
+                        tag.Set(pk, ip.Label, z is UpgradePad ? 1 : 0); // price>0 shows amount row; UpgradePad refreshes via Card
+                    }
+                    var padIcon = z.gameObject.AddComponent<UltimoMiglio.VFX.UM_PadIcon>();
+                    padIcon.kindFromRing = true;
+                    if (ip.Ring) padIcon.SetKind(ip.Ring.kind);
+                    else padIcon.SetKind(ip.Kind == PoiKind.Prendi ? UltimoMiglio.VFX.UM_PadFillRing.Kind.Pickup : ip.Kind == PoiKind.Consegna ? UltimoMiglio.VFX.UM_PadFillRing.Kind.Delivery : UltimoMiglio.VFX.UM_PadFillRing.Kind.Purchase);
+                    padIcon.AssignDefaultIcon();
+                    ip.PadIcon = padIcon;
                     var oldPad = z.transform.Find("Pad"); if (oldPad) { var r = oldPad.GetComponent<Renderer>(); if (r) r.enabled = false; }
                 }
             }

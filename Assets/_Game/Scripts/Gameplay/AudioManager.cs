@@ -57,6 +57,9 @@ namespace UltimoMiglio.Gameplay
         }
         /// <summary>Layer fade (e.g. mel only after NONNO). index 0 base, 1 perc, 2 mel.</summary>
         public void SetStemVolume(int i, float v) { if (_music != null && i < _music.Length && _music[i]) _music[i].volume = v * MusicVolume; }
+        float _sfxMul = 1f;
+        public void SetMusicVolume(float v) { MusicVolume = Mathf.Clamp01(v); if (_music != null) foreach (var s in _music) if (s) s.volume = MusicVolume; }
+        public void SetSfxVolume(float v) { _sfxMul = Mathf.Clamp01(v); }
 
         public void PlayPickup(int stackHeight)
         {
@@ -89,7 +92,7 @@ namespace UltimoMiglio.Gameplay
         {
             if (!c || !Unlocked) return;
             var s = _voices[_next = (_next + 1) % _voices.Length]; // voice cap (README: coins cap 6 voices)
-            s.pitch = 1f + Random.Range(-0.05f, 0.05f); s.PlayOneShot(c, vol);
+            s.pitch = 1f + Random.Range(-0.05f, 0.05f); s.PlayOneShot(c, vol * _sfxMul);
         }
     }
 }
