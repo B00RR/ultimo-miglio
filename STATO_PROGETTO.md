@@ -111,3 +111,5 @@ Voci più recenti in alto. Formato: `AAAA-MM-GG HH:MM` (Europe/Rome) — [commit
 - 2026-10-15 13:04 — [c3b588a](https://github.com/B00RR/ultimo-miglio/commit/c3b588a4fb23debea683be0008c700ce1265f8c3) — main: HUD integration: core events (OnLnCredited/OnMoraChanged/DayChanged/BulloniChanged)+tests, bridge wiring, HUD.prefab hook, Inter+Roboto OFL fonts, ci hud step
 - 2026-10-15 12:55 — [a7cba95](https://github.com/B00RR/ultimo-miglio/commit/a7cba953cc88b93db02efafa66734e26b94a090a) — main: keep empty folders
 - 2026-10-15 12:55 — [8e08315](https://github.com/B00RR/ultimo-miglio/commit/8e08315b5b3178ce41972f37c02d973b39e67ecd) — main: Unity 6 project skeleton + ch1 vertical slice code (EconomyCore+tests, gameplay, audio, data import, build/capture scripts, Unity-MCP plugin)
+
+- **VFX v2.0** (15/10 16:30, ramo `vfx-v2`): shader toon premium (ombre colorate, AO, cielo a gradiente, grading in-shader con post OFF su WebGL), effetto acquisto `Fx.Purchase`, consegna più grande. Materiali/prefab da generare con *Ultimo Miglio/VFX/Setup Scene*. Non ancora compilato (compila il Tech Lead nella build).
