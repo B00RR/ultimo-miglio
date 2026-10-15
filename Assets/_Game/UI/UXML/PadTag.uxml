@@ -1,0 +1,9 @@
+<ui:UXML xmlns:ui="UnityEngine.UIElements"><Style src="project://database/Assets/_Game/UI/Tokens.uss" /><Style src="project://database/Assets/_Game/UI/USS/PadTag.uss" />
+    <ui:VisualElement class="pad-tag pad-tag--pacco" picking-mode="Ignore">
+        <ui:VisualElement class="pad-tag__row" picking-mode="Ignore">
+            <ui:VisualElement name="tag-icon" class="pad-tag__icon" picking-mode="Ignore" />
+            <ui:Label name="tag-label" class="pad-tag__label" text="Ritira" picking-mode="Ignore" />
+        </ui:VisualElement>
+        <ui:Label name="tag-price" class="pad-tag__price" text="" picking-mode="Ignore" />
+    </ui:VisualElement>
+</ui:UXML>

@@ -6,6 +6,7 @@ namespace UltimoMiglio.UI.World
     /// <summary>Card above the Cassa: "240 / 352 LN", terracotta "PIENA" when full, optional "x2 con video" prompt (04_UI §3.4).</summary>
     public class CassaCard : WorldAnchoredElement
     {
+        protected override bool RequireOnPad => true;
         public event System.Action DoubleWithVideoTapped;
         Label amountL, stateL; VisualElement x2;
 
