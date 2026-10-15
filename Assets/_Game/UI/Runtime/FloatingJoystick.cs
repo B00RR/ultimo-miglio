@@ -44,7 +44,7 @@ namespace UltimoMiglio.UI
         void OnEnable()
         {
             EnhancedTouchSupport.Enable();
-#if UNITY_EDITOR
+#if UNITY_EDITOR || UNITY_WEBGL || UNITY_STANDALONE // mouse drives the joystick on desktop browsers
             UnityEngine.InputSystem.EnhancedTouch.TouchSimulation.Enable();
 #endif
             ETouch.onFingerDown += OnDown;

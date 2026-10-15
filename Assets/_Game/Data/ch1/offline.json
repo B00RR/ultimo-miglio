@@ -7,7 +7,7 @@
   "cassaCapacityShareOfTranche": 0.04,
   "cassaCapacityLn": 336,
   "offlineShareOfChapterCoinsMax": 0.2,
-  "offlineShareOfChapterCoinsMaxAssist": 0.12,
+  "offlineShareOfChapterCoinsMaxAssist": 0.2,
   "adDoubleMaxPerDay": 2,
   "adDoubleAlsoWithBulloni": true,
   "pedaggioApplies": true,
@@ -28,5 +28,6 @@
       "stackBonus": 0.5,
       "durationSec": 120
     }
-  }
+  },
+  "offlineAssistNote": "01 v3.4: Assist 12% solo dal cap 4; nei cap 1-3 resta 20%"
 }

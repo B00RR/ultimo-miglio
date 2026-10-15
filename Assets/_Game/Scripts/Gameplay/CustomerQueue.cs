@@ -12,6 +12,7 @@ namespace UltimoMiglio.Gameplay
         public int Waiting => _line.Count;
         void Update()
         {
+            if (!GameRoot.Ready || !Prefab || !Door || !CounterSlot) return;
             _t += Time.deltaTime; float every = 60f / (float)GameRoot.I.Eco.Cfg.CustomersPerMin;
             if (_t >= every && _line.Count < MaxLine) { _t = 0; Spawn(); }
             for (int i = 0; i < _line.Count; i++) _line[i].Target = CounterSlot.position + LineStep * i;

@@ -1,0 +1,311 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: adc702d745ea5ca1b902da029d680935, type: 3}
+  m_Name: Ch1Data
+  m_EditorClassIdentifier: UltimoMiglio.Gameplay::UltimoMiglio.Gameplay.ChapterDataAsset
+  Data:
+    chapter: 1
+    economy:
+      parcelValueLn: 10
+      parcelValueGrowthPerChapter: 1.5
+      customersPerMin: 30
+      customerPatienceSec: 20
+      customersAtNight: 0
+      combo:
+        stepPerCustomer: 0.1
+        maxMultiplier: 2
+        resetGapSec: 5
+        resetGapSecAssist: 7
+      insegnaValueBonusPerLevel: 0.06
+      reputationVipValueBonusPerLevel: 0.05
+      playerSpendShare: 0.4
+      nina:
+        baseSpeedMps: 3
+        fullStackSlowdown: 0.1
+        startStackCapacity: 5
+    debt:
+      trancheLn: 8400
+      requiredPadLn: 0
+      dueCalendarDay: 24
+      yearDays: 365
+      tranchesTotal: 15
+      windowActiveMin: 40
+      minWindowFromPrevPaymentActiveMin: 40
+      calendarDaysPerCycle: 4.2583
+      earlyPayment:
+        minCyclesEarly: 1
+        reputationLevels: 1
+        bulloni: 5
+      proroga:
+        tokensGrantedAtActStart: 1
+        tokensMax: 3
+        extensionActiveMin: 7
+        appliesToCurrentTrancheOnly: 1
+        autoUse: 1
+        purchasable: 0
+      late:
+        trancheSurcharge: 0.1
+        pedaggioCoinPenalty: 0.15
+        pedaggioAppliesToOffline: 1
+      assist:
+        trancheDiscount: 0.1
+        trancheDiscountFromChapter: 4
+        calendarDaysPerCycle: 4
+        windowActiveMin: 42.6
+        comboResetGapSec: 7
+        offlineShareMax: 0.12
+    upgrades:
+      zaino:
+        levels:
+        - level: 0
+          stackCapacity: 5
+          costLn: 0
+        - level: 1
+          stackCapacity: 6
+          costLn: 40
+        - level: 2
+          stackCapacity: 7
+          costLn: 80
+        - level: 3
+          stackCapacity: 8
+          costLn: 160
+        - level: 4
+          stackCapacity: 9
+          costLn: 320
+        - level: 5
+          stackCapacity: 10
+          costLn: 640
+        - level: 6
+          stackCapacity: 12
+          costLn: 1280
+        - level: 7
+          stackCapacity: 14
+          costLn: 2560
+        - level: 8
+          stackCapacity: 16
+          costLn: 5120
+        - level: 9
+          stackCapacity: 18
+          costLn: 10240
+        - level: 10
+          stackCapacity: 20
+          costLn: 20480
+        - level: 11
+          stackCapacity: 22
+          costLn: 40960
+        - level: 12
+          stackCapacity: 24
+          costLn: 81920
+        - level: 13
+          stackCapacity: 27
+          costLn: 163840
+        - level: 14
+          stackCapacity: 30
+          costLn: 327680
+      scarpe:
+        levels:
+        - level: 0
+          speedBonus: 0
+          costLn: 0
+        - level: 1
+          speedBonus: 0.06
+          costLn: 60
+        - level: 2
+          speedBonus: 0.12
+          costLn: 162
+        - level: 3
+          speedBonus: 0.18
+          costLn: 437
+        - level: 4
+          speedBonus: 0.24
+          costLn: 1181
+        - level: 5
+          speedBonus: 0.3
+          costLn: 3189
+        - level: 6
+          speedBonus: 0.36
+          costLn: 8609
+        - level: 7
+          speedBonus: 0.42
+          costLn: 23245
+        - level: 8
+          speedBonus: 0.48
+          costLn: 62762
+        - level: 9
+          speedBonus: 0.54
+          costLn: 169458
+        - level: 10
+          speedBonus: 0.6
+          costLn: 457536
+      insegna:
+        levels:
+        - level: 0
+          customerValueBonus: 0
+          costLn: 0
+        - level: 1
+          customerValueBonus: 0.06
+          costLn: 90
+        - level: 2
+          customerValueBonus: 0.12
+          costLn: 243
+        - level: 3
+          customerValueBonus: 0.18
+          costLn: 656
+        - level: 4
+          customerValueBonus: 0.24
+          costLn: 1771
+        - level: 5
+          customerValueBonus: 0.3
+          costLn: 4783
+        - level: 6
+          customerValueBonus: 0.36
+          costLn: 12914
+        - level: 7
+          customerValueBonus: 0.42
+          costLn: 34868
+        - level: 8
+          customerValueBonus: 0.48
+          costLn: 94143
+        - level: 9
+          customerValueBonus: 0.54
+          costLn: 254187
+        - level: 10
+          customerValueBonus: 0.6
+          costLn: 686304
+    robots:
+      nonno:
+        unlockAtOnboardingSec: 130
+        hireCostLn: 50
+        padLabel: "ASSUMI NONNO \xB7 50 LN"
+        restockPpmBase: 6
+        restockPpmPerLevel: 1.5
+        selfServicePpmBase: 0.5
+        selfServicePpmPerLevel: 0.2
+        maxLevel: 10
+        upgradeCostBaseLn: 100
+        upgradeCostGrowth: 2.4
+        levels:
+        - level: 0
+          restockPpm: 6
+          selfServicePpm: 0.5
+          costLn: 0
+        - level: 1
+          restockPpm: 7.5
+          selfServicePpm: 0.7
+          costLn: 100
+        - level: 2
+          restockPpm: 9
+          selfServicePpm: 0.9
+          costLn: 240
+        - level: 3
+          restockPpm: 10.5
+          selfServicePpm: 1.1
+          costLn: 576
+        - level: 4
+          restockPpm: 12
+          selfServicePpm: 1.3
+          costLn: 1382
+        - level: 5
+          restockPpm: 13.5
+          selfServicePpm: 1.5
+          costLn: 3318
+        - level: 6
+          restockPpm: 15
+          selfServicePpm: 1.7
+          costLn: 7963
+        - level: 7
+          restockPpm: 16.5
+          selfServicePpm: 1.9
+          costLn: 19110
+        - level: 8
+          restockPpm: 18
+          selfServicePpm: 2.1
+          costLn: 45865
+        - level: 9
+          restockPpm: 19.5
+          selfServicePpm: 2.3
+          costLn: 110075
+        - level: 10
+          restockPpm: 21
+          selfServicePpm: 2.5
+          costLn: 264181
+      ninaCanAlwaysRestockByHand: 1
+    zones:
+      distancesM:
+        arriviToShelves: 6
+        shelvesToBancone: 9.4
+      timingsSec:
+        zoneDwellBeforeAction: 0.5
+        pickPerParcel: 0.1
+        dropPerParcel: 0.1
+        servePerCustomer: 1
+        coinPickupPerTrip: 1.5
+        padFillMax: 3
+      pads:
+      - id: hireNonno
+        costLn: 50
+        unlockAtOnboardingSec: 130
+        costRef: 
+      - id: zaino
+        costLn: 0
+        unlockAtOnboardingSec: 0
+        costRef: upgrades.zaino
+      - id: scarpe
+        costLn: 0
+        unlockAtOnboardingSec: 0
+        costRef: upgrades.scarpe
+      - id: insegna
+        costLn: 0
+        unlockAtOnboardingSec: 0
+        costRef: upgrades.insegna
+      - id: nonnoUpgrade
+        costLn: 0
+        unlockAtOnboardingSec: 0
+        costRef: robots.nonno.levels
+      padPaymentPersistent: 1
+    offline:
+      collectionMethod: cassaWalkOver
+      modalSummary: 0
+      rateShareOfRobotThroughput: 0.5
+      cassaCapacityShareOfTranche: 0.04
+      cassaCapacityLn: 336
+      offlineShareOfChapterCoinsMax: 0.2
+      offlineShareOfChapterCoinsMaxAssist: 0.2
+      adDoubleMaxPerDay: 2
+      adDoubleAlsoWithBulloni: 1
+      pedaggioApplies: 1
+      turnoDiNotte:
+        unlockChapter: 3
+        costLn: 2500
+        cassaCapacityShareOfTranche: 0.06
+      boostTotems:
+        unlockChapter: 4
+        maxPerSession: 1
+        maxPerDay: 4
+        caffeTurbo:
+          speedBonus: 0.3
+          stackBonus: 0
+          durationSec: 120
+        zainoGonfio:
+          speedBonus: 0
+          stackBonus: 0.5
+          durationSec: 120
+    daycycle:
+      cycleDurationSec: 420
+      dayDurationSec: 415
+      sunsetTransitionSec: 5
+      nightDurationSec: 0
+      nightFromChapter: 6
+      nightDurationSecFromCh6: 120
+      dayDurationSecFromCh6: 300
+      calendarDaysPerCycle: 4.2583
+      timeAdvancesOnlyWhileActive: 1

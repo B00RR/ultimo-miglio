@@ -58,11 +58,15 @@ namespace UltimoMiglio.EditorTools
             // --- Nina
             var nina = new GameObject("Nina"); nina.transform.position = new Vector3(0, 0, 0);
             var cc = nina.AddComponent<CharacterController>(); cc.center = new Vector3(0, 0.8f, 0); cc.height = 1.6f; cc.radius = 0.3f;
-            Prim(PrimitiveType.Capsule, "Body", nina.transform, new Vector3(0, 0.8f, 0), new Vector3(0.6f, 0.8f, 0.6f), chars, UM_Palette.AranceNina);
-            Prim(PrimitiveType.Sphere, "Helmet", nina.transform, new Vector3(0, 1.65f, 0.02f), Vector3.one * 0.42f, chars, UM_Palette.Terracotta);
+            var ninaAnim = Rig(nina.transform, "chr_nina_vela");
+            if (!ninaAnim)
+            {
+                Prim(PrimitiveType.Capsule, "Body", nina.transform, new Vector3(0, 0.8f, 0), new Vector3(0.6f, 0.8f, 0.6f), chars, UM_Palette.AranceNina);
+                Prim(PrimitiveType.Sphere, "Helmet", nina.transform, new Vector3(0, 1.65f, 0.02f), Vector3.one * 0.42f, chars, UM_Palette.Terracotta);
+            }
             var anchor = new GameObject("StackAnchor").transform; anchor.SetParent(nina.transform, false); anchor.localPosition = new Vector3(0, 0.9f, -0.42f);
             var stack = nina.AddComponent<PackageStack>(); stack.Anchor = anchor; stack.ParcelPrefab = parcel;
-            var ctrl = nina.AddComponent<NinaController>(); ctrl.Stack = stack; root.Nina = ctrl;
+            var ctrl = nina.AddComponent<NinaController>(); ctrl.Stack = stack; ctrl.Animator = ninaAnim; root.Nina = ctrl;
             // HUD (UI/UX, UI Toolkit): HUD.prefab owns the FloatingJoystick (overlay exclusion + graphics)
             var hudPrefab = AssetDatabase.LoadAssetAtPath<GameObject>(HudPrefabPath);
             GameObject hudGo = hudPrefab ? (GameObject)PrefabUtility.InstantiatePrefab(hudPrefab) : null;
@@ -106,10 +110,14 @@ namespace UltimoMiglio.EditorTools
 
             // --- NONNO
             var nonno = new GameObject("NONNO"); nonno.transform.position = arrPos + new Vector3(2.5f, 0, -2);
-            Box("Body", nonno.transform, new Vector3(0, 0.5f, 0), new Vector3(0.8f, 0.8f, 1f), chars, UM_Palette.TealOmni);
-            Box("Forks", nonno.transform, new Vector3(0, 0.15f, 0.7f), new Vector3(0.6f, 0.06f, 0.6f), chars, UM_Palette.ScuroCaldo);
+            var nonnoAnim = Rig(nonno.transform, "bot_nonno");
+            if (!nonnoAnim)
+            {
+                Box("Body", nonno.transform, new Vector3(0, 0.5f, 0), new Vector3(0.8f, 0.8f, 1f), chars, UM_Palette.TealOmni);
+                Box("Forks", nonno.transform, new Vector3(0, 0.15f, 0.7f), new Vector3(0.6f, 0.06f, 0.6f), chars, UM_Palette.ScuroCaldo);
+            }
             var agent = nonno.AddComponent<NavMeshAgent>(); agent.radius = 0.45f;
-            var bot = nonno.AddComponent<NonnoRobot>(); bot.Arrivals = arrivals; bot.Shelves = shelves; bot.Bancone = bancone; bot.Queue = queue;
+            var bot = nonno.AddComponent<NonnoRobot>(); bot.Arrivals = arrivals; bot.Shelves = shelves; bot.Bancone = bancone; bot.Queue = queue; bot.Animator = nonnoAnim;
 
             // --- NavMesh
             var surf = floor.AddComponent<NavMeshSurface>(); surf.collectObjects = CollectObjects.All; surf.useGeometry = NavMeshCollectGeometry.PhysicsColliders;
@@ -180,6 +188,22 @@ namespace UltimoMiglio.EditorTools
             if (!o) return; var so = new SerializedObject(o); var p = so.FindProperty(field);
             if (p == null) { Debug.LogWarning($"[Scene] {o.GetType().Name}.{field} not found"); return; }
             p.objectReferenceValue = value; so.ApplyModifiedPropertiesWithoutUndo();
+        }
+
+        /// <summary>Animator delivery (Art/Characters): model is -Z forward → rotated 180° Y; no root motion.</summary>
+        static Animator Rig(Transform parent, string name)
+        {
+            const string dir = "Assets/_Game/Art/Characters";
+            var fbx = AssetDatabase.LoadAssetAtPath<GameObject>($"{dir}/{name}.fbx");
+            var ctl = AssetDatabase.LoadAssetAtPath<RuntimeAnimatorController>($"{dir}/{name}.controller");
+            if (!fbx || !ctl) { Debug.LogWarning($"[Scene] rig {name} missing (fbx={(bool)fbx}, controller={(bool)ctl}): graybox"); return null; }
+            var go = (GameObject)PrefabUtility.InstantiatePrefab(fbx, parent);
+            go.transform.localPosition = Vector3.zero; go.transform.localRotation = Quaternion.Euler(0, 180, 0);
+            var mat = AssetDatabase.LoadAssetAtPath<Material>("Assets/_Game/VFX/Materials/M_Char_Atlas.mat");
+            if (mat) foreach (var r in go.GetComponentsInChildren<Renderer>()) r.sharedMaterials = System.Array.ConvertAll(r.sharedMaterials, _ => mat);
+            var an = go.GetComponent<Animator>() ?? go.AddComponent<Animator>();
+            an.runtimeAnimatorController = ctl; an.applyRootMotion = false; an.cullingMode = AnimatorCullingMode.CullUpdateTransforms;
+            return an;
         }
 
         static void Pad(string name, UpgradeKind k, Vector3 pos, float unlock, Material m)

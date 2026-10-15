@@ -17,7 +17,7 @@ namespace UltimoMiglio.Gameplay
             var go = new GameObject("CM_Follow"); go.transform.SetParent(transform);
             go.transform.rotation = Quaternion.Euler(Pitch, Yaw, 0);
             var cm = go.AddComponent<CinemachineCamera>();
-            cm.Follow = Target; cm.Lens = new LensSettings { Orthographic = true, OrthographicSize = OrthoSize, NearClipPlane = 0.3f, FarClipPlane = 120f, ModeOverride = LensSettings.OverrideModes.Orthographic };
+            cm.Follow = Target; cm.Lens = new LensSettings { OrthographicSize = OrthoSize, NearClipPlane = 0.3f, FarClipPlane = 120f, ModeOverride = LensSettings.OverrideModes.Orthographic };
             var pc = go.AddComponent<CinemachinePositionComposer>();
             pc.CameraDistance = Distance; pc.Damping = new Vector3(0.25f, 0.25f, 0.25f);
             pc.Lookahead = new LookaheadSettings { Enabled = true, Time = 0.5f, Smoothing = 5f, IgnoreY = true }; // 0.5 s × 3 m/s ≈ 1.5 m

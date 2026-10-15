@@ -5,7 +5,19 @@ namespace UltimoMiglio.UI
     /// <summary>Italian number formatting: 1.240 / 8,5 / 1,2K / 3,4M. Tabular digits come from the USS font settings.</summary>
     public static class HudFormat
     {
-        static readonly CultureInfo It = CultureInfo.GetCultureInfo("it-IT");
+        // WebGL/IL2CPP (invariant globalization) may not ship it-IT: a throwing static ctor would kill the whole HUD.
+        static readonly CultureInfo It = MakeIt();
+        static CultureInfo MakeIt()
+        {
+            try { return CultureInfo.GetCultureInfo("it-IT"); }
+            catch (System.Exception)
+            {
+                var c = (CultureInfo)CultureInfo.InvariantCulture.Clone();
+                c.NumberFormat.NumberDecimalSeparator = ","; c.NumberFormat.NumberGroupSeparator = ".";
+                c.NumberFormat.PercentDecimalSeparator = ","; c.NumberFormat.PercentGroupSeparator = ".";
+                return c;
+            }
+        }
 
         public static string Amount(double v)
         {

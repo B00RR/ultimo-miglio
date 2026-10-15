@@ -18,8 +18,13 @@ namespace UltimoMiglio.UI.World
 
         protected VisualElement Element { get; private set; }
 
-        protected virtual void OnEnable()
+        protected virtual void OnEnable() => TryCreate();
+
+        // OnEnable order across objects is undefined: if this runs before HudController.OnEnable, hud.Root is null
+        // and the card/counter would never appear. Retried from LateUpdate until it succeeds.
+        void TryCreate()
         {
+            if (Element != null) return;
             if (!hud) hud = FindFirstObjectByType<UltimoMiglio.UI.HudController>();
             if (!cam) cam = Camera.main;
             if (!anchor) anchor = transform;
@@ -38,6 +43,7 @@ namespace UltimoMiglio.UI.World
 
         protected virtual void LateUpdate()
         {
+            if (Element == null) TryCreate();
             if (Element == null || cam == null || Element.panel == null) return;
             Vector3 sp = cam.WorldToScreenPoint(anchor.position + worldOffset);
             bool visible = sp.z > 0;

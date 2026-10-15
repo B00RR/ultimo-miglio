@@ -13,15 +13,18 @@ namespace UltimoMiglio.Gameplay
         [Tooltip("Debug/capture: overrides joystick when non-zero")] public Vector3 ScriptedInput;
         const float AccelTime = 0.1f, BrakeTime = 0.08f, TurnRate = 12f, Gravity = -20f;
         CharacterController _cc; Vector3 _vel; float _vy;
-        static readonly int SpeedId = Animator.StringToHash("Speed"), CarryId = Animator.StringToHash("Carry");
+        static readonly int SpeedId = Animator.StringToHash("Speed"), CarryId = Animator.StringToHash("Carry"), DeliverId = Animator.StringToHash("Deliver"), CheerId = Animator.StringToHash("Cheer");
+        public void Deliver() { if (Animator) Animator.SetTrigger(DeliverId); }
+        public void Cheer() { if (Animator) Animator.SetTrigger(CheerId); }
 
         void Awake() { _cc = GetComponent<CharacterController>(); }
 
         void Update()
         {
+            if (!GameRoot.Ready) return;
             var eco = GameRoot.I.Eco;
             Vector3 dir = ScriptedInput.sqrMagnitude > 0 ? Vector3.ClampMagnitude(ScriptedInput, 1) : (Joystick ? Joystick.WorldDirection : Vector3.zero);
-#if UNITY_EDITOR
+#if UNITY_EDITOR || UNITY_WEBGL || UNITY_STANDALONE
             if (dir == Vector3.zero) { var k = new Vector3(Input2.H, 0, Input2.V); dir = Quaternion.Euler(0, 45, 0) * Vector3.ClampMagnitude(k, 1); }
 #endif
             float max = (float)eco.NinaSpeed(Stack ? Stack.Count : 0);
@@ -36,11 +39,11 @@ namespace UltimoMiglio.Gameplay
         }
     }
 
-#if UNITY_EDITOR
-    static class Input2 // editor keyboard fallback via Input System
+#if UNITY_EDITOR || UNITY_WEBGL || UNITY_STANDALONE
+    static class Input2 // keyboard (WASD + arrows) via Input System: editor + WebGL/desktop builds
     {
-        public static float H { get { var k = UnityEngine.InputSystem.Keyboard.current; return k == null ? 0 : (k.dKey.isPressed ? 1 : 0) - (k.aKey.isPressed ? 1 : 0); } }
-        public static float V { get { var k = UnityEngine.InputSystem.Keyboard.current; return k == null ? 0 : (k.wKey.isPressed ? 1 : 0) - (k.sKey.isPressed ? 1 : 0); } }
+        public static float H { get { var k = UnityEngine.InputSystem.Keyboard.current; return k == null ? 0 : (k.dKey.isPressed || k.rightArrowKey.isPressed ? 1 : 0) - (k.aKey.isPressed || k.leftArrowKey.isPressed ? 1 : 0); } }
+        public static float V { get { var k = UnityEngine.InputSystem.Keyboard.current; return k == null ? 0 : (k.wKey.isPressed || k.upArrowKey.isPressed ? 1 : 0) - (k.sKey.isPressed || k.downArrowKey.isPressed ? 1 : 0); } }
     }
 #endif
 }
