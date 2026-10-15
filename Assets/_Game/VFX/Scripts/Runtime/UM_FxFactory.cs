@@ -155,7 +155,8 @@ namespace UltimoMiglio.VFX
             rr.renderMode = ParticleSystemRenderMode.HorizontalBillboard; rr.maxParticleSize = 3f;
             // soft ring, slow pulse (2 breaths over 1.2 s), max alpha 0.45
             var rm = ring.main; rm.duration = 1.2f; rm.startLifetime = 1.2f; rm.startSpeed = 0; rm.startSize = 2.2f;
-            var rc = UM_Palette.UpgradeSole; rc.a = 0.45f; rm.startColor = rc;
+            var rc = UM_Palette.UiUpgrade; rc.a = 0.45f; // UI: upgrade = limone (distinto dalla consegna menta)
+            rm.startColor = rc;
             var re = ring.emission; re.SetBursts(new[] { new ParticleSystem.Burst(0, 1) });
             var rs = ring.sizeOverLifetime; rs.enabled = true;
             rs.size = new ParticleSystem.MinMaxCurve(1f, new AnimationCurve(
@@ -194,7 +195,7 @@ namespace UltimoMiglio.VFX
             m.duration = 0.25f; m.startLifetime = new ParticleSystem.MinMaxCurve(0.25f, 0.4f);
             m.startSpeed = new ParticleSystem.MinMaxCurve(1.8f, 3.2f);
             m.startSize = new ParticleSystem.MinMaxCurve(0.07f, 0.13f);
-            m.startColor = Grad(UM_Palette.Cartone, UM_Palette.Crema);
+            m.startColor = Grad(UM_Palette.UiPacco, Color.Lerp(UM_Palette.UiPacco, UM_Palette.Crema, 0.35f)); // UI: teal pacco
             m.gravityModifier = 0.6f;
             var e = ps.emission; e.SetBursts(new[] { new ParticleSystem.Burst(0, (short)N(9)) });
             var sh = ps.shape; sh.shapeType = ParticleSystemShapeType.Cone; sh.angle = 25f; sh.radius = 0.15f; sh.rotation = new Vector3(-90, 0, 0);
@@ -205,6 +206,12 @@ namespace UltimoMiglio.VFX
             var se = st.emission; se.SetBursts(new[] { new ParticleSystem.Burst(0, 2) });
             var ss = st.shape; ss.shapeType = ParticleSystemShapeType.Sphere; ss.radius = 0.25f;
             ShrinkOut(st);
+            var pr = Make("ring", mat, 1, out var prr); pr.transform.SetParent(ps.transform, false); Tile(pr, TileRing);
+            prr.renderMode = ParticleSystemRenderMode.HorizontalBillboard; prr.maxParticleSize = 3f;
+            var prm = pr.main; prm.duration = 0.35f; prm.startLifetime = 0.35f; prm.startSpeed = 0; prm.startSize = 1.4f; prm.startColor = UM_Palette.UiPacco;
+            var pre = pr.emission; pre.SetBursts(new[] { new ParticleSystem.Burst(0, 1) });
+            var prs = pr.sizeOverLifetime; prs.enabled = true; prs.size = new ParticleSystem.MinMaxCurve(1f, AnimationCurve.EaseInOut(0, 0.3f, 1, 1f));
+            FadeOut(pr, UM_Palette.UiPacco, 0.3f);
             return ps.gameObject;
         }
 
@@ -217,7 +224,7 @@ namespace UltimoMiglio.VFX
             m.startSpeed = new ParticleSystem.MinMaxCurve(2.5f, 4f);
             m.startSize = new ParticleSystem.MinMaxCurve(0.12f, 0.2f); // v2.0: +40%
             var g = new Gradient(); // coriandoli: terracotta, giallo sole, menta, limone
-            g.SetKeys(new[] { new GradientColorKey(UM_Palette.Terracotta, 0), new GradientColorKey(UM_Palette.GialloSole, 0.33f), new GradientColorKey(UM_Palette.Menta, 0.66f), new GradientColorKey(UM_Palette.Limone, 1) },
+            g.SetKeys(new[] { new GradientColorKey(UM_Palette.UiCliente, 0), new GradientColorKey(UM_Palette.UiCliente, 0.6f), new GradientColorKey(Color.Lerp(UM_Palette.UiCliente, UM_Palette.Crema, 0.4f), 0.61f), new GradientColorKey(UM_Palette.Crema, 1) }, // UI: menta consegna (60%) + crema
                       new[] { new GradientAlphaKey(1, 0), new GradientAlphaKey(1, 1) });
             m.startColor = new ParticleSystem.MinMaxGradient(g) { mode = ParticleSystemGradientMode.RandomColor };
             m.gravityModifier = 1.4f;
@@ -226,10 +233,10 @@ namespace UltimoMiglio.VFX
             ShrinkOut(ps);
             var ring = Make("ring", mat, 1, out var rr); ring.transform.SetParent(ps.transform, false); Tile(ring, TileRing);
             rr.renderMode = ParticleSystemRenderMode.HorizontalBillboard; rr.maxParticleSize = 3f;
-            var rm = ring.main; rm.duration = 0.45f; rm.startLifetime = 0.45f; rm.startSpeed = 0; rm.startSize = 2.3f; rm.startColor = UM_Palette.UpgradeSole;
+            var rm = ring.main; rm.duration = 0.45f; rm.startLifetime = 0.45f; rm.startSpeed = 0; rm.startSize = 2.3f; rm.startColor = UM_Palette.UiCliente;
             var re = ring.emission; re.SetBursts(new[] { new ParticleSystem.Burst(0, 1) });
             var rs = ring.sizeOverLifetime; rs.enabled = true; rs.size = new ParticleSystem.MinMaxCurve(1f, AnimationCurve.EaseInOut(0, 0.25f, 1, 1f));
-            FadeOut(ring, UM_Palette.UpgradeSole, 0.3f);
+            FadeOut(ring, UM_Palette.UiCliente, 0.3f);
             var st = Make("star", mat, 1, out _); st.transform.SetParent(ps.transform, false); st.transform.localPosition = Vector3.up * 0.4f; Tile(st, TileStar);
             var sm = st.main; sm.duration = 0.2f; sm.startLifetime = 0.3f; sm.startSpeed = 0; sm.startSize = 1.0f; sm.startColor = UM_Palette.Crema;
             var se = st.emission; se.SetBursts(new[] { new ParticleSystem.Burst(0, 1) });
@@ -245,17 +252,17 @@ namespace UltimoMiglio.VFX
             m.duration = 0.3f; m.startLifetime = new ParticleSystem.MinMaxCurve(0.5f, 0.7f);
             m.startSpeed = new ParticleSystem.MinMaxCurve(3f, 4.5f);
             m.startSize = new ParticleSystem.MinMaxCurve(0.12f, 0.2f);
-            m.startColor = Grad(UM_Palette.MonetaOro, UM_Palette.UpgradeLimone);
+            m.startColor = Grad(UM_Palette.UiSole, UM_Palette.UpgradeLimone); // UI: sole moneta/acquisto
             m.gravityModifier = 1.3f;
             var e = ps.emission; e.SetBursts(new[] { new ParticleSystem.Burst(0, (short)N(12)) });
             var sh = ps.shape; sh.shapeType = ParticleSystemShapeType.Cone; sh.angle = 22f; sh.radius = 0.15f; sh.rotation = new Vector3(-90, 0, 0);
             ShrinkOut(ps);
             var ring = Make("ring", mat, 1, out var rr); ring.transform.SetParent(ps.transform, false); Tile(ring, TileRing);
             rr.renderMode = ParticleSystemRenderMode.HorizontalBillboard; rr.maxParticleSize = 3f;
-            var rm = ring.main; rm.duration = 0.45f; rm.startLifetime = 0.45f; rm.startSpeed = 0; rm.startSize = 2.0f; rm.startColor = UM_Palette.Menta;
+            var rm = ring.main; rm.duration = 0.45f; rm.startLifetime = 0.45f; rm.startSpeed = 0; rm.startSize = 2.0f; rm.startColor = UM_Palette.UiSole;
             var re = ring.emission; re.SetBursts(new[] { new ParticleSystem.Burst(0, 1) });
             var rs = ring.sizeOverLifetime; rs.enabled = true; rs.size = new ParticleSystem.MinMaxCurve(1f, AnimationCurve.EaseInOut(0, 0.2f, 1, 1f));
-            FadeOut(ring, UM_Palette.Menta, 0.3f);
+            FadeOut(ring, UM_Palette.UiSole, 0.3f);
             var st = Make("stars", mat, 2, out _); st.transform.SetParent(ps.transform, false); st.transform.localPosition = Vector3.up * 0.6f; Tile(st, TileStar);
             var sm = st.main; sm.duration = 0.2f; sm.startLifetime = 0.35f; sm.startSpeed = new ParticleSystem.MinMaxCurve(0.3f, 0.8f); sm.startSize = new ParticleSystem.MinMaxCurve(0.6f, 0.9f); sm.startColor = UM_Palette.Crema;
             var se = st.emission; se.SetBursts(new[] { new ParticleSystem.Burst(0, 2) });

@@ -92,6 +92,7 @@ namespace UltimoMiglio.Gameplay
 
         static int ShelfTotal() { int n = 0; foreach (var sh in FindObjectsByType<Shelf>(FindObjectsSortMode.None)) n += sh.Count; return n; }
 
+        public Transform CurrentTarget => Target();
         Transform Target() => Current switch
         {
             Step.Arrivi => Arrivi, Step.Scaffali => Scaffale, Step.Bancone => Bancone, Step.Monete => Monete,

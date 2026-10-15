@@ -33,7 +33,7 @@ Material:
     - _Thickness: 0.07
     m_Colors:
     - _Color: {r: 0.957, g: 0.769, b: 0.188, a: 1}
-    - _GlowColor: {r: 0.969, g: 0.886, b: 0.42, a: 1}
+    - _GlowColor: {r: 1, g: 0.957, b: 0.839, a: 1}
     - _TrackColor: {r: 0.231, g: 0.165, b: 0.125, a: 0.35}
   m_BuildTextureStacks: []
   m_AllowLocking: 1

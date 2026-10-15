@@ -1,5 +1,6 @@
 // Ultimo Miglio - cablaggio in un clic per il Tech Lead: genera materiali/prefab, poi aggiunge alla scena aperta
-// UM_FxPlayer (prefab assegnati), UM_LookSettings (cielo + grading in-shader), UM_DayCycle sul sole.
+// UM_FxPlayer (prefab assegnati), UM_LookSettings (cielo + grading in-shader), UM_DayCycle sul sole,
+// e assegna le icone UI/UX a ogni UM_PadIcon presente.
 // Menu "Ultimo Miglio/VFX/Setup Scene" o -executeMethod UltimoMiglio.VFX.EditorTools.UM_VfxSceneSetup.Setup
 using UnityEditor;
 using UnityEditor.SceneManagement;
@@ -34,9 +35,21 @@ namespace UltimoMiglio.VFX.EditorTools
                 EditorUtility.SetDirty(dc);
             }
             look.Apply();
+            AssignPadIcons();
             EditorUtility.SetDirty(fx); EditorUtility.SetDirty(look);
             EditorSceneManager.MarkSceneDirty(fxGo.scene);
-            Debug.Log("[UM VFX] scena cablata: UM_FX (FxPlayer + LookSettings), DayCycle sul sole. Salvare la scena.");
+            Debug.Log("[UM VFX] scena cablata: UM_FX (FxPlayer + LookSettings), DayCycle sul sole, icone pad assegnate. Salvare la scena.");
+        }
+
+        /// Assegna le icone UI/UX (Assets/_Game/UI/Icons/ic_pad_*_white.png) a ogni UM_PadIcon in scena.
+        /// Aggiungere UM_PadIcon a ciascun oggetto pad (acquisto/upgrade/pacco/consegna); Kind da UM_PadFillRing se presente.
+        public static void AssignPadIcons()
+        {
+            foreach (var icon in Object.FindObjectsByType<UM_PadIcon>(FindObjectsInactive.Include, FindObjectsSortMode.None))
+            {
+                icon.AssignDefaultIcon();
+                EditorUtility.SetDirty(icon);
+            }
         }
     }
 }
