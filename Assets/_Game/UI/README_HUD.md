@@ -33,6 +33,9 @@ _Game/UI/
 ## API principali
 - `HudController`: `SetCurrencies(ln, bulloni, gettoni?)`, `PulseCurrency()`, `SetPhoneVisible(bool)`, `SetPhoneBadge(n)`, `RingPhone()`, `ShowPedaggio(fraction?)` / `ShowPedaggio(fraction, preview)` / `HidePedaggio()`, `ShowRoomLabel(name)`, `ShowToast(text)`, `ShowOfflineToast(ln)`, `ShowSafeCard(SafeCardData)` / `HideSafeCard()`, `ShowCollectPopup(screenPos, netLn, tollFraction)`, `IsOverInteractive(panelPos)`, `Config` (IHudConfig).
   Eventi: `PhoneButtonTapped`, `PedaggioTapped` (→ `ShowSafeCard` + `EdgeArrow.SetTarget(cassaforte)`), `SafeCardClosed`.
+
+- `SettingsController`: `Open()` / `Close()`; PlayerPrefs `cam_zoom` / `vol_music` / `vol_sfx`. Anteprima live via reflection su `DepotCameraFit.SetOrthoSize`/`GetOrthoSize` e `AudioManager.SetMusicVolume`/`SetSfxVolume` (Tech Lead). Eventi: `Opened`, `Closed`. Ingranaggio → `HudController.SettingsButtonTapped`.
+- `UpgradePadCard.ShowOnPad(bool)` / `SetVisible(bool)`: una sola card attiva (`ActiveCard`). Tech Lead: ProximityZone → ShowOnPad.
 - `PhoneController`: `OpenPhone(app)`, `Close()`, `Back()`, `HandleBack()`, `UnlockApp`, `SetLockChapter`, `SetBadge`, `SetHome`, `SetOrders`, `SetChat`, `SetFleet`. Eventi: `Opened`, `Closed`, `AppShown`, `ShowTheWayRequested(app, id)`, `QuickReplyChosen(contact, idx)`.
 - `FloatingJoystick`: `Value`, `WorldDirection`, `IsActive`, eventi `Moved`, `Released`. Si rilascia da solo all'apertura del telefono (Nina si ferma; il gioco non va in pausa).
 - `EdgeArrow`: `SetTarget(transform, "Cliente al Bancone", "icon-customer")`, `Clear()`.

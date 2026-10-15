@@ -1,0 +1,67 @@
+/* Impostazioni — token HUD v2 */
+.settings-scrim {
+    position: absolute; left: 0; top: 0; right: 0; bottom: 0;
+    background-color: rgba(59, 42, 32, 0.45);
+    justify-content: center; align-items: center;
+}
+.settings-panel {
+    width: 340px; max-width: 92%;
+    padding: 20px 18px 16px 18px;
+    border-radius: 18px; border-width: var(--bw); border-color: var(--c-ink);
+    background-color: var(--c-paper);
+    flex-direction: column;
+}
+.settings-title {
+    font-size: 22px; color: var(--c-ink);
+    -unity-font-definition: url("project://database/Assets/_Game/UI/Fonts/Fredoka-Bold.ttf");
+    -unity-text-align: middle-center; margin-bottom: 14px;
+}
+.settings-row {
+    flex-direction: row; align-items: center; justify-content: space-between;
+    margin-bottom: 12px; min-height: 44px;
+}
+.settings-label {
+    font-size: 17px; color: var(--c-ink); flex-grow: 1;
+    -unity-font-definition: url("project://database/Assets/_Game/UI/Fonts/Fredoka-SemiBold.ttf");
+}
+.settings-zoom-group { flex-direction: row; align-items: center; }
+.settings-zoom-btn {
+    width: 44px; height: 44px; border-radius: 12px; border-width: var(--bw); border-color: var(--c-ink);
+    background-color: var(--c-sun); color: var(--c-ink);
+    font-size: 22px; -unity-font-definition: url("project://database/Assets/_Game/UI/Fonts/Fredoka-Bold.ttf");
+    -unity-text-align: middle-center; margin: 0 4px;
+}
+.settings-zoom-btn:active { translate: 0 2px; background-color: var(--c-lemon); }
+.settings-zoom-value {
+    min-width: 56px; font-size: 18px; color: var(--c-ink);
+    -unity-font-definition: url("project://database/Assets/_Game/UI/Fonts/Fredoka-Bold.ttf");
+    -unity-text-align: middle-center;
+}
+.settings-slider {
+    flex-grow: 1; height: 28px; margin-left: 12px;
+}
+.settings-actions { flex-direction: row; justify-content: space-between; margin-top: 8px; }
+.settings-btn-save {
+    flex-grow: 1; height: 52px; margin-right: 8px;
+    border-radius: var(--r-btn); border-width: var(--bw); border-bottom-width: 8px; border-color: var(--c-ink);
+    background-color: var(--c-terracotta); color: #FFF9EE;
+    font-size: var(--fs-btn); -unity-font-definition: url("project://database/Assets/_Game/UI/Fonts/Fredoka-Bold.ttf");
+    -unity-text-align: middle-center;
+}
+.settings-btn-save:active { translate: 0 4px; border-bottom-width: 4px; }
+.settings-btn-back {
+    width: 100px; height: 52px;
+    border-radius: var(--r-btn); border-width: var(--bw); border-bottom-width: 8px; border-color: var(--c-ink);
+    background-color: var(--c-mint); color: var(--c-ink);
+    font-size: 16px; -unity-font-definition: url("project://database/Assets/_Game/UI/Fonts/Fredoka-Bold.ttf");
+    -unity-text-align: middle-center;
+}
+.settings-btn-back:active { translate: 0 4px; border-bottom-width: 4px; }
+#settings-button {
+    width: 52px; height: 52px; margin-right: 8px;
+    border-radius: var(--r-phone); border-width: var(--bw); border-bottom-width: 8px; border-color: var(--c-ink);
+    background-color: var(--c-walnut); justify-content: center; align-items: center;
+}
+#settings-button:active { translate: 0 4px; border-bottom-width: 4px; background-color: var(--c-sun); }
+#settings-button .icon { width: 26px; height: 26px; -unity-background-image-tint-color: var(--c-paper); }
+.icon-gear { background-image: url("project://database/Assets/_Game/UI/Icons/ic_gear.png"); -unity-background-scale-mode: scale-to-fit; }

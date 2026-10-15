@@ -18,6 +18,22 @@ namespace UltimoMiglio.UI.World
 
         protected VisualElement Element { get; private set; }
 
+        /// <summary>Se true, la card resta nascosta finché ShowOnPad(true) (Tech Lead ↔ ProximityZone).</summary>
+        protected bool padProximityRequired;
+        protected bool padVisible = true; // ignorato se !padProximityRequired
+
+        /// <summary>Mostra/nasconde quando Nina è sul pad. No-op se padProximityRequired è false.</summary>
+        public virtual void ShowOnPad(bool on)
+        {
+            padVisible = on;
+            if (Element != null && padProximityRequired && !on)
+                Element.style.display = DisplayStyle.None;
+        }
+
+        public void SetVisible(bool on) => ShowOnPad(on);
+
+        protected bool IsPadAllowed => !padProximityRequired || padVisible;
+
         protected virtual void OnEnable() => TryCreate();
 
         // OnEnable order across objects is undefined: if this runs before HudController.OnEnable, hud.Root is null
@@ -46,7 +62,8 @@ namespace UltimoMiglio.UI.World
             if (Element == null) TryCreate();
             if (Element == null || cam == null || Element.panel == null) return;
             Vector3 sp = cam.WorldToScreenPoint(anchor.position + worldOffset);
-            bool visible = sp.z > 0 && sp.x >= 0 && sp.x <= Screen.width && sp.y >= 0 && sp.y <= Screen.height; // anchor off-screen: hide (edge arrow guides), on-screen: clamp
+            bool onScreen = sp.z > 0 && sp.x >= 0 && sp.x <= Screen.width && sp.y >= 0 && sp.y <= Screen.height; // anchor off-screen: hide (edge arrow guides), on-screen: clamp
+            bool visible = onScreen && IsPadAllowed;
             Element.style.display = visible ? DisplayStyle.Flex : DisplayStyle.None;
             if (!visible) return;
             var p = UltimoMiglio.UI.SafeAreaUtil.ScreenToPanel(Element.panel, sp);
