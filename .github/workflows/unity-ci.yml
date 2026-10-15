@@ -1,9 +1,12 @@
-# Pipeline Ultimo Miglio: test EditMode/PlayMode + build WebGL + commento sulla PR.
-# Si attiva solo se nei secret del repo c'è la licenza Unity (UNITY_LICENSE oppure UNITY_EMAIL/UNITY_PASSWORD/UNITY_SERIAL).
-# Senza secret il job "licenza" lo segnala e gli altri job vengono saltati: usare tools/*.sh sulla box.
+# Pipeline Ultimo Miglio (issue #12)
+# - Ogni PR verso main: test EditMode + PlayMode (game-ci) e commento con l'esito sulla PR.
+# - Push/merge su main: build WebGL non compressa e deploy su B00RR/ultimo-miglio-web (GitHub Pages, file sciolti).
+# Secret richiesti: UNITY_LICENSE (.ulf Personal), UNITY_EMAIL, UNITY_PASSWORD; PAGES_DEPLOY_KEY (deploy key con scrittura sul repo web).
 name: Unity CI (WebGL)
 on:
   pull_request:
+    branches: [main]
+  push:
     branches: [main]
   workflow_dispatch:
 permissions:
@@ -16,6 +19,7 @@ concurrency:
 env:
   UNITY_VERSION: 6000.3.26f1
   TZ: Europe/Rome
+
 jobs:
   licenza:
     runs-on: ubuntu-latest
@@ -25,29 +29,41 @@ jobs:
       - id: c
         env:
           L: ${{ secrets.UNITY_LICENSE }}
-          S: ${{ secrets.UNITY_SERIAL }}
+          E: ${{ secrets.UNITY_EMAIL }}
+          P: ${{ secrets.UNITY_PASSWORD }}
         run: |
-          if [ -n "$L" ] || [ -n "$S" ]; then echo "ok=true" >> "$GITHUB_OUTPUT"
-          else echo "ok=false" >> "$GITHUB_OUTPUT"; echo "::warning::Licenza Unity assente nei secret: CI saltata, usare tools/run_tests.sh e tools/build_webgl.sh sulla box."; fi
+          mancano=""
+          [ -n "$L" ] || mancano="$mancano UNITY_LICENSE"
+          [ -n "$E" ] || mancano="$mancano UNITY_EMAIL"
+          [ -n "$P" ] || mancano="$mancano UNITY_PASSWORD"
+          if [ -z "$mancano" ]; then echo "ok=true" >> "$GITHUB_OUTPUT"
+          else echo "ok=false" >> "$GITHUB_OUTPUT"; echo "::error::Secret mancanti:$mancano. Vedi LEGGIMI_BUILD.md §3."; exit 1; fi
 
   test:
     needs: licenza
-    if: needs.licenza.outputs.ok == 'true'
+    if: needs.licenza.outputs.ok == 'true' && github.event_name != 'push'
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-        with: { lfs: true }
+      # LFS con cache: si scaricano solo gli oggetti nuovi (risparmio banda LFS)
+      - name: Elenco oggetti LFS
+        run: git lfs ls-files -l | cut -d' ' -f1 | sort > .lfs-assets-id
+      - uses: actions/cache@v4
+        with:
+          path: .git/lfs
+          key: lfs-${{ hashFiles('.lfs-assets-id') }}
+          restore-keys: lfs-
+      - run: git lfs pull
       - uses: actions/cache@v4
         with:
           path: Library
-          key: Library-test-${{ hashFiles('Packages/packages-lock.json') }}
+          key: Library-test-${{ hashFiles('Assets/**/*.asmdef', 'Packages/packages-lock.json', 'ProjectSettings/ProjectVersion.txt') }}
+          restore-keys: Library-test-
       - uses: game-ci/unity-test-runner@v4
-        id: tests
         env:
           UNITY_LICENSE: ${{ secrets.UNITY_LICENSE }}
           UNITY_EMAIL: ${{ secrets.UNITY_EMAIL }}
           UNITY_PASSWORD: ${{ secrets.UNITY_PASSWORD }}
-          UNITY_SERIAL: ${{ secrets.UNITY_SERIAL }}
         with:
           unityVersion: ${{ env.UNITY_VERSION }}
           testMode: all
@@ -58,34 +74,9 @@ jobs:
         if: always()
         with: { name: test-results, path: test-results }
 
-  build:
-    needs: licenza
-    if: needs.licenza.outputs.ok == 'true'
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
-        with: { lfs: true }
-      - uses: actions/cache@v4
-        with:
-          path: Library
-          key: Library-WebGL-${{ hashFiles('Packages/packages-lock.json') }}
-      - uses: game-ci/unity-builder@v4
-        env:
-          UNITY_LICENSE: ${{ secrets.UNITY_LICENSE }}
-          UNITY_EMAIL: ${{ secrets.UNITY_EMAIL }}
-          UNITY_PASSWORD: ${{ secrets.UNITY_PASSWORD }}
-          UNITY_SERIAL: ${{ secrets.UNITY_SERIAL }}
-        with:
-          unityVersion: ${{ env.UNITY_VERSION }}
-          targetPlatform: WebGL
-          buildMethod: UltimoMiglio.EditorTools.WebGLBuild.BuildCI
-          customParameters: -outputPath build/WebGL
-      - uses: actions/upload-artifact@v4
-        with: { name: webgl, path: build/WebGL }
-
   commento:
-    needs: [licenza, test, build]
-    if: always() && needs.licenza.outputs.ok == 'true' && github.event_name == 'pull_request'
+    needs: [licenza, test]
+    if: always() && github.event_name == 'pull_request'
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -96,10 +87,57 @@ jobs:
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           UM_REPO: ${{ github.repository }}
+          LICENZA_OK: ${{ needs.licenza.outputs.ok }}
         run: |
           mkdir -p Logs
-          for f in test-results/*.xml; do
-            case "$f" in *ditmode*|*EditMode*) cp "$f" Logs/editmode-results.xml;; *laymode*|*PlayMode*) cp "$f" Logs/playmode-results.xml;; esac
+          for f in $(find test-results -name '*.xml' 2>/dev/null); do
+            case "$f" in *[Ee]dit[Mm]ode*) cp "$f" Logs/editmode-results.xml;; *[Pp]lay[Mm]ode*) cp "$f" Logs/playmode-results.xml;; esac
           done
-          echo "[WebGLBuild] esito=${{ needs.build.result == 'success' && 'Succeeded' || 'Failed' }} (GitHub Actions)" > Logs/webgl_build.log
-          tools/pr_comment.sh ${{ github.event.pull_request.number }} "${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}"
+          RUN="${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}"
+          [ "$LICENZA_OK" = true ] || export UM_NOTA="⚠️ Test non eseguiti: licenza Unity non configurata nei secret (vedi LEGGIMI_BUILD.md §3)."
+          tools/pr_comment.sh ${{ github.event.pull_request.number }} "" "$RUN"
+
+  build-deploy:
+    needs: licenza
+    if: needs.licenza.outputs.ok == 'true' && github.event_name != 'pull_request'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - run: git lfs ls-files -l | cut -d' ' -f1 | sort > .lfs-assets-id
+      - uses: actions/cache@v4
+        with:
+          path: .git/lfs
+          key: lfs-${{ hashFiles('.lfs-assets-id') }}
+          restore-keys: lfs-
+      - run: git lfs pull
+      - uses: actions/cache@v4
+        with:
+          path: Library
+          key: Library-WebGL-${{ hashFiles('Assets/**/*.asmdef', 'Packages/packages-lock.json', 'ProjectSettings/ProjectVersion.txt') }}
+          restore-keys: Library-WebGL-
+      - uses: game-ci/unity-builder@v4
+        env:
+          UNITY_LICENSE: ${{ secrets.UNITY_LICENSE }}
+          UNITY_EMAIL: ${{ secrets.UNITY_EMAIL }}
+          UNITY_PASSWORD: ${{ secrets.UNITY_PASSWORD }}
+        with:
+          unityVersion: ${{ env.UNITY_VERSION }}
+          targetPlatform: WebGL
+          buildMethod: UltimoMiglio.EditorTools.WebGLBuild.BuildCI
+          customParameters: -outputPath build/WebGL
+      - name: Controllo build non compressa
+        run: |
+          test -f build/WebGL/index.html
+          if ls build/WebGL/Build/*.br build/WebGL/Build/*.gz 2>/dev/null; then echo "::error::Build compressa"; exit 1; fi
+      - name: Deploy su GitHub Pages (B00RR/ultimo-miglio-web)
+        uses: peaceiris/actions-gh-pages@v4
+        with:
+          deploy_key: ${{ secrets.PAGES_DEPLOY_KEY }}
+          external_repository: B00RR/ultimo-miglio-web
+          publish_branch: main
+          publish_dir: build/WebGL
+          enable_jekyll: false
+          force_orphan: true
+          commit_message: "Build WebGL da ultimo-miglio@${{ github.sha }}"
+      - uses: actions/upload-artifact@v4
+        with: { name: webgl, path: build/WebGL, retention-days: 3 }

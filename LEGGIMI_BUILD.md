@@ -28,7 +28,24 @@ Variabili: `UM_DEV=1` (build development), `UM_SKIP_SCENE=1` (non rigenera la sc
 Exit code: `0` ok · `1` test/build falliti · `2` configurazione (Unity mancante, istanza già aperta, build compressa).
 
 ## 3. GitHub Actions (game-ci)
-Servono i secret del repo: `UNITY_LICENSE` (licenza Personal, file `.ulf`) **oppure** `UNITY_EMAIL` + `UNITY_PASSWORD` + `UNITY_SERIAL` (Pro). Attenzione: gli asset sono in **Git LFS** → la CI consuma banda LFS; i runner standard hanno 7 GB di RAM, una build IL2CPP WebGL può essere lenta (20–40 min con cache vuota).
+- **Ogni PR verso `main`**: test EditMode + PlayMode (`game-ci/unity-test-runner@v4`), check "Test Unity" e commento unico con l'esito sulla PR (`tools/pr_comment.sh`).
+- **Push/merge su `main`**: build WebGL non compressa (`WebGLBuild.BuildCI`) e deploy dei file sciolti su `B00RR/ultimo-miglio-web` con deploy key (`peaceiris/actions-gh-pages`).
+- **Banda LFS**: `.git/lfs` in cache con chiave sull'elenco degli oggetti LFS → si scaricano solo gli oggetti nuovi; `Library/` in cache separata per test e build.
+
+Secret richiesti (Settings → Secrets → Actions):
+| Secret | Stato |
+|---|---|
+| `UNITY_PASSWORD` | impostato |
+| `PAGES_DEPLOY_KEY` | impostato (chiave privata ed25519; la pubblica è una deploy key con scrittura **solo** su `ultimo-miglio-web`) |
+| `UNITY_LICENSE` | **manca**: serve il file `Unity_lic.ulf` della licenza Personal |
+| `UNITY_EMAIL` | **manca**: email dell'account Unity |
+
+Come ottenere la `.ulf` (procedura game-ci per Personal): da un PC con Unity Hub, login con l'account Unity → Preferenze → Licenze → **Aggiungi** → *Licenza Personal gratuita*. Il file si trova in `~/.local/share/unity3d/Unity/Unity_lic.ulf` (Linux), `C:\ProgramData\Unity\Unity_lic.ulf` (Windows), `/Library/Application Support/Unity/Unity_lic.ulf` (Mac). Poi:
+```bash
+gh secret set UNITY_LICENSE -R B00RR/ultimo-miglio < Unity_lic.ulf
+printf %s "email@account" | gh secret set UNITY_EMAIL -R B00RR/ultimo-miglio
+```
+Nota: sulla box c'è solo una licenza *entitlement* legata alla macchina (`UnityEntitlementLicense.xml`), che **non** è utilizzabile in CI.
 
 ## 4. Proposta link giocabile (GitHub Pages)
 - Repo dedicato **`B00RR/ultimo-miglio-web`** (pubblico, già creato con segnaposto, Pages attivo su `main` /root).
