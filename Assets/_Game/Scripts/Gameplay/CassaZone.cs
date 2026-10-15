@@ -12,7 +12,7 @@ namespace UltimoMiglio.Gameplay
         {
             var eco = GameRoot.I.Eco; if (eco.S.CassaLn <= 0) return;
             long day = System.DateTimeOffset.UtcNow.ToUnixTimeSeconds() / 86400;
-            double ln = eco.CollectCassa(OfferDouble, day);
+            double ln = eco.CollectCassa(OfferDouble, day, transform.position.ToWP());
             Coins.Burst(transform.position, ln);
         }
         protected override void OnZoneTick(float t) { }

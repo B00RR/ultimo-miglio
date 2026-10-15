@@ -1,6 +1,6 @@
 using UnityEngine;
 
-namespace UltimoMiglio.UI.World
+namespace UltimoMiglio.UI
 {
     /// <summary>
     /// Drives the "_Fill" parameter (0..1) of a ground ring quad/decal (04_UI §2.1). Works with any shader that

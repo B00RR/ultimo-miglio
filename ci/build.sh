@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 # Ultimo Miglio - headless Unity tasks. Usage:
-#   ci/build.sh setup|scene|test|dev|apk|aab|all|still|video [seconds] [name]
+#   ci/build.sh setup|hud|scene|test|dev|apk|aab|all|still|video [seconds] [name]
 # Env: UNITY (editor binary), UM_KEYSTORE/UM_KEYSTORE_PASS/UM_KEY_ALIAS/UM_KEY_PASS (release signing)
 set -euo pipefail
 cd "$(dirname "$0")/.."
@@ -10,7 +10,9 @@ run() { local log="Logs/$1.log"; shift; echo ">> $*"; "$UNITY" -batchmode -proje
 X="xvfb-run -a"
 case "${1:-all}" in
   setup) run setup -nographics -quit -executeMethod UltimoMiglio.EditorTools.ProjectSetup.Apply ;;
-  scene) run scene -nographics -quit -executeMethod UltimoMiglio.EditorTools.SliceSceneBuilder.Build ;;
+  hud)   run hud -nographics -quit -executeMethod UltimoMiglio.UI.EditorTools.HudSetup.BuildAll ;;
+  scene) run hud -nographics -quit -executeMethod UltimoMiglio.UI.EditorTools.HudSetup.BuildAll
+         run scene -nographics -quit -executeMethod UltimoMiglio.EditorTools.SliceSceneBuilder.Build ;;
   test)  run test -nographics -runTests -testPlatform EditMode -testResults "$PWD/Logs/editmode-results.xml"; echo "results: Logs/editmode-results.xml" ;;
   dev)   run build_dev -nographics -executeMethod UltimoMiglio.EditorTools.BuildScript.BuildDevApk ;;
   apk)   run build_apk -nographics -executeMethod UltimoMiglio.EditorTools.BuildScript.BuildApk ;;

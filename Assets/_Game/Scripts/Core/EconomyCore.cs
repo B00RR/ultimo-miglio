@@ -4,6 +4,9 @@ namespace UltimoMiglio.Core
 {
     public enum UpgradeKind { Zaino, Scarpe, Insegna, NonnoHire, NonnoLevel }
 
+    /// <summary>Engine-free world position (converted to/from UnityEngine.Vector3 in Gameplay).</summary>
+    [Serializable] public struct WorldPos { public float x, y, z; public WorldPos(float x, float y, float z) { this.x = x; this.y = y; this.z = z; } }
+
     /// <summary>Serializable game state (save v1). Pure data.</summary>
     [Serializable]
     public sealed class EconomyState
@@ -21,6 +24,7 @@ namespace UltimoMiglio.Core
         public int AdDoublesToday; public long AdDayIndex;
         public int CustomersServed, CustomersLost;
         public bool ChapterComplete;
+        public double Bulloni; public int ProrogaTokens = -1; public double DueActiveSec = -1; public bool Mora; public int Day = 1;
     }
 
     /// <summary>Deterministic, engine-free economy (02_TECH §2). All mutations go through here.</summary>
@@ -28,8 +32,16 @@ namespace UltimoMiglio.Core
     {
         public readonly EconomyConfig Cfg; public EconomyState S;
         public event Action<string, string> OnEvent; // (type, json-fields) -> QA log
+        /// <summary>LN credited to the player: (gross, net after Pedaggio, world position of the pickup).</summary>
+        public event Action<double, double, WorldPos> OnLnCredited;
+        public event Action<bool> OnMoraChanged;
+        public event Action<int> DayChanged;          // calendar day 1..YearDays
+        public event Action<double> BulloniChanged;    // new total
 
-        public EconomyCore(EconomyConfig cfg, EconomyState state = null) { Cfg = cfg ?? throw new ArgumentNullException(nameof(cfg)); S = state ?? new EconomyState(); }
+        public EconomyCore(EconomyConfig cfg, EconomyState state = null) { Cfg = cfg ?? throw new ArgumentNullException(nameof(cfg)); S = state ?? new EconomyState();
+            if (S.ProrogaTokens < 0) S.ProrogaTokens = Math.Min(Cfg.ProrogaTokensAtActStart, Cfg.ProrogaTokensMax); // cap 1 = start of Act I
+            if (S.DueActiveSec < 0) S.DueActiveSec = Cfg.WindowActiveMin * 60;
+        }
 
         void Emit(string type, string fields) => OnEvent?.Invoke(type, fields);
         static string F(double v) => v.ToString("0.###", System.Globalization.CultureInfo.InvariantCulture);
@@ -42,7 +54,30 @@ namespace UltimoMiglio.Core
             return stackCount >= StackCapacity ? v * (1 - Cfg.FullStackSlowdown) : v;
         }
 
-        public void Tick(double dt) { S.ActiveSec += dt; }
+        public double TrancheDue => Cfg.TrancheLn * (S.Mora ? 1 + Cfg.MoraTrancheSurcharge : 1);
+        public double TollFraction => S.Mora ? Cfg.PedaggioCoinPenalty : 0;
+        public int CalendarDay => Math.Min(Cfg.YearDays, 1 + (int)Math.Floor(S.ActiveSec / Cfg.CycleSec * Cfg.CalendarDaysPerCycle));
+
+        /// <summary>Advance active (foreground) time: calendar day, deadline → auto Proroga → mora.</summary>
+        public void Tick(double dt)
+        {
+            S.ActiveSec += dt;
+            int d = CalendarDay; if (d != S.Day) { S.Day = d; DayChanged?.Invoke(d); }
+            if (S.ChapterComplete || S.Mora || S.ActiveSec <= S.DueActiveSec) return;
+            if (S.ProrogaTokens > 0)
+            {
+                S.ProrogaTokens--; S.DueActiveSec += Cfg.ProrogaExtensionActiveMin * 60;
+                Emit("proroga_used", $"\"tokens_left\":{S.ProrogaTokens}");
+            }
+            else SetMora(true);
+        }
+        void SetMora(bool on) { if (S.Mora == on) return; S.Mora = on; Emit("mora", $"\"on\":{(on ? "true" : "false")}"); OnMoraChanged?.Invoke(on); }
+
+        public void AddBulloni(double n, string reason)
+        {
+            if (n == 0) return; S.Bulloni += n; Emit("bulloni", $"\"delta\":{F(n)},\"reason\":\"{reason}\"");
+            BulloniChanged?.Invoke(S.Bulloni);
+        }
 
         // ---------- Customers ----------
         public double CustomerValue => Cfg.ParcelValueLn * (1 + Cfg.InsegnaBonus[Math.Min(S.Insegna, Cfg.InsegnaBonus.Length - 1)]);
@@ -60,16 +95,22 @@ namespace UltimoMiglio.Core
         public void CustomerLost() { S.CustomersLost++; Emit("customer_lost", ""); }
 
         /// <summary>Coins picked up from the floor: split 40% wallet / 60% debt.</summary>
-        public void CollectActive(double ln) { S.ChapterEarnedActive += ln; Split(ln); }
+        public void CollectActive(double ln, WorldPos at = default)
+        {
+            double net = ln * (1 - TollFraction);
+            S.ChapterEarnedActive += net; Split(net); OnLnCredited?.Invoke(ln, net, at);
+        }
 
         void Split(double ln)
         {
             S.Wallet += ln * Cfg.PlayerSpendShare;
             double toDebt = ln * (1 - Cfg.PlayerSpendShare);
             S.DebtPaid += toDebt;
-            if (!S.ChapterComplete && S.DebtPaid >= Cfg.TrancheLn)
+            if (!S.ChapterComplete && S.DebtPaid >= TrancheDue)
             {
-                S.ChapterComplete = true; Emit("vault_deposit", $"\"tranche\":{F(Cfg.TrancheLn)}");
+                S.ChapterComplete = true; Emit("vault_deposit", $"\"tranche\":{F(TrancheDue)}");
+                if (S.DueActiveSec - S.ActiveSec >= Cfg.EarlyPaymentMinCycles * Cfg.CycleSec) AddBulloni(Cfg.EarlyPaymentBulloni, "early_payment");
+                SetMora(false);
                 Emit("chapter_complete", $"\"chapter\":{Cfg.Chapter},\"active_min\":{F(S.ActiveSec / 60)}");
             }
         }
@@ -145,7 +186,7 @@ namespace UltimoMiglio.Core
         double AddToCassa(double ln) { double add = Math.Max(0, Math.Min(ln, OfflineHeadroom())); S.CassaLn += add; return add; }
 
         /// <summary>Nina walks over the Cassa. x2 (ad/Bulloni) max AdDoubleMaxPerDay per server-day; still capped.</summary>
-        public double CollectCassa(bool doubled, long dayIndex)
+        public double CollectCassa(bool doubled, long dayIndex, WorldPos at = default)
         {
             if (S.AdDayIndex != dayIndex) { S.AdDayIndex = dayIndex; S.AdDoublesToday = 0; }
             double ln = S.CassaLn; S.CassaLn = 0;
@@ -157,7 +198,8 @@ namespace UltimoMiglio.Core
                 ln = Math.Min(ln * 2, Math.Max(ln, cap));
             }
             if (ln <= 0) return 0;
-            S.ChapterEarnedOffline += ln; Split(ln);
+            double gross = ln; if (Cfg.PedaggioAppliesToOffline) ln *= 1 - TollFraction;
+            S.ChapterEarnedOffline += ln; Split(ln); OnLnCredited?.Invoke(gross, ln, at);
             Emit("cassa_collect", $"\"ln\":{F(ln)},\"x2\":{(doubled ? "true" : "false")}");
             return ln;
         }

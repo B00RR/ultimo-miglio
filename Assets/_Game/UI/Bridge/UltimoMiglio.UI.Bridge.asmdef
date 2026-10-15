@@ -1,0 +1,1 @@
+{ "name": "UltimoMiglio.UI.Bridge", "rootNamespace": "UltimoMiglio.UI.Bridge", "references": ["UltimoMiglio.Core", "UltimoMiglio.Gameplay", "UltimoMiglio.UI", "Unity.InputSystem"], "autoReferenced": true }

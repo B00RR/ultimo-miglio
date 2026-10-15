@@ -1,75 +1,48 @@
-using System;
-using System.IO;
-using UnityEngine;
+using UltimoMiglio.Core.Data;
 
 namespace UltimoMiglio.UI.Data
 {
     /// <summary>
-    /// Read-only view of the few numbers the HUD needs to *display* (never to simulate).
-    /// The Tech Lead's data layer should implement this; until it exists, <see cref="JsonHudConfig"/>
-    /// reads data/ch1/*.json, and the fallback is "unknown" (the HUD hides the number instead of inventing one).
+    /// Read-only view of the few numbers the HUD *displays* (never simulates). Backed by the Tech Lead's
+    /// ChapterData (data/ch1/*.json → Ch1Data.asset via 'Ultimo Miglio/Data/Import Ch1 Data').
+    /// No fallback numbers: unknown values are NaN / -1 and the HUD hides them.
     /// </summary>
     public interface IHudConfig
     {
-        /// <summary>Pedaggio multiplier on LN credits while in mora (e.g. 0.85). NaN if unknown.</summary>
-        float TollMultiplier { get; }
+        int Chapter { get; }
+        /// <summary>Pedaggio share taken in mora (debt.late.pedaggioCoinPenalty, e.g. 0.15). NaN if unknown.</summary>
+        float TollFraction { get; }
         int DaysPerYear { get; }
-        /// <summary>Installment amount in LN for installment k (1-based). NaN if unknown.</summary>
+        int InstallmentsPerYear { get; }
+        /// <summary>LN of installment k (1-based). Sprint 1: one tranche per chapter = debt.trancheLn.</summary>
         double InstallmentAmount(int k);
-        /// <summary>Due day of installment k (1-based). -1 if unknown.</summary>
+        /// <summary>Due calendar day of installment k: round(yearDays·k/tranchesTotal); k=1 uses debt.dueCalendarDay.</summary>
         int InstallmentDueDay(int k);
-        int StackBaseCapacity { get; }
+        double CassaCapacityLn { get; }
     }
 
-    [Serializable]
-    public class Ch1HudJson
+    public sealed class ChapterDataHudConfig : IHudConfig
     {
-        // Field names are a proposal for the Game Designer; JsonUtility ignores missing ones.
-        public float tollMultiplier = float.NaN;
-        public int daysPerYear = 365;
-        public int installmentsPerYear = 0;      // rata k due at round(daysPerYear*k/installmentsPerYear)
-        public double[] installmentAmounts = new double[0];
-        public int[] installmentDueDays = new int[0];
-        public int stackBaseCapacity = 0;
-    }
+        readonly ChapterData d;
+        public ChapterDataHudConfig(ChapterData data) { d = data; }
 
-    public class JsonHudConfig : IHudConfig
-    {
-        readonly Ch1HudJson d;
-        public JsonHudConfig(Ch1HudJson data) { d = data ?? new Ch1HudJson(); }
+        public int Chapter => d != null ? d.chapter : 0;
+        public float TollFraction => d?.debt?.late != null ? (float)d.debt.late.pedaggioCoinPenalty : float.NaN;
+        public int DaysPerYear => d?.debt != null && d.debt.yearDays > 0 ? d.debt.yearDays : -1;
+        public int InstallmentsPerYear => d?.debt != null ? d.debt.tranchesTotal : 0;
 
-        /// <summary>Loads from a TextAsset (Resources/Addressables) or a file path (StreamingAssets / dev box).</summary>
-        public static JsonHudConfig FromText(string json)
-        {
-            var d = new Ch1HudJson();
-            if (!string.IsNullOrEmpty(json)) JsonUtility.FromJsonOverwrite(json, d);
-            return new JsonHudConfig(d);
-        }
-        public static JsonHudConfig FromFile(string path) =>
-            FromText(File.Exists(path) ? File.ReadAllText(path) : null);
-
-        public float TollMultiplier => d.tollMultiplier;
-        public int DaysPerYear => d.daysPerYear > 0 ? d.daysPerYear : 365;
-        public int StackBaseCapacity => d.stackBaseCapacity;
-
-        public double InstallmentAmount(int k) =>
-            k >= 1 && k <= d.installmentAmounts.Length ? d.installmentAmounts[k - 1] : double.NaN;
+        public double InstallmentAmount(int k) => d?.debt != null && k == Chapter ? d.debt.trancheLn : double.NaN;
 
         public int InstallmentDueDay(int k)
         {
-            if (k >= 1 && k <= d.installmentDueDays.Length) return d.installmentDueDays[k - 1];
-            if (d.installmentsPerYear > 0) return Mathf.RoundToInt((float)DaysPerYear * k / d.installmentsPerYear);
+            if (d?.debt == null) return -1;
+            if (k == Chapter && d.debt.dueCalendarDay > 0) return d.debt.dueCalendarDay;
+            if (DaysPerYear > 0 && InstallmentsPerYear > 0) return (int)System.Math.Round((double)DaysPerYear * k / InstallmentsPerYear, System.MidpointRounding.AwayFromZero);
             return -1;
         }
-    }
 
-    /// <summary>Inspector-friendly holder so scenes can point at a JSON TextAsset.</summary>
-    [CreateAssetMenu(menuName = "Ultimo Miglio/UI/Hud Config Source", fileName = "HudConfigSource")]
-    public class HudConfigSource : ScriptableObject
-    {
-        public TextAsset ch1Json;
-        IHudConfig cached;
-        public IHudConfig Config => cached ??= JsonHudConfig.FromText(ch1Json ? ch1Json.text : null);
-        public void Override(IHudConfig cfg) => cached = cfg;
+        public double CassaCapacityLn => d?.offline != null
+            ? (d.offline.cassaCapacityLn > 0 ? d.offline.cassaCapacityLn : d.debt.trancheLn * d.offline.cassaCapacityShareOfTranche)
+            : double.NaN;
     }
 }

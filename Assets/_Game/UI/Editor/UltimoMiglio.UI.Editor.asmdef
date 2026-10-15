@@ -1,0 +1,1 @@
+{ "name": "UltimoMiglio.UI.Editor", "rootNamespace": "UltimoMiglio.UI.EditorTools", "references": ["UltimoMiglio.UI", "UltimoMiglio.UI.Demo", "UltimoMiglio.UI.Bridge", "UltimoMiglio.Gameplay"], "includePlatforms": ["Editor"], "autoReferenced": false }

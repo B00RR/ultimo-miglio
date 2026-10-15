@@ -19,7 +19,10 @@ namespace UltimoMiglio.Core
         public double OfflineRateShare, CassaCapacityShareOfTranche, OfflineShareOfChapterMax; public int AdDoubleMaxPerDay;
         public double MaxOfflineSec = 7 * 24 * 3600; // tech guard (not balance)
         public double ZoneDwellSec, ZoneTickSec, ServeSec, PadFillMaxSec, PickPerParcelSec, DropPerParcelSec;
-        public double CycleSec, CalendarDaysPerCycle;
+        public double CycleSec, CalendarDaysPerCycle; public int YearDays;
+        // Debt deadline / mora (01 §7, debt.json)
+        public double WindowActiveMin, ProrogaExtensionActiveMin, MoraTrancheSurcharge, PedaggioCoinPenalty; public int ProrogaTokensAtActStart, ProrogaTokensMax;
+        public bool PedaggioAppliesToOffline; public int DueCalendarDay; public int EarlyPaymentMinCycles, EarlyPaymentBulloni;
 
         public double CassaCapacity => TrancheLn * CassaCapacityShareOfTranche;
         public double NonnoUpgradeCost(int toLevel) => NonnoCost[toLevel];
@@ -45,7 +48,11 @@ namespace UltimoMiglio.Core
                 OfflineShareOfChapterMax = d.offline.offlineShareOfChapterCoinsMax, AdDoubleMaxPerDay = d.offline.adDoubleMaxPerDay,
                 ZoneDwellSec = t.zoneDwellBeforeAction, ZoneTickSec = t.pickPerParcel, ServeSec = t.servePerCustomer, PadFillMaxSec = t.padFillMax,
                 PickPerParcelSec = t.pickPerParcel, DropPerParcelSec = t.dropPerParcel,
-                CycleSec = d.daycycle.cycleDurationSec, CalendarDaysPerCycle = d.daycycle.calendarDaysPerCycle,
+                CycleSec = d.daycycle.cycleDurationSec, CalendarDaysPerCycle = d.daycycle.calendarDaysPerCycle, YearDays = d.debt.yearDays,
+                WindowActiveMin = d.debt.windowActiveMin, DueCalendarDay = d.debt.dueCalendarDay,
+                ProrogaExtensionActiveMin = d.debt.proroga.extensionActiveMin, ProrogaTokensAtActStart = d.debt.proroga.tokensGrantedAtActStart, ProrogaTokensMax = d.debt.proroga.tokensMax,
+                MoraTrancheSurcharge = d.debt.late.trancheSurcharge, PedaggioCoinPenalty = d.debt.late.pedaggioCoinPenalty, PedaggioAppliesToOffline = d.debt.late.pedaggioAppliesToOffline,
+                EarlyPaymentMinCycles = d.debt.earlyPayment.minCyclesEarly, EarlyPaymentBulloni = d.debt.earlyPayment.bulloni,
             };
         }
     }

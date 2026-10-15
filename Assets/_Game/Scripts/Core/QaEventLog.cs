@@ -11,7 +11,7 @@ namespace UltimoMiglio.Core
     {
         public event Action<string> Sink;
         readonly EconomyCore _eco; readonly string _sid; 
-        int _served0; public double TheoreticalPpm = 25; // sim reference (packages/min at eff 1.0, cap 1)
+        public double TheoreticalPpm = 25; // sim reference (packages/min at eff 1.0, cap 1)
 
         public QaEventLog(EconomyCore eco, string sessionId) { _eco = eco; _sid = sessionId; eco.OnEvent += Log; }
 
