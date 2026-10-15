@@ -1,7 +1,7 @@
 # STATO PROGETTO — Ultimo Miglio
 
 > Punto di ingresso unico per chiunque (persona o agente) lavori su questo repo. Aggiornalo **nella stessa PR** in cui completi qualcosa.
-> Ultimo aggiornamento: 15/10/2026 16:30 (ora di Roma).
+> Ultimo aggiornamento: 2026-10-15 16:25 (Europe/Rome).
 
 ## 1. Il gioco
 - **Ultimo Miglio**: gioco mobile **Android**, **Unity 6 (6000.3) URP**.
@@ -74,10 +74,40 @@ $UNITY -batchmode -projectPath "$PWD" -runTests -testPlatform PlayMode \
 5. Il **Tech Lead** fa review e merge (squash).
 6. Quando qualcosa è completato, **aggiorna questo file nella stessa PR**.
 7. **Messaggi di commit in italiano**, brevi e descrittivi.
-8. Non lavorare nel working tree di un altro agente: usa un clone tuo.
+8. **Ogni voce/modifica di questo file ha data e ora** (Europe/Rome, formato `AAAA-MM-GG HH:MM`) e, se pushata, il **link al commit** (hash corto). Aggiungi la voce in cima alla sezione *Cronologia*.
+9. Non lavorare nel working tree di un altro agente: usa un clone tuo.
 
 ## 10. Da dove iniziare (nuovo agente)
 1. Leggi questo file, poi `00_BIBBIA.md` e `11_CAP1_COMPLETO.md` nel repo docs.
 2. Guarda le issue aperte: `gh issue list -R B00RR/ultimo-miglio` e scegli quelle del tuo ruolo con `priorita:alta`.
 3. Clona in una cartella tua, crea il ramo, lavora, lancia i test, apri la PR.
 4. Rispetta i vincoli della sezione 2 (italiano, WebGL, niente video, asset liberi adattati).
+
+## 11. Cronologia
+Voci più recenti in alto. Formato: `AAAA-MM-GG HH:MM` (Europe/Rome) — [commit] — descrizione.
+
+- 2026-10-15 16:25 — [#8](https://github.com/B00RR/ultimo-miglio/pull/8) + #9 — Aggiunto STATO_PROGETTO.md; create etichette e issue #1–#7.
+- 2026-10-15 16:08 — [0c05198](https://github.com/B00RR/ultimo-miglio/commit/0c051984aef7a75dafc24616fa890cae5cc102b3) — ramo animator: Clienti v02: rig Humanoid di Nina riusato sui 6 clienti, pesi accessori rigidi, clip Idle/Walk/Wait_Impatient/Pay/Happy/Angry e controller condiviso chr_cliente
+- 2026-10-15 16:07 — [b03a3ad](https://github.com/B00RR/ultimo-miglio/commit/b03a3adc9324209f1ec95ac87aa57a0a0939cfbb) — ramo animator: Nina: Carry mani sotto la pila al petto, giacca Cheer senza schegge, soglie Speed in m/s
+- 2026-10-15 16:02 — [b59b95e](https://github.com/B00RR/ultimo-miglio/commit/b59b95e7e8e4c57240186b6ab141c9b3f3dd36e7) — ramo animator: AnimWalkVideo: la mesh skinnata ora si deforma nel video di verifica
+- 2026-10-15 15:59 — [3a2d5a9](https://github.com/B00RR/ultimo-miglio/commit/3a2d5a919ba65d71651c240212ba7b76c1ae7290) — ramo animator: NONNO v03: bind dalla mesh v03 (baffi ristretti/avanti, montante abbassato a 1.32 e avanzato, ruote allargate)
+- 2026-10-15 15:57 — [614ed5d](https://github.com/B00RR/ultimo-miglio/commit/614ed5d14ec6bb9dc5adbb73a90454fe710cbca6) — main: webgl-min: VFX v1.6 (pickup/deliver/upgrade fx, contact shadow), materiali kit su atlas (fix bianco), schede nascoste fuori schermo, margine freccia; test PlayMode 4/4
+- 2026-10-15 15:51 — [8ce7e18](https://github.com/B00RR/ultimo-miglio/commit/8ce7e18ed1037e8e05084990c678add07fa5e025) — ramo animator: Nina: passo nel verso giusto (+Z) e Carry con mani sotto la pila
+- 2026-10-15 15:39 — [1f1d6ca](https://github.com/B00RR/ultimo-miglio/commit/1f1d6ca2ffa6a429a383c513c02bd3e04eab9bd7) — main: webgl-min: onboarding Nonna Ada (7 passi + chiusura, marker a terra, freccia bordo, PlayerPrefs), pad ASSUMI NONNO, pacco prop_parcel_box; Ch1LoopTest copre il tutorial (PASS)
+- 2026-10-15 15:33 — [3b78348](https://github.com/B00RR/ultimo-miglio/commit/3b78348e7faee029d0b880a782424fd7490f2716) — main: webgl-min: confini 4 lati, kit 3D deposito, clamp schede, game feel (pila a molla, pacchi ad arco, monete verso HUD, pad pulse), SFX wt/sound dopo primo input; test loop+confini PASS
+- 2026-10-15 15:25 — [18d4abe](https://github.com/B00RR/ultimo-miglio/commit/18d4abe5e051f102f4781e27c8779c10f9949ed9) — ramo animator: anim v05 Nina: giacca staccata dalle braccia (Cheer stirava i pannelli laterali)
+- 2026-10-15 15:19 — [13cca59](https://github.com/B00RR/ultimo-miglio/commit/13cca59b17e69522405c203e0f7b08959a49cb22) — main: webgl-min: HUD responsive (wt/ui), single keyboard input via FloatingJoystick, full-window web template, palette update, NONNO v02, loop test PASS
+- 2026-10-15 15:13 — [6b91c0e](https://github.com/B00RR/ultimo-miglio/commit/6b91c0e2404228828d6bea1e4945274d33070953) — ramo animator: anim v04: NONNO fork cap 0.40m; Nina v02 mesh + ponytail_01/02 bones w/ baked secondary motion; jacket-hem flap skin; anti-penetration pass; same GUIDs/clip IDs
+- 2026-10-15 15:08 — [a93fd71](https://github.com/B00RR/ultimo-miglio/commit/a93fd710ade8d4adfd6580718dd8da3df60db8ee) — ramo animator: Characters: anti-compenetrazione (audit BVH per frame): NONNO baffi/montante/forche/testa, TICO braccia Happy, Nina braccia-testa/torso; stessi GUID/clip ID
+- 2026-10-15 15:02 — [77d5c30](https://github.com/B00RR/ultimo-miglio/commit/77d5c301b43e19a41a586b28fe07422e4bf0dc59) — main: webgl-min: Nina facing fix, camera ortho 4.5, single Zaino pad, HUD panels 1920x1080 match .5, phone TAB/ESC, LoopAutoTest + PlayMode Ch1 loop test (PASS)
+- 2026-10-15 15:00 — [7dfcd5d](https://github.com/B00RR/ultimo-miglio/commit/7dfcd5d3eced26b4ebd80cbf5ea5973e65539d5a) — ramo animator: Characters: NONNO v02 (muletto, rig Generic 8 ossa dai vertex group, Idle/Drive/Lift/Drop/Happy, stessi GUID/clip ID) + TICO v02 (rig 8 ossa, Idle/Move/Stamp/Happy, nuovo controller + meta GUID fissi); AnimVerify esteso
+- 2026-10-15 14:51 — [3d43efb](https://github.com/B00RR/ultimo-miglio/commit/3d43efbac7071f6b3ac76c31f19550f1ead67b3c) — main: webgl-min: fix magenta (URP Forward, no postFX, always-included shaders), VFX v1.3, 3D kit+palette, final Nina, input handler Both, fps -1 on WebGL
+- 2026-10-15 14:33 — [db1e86b](https://github.com/B00RR/ultimo-miglio/commit/db1e86bb3e2e2ea48536f591400290bda7e35ace) — main: webgl-min: wip
+- 2026-10-15 14:30 — [b11e16c](https://github.com/B00RR/ultimo-miglio/commit/b11e16ca9bda78b7a99cf6ca5e435759afd04f3c) — ramo animator: Characters: Nina skin finale (giunture braccia misurate sulla mesh, re-bake a matrici, take a 30 fps), mesh finale con UV T_Palette_Atlas
+- 2026-10-15 14:16 — [49855ed](https://github.com/B00RR/ultimo-miglio/commit/49855ed4e187e074772c2dd7d9b59a2462f6b7f0) — main: webgl-min: WebGL build entry (EnsureUrp, scene rebuild), particlesystem module, drop vibration/unity-mcp/recorder, Cinemachine lens fix, QA patches 03-10
+- 2026-10-15 14:00 — [01f0b9c](https://github.com/B00RR/ultimo-miglio/commit/01f0b9c7c5a6670b1d2336d85704f6e9eeb841ae) — ramo animator: Characters: Nina re-bind su re-export 13:55; NONNO riportato a v01 blockout (la mesh menta e' il bot del Bancone, non NONNO)
+- 2026-10-15 13:52 — [abcfcd7](https://github.com/B00RR/ultimo-miglio/commit/abcfcd76eb698cb86cfec6b6f28e317c7d783458) — ramo animator: Characters: re-bind su re-export 13:50 delle mesh (UV T_Palette_Atlas), stessi GUID/clip
+- 2026-10-15 13:49 — [3b71509](https://github.com/B00RR/ultimo-miglio/commit/3b715095d9ffbbe5efcc31cec3eabc5810b16c78) — ramo animator: Characters: Nina rig Humanoid su mesh finale (24 ossa, skin max 4) + 7 clip re-bake; NONNO 10 ossa su mesh ricentrata + 5 clip; AnimVerify editor (GUID/meta/controller invariati)
+- 2026-10-15 13:04 — [c3b588a](https://github.com/B00RR/ultimo-miglio/commit/c3b588a4fb23debea683be0008c700ce1265f8c3) — main: HUD integration: core events (OnLnCredited/OnMoraChanged/DayChanged/BulloniChanged)+tests, bridge wiring, HUD.prefab hook, Inter+Roboto OFL fonts, ci hud step
+- 2026-10-15 12:55 — [a7cba95](https://github.com/B00RR/ultimo-miglio/commit/a7cba953cc88b93db02efafa66734e26b94a090a) — main: keep empty folders
+- 2026-10-15 12:55 — [8e08315](https://github.com/B00RR/ultimo-miglio/commit/8e08315b5b3178ce41972f37c02d973b39e67ecd) — main: Unity 6 project skeleton + ch1 vertical slice code (EconomyCore+tests, gameplay, audio, data import, build/capture scripts, Unity-MCP plugin)
