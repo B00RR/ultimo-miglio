@@ -5,11 +5,14 @@ namespace UltimoMiglio.VFX
 {
     public class UM_PadFillRing : MonoBehaviour
     {
+        public enum Kind { Purchase, Upgrade, Pickup, Delivery }
         public Renderer ring;
+        [Tooltip("Colore UI dell'anello (pulsazione + riempimento). Purchase/Upgrade = sole #F4C430, Pickup = teal #5E7F86, Delivery = terracotta #C8633B")]
+        public Kind kind = Kind.Purchase;
         [Tooltip("Velocità con cui il riempimento visivo insegue il valore (1/s)")] public float followSpeed = 8f;
         public float pulseSpeed = 2.2f, flashTime = 0.45f;
         public bool playCompleteBurst = true;
-        static readonly int FillId = Shader.PropertyToID("_Fill"), PulseId = Shader.PropertyToID("_Pulse"), FlashId = Shader.PropertyToID("_Flash");
+        static readonly int ColorId = Shader.PropertyToID("_Color"), FillId = Shader.PropertyToID("_Fill"), PulseId = Shader.PropertyToID("_Pulse"), FlashId = Shader.PropertyToID("_Flash");
         MaterialPropertyBlock _mpb; float _target, _shown, _flash; bool _completed;
         public System.Action OnCompleted;
 
@@ -21,6 +24,9 @@ namespace UltimoMiglio.VFX
             _target = Mathf.Clamp01(p);
             if (_target < 0.999f) _completed = false;
         }
+        /// Cambia il colore UI dell'anello (es. pad acquisto vs zona pacco/cliente).
+        public void SetKind(Kind k) { kind = k; Push(); }
+        public static Color ColorOf(Kind k) => k == Kind.Pickup ? UM_Palette.UiPacco : k == Kind.Delivery ? UM_Palette.UiCliente : UM_Palette.UiSole;
         public void ResetRing() { _target = _shown = 0; _completed = false; _flash = 0; Push(); }
         /// Per screenshot/test: applica subito senza inseguimento.
         public void SetImmediate(float p, float flash = 0) { _target = _shown = Mathf.Clamp01(p); _flash = flash; Push(); }
@@ -43,6 +49,7 @@ namespace UltimoMiglio.VFX
             if (!ring) return;
             if (_mpb == null) _mpb = new MaterialPropertyBlock();
             ring.GetPropertyBlock(_mpb);
+            _mpb.SetColor(ColorId, ColorOf(kind));
             _mpb.SetFloat(FillId, _shown);
             _mpb.SetFloat(PulseId, _shown > 0 && _shown < 1 ? 0.5f + 0.5f * Mathf.Sin(Time.time * pulseSpeed * Mathf.PI) : 0);
             _mpb.SetFloat(FlashId, _flash);
