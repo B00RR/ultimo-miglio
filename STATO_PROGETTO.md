@@ -69,7 +69,7 @@ $UNITY -batchmode -projectPath "$PWD" -runTests -testPlatform PlayMode \
 ## 9. Come lavoriamo
 1. **Ogni attività = una issue GitHub**, con etichette di ruolo (`ruolo:tech`, `ruolo:3d`, `ruolo:animator`, `ruolo:vfx`, `ruolo:ui`), priorità (`priorita:alta`) e ambito (`cap1`, `bug`).
 2. Si lavora su un **ramo per issue/ruolo** (es. `animator`, `ui/hud-sovrapposizioni-12`).
-3. Si apre una **Pull Request verso `main`** che cita la issue (`Chiude #N`).
+3. Si apre una **Pull Request verso `main`** che cita la issue (`Closes #N` o `Refs #N`, vedi punto 10).
 4. **Merge solo con test verdi** (EditMode + PlayMode) e build WebGL che compila.
 5. Il **Tech Lead** fa review e merge (squash).
 6. Quando qualcosa è completato, **aggiorna questo file nella stessa PR**.
