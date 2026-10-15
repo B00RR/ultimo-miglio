@@ -129,3 +129,9 @@ Voci più recenti in alto. Formato: `AAAA-MM-GG HH:MM` (Europe/Rome) — [commit
 - Etichette pad clampate nella safe area (margine 8 dp) con flip vicino ai bordi.
 - Font Fredoka (SIL OFL 1.1, Google Fonts) in `UI/Fonts` — licenza in `LICENSE_Fredoka_OFL.txt`; da registrare in LICENZE_ASSET.md.
 - **Non compilato in Unity** (solo check dotnet sui DLL UnityEngine). Da verificare dal Tech Lead.
+
+## Aggiornamento 17:35 — Pad leggibili (UI, issue #33, branch ui/pad-leggibili)
+- Nuovo `PadTag` (UI/Runtime/World) + `UXML/PadTag.uxml` + `USS/PadTag.uss`: cartellino sopra ogni pad con icona, etichetta corta (max 12 car.) e prezzo grande sui pad di acquisto (26 dp vs 16 dp).
+- Enum `PadKind` da Inspector (Pacco/Moneta/Cliente), default dedotto in Reset (UpgradePad/CassaZone → Moneta, nome "banc/client/consegn" → Cliente, altrimenti Pacco).
+- Colori: pacco teal #5E7F86/#3E5A61, moneta sun #F4C430 + ink, cliente terracotta #C8633B/#8E3F22; ZoneFillRing ricolorato con lo stesso colore. Font Fredoka. Icone già presenti (ic_box, ic_coin, ic_customer, Lucide ISC): nessuna nuova risorsa.
+- **Non compilato in Unity** (dotnet non disponibile sulla macchina dell'agente). Da agganciare ai pad in scena dal Tech Lead.
