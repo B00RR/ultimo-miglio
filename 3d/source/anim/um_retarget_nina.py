@@ -182,12 +182,15 @@ def _split_arm_torso():
             v=lp.vert
             if C[v.index] in (side,None) and C[v.index]==side: continue
             if C[v.index]==side: continue
-            key=(v.index,side)
+            key=(v.index,side,f.index)
             if key not in dup:
-                nv=bm.verts.new(v.co); nv[dl].clear()
+                # il vertice duplicato collassa sul vertice piu' vicino del lato che vince: il lembo si appiattisce
+                # sul torso (o sulla manica) invece di restare sospeso dove stava il braccio a riposo (schegge in Cheer)
+                near=min(donors,key=lambda d_:(d_.co-v.co).length)
+                nv=bm.verts.new(near.co); nv[dl].clear()
                 for g,w in avg.items(): nv[dl][g]=w
                 dup[key]=nv
-        verts=[dup.get((v.index,side),v) if C[v.index]!=side else v for v in f.verts]
+        verts=[dup.get((v.index,side,f.index),v) if C[v.index]!=side else v for v in f.verts]
         uvs=[[lp[l].uv.copy() for l in bm.loops.layers.uv.values()] for lp in f.loops]
         nfc=bm.faces.new(verts,f); 
         for lp,uv in zip(nfc.loops,uvs):
@@ -252,10 +255,10 @@ def carry_arms(act,N,steps):
             a_=arm.pose.bones[sd+"Arm"]; fa=arm.pose.bones[sd+"ForeArm"]; h=arm.pose.bones[sd+"Hand"]
             l1=(ad.bones[sd+"ForeArm"].head_local-ad.bones[sd+"Arm"].head_local).length
             l2=(ad.bones[sd+"Hand"].head_local-ad.bones[sd+"ForeArm"].head_local).length
-            S=a_.matrix.translation.copy(); T=C@Vector((0.11*sx,-0.23,1.08+bounce))
+            S=a_.matrix.translation.copy(); T=C@Vector((0.12*sx,-0.30,1.10+bounce))
             d=T-S; L=min(d.length,(l1+l2)*0.995); dn=d.normalized()
             x=(l1*l1-l2*l2+L*L)/(2*L); hgt=math.sqrt(max(0.0,l1*l1-x*x))
-            pole=(C.to_3x3()@Vector((0.6*sx,0.2,-1.0))); pole=(pole-dn*pole.dot(dn)).normalized()
+            pole=(C.to_3x3()@Vector((1.0*sx,0.3,-0.8))); pole=(pole-dn*pole.dot(dn)).normalized()
             E=S+dn*x+pole*hgt
             _aim(a_,E-S); _aim(fa,S+dn*L-E)
             _aim(h,C.to_3x3()@Vector((-0.25*sx,-1.0,0.15)))   # mani piatte in avanti, palmi su a sorreggere

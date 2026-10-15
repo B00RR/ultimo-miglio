@@ -60,7 +60,9 @@ for act in sorted(bpy.data.actions,key=lambda x:x.name):
             for k in bb:
                 ch=chain(*k); sec=[n for n in ch if n.startswith("ponytail")]
                 for n in (sec or ch):   # parti secondarie (coda) cedono per prime
-                    if not n.startswith('wheel'): S[n]=S.get(n,1.0)*0.85   # le ruote girano su se stesse: non smorzare
+                    if n.startswith('wheel'): continue   # le ruote girano su se stesse: non smorzare
+                    if act.name.startswith("Carry") and any(t in n for t in ("Arm","Hand","Shoulder","Chest","Spine")): continue   # posa 'pila al petto' intenzionale
+                    S[n]=S.get(n,1.0)*0.85   # le ruote girano su se stesse: non smorzare
             apply(poses[f],S); it+=1
         need[f]=S
         if S: log.append((act.name,f,bb if bb else "clean",{k:round(v,2) for k,v in S.items()}))

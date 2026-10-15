@@ -178,8 +178,9 @@ AnimatorStateTransition:
     # ConditionMode: 1=If(true) 2=IfNot 3=Greater 4=Less
     if name=="chr_nina_vela":
         params=[("Speed",1),("Carry",4),("Deliver",9),("Cheer",9)]
-        loco=blend("Locomotion","Speed",[(motion(name,"Idle"),0),(motion(name,"Walk"),0.5),(motion(name,"Run"),1)])
-        carry=blend("CarryLocomotion","Speed",[(motion(name,"Carry_Idle"),0),(motion(name,"Carry_Walk"),0.5),(motion(name,"Carry_Walk"),1)])
+        # soglie in m/s: NinaController passa Speed=|velocita| (max 3.0 m/s, 2.7 con pila); 1.2/2.8 = velocita naturali dei cicli
+        loco=blend("Locomotion","Speed",[(motion(name,"Idle"),0),(motion(name,"Walk"),1.2),(motion(name,"Run"),2.8)])
+        carry=blend("CarryLocomotion","Speed",[(motion(name,"Carry_Idle"),0),(motion(name,"Carry_Walk"),1.15),(motion(name,"Carry_Walk"),2.7)])
         # ids pre-allocati per riferimenti incrociati
         ids={k:nid() for k in ("Locomotion","Carry","Deliver","Cheer")}
         t_lc=tr(ids["Carry"],[(1,"Carry",0)]); t_cl=tr(ids["Locomotion"],[(2,"Carry",0)])
