@@ -1,0 +1,105 @@
+# Pipeline Ultimo Miglio: test EditMode/PlayMode + build WebGL + commento sulla PR.
+# Si attiva solo se nei secret del repo c'è la licenza Unity (UNITY_LICENSE oppure UNITY_EMAIL/UNITY_PASSWORD/UNITY_SERIAL).
+# Senza secret il job "licenza" lo segnala e gli altri job vengono saltati: usare tools/*.sh sulla box.
+name: Unity CI (WebGL)
+on:
+  pull_request:
+    branches: [main]
+  workflow_dispatch:
+permissions:
+  contents: read
+  pull-requests: write
+  checks: write
+concurrency:
+  group: unity-ci-${{ github.ref }}
+  cancel-in-progress: true
+env:
+  UNITY_VERSION: 6000.3.26f1
+  TZ: Europe/Rome
+jobs:
+  licenza:
+    runs-on: ubuntu-latest
+    outputs:
+      ok: ${{ steps.c.outputs.ok }}
+    steps:
+      - id: c
+        env:
+          L: ${{ secrets.UNITY_LICENSE }}
+          S: ${{ secrets.UNITY_SERIAL }}
+        run: |
+          if [ -n "$L" ] || [ -n "$S" ]; then echo "ok=true" >> "$GITHUB_OUTPUT"
+          else echo "ok=false" >> "$GITHUB_OUTPUT"; echo "::warning::Licenza Unity assente nei secret: CI saltata, usare tools/run_tests.sh e tools/build_webgl.sh sulla box."; fi
+
+  test:
+    needs: licenza
+    if: needs.licenza.outputs.ok == 'true'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with: { lfs: true }
+      - uses: actions/cache@v4
+        with:
+          path: Library
+          key: Library-test-${{ hashFiles('Packages/packages-lock.json') }}
+      - uses: game-ci/unity-test-runner@v4
+        id: tests
+        env:
+          UNITY_LICENSE: ${{ secrets.UNITY_LICENSE }}
+          UNITY_EMAIL: ${{ secrets.UNITY_EMAIL }}
+          UNITY_PASSWORD: ${{ secrets.UNITY_PASSWORD }}
+          UNITY_SERIAL: ${{ secrets.UNITY_SERIAL }}
+        with:
+          unityVersion: ${{ env.UNITY_VERSION }}
+          testMode: all
+          artifactsPath: test-results
+          githubToken: ${{ secrets.GITHUB_TOKEN }}
+          checkName: Test Unity
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with: { name: test-results, path: test-results }
+
+  build:
+    needs: licenza
+    if: needs.licenza.outputs.ok == 'true'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with: { lfs: true }
+      - uses: actions/cache@v4
+        with:
+          path: Library
+          key: Library-WebGL-${{ hashFiles('Packages/packages-lock.json') }}
+      - uses: game-ci/unity-builder@v4
+        env:
+          UNITY_LICENSE: ${{ secrets.UNITY_LICENSE }}
+          UNITY_EMAIL: ${{ secrets.UNITY_EMAIL }}
+          UNITY_PASSWORD: ${{ secrets.UNITY_PASSWORD }}
+          UNITY_SERIAL: ${{ secrets.UNITY_SERIAL }}
+        with:
+          unityVersion: ${{ env.UNITY_VERSION }}
+          targetPlatform: WebGL
+          buildMethod: UltimoMiglio.EditorTools.WebGLBuild.BuildCI
+          customParameters: -outputPath build/WebGL
+      - uses: actions/upload-artifact@v4
+        with: { name: webgl, path: build/WebGL }
+
+  commento:
+    needs: [licenza, test, build]
+    if: always() && needs.licenza.outputs.ok == 'true' && github.event_name == 'pull_request'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/download-artifact@v4
+        with: { name: test-results, path: test-results }
+        continue-on-error: true
+      - name: Commenta la PR
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          UM_REPO: ${{ github.repository }}
+        run: |
+          mkdir -p Logs
+          for f in test-results/*.xml; do
+            case "$f" in *ditmode*|*EditMode*) cp "$f" Logs/editmode-results.xml;; *laymode*|*PlayMode*) cp "$f" Logs/playmode-results.xml;; esac
+          done
+          echo "[WebGLBuild] esito=${{ needs.build.result == 'success' && 'Succeeded' || 'Failed' }} (GitHub Actions)" > Logs/webgl_build.log
+          tools/pr_comment.sh ${{ github.event.pull_request.number }} "${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}"
