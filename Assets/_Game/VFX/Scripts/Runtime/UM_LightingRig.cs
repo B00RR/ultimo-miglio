@@ -30,7 +30,7 @@ namespace UltimoMiglio.VFX
             float g = preset == Preset.Golden ? 1f : blendToGolden;
             float n = preset == Preset.Night ? 1f : blendToNight;
             Color dayCol = Color.Lerp(UM_Palette.Sole, UM_Palette.SoleTramonto, g);
-            float dayInt = Mathf.Lerp(1.05f, 0.85f, g);
+            float dayInt = Mathf.Lerp(1.3f, 1.0f, g); // v2.0: key piu forte contro fill freddo
 
             sun.color = Color.Lerp(dayCol, UM_Palette.LunaCalda, n);
             sun.intensity = Mathf.Lerp(dayInt, 0.5f, n);
@@ -49,7 +49,7 @@ namespace UltimoMiglio.VFX
             // Linear fog = warm haze on the distant OmniFreight tower / bay (cheap on mobile)
             RenderSettings.fog = true;
             RenderSettings.fogMode = FogMode.Linear;
-            RenderSettings.fogColor = Color.Lerp(Color.Lerp(UM_Palette.Cielo, UM_Palette.TramCielo, g), UM_Palette.NottEq, n);
+            RenderSettings.fogColor = Color.Lerp(Color.Lerp(UM_Palette.Foschia, UM_Palette.TramCielo, g), UM_Palette.NottEq, n);
             RenderSettings.fogStartDistance = 45f; // lighter: OmniFreight tower stays readable
             RenderSettings.fogEndDistance = 140f;
         }

@@ -116,3 +116,11 @@ Con Unity-MCP attivo: `script-update-or-create` per i `.cs`, `script-execute` pe
 - v1.4 (review 2 Concept Artist): lanterne 1.7 con falloff morbido (luna 0.5); polvere `#B8906A` con alpha più persistente; scintille upgrade +30% con nucleo limone `#F7E26B` e alone `#F4C430`; ombre filtrate (soft Low + bordo toon smoothstep), distanze/risoluzioni per tier; variazione world-space sul set; ombra di contatto `fx_contact_shadow`; assegnato `PostProcessData` (il post non era attivo); esposizione notte +0.45 per il rapporto notte/giorno.
 - v1.5 (sprint game feel): `fx_package_pickup`, `fx_package_deliver`, `fx_upgrade_complete`, `fx_coin_flyer` + API `FlyCoins*`, `fx_pad_fill_ring` + `UM_PadFillRing.SetProgress`; shader `UM_FxRingFill`; notte schiarita col colorFilter (postExposure ignorato in LDR).
 - v1.6: cap. 1 senza notte → `UM_DayCycle` (giorno → tramonto) + `UM_Lantern`; `UM_LightingRig.SetGoldenBlend`; tier Web con post OFF e MSAA 2x; screenshot con camera 15/4.5; `vfx_night.png` sostituito da `vfx_sunset.png`.
+
+## v2.0 – Look premium + acquisto (ricostruito dopo la perdita di wt/vfx)
+- `UM_ToonDiorama` premium: ombre colorate viola (`_ShadowTint` 0.55/0.50/0.72), gradiente in altezza (`_HeightDark`), AO alla base dei muri e di vertice (alpha del vertex color), highlight facce superiori (`_TopLight`), rim fresnel (fresco dal lato ombra), variazione piastrelle (`_TileVar`), vignetta a terra e grading in-shader (tonemap morbido, contrasto 1.14, saturazione 1.18, glow 0.35) pilotati da `UM_LookSettings`. Funziona con post-processing OFF (WebGL).
+- Nuovo `UM_SkyGradient.shader` + `UM_LookSettings`: cielo a gradiente dietro la scena, giorno → tramonto seguendo `UM_DayCycle`.
+- Luce: sole `#FFD08A` intensità 1.3 (tramonto `#FF9F5A` 1.0), ambiente cielo fresco `#9FBCD8`, nebbia `#F6D7B0`.
+- Nuovo effetto `fx_purchase` → `UM_FxPlayer.Play(UM_FxPlayer.Fx.Purchase, pos)`.
+- `fx_package_deliver` più grande (coriandoli +40%, anello 2.3 m, stella 1.0).
+- **Materiali e prefab si generano in Unity**: menu *Ultimo Miglio/VFX/Build FX Prefabs + Materials* e poi *Ultimo Miglio/VFX/Setup Scene* (`UM_VfxSceneSetup.Setup`), che cabla UM_FX (FxPlayer + LookSettings) e UM_DayCycle sul sole. Salvare la scena.

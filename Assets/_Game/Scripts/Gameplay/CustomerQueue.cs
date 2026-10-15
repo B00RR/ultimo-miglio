@@ -28,7 +28,7 @@ namespace UltimoMiglio.Gameplay
         {
             if (!_line.Remove(c)) return;
             if (!served) GameRoot.I.Eco.CustomerLost();
-            c.Leaving = true; c.Target = Door.position;
+            c.OnLeave(served); c.Leaving = true; c.Target = Door.position;
         }
         public void Recycle(Customer c) { c.gameObject.SetActive(false); _pool.Push(c); }
     }

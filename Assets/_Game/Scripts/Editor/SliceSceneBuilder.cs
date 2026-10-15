@@ -46,7 +46,7 @@ namespace UltimoMiglio.EditorTools
             // --- GameRoot + audio + FX
             var root = new GameObject("GameRoot").AddComponent<GameRoot>();
             var audio = BuildAudio(root.transform);
-            var fxGo = new GameObject("FxPlayer"); fxGo.transform.SetParent(root.transform);
+            var fxGo = new GameObject("UM_FX"); fxGo.transform.SetParent(root.transform);
             var fx = fxGo.AddComponent<UM_FxPlayer>();
             GameObject VP(string n) => AssetDatabase.LoadAssetAtPath<GameObject>($"Assets/_Game/VFX/Prefabs/{n}.prefab");
             fx.packagePop = VP("fx_package_pop"); fx.coins = VP("fx_coins"); fx.upgrade = VP("fx_upgrade");
@@ -71,8 +71,25 @@ namespace UltimoMiglio.EditorTools
             var coinGo = coinMesh ? (GameObject)PrefabUtility.InstantiatePrefab(coinMesh) : Prim(PrimitiveType.Cylinder, "Coin", null, Vector3.zero, new Vector3(0.25f, 0.02f, 0.25f), props, UM_Palette.GialloSole);
             coinGo.name = "Coin"; foreach (var c in coinGo.GetComponentsInChildren<Collider>()) Object.DestroyImmediate(c);
             var coin = SavePrefab(coinGo, "Coin");
-            var custGo = Prim(PrimitiveType.Capsule, "Customer", null, Vector3.zero, new Vector3(0.5f, 0.8f, 0.5f), chars, UM_Palette.Menta);
-            Object.DestroyImmediate(custGo.GetComponent<Collider>()); var cust = SavePrefab(custGo, "Customer").AddComponentPrefab<Customer>();
+            GameObject custGo = null;
+            {
+                const string cd = "Assets/_Game/Art/Characters/Clienti/";
+                var cctl = AssetDatabase.LoadAssetAtPath<RuntimeAnimatorController>(cd + "chr_cliente.controller");
+                var cfbx = AssetDatabase.LoadAssetAtPath<GameObject>(cd + "chr_cliente_base.fbx");
+                if (cctl && cfbx)
+                {
+                    custGo = new GameObject("Customer");
+                    var m = (GameObject)PrefabUtility.InstantiatePrefab(cfbx, custGo.transform); m.transform.localPosition = Vector3.zero;
+                    var cmat = AssetDatabase.LoadAssetAtPath<Material>("Assets/_Game/VFX/Materials/M_Char_Atlas.mat");
+                    if (cmat) foreach (var r in m.GetComponentsInChildren<Renderer>()) r.sharedMaterials = System.Array.ConvertAll(r.sharedMaterials, _ => cmat);
+                    var ca = m.GetComponent<Animator>() ?? m.AddComponent<Animator>();
+                    var av = AssetDatabase.LoadAllAssetsAtPath(cd + "chr_cliente_base.fbx").OfType<Avatar>().FirstOrDefault(); if (av) ca.avatar = av;
+                    ca.runtimeAnimatorController = cctl; ca.applyRootMotion = false; ca.cullingMode = AnimatorCullingMode.AlwaysAnimate;
+                }
+                else Debug.LogWarning("[Scene] clienti riggati mancanti: capsula");
+            }
+            if (!custGo) { custGo = Prim(PrimitiveType.Capsule, "Customer", null, Vector3.zero, new Vector3(0.5f, 0.8f, 0.5f), chars, UM_Palette.Menta); Object.DestroyImmediate(custGo.GetComponent<Collider>()); }
+            var cust = SavePrefab(custGo, "Customer").AddComponentPrefab<Customer>();
 
             // --- Nina
             var nina = new GameObject("Nina"); nina.transform.position = new Vector3(0, 0, 0);
@@ -83,7 +100,7 @@ namespace UltimoMiglio.EditorTools
                 Prim(PrimitiveType.Capsule, "Body", nina.transform, new Vector3(0, 0.8f, 0), new Vector3(0.6f, 0.8f, 0.6f), chars, UM_Palette.AranceNina);
                 Prim(PrimitiveType.Sphere, "Helmet", nina.transform, new Vector3(0, 1.65f, 0.02f), Vector3.one * 0.42f, chars, UM_Palette.Terracotta);
             }
-            var anchor = new GameObject("StackAnchor").transform; anchor.SetParent(nina.transform, false); anchor.localPosition = new Vector3(0, 0.9f, -0.42f);
+            var anchor = new GameObject("StackAnchor").transform; anchor.SetParent(nina.transform, false); anchor.localPosition = new Vector3(0, 0.9f, 0.38f);
             var shadowPf = AssetDatabase.LoadAssetAtPath<GameObject>("Assets/_Game/VFX/Prefabs/fx_contact_shadow.prefab");
             if (shadowPf) { var sh = (GameObject)PrefabUtility.InstantiatePrefab(shadowPf); sh.transform.SetParent(nina.transform, false); sh.transform.localPosition = new Vector3(0, 0.02f, 0); }
             var stack = nina.AddComponent<PackageStack>(); stack.Anchor = anchor; stack.ParcelPrefab = parcel;
@@ -152,6 +169,7 @@ namespace UltimoMiglio.EditorTools
             WireHud(hudGo, hud, joy, camera, nina.transform, cassa.transform);
             TryRun("UltimoMiglio.VFX.EditorTools.UM_LightingSetup", "Setup");
             TryRun("UltimoMiglio.VFX.EditorTools.UM_PostProcessBuilder", "BuildAll");
+            TryRun("UltimoMiglio.VFX.EditorTools.UM_VfxSceneSetup", "Setup");
             if (!Object.FindAnyObjectByType<Light>()) { var l = new GameObject("Sun").AddComponent<Light>(); l.type = LightType.Directional; l.transform.rotation = Quaternion.Euler(50, -35, 0); l.color = UM_Palette.Sole; }
 
             // --- blockout reference (05_3D_PIPELINE), hidden
@@ -230,7 +248,7 @@ namespace UltimoMiglio.EditorTools
             var mat = AssetDatabase.LoadAssetAtPath<Material>("Assets/_Game/VFX/Materials/M_Char_Atlas.mat");
             if (mat) foreach (var r in go.GetComponentsInChildren<Renderer>()) r.sharedMaterials = System.Array.ConvertAll(r.sharedMaterials, _ => mat);
             var an = go.GetComponent<Animator>() ?? go.AddComponent<Animator>();
-            an.runtimeAnimatorController = ctl; an.applyRootMotion = false; an.cullingMode = AnimatorCullingMode.CullUpdateTransforms;
+            an.runtimeAnimatorController = ctl; an.applyRootMotion = false; an.cullingMode = AnimatorCullingMode.AlwaysAnimate;
             return an;
         }
 
