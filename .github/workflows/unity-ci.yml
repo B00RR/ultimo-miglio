@@ -44,6 +44,9 @@ jobs:
     if: needs.licenza.outputs.ok == 'true' && github.event_name != 'push'
     runs-on: ubuntu-latest
     steps:
+      # L'immagine unityci/editor è molto grande: liberare spazio sul runner
+      - uses: jlumbroso/free-disk-space@v1.3.1
+        with: { tool-cache: true, android: true, dotnet: true, haskell: true, large-packages: false, docker-images: true, swap-storage: false }
       - uses: actions/checkout@v4
       # LFS con cache: si scaricano solo gli oggetti nuovi (risparmio banda LFS)
       - name: Elenco oggetti LFS
@@ -102,6 +105,9 @@ jobs:
     if: needs.licenza.outputs.ok == 'true' && github.event_name != 'pull_request'
     runs-on: ubuntu-latest
     steps:
+      # L'immagine unityci/editor è molto grande: liberare spazio sul runner
+      - uses: jlumbroso/free-disk-space@v1.3.1
+        with: { tool-cache: true, android: true, dotnet: true, haskell: true, large-packages: false, docker-images: true, swap-storage: false }
       - uses: actions/checkout@v4
       - run: git lfs ls-files -l | cut -d' ' -f1 | sort > .lfs-assets-id
       - uses: actions/cache@v4
