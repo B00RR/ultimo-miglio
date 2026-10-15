@@ -17,6 +17,9 @@ namespace UltimoMiglio.UI.World
         [SerializeField] protected Camera cam;
 
         protected VisualElement Element { get; private set; }
+        /// <summary>Nina: big cards show only within ProximityM of her (else the compact POI chip stays).</summary>
+        public static Transform Focus; public static float ProximityM = 3f;
+        protected virtual bool UseProximity => true;
 
         protected virtual void OnEnable() => TryCreate();
 
@@ -46,7 +49,8 @@ namespace UltimoMiglio.UI.World
             if (Element == null) TryCreate();
             if (Element == null || cam == null || Element.panel == null) return;
             Vector3 sp = cam.WorldToScreenPoint(anchor.position + worldOffset);
-            bool visible = sp.z > 0 && sp.x >= 0 && sp.x <= Screen.width && sp.y >= 0 && sp.y <= Screen.height; // anchor off-screen: hide (edge arrow guides), on-screen: clamp
+            bool visible = sp.z > 0 && sp.x >= 0 && sp.x <= Screen.width && sp.y >= 0 && sp.y <= Screen.height;
+            if (visible && UseProximity && Focus) { var d = Focus.position - anchor.position; d.y = 0; visible = d.sqrMagnitude <= ProximityM * ProximityM; } // anchor off-screen: hide (edge arrow guides), on-screen: clamp
             Element.style.display = visible ? DisplayStyle.Flex : DisplayStyle.None;
             if (!visible) return;
             var p = UltimoMiglio.UI.SafeAreaUtil.ScreenToPanel(Element.panel, sp);
