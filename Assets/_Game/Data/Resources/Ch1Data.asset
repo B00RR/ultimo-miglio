@@ -184,8 +184,8 @@ MonoBehaviour:
     robots:
       nonno:
         unlockAtOnboardingSec: 130
-        hireCostLn: 50
-        padLabel: "ASSUMI NONNO \xB7 50 LN"
+        hireCostLn: 15
+        padLabel: "ASSUMI NONNO \xB7 15 LN"
         restockPpmBase: 6
         restockPpmPerLevel: 1.5
         selfServicePpmBase: 0.5
