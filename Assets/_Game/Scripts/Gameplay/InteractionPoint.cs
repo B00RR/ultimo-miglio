@@ -34,6 +34,8 @@ namespace UltimoMiglio.Gameplay
             _beacon = Disc("POI_Beacon", _beaconMat, new Vector3(0.18f, 2.2f, 0.18f), 2.2f);
             _beacon.gameObject.SetActive(false);
             _tut = FindAnyObjectByType<TutorialManager>();
+            if (PadIcon) PadIcon.SetVisible(false);
+            var pt = GetComponent<UltimoMiglio.UI.World.PadTag>(); if (pt) pt.enabled = false;
         }
 
         Transform Disc(string n, Material m, Vector3 s, float y)
@@ -89,7 +91,7 @@ namespace UltimoMiglio.Gameplay
             float sc = big * (1f + amp * k);
             _rim.localScale = new Vector3((Radius * 2f + 0.25f) * sc, 0.06f, (Radius * 2f + 0.25f) * sc);
             _fill.localScale = new Vector3(Radius * 2f * sc, 0.07f, Radius * 2f * sc);
-            _fillMat.SetColor("_BaseColor", Color.Lerp(_col, Color.white, (_active ? 0.45f : 0.18f) * k)); // "emission" pulse
+            var fill = Color.Lerp(_col, Color.white, (_active ? 0.35f : 0.12f) * k); fill.a = _active ? 0.55f : 0.32f; _fillMat.SetColor("_BaseColor", fill); if (_fillMat.HasProperty("_Color")) _fillMat.SetColor("_Color", fill); // "emission" pulse
             if (_active) { _beacon.localScale = new Vector3(0.18f, 2.2f + 0.3f * k, 0.18f); _beaconMat.SetColor("_BaseColor", Color.Lerp(_col, Color.white, 0.3f + 0.4f * k)); }
 
             EnsureChip();
