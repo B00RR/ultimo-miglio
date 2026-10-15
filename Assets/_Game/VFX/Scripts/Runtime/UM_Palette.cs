@@ -33,8 +33,9 @@ namespace UltimoMiglio.VFX
         // Colori UI/UX (esatti, condivisi con HUD e anelli zona): pacco/raccolta, moneta/acquisto, cliente/consegna, upgrade
         public static readonly Color UiPacco    = H("#5E7F86"); // teal: pacco / Pickup
         public static readonly Color UiSole     = H("#F4C430"); // sole: moneta / Purchase / riempimento in pagamento
-        public static readonly Color UiCliente  = H("#8FC9A8"); // verde menta: consegna / Delivery (richiesta Lorenzo)
-        public static readonly Color UiMenta    = H("#8FC9A8"); // menta: upgrade (alternativa al sole)
+        public static readonly Color UiCliente  = H("#8FC9A8"); // verde menta: consegna / Delivery (scaffali, Bancone, clienti) - correzione Lorenzo 17:28
+        public static readonly Color UiMenta    = H("#8FC9A8"); // = UiCliente
+        public static readonly Color UiUpgrade  = H("#F7E26B"); // limone: upgrade (distinto da consegna e acquisto)
         public static readonly Color MonetaLuce = H("#FFF4D6");
         // Tramonto (cap. 1): sole basso arancio-dorato, ambiente pesca, cielo albicocca
         public static readonly Color SoleTramonto = H("#FF9F5A");

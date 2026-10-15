@@ -155,7 +155,8 @@ namespace UltimoMiglio.VFX
             rr.renderMode = ParticleSystemRenderMode.HorizontalBillboard; rr.maxParticleSize = 3f;
             // soft ring, slow pulse (2 breaths over 1.2 s), max alpha 0.45
             var rm = ring.main; rm.duration = 1.2f; rm.startLifetime = 1.2f; rm.startSpeed = 0; rm.startSize = 2.2f;
-            var rc = UM_Palette.UiSole; rc.a = 0.45f; // UI: upgrade = sole (alternativa: UiMenta) rm.startColor = rc;
+            var rc = UM_Palette.UiUpgrade; rc.a = 0.45f; // UI: upgrade = limone (distinto dalla consegna menta)
+            rm.startColor = rc;
             var re = ring.emission; re.SetBursts(new[] { new ParticleSystem.Burst(0, 1) });
             var rs = ring.sizeOverLifetime; rs.enabled = true;
             rs.size = new ParticleSystem.MinMaxCurve(1f, new AnimationCurve(
@@ -223,7 +224,7 @@ namespace UltimoMiglio.VFX
             m.startSpeed = new ParticleSystem.MinMaxCurve(2.5f, 4f);
             m.startSize = new ParticleSystem.MinMaxCurve(0.12f, 0.2f); // v2.0: +40%
             var g = new Gradient(); // coriandoli: terracotta, giallo sole, menta, limone
-            g.SetKeys(new[] { new GradientColorKey(UM_Palette.UiCliente, 0), new GradientColorKey(UM_Palette.UiCliente, 0.6f), new GradientColorKey(Color.Lerp(UM_Palette.UiCliente, UM_Palette.Crema, 0.4f), 0.61f), new GradientColorKey(UM_Palette.Crema, 1) }, // UI: terracotta cliente (60%) + crema
+            g.SetKeys(new[] { new GradientColorKey(UM_Palette.UiCliente, 0), new GradientColorKey(UM_Palette.UiCliente, 0.6f), new GradientColorKey(Color.Lerp(UM_Palette.UiCliente, UM_Palette.Crema, 0.4f), 0.61f), new GradientColorKey(UM_Palette.Crema, 1) }, // UI: menta consegna (60%) + crema
                       new[] { new GradientAlphaKey(1, 0), new GradientAlphaKey(1, 1) });
             m.startColor = new ParticleSystem.MinMaxGradient(g) { mode = ParticleSystemGradientMode.RandomColor };
             m.gravityModifier = 1.4f;
