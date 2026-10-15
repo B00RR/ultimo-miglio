@@ -4,6 +4,6 @@
             <ui:VisualElement class="row" picking-mode="Ignore"><ui:VisualElement class="icon icon--sm icon-coin" picking-mode="Ignore" /><ui:Label name="cassa-amount" text="0 / 0" picking-mode="Ignore" /></ui:VisualElement>
             <ui:Label name="cassa-state" text="OFFLINE · PASSA A RITIRARE" picking-mode="Ignore" />
         </ui:VisualElement>
-        <ui:VisualElement name="cassa-x2" class="pill"><ui:VisualElement class="icon icon--sm icon-video" /><ui:Label text="x2 con video" /></ui:VisualElement>
+        <ui:VisualElement name="cassa-x2" class="pill" style="display: none;"><ui:VisualElement class="icon icon--sm icon-video" /><ui:Label text="x2 con video" /></ui:VisualElement>
     </ui:VisualElement>
 </ui:UXML>
