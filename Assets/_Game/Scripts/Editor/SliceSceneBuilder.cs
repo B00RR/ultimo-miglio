@@ -184,6 +184,7 @@ namespace UltimoMiglio.EditorTools
             tut.Monete = new GameObject("Tut_Monete").transform; tut.Monete.position = banPos + Vector3.right * 0.8f;
             foreach (var pz in Object.FindObjectsByType<UpgradePad>(FindObjectsSortMode.None)) { if (pz.Kind == UpgradeKind.Zaino) tut.PadZaino = pz.transform; if (pz.Kind == UpgradeKind.NonnoHire) tut.PadNonno = pz.transform; }
 
+            TryRun("UltimoMiglio.VFX.EditorTools.UM_FxPrefabBuilder", "BuildAll");
             // --- punti di interazione stile My Little Universe (pad a terra + chip billboard)
             {
                 Texture2D I(string n) => AssetDatabase.LoadAssetAtPath<Texture2D>($"Assets/_Game/UI/Icons/{n}.png");
@@ -205,6 +206,12 @@ namespace UltimoMiglio.EditorTools
                             if (ringPf) { var rg = (GameObject)PrefabUtility.InstantiatePrefab(ringPf); rg.transform.SetParent(up.transform, false); rg.transform.localPosition = new Vector3(0, 0.1f, 0); up.FillRing = rg.GetComponent<UltimoMiglio.VFX.UM_PadFillRing>(); }
                             break;
                         default: ip.Kind = PoiKind.Prendi; ip.Label = z.name.Replace("Zona_", ""); break;
+                    }
+                    if (ringPf && !(z is UpgradePad))
+                    {
+                        var rg = (GameObject)PrefabUtility.InstantiatePrefab(ringPf); rg.transform.SetParent(z.transform, false); rg.transform.localPosition = new Vector3(0, 0.1f, 0);
+                        rg.transform.localScale = Vector3.one * (ip.Radius / 0.95f);
+                        var fr = rg.GetComponent<UltimoMiglio.VFX.UM_PadFillRing>(); if (fr) { fr.playCompleteBurst = false; fr.kind = ip.Kind == PoiKind.Consegna ? UltimoMiglio.VFX.UM_PadFillRing.Kind.Delivery : UltimoMiglio.VFX.UM_PadFillRing.Kind.Pickup; ip.Ring = fr; }
                     }
                     var oldPad = z.transform.Find("Pad"); if (oldPad) { var r = oldPad.GetComponent<Renderer>(); if (r) r.enabled = false; }
                 }
