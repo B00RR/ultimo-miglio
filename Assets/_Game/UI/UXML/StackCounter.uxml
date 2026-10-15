@@ -1,4 +1,4 @@
-<ui:UXML xmlns:ui="UnityEngine.UIElements"><Style src="project://database/Assets/_Game/UI/USS/DioramaSolare.uss" />
+<ui:UXML xmlns:ui="UnityEngine.UIElements"><Style src="project://database/Assets/_Game/UI/USS/DioramaSolare.uss" /><Style src="project://database/Assets/_Game/UI/Tokens.uss" /><Style src="project://database/Assets/_Game/UI/USS/HudV2.uss" />
     <ui:VisualElement class="row" picking-mode="Ignore">
         <ui:VisualElement class="pill stack-pill" picking-mode="Ignore"><ui:Label name="stack-count" text="0/5" picking-mode="Ignore" /></ui:VisualElement>
         <ui:VisualElement name="buff-chip" class="pill" picking-mode="Ignore"><ui:VisualElement name="buff-icon" class="icon icon--sm icon-coffee" picking-mode="Ignore" /><ui:Label name="buff-timer" text="2:00" picking-mode="Ignore" /></ui:VisualElement>

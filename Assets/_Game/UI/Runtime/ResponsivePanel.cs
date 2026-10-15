@@ -19,6 +19,11 @@ namespace UltimoMiglio.UI
         public const float RefW = 1080f, RefH = 1920f;
         [SerializeField] float landscapeShortSideRef = 1200f;
         [SerializeField] float minScale = 0.42f, maxScale = 2.5f;
+        /// <summary>HUD v2: USS units are dp. Portrait scale = px per dp = min(W/411, H/914) (1080x2400 → 2,63 = 420 dpi),
+        /// landscape = H/600 (WebGL desktop). Auto-on for the document that hosts HudController.</summary>
+        [SerializeField] bool dpUnits = false;
+        public const float DpRefW = 411f, DpRefH = 914f, DpLandscapeH = 600f;
+        public static float ComputeDpScale(int w, int h) => w <= 0 || h <= 0 ? 1f : (w > h ? Mathf.Clamp(h / DpLandscapeH, 0.8f, 3f) : Mathf.Clamp(Mathf.Min(w / DpRefW, h / DpRefH), 0.8f, 4f));
 
         UIDocument doc; PanelSettings runtimeSettings;
         Vector2Int lastSize = new Vector2Int(-1, -1);
@@ -32,6 +37,7 @@ namespace UltimoMiglio.UI
         void Awake()
         {
             doc = GetComponent<UIDocument>();
+            if (GetComponent<HudController>()) dpUnits = true;
             if (doc.panelSettings != null && runtimeSettings == null)
             {
                 runtimeSettings = Instantiate(doc.panelSettings);
@@ -62,7 +68,7 @@ namespace UltimoMiglio.UI
             if (!force && size == lastSize) return;
             lastSize = size;
             Landscape = size.x > size.y;
-            Scale = ComputeScale(size.x, size.y, landscapeShortSideRef, minScale, maxScale);
+            Scale = dpUnits ? ComputeDpScale(size.x, size.y) : ComputeScale(size.x, size.y, landscapeShortSideRef, minScale, maxScale);
             var ps = doc ? doc.panelSettings : null;
             if (ps != null)
             {
