@@ -48,3 +48,11 @@ SliceSceneBuilder: sostituire la creazione del joystick vuoto con l'istanza di `
 ## Regole
 - Nessun numero di bilanciamento nel codice UI: prezzi, capienze, rate, percentuali arrivano da `ChapterData`/`EconomyCore` o dal chiamante. I tempi UX (1,5 s etichetta, 2,5 s toast, 150 ms fade, 24 dp) vengono da 04_UI e sono campi serializzati.
 - Gioco mai in pausa; nessun pulsante d'azione in gameplay; CTA solo nel telefono.
+
+## WebGL / responsive (15/10, v2)
+- `ResponsivePanel` su entrambi gli UIDocument: clona la PanelSettings a runtime, ConstantPixelSize con scala dal lato corto: portrait `min(W/1080, H/1920)`, landscape `H/1200` (clamp 0,42-2,5). Classi root `um-portrait` / `um-landscape`. USS riferita a 1080x1920.
+- Layout: flexbox ancorato agli angoli (top-bar sx/dx, `top-center` per l'etichetta stanza, `bottom-dock` per la scheda Cassaforte con width 92% / max 780). Elementi contestuali nascosti di default in UXML; i controller fanno bind con retry (prima il tree poteva non esistere → tutti i pannelli visibili insieme in WebGL).
+- Telefono: disegnato a 900x1600 (9:16) dentro `#phone-frame`, scalato uniformemente a max 90% altezza / 94% larghezza → colonna centrata (pillarbox) su desktop. TAB apre/chiude, ESC = Indietro (app → home → chiuso). Hint "TAB" sotto il pulsante solo su desktop.
+- Input desktop: `FloatingJoystick` legge WASD/frecce e click-drag del mouse nello stesso `Value`/`WorldDirection` del touch (niente TouchSimulation → niente doppio input sui browser touch).
+- Verifica: `xvfb-run -a Unity -batchmode -projectPath <copia> -executeMethod UltimoMiglio.UI.EditorTools.HudCapture.Run` → `Captures/hud/hud_<W>x<H>[_phone].png` (solo UI, sfondo trasparente, tutti i contestuali accesi). Opzione `-hudSizes 1920x1080,...`.
+- Icone: 24 Lucide (ISC) + 3 originali; vedi `Icons/Source~/build_icons.py` e LICENZE_ASSET.md.

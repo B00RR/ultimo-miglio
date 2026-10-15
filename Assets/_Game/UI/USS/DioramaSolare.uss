@@ -1,5 +1,7 @@
-/* Diorama Solare - Ultimo Miglio HUD (04_UI §6). Units = mockup px on the 1170x2532 reference
-   (PanelSettings: Scale With Screen Size, 1170x2532, match width). 3 px ≈ 1 dp. */
+/* Diorama Solare - Ultimo Miglio HUD (04_UI §7). Units = reference px on a 1080x1920 portrait canvas.
+   Runtime scale comes from ResponsivePanel (shorter side drives it): portrait min(W/1080,H/1920),
+   landscape H/1200. Layout = flexbox anchored to corners; only overlays that follow a point
+   (joystick, edge arrow, world cards, popups) are absolutely positioned. */
 :root {
     --terracotta: #C8633B; --sun: #F4C430; --mint: #8FC9A8; --lemon: #F7E26B;
     --cream: #F3E3C3; --cream-hi: #FFF9EE; --panel-a: #FBF1DC; --panel-b: #F1DFBE;
@@ -16,8 +18,11 @@
 .row { flex-direction: row; align-items: center; }
 .layer { position: absolute; left: 0; top: 0; right: 0; bottom: 0; }
 #safe-root { flex-grow: 1; }
-.top-bar { flex-direction: row; justify-content: space-between; align-items: flex-start; padding: 24px 36px 0 36px; }
-.top-left { flex-direction: column; align-items: flex-start; }
+.top-bar { flex-direction: row; justify-content: space-between; align-items: flex-start; padding: 28px 32px 0 32px; flex-shrink: 0; }
+.top-left { flex-direction: column; align-items: flex-start; flex-shrink: 1; max-width: 72%; min-width: 0; }
+.top-center { position: absolute; left: 0; right: 0; top: 28px; flex-direction: row; justify-content: center; }
+.um-portrait .top-center { top: 360px; }   /* portrait: below the currency row so it can never overlap */
+.bottom-dock { position: absolute; left: 0; right: 0; bottom: 48px; align-items: center; }
 
 /* ---------- panels ---------- */
 .panel {
@@ -29,7 +34,7 @@
 .shadow { /* solid brown drop shadow: a sibling ".shadow-plate" offset 6px is used where needed */ }
 
 /* ---------- currency pill ---------- */
-#currency-pill { padding: 12px 34px 12px 22px; }
+#currency-pill { padding: 12px 30px 12px 20px; flex-wrap: wrap; flex-shrink: 1; }
 .currency { flex-direction: row; align-items: center; margin-right: 26px; }
 .currency-value { font-size: 52px; -unity-font-style: bold; letter-spacing: -1px; margin-left: 10px; }
 .icon { width: 52px; height: 52px; -unity-background-scale-mode: scale-to-fit; flex-shrink: 0; }
@@ -45,6 +50,7 @@
 .icon-robot { background-image: url("project://database/Assets/_Game/UI/Icons/ic_robot.png"); }
 .icon-box { background-image: url("project://database/Assets/_Game/UI/Icons/ic_box.png"); }
 .icon-van { background-image: url("project://database/Assets/_Game/UI/Icons/ic_truck.png"); }
+.icon-chat { background-image: url("project://database/Assets/_Game/UI/Icons/ic_chat.png"); }
 .icon-customer { background-image: url("project://database/Assets/_Game/UI/Icons/ic_customer.png"); }
 .icon-pad { background-image: url("project://database/Assets/_Game/UI/Icons/ic_down.png"); }
 .icon-lock { background-image: url("project://database/Assets/_Game/UI/Icons/ic_lock.png"); }
@@ -62,14 +68,14 @@
 #toll-chip.toll-chip--preview { opacity: 0.55; }
 
 /* ---------- phone button ---------- */
-#phone-button { width: 124px; height: 124px; border-radius: 40px; background-color: var(--panel-a); border-width: var(--border); border-color: var(--brown); align-items: center; justify-content: center; }
+#phone-button { flex-shrink: 0; margin-left: 24px; width: 124px; height: 124px; border-radius: 40px; background-color: var(--panel-a); border-width: var(--border); border-color: var(--brown); align-items: center; justify-content: center; }
 #phone-button .icon { width: 64px; height: 64px; }
 .badge { position: absolute; top: -12px; right: -12px; min-width: 44px; height: 44px; border-radius: 22px; background-color: var(--terracotta); color: #FFFFFF; border-width: 4px; border-color: var(--panel-a); -unity-text-align: middle-center; font-size: 24px; -unity-font-style: bold; padding: 0 6px; }
 
 /* ---------- room label, toast ---------- */
-#room-pill { position: absolute; top: 40px; align-self: center; padding: 8px 26px; transition-property: opacity; transition-duration: 0.3s; }
+#room-pill { padding: 8px 26px; transition-property: opacity; transition-duration: 0.3s; }
 #room-name { font-size: 30px; -unity-font-style: bold; margin-left: 10px; }
-#toast { margin-top: 14px; padding: 10px 26px; background-color: var(--brown); border-color: var(--brown); transition-property: opacity; transition-duration: 0.3s; }
+#toast { margin-top: 14px; max-width: 100%; padding: 10px 26px; background-color: var(--brown); border-color: var(--brown); transition-property: opacity; transition-duration: 0.3s; }
 #toast-text { color: var(--cream-hi); font-size: 30px; -unity-font-style: bold; }
 .faded { opacity: 0; }
 .pulse { scale: 1.08 1.08; }
@@ -77,8 +83,8 @@
 .pop-out { scale: 1.3 1.3; opacity: 0; }
 
 /* ---------- Cassaforte card ---------- */
-#safe-card { position: absolute; left: 60px; right: 60px; bottom: 160px; padding: 34px 40px; }
-#safe-toll { background-color: var(--teal); border-radius: 24px; padding: 10px 18px; margin-bottom: 16px; }
+#safe-card { width: 92%; max-width: 780px; padding: 34px 40px; }
+#safe-toll { background-color: var(--teal); border-radius: 24px; padding: 10px 18px; margin-bottom: 16px; margin-right: 56px; }
 #safe-toll-text { color: var(--cream-hi); font-size: 24px; -unity-font-style: bold; letter-spacing: 1px; white-space: normal; }
 #safe-title { font-size: 44px; -unity-font-style: bold; }
 #safe-day { font-size: 26px; -unity-font-style: bold; letter-spacing: 1px; color: var(--teal); }
@@ -121,8 +127,10 @@
 
 /* ================= PHONE ================= */
 #phone-scrim { background-color: rgba(43, 34, 48, 0.35); }
-#phone { position: absolute; top: 140px; right: 36px; width: 900px; height: 1800px; border-radius: 96px; background-color: var(--phone-shell); padding: 24px; border-width: var(--border); border-color: var(--brown);
-    transform-origin: 100% 0; scale: 0.2 0.2; opacity: 0; transition-property: scale, opacity; transition-duration: 0.4s, 0.2s; transition-timing-function: ease-out-back, ease-out; }
+#phone-scrim { align-items: center; justify-content: center; }
+#phone-frame { width: 900px; height: 1600px; flex-shrink: 0; transform-origin: center; }  /* scaled uniformly by PhoneController */
+#phone { width: 100%; height: 100%; border-radius: 96px; background-color: var(--phone-shell); padding: 24px; border-width: var(--border); border-color: var(--brown);
+    transform-origin: 100% 0; scale: 0.6 0.6; opacity: 0; transition-property: scale, opacity; transition-duration: 0.4s, 0.2s; transition-timing-function: ease-out-back, ease-out; }
 #phone.phone--open { scale: 1 1; opacity: 1; }
 #phone-screen { flex-grow: 1; border-radius: 76px; background-color: var(--phone-a); padding: 40px 44px; overflow: hidden; }
 /* gradient #4A3428 -> #2B2230: use PhoneScreenGradient.png as background-image if desired */
@@ -166,3 +174,6 @@
 #messaggi-contact { color: var(--cream-hi); font-size: 34px; -unity-font-style: bold; margin-bottom: 16px; }
 #flotta-cassa { font-size: 30px; -unity-font-style: bold; }
 #flotta-nextpad { color: var(--cream); font-size: 28px; margin-top: 12px; white-space: normal; }
+
+/* desktop key hint under the phone button */
+.key-hint { position: absolute; bottom: -46px; left: -20px; right: -20px; -unity-text-align: middle-center; font-size: 26px; -unity-font-style: bold; letter-spacing: 1px; color: var(--cream-hi); -unity-text-outline-width: 2px; -unity-text-outline-color: var(--brown); }

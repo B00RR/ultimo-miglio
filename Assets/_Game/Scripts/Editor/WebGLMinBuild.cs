@@ -1,3 +1,4 @@
+using System.Linq;
 using System.IO;
 using UnityEditor;
 using UnityEditor.Build;
@@ -20,6 +21,7 @@ namespace UltimoMiglio.EditorTools
             foreach (var n in new[] { "UltimoMiglio/ToonDiorama", "Universal Render Pipeline/Lit", "Universal Render Pipeline/Unlit" }) { var sh = Shader.Find(n); if (!sh) continue; bool has = false; for (int i = 0; i < arr.arraySize; i++) if (arr.GetArrayElementAtIndex(i).objectReferenceValue == sh) has = true; if (!has) { arr.InsertArrayElementAtIndex(arr.arraySize); arr.GetArrayElementAtIndex(arr.arraySize - 1).objectReferenceValue = sh; } }
             so.ApplyModifiedProperties();
             AssetDatabase.SaveAssets();
+            { var t = System.AppDomain.CurrentDomain.GetAssemblies().Select(a => a.GetType("UltimoMiglio.UI.EditorTools.HudSetup")).FirstOrDefault(x => x != null); t?.GetMethod("BuildAll")?.Invoke(null, null); Debug.Log("[WebGLMin] HudSetup ran=" + (t != null)); }
             SliceSceneBuilder.Build();
             EditorUserBuildSettings.SwitchActiveBuildTarget(BuildTargetGroup.WebGL, BuildTarget.WebGL);
             EditorUserBuildSettings.development = false;
@@ -33,6 +35,7 @@ namespace UltimoMiglio.EditorTools
             var outDir = "Builds/WebGL_min";
             Directory.CreateDirectory(outDir);
             var r = BuildPipeline.BuildPlayer(new BuildPlayerOptions { scenes = new[] { SliceSceneBuilder.ScenePath }, locationPathName = outDir, target = BuildTarget.WebGL, options = BuildOptions.None });
+            if (r.summary.result == BuildResult.Succeeded) { File.Copy("Assets/_Game/Scripts/Editor/WebTemplate/index.html.txt", Path.Combine(outDir, "index.html"), true); if (Directory.Exists(Path.Combine(outDir, "TemplateData"))) Directory.Delete(Path.Combine(outDir, "TemplateData"), true); }
             Debug.Log($"[WebGLMin] {r.summary.result} errors={r.summary.totalErrors} size={r.summary.totalSize}");
             EditorApplication.Exit(r.summary.result == BuildResult.Succeeded ? 0 : 1);
         }

@@ -9,7 +9,7 @@ namespace UltimoMiglio.UI
         /// <summary>Pixels per dp (Android: dpi/160). Falls back to 160 dpi when unknown (editor).</summary>
         public static float DpToPx
         {
-            get { float dpi = Screen.dpi; return (dpi > 1f ? dpi : 160f) / 160f; }
+            get { float dpi = Screen.dpi; return Mathf.Max(1f, (dpi > 1f ? dpi : 160f) / 160f); } // desktop browsers report ~96 dpi: never below 1 px/dp
         }
 
         /// <summary>Safe area in screen pixels, origin bottom-left (Unity convention).</summary>
@@ -19,6 +19,7 @@ namespace UltimoMiglio.UI
         public static void ApplyPadding(VisualElement safeRoot)
         {
             if (safeRoot?.panel == null) return;
+            if (ResponsivePanel.SizeOverride.HasValue) { safeRoot.style.paddingLeft = safeRoot.style.paddingTop = safeRoot.style.paddingRight = safeRoot.style.paddingBottom = 0; return; }
             Rect sa = Screen.safeArea;
             var tl = RuntimePanelUtils.ScreenToPanel(safeRoot.panel, new Vector2(sa.xMin, Screen.height - sa.yMax));
             var br = RuntimePanelUtils.ScreenToPanel(safeRoot.panel, new Vector2(sa.xMax, Screen.height - sa.yMin));

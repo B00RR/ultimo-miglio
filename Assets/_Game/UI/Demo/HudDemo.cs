@@ -25,7 +25,7 @@ namespace UltimoMiglio.UI.Demo
             phone.SetBadge(PhoneApp.Flotta, 1);
             hud.SetCurrencies(1240, 12);
             hud.SetPhoneBadge(1);
-            phone.SetHome(new PhoneHomeData { day = 4, daysPerYear = 365, time = "08:40", installmentLine = "Rata 1 · Cassaforte · 8.800 LN · Giorno 24", notification = "Mamma Rosa: ordine speciale!", questLine = "Quest di oggi: consegna 10 pacchi" });
+            phone.SetHome(new PhoneHomeData { day = 4, daysPerYear = 365, time = "08:40", installmentLine = "Rata 1 · Cassaforte · 8.400 LN · Giorno 24", notification = "Mamma Rosa: ordine speciale!", questLine = "Quest di oggi: consegna 10 pacchi" });
             phone.SetOrders(new List<OrderItem> { new OrderItem { id = "rosa_01", customer = "MAMMA ROSA", title = "Pacco di sughi", reward = "+40 LN", secondsLeft = 95, comboText = "x1,2" } });
             phone.SetChat(new ChatThread { contact = "Civetta 🦉", accentClass = "accent-civetta",
                 messages = new List<ChatMessage> { new ChatMessage { text = "Conoscevo tua nonna. Ada teneva i conti meglio di te. Il pacco sul bancone? Non aprirlo." } },
@@ -34,8 +34,8 @@ namespace UltimoMiglio.UI.Demo
                 cassaAmount = 240, cassaCapacity = 352, cassaFullInSeconds = 1200, nextPadTitle = "NUOVO SCAFFALE", nextPadId = "pad_shelf_2" });
         }
 
-        SafeCardData MockSafe() => new SafeCardData { chapter = 1, trancheTotal = 132000, tranchePaid = 8800, day = 4, daysPerYear = 365,
-            installmentIndex = 1, installmentAmount = 8800, installmentDueDay = 24, tollActive = toll, tollFraction = 0.15f };
+        SafeCardData MockSafe() => new SafeCardData { chapter = 1, trancheTotal = 8400, tranchePaid = 2100, day = 4, daysPerYear = 365,
+            installmentIndex = 1, installmentAmount = 8400, installmentDueDay = 24, tollActive = toll, tollFraction = 0.15f };
 
         void Update()
         {
