@@ -8,7 +8,7 @@ namespace UltimoMiglio.Gameplay
     /// Steps complete from game state (EconomyState / stack / shelves). Progress saved in PlayerPrefs "um_tut_step".</summary>
     public sealed class TutorialManager : MonoBehaviour
     {
-        public enum Step { Muoviti, Arrivi, Scaffali, Bancone, Monete, Zaino, Nonno, Fine, Chiuso }
+        public enum Step { Muoviti, Arrivi, Scaffali, Bancone, Monete, Nonno, Zaino, Fine, Chiuso }
         public const string PrefKey = "um_tut_step";
         public static TutorialManager I { get; private set; }
         public static System.Action<Step> StepChanged;
@@ -21,7 +21,7 @@ namespace UltimoMiglio.Gameplay
         public Step Current { get; private set; }
         Vector3 _startPos; int _shelfBase, _servedBase; double _walletBase; float _endT;
         Transform _marker, _markerArrow; VisualElement _banner; Label _bannerText, _objective;
-        static readonly string[] Objectives = { "Muoviti", "Vai agli Arrivi", "Metti sullo scaffale", "Porta al Bancone", "Raccogli le monete", "Compra lo Zaino", "Assumi NONNO" };
+        static readonly string[] Objectives = { "Muoviti", "Vai agli Arrivi", "Metti sullo scaffale", "Porta al Bancone", "Raccogli le monete", "Assumi NONNO", "Compra lo Zaino" };
         UltimoMiglio.UI.EdgeArrow _edge; UltimoMiglio.UI.HudController _hud;
 
         void Awake() { I = this; }
@@ -43,7 +43,7 @@ namespace UltimoMiglio.Gameplay
             var ring = GameObject.CreatePrimitive(PrimitiveType.Cylinder); Destroy(ring.GetComponent<Collider>());
             ring.transform.SetParent(_marker, false); ring.transform.localScale = new Vector3(1.4f, 0.01f, 1.4f); ring.transform.localPosition = new Vector3(0, 0.04f, 0);
             ring.GetComponent<Renderer>().sharedMaterial = mat;
-            _markerArrow = new GameObject("Arrow").transform; _markerArrow.SetParent(_marker, false);
+            _markerArrow = new GameObject("Arrow").transform; _markerArrow.SetParent(_marker, false); _markerArrow.gameObject.SetActive(false); // QA #44: no floating mid-screen waypoint
             for (int s = -1; s <= 1; s += 2)
             {   // chevron pointing down made of two bars
                 var bar = GameObject.CreatePrimitive(PrimitiveType.Cube); Destroy(bar.GetComponent<Collider>());
@@ -102,6 +102,15 @@ namespace UltimoMiglio.Gameplay
             var eco = GameRoot.Ready ? GameRoot.I.Eco : null;
             if (GameRoot.I && GameRoot.I.Nina) _startPos = GameRoot.I.Nina.transform.position;
             _shelfBase = ShelfTotal(); _servedBase = eco?.S.CustomersServed ?? 0; _walletBase = eco?.S.Wallet ?? 0; _endT = 0;
+            // QA #42: after Arrivi/Bancone path, enough LN to hire NONNO within ~90s tutorial
+            if (s == Step.Nonno && eco != null && eco.S.NonnoLevel < 0)
+            {
+                double need = eco.Cost(UpgradeKind.NonnoHire);
+                if (!double.IsInfinity(need) && eco.S.Wallet < need)
+                    eco.S.Wallet = need;
+            }
+            if (s == Step.Monete && eco != null && eco.S.Wallet < 4)
+                eco.S.Wallet = System.Math.Max(eco.S.Wallet, 4);
             Debug.Log($"[Tutorial] step {(int)s} {s}: {CurrentText}");
             StepChanged?.Invoke(s);
             var t = Target();

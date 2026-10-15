@@ -22,7 +22,7 @@ namespace UltimoMiglio.Gameplay
             if (FillRing) { FillRing.gameObject.SetActive(avail); if (avail) FillRing.SetProgress((float)eco.PadFill(Kind)); }
             var icon = GetComponent<UM_PadIcon>(); if (icon) icon.SetPlayerNear(Nina);
             if (Card) { Card.gameObject.SetActive(avail); if (avail) Card.SetProgress(eco.S.PadPaid[(int)Kind], eco.Cost(Kind)); }
-            var tag = GetComponent<UltimoMiglio.UI.World.PadTag>(); if (tag) { tag.enabled = avail; if (avail) { double left = eco.Cost(Kind) - eco.S.PadPaid[(int)Kind]; if (!double.IsInfinity(left)) tag.SetPrice(System.Math.Max(0, left)); } }
+            var tag = GetComponent<UltimoMiglio.UI.World.PadTag>(); if (tag) tag.enabled = false; // QA #41: no floating price chips
         }
         protected override void OnZoneTick(float t)
         {
