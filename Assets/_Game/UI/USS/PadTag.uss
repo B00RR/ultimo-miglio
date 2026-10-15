@@ -1,0 +1,21 @@
+/* Cartellino pad (issue #33). Etichetta 16 dp, prezzo 26 dp (>= 1,5x). Fredoka. */
+.pad-tag { align-items: center; padding: 6px 12px; border-radius: 14px; border-width: 3px; translate: -50% -100%; position: absolute; }
+.pad-tag__row { flex-direction: row; align-items: center; }
+.pad-tag__icon { width: 24px; height: 24px; margin-right: 6px; -unity-background-scale-mode: scale-to-fit; }
+.pad-tag__label { font-size: 16px; -unity-font-definition: url("project://database/Assets/_Game/UI/Fonts/Fredoka-SemiBold.ttf"); -unity-font-style: normal; margin: 0; padding: 0; white-space: nowrap; }
+.pad-tag__price { font-size: 26px; -unity-font-definition: url("project://database/Assets/_Game/UI/Fonts/Fredoka-Bold.ttf"); -unity-font-style: normal; margin: 0; padding: 0; white-space: nowrap; }
+
+/* Pacco: bianco su teal scuro (7,4:1), bordo teal */
+.pad-tag--pacco { background-color: #3E5A61; border-color: #5E7F86; }
+.pad-tag--pacco .pad-tag__label, .pad-tag--pacco .pad-tag__price { color: #FFFFFF; }
+.pad-tag--pacco .pad-tag__icon { background-image: url("project://database/Assets/_Game/UI/Icons/ic_box_cream.png"); }
+
+/* Moneta: ink su sun (8,9:1), bordo ink */
+.pad-tag--moneta { background-color: #F4C430; border-color: #3B2A20; }
+.pad-tag--moneta .pad-tag__label, .pad-tag--moneta .pad-tag__price { color: #3B2A20; }
+.pad-tag--moneta .pad-tag__icon { background-image: url("project://database/Assets/_Game/UI/Icons/ic_coin.png"); -unity-background-image-tint-color: #3B2A20; }
+
+/* Cliente: bianco su terracotta scuro (7,6:1), bordo terracotta */
+.pad-tag--cliente { background-color: #8E3F22; border-color: #C8633B; }
+.pad-tag--cliente .pad-tag__label, .pad-tag--cliente .pad-tag__price { color: #FFFFFF; }
+.pad-tag--cliente .pad-tag__icon { background-image: url("project://database/Assets/_Game/UI/Icons/ic_customer_cream.png"); }
