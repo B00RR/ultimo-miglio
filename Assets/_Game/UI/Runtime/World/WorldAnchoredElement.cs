@@ -46,7 +46,7 @@ namespace UltimoMiglio.UI.World
             if (Element == null) TryCreate();
             if (Element == null || cam == null || Element.panel == null) return;
             Vector3 sp = cam.WorldToScreenPoint(anchor.position + worldOffset);
-            bool visible = sp.z > 0;
+            bool visible = sp.z > 0 && sp.x >= 0 && sp.x <= Screen.width && sp.y >= 0 && sp.y <= Screen.height; // anchor off-screen: hide (edge arrow guides), on-screen: clamp
             Element.style.display = visible ? DisplayStyle.Flex : DisplayStyle.None;
             if (!visible) return;
             var p = UltimoMiglio.UI.SafeAreaUtil.ScreenToPanel(Element.panel, sp);

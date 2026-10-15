@@ -8,12 +8,12 @@ namespace UltimoMiglio.EditorTools
     public static class DepotKit
     {
         const string Root = "Assets/_Game/Art/Environment/";
-        static Transform _parent; static Material _mat;
+        static Transform _parent; static Material _mat, _emi;
 
         public static bool Build(Material world)
         {
             if (!AssetDatabase.LoadAssetAtPath<GameObject>(Root + "Kit/env_floor_2x2_a.fbx")) { Debug.LogWarning("[Kit] kit missing: graybox"); return false; }
-            _mat = world; _parent = new GameObject("DepotKit").transform; _parent.gameObject.isStatic = true;
+            _mat = world; _emi = AssetDatabase.LoadAssetAtPath<Material>("Assets/_Game/VFX/Materials/M_Diorama_Atlas_Emissive.mat"); _parent = new GameObject("DepotKit").transform; _parent.gameObject.isStatic = true;
             // floor 18x22: 2x2 tiles
             for (int x = 0; x < 9; x++) for (int z = 0; z < 11; z++)
                 Place((x + z) % 2 == 0 ? "Kit/env_floor_2x2_a" : "Kit/env_floor_2x2_b", _parent, new Vector3(-8 + x * 2, -0.02f, -10 + z * 2), 0, false, false, 2f);
@@ -63,7 +63,7 @@ namespace UltimoMiglio.EditorTools
             if (wall) { bool wantX = Mathf.Abs(Mathf.DeltaAngle(yaw, 90)) > 45; bool isX = b.size.x >= b.size.z; if (wantX != isX) { go.transform.rotation = Quaternion.Euler(0, yaw + 90, 0); b = Bounds(go); } }
             go.transform.position += new Vector3(pos.x - b.center.x, pos.y - b.min.y, pos.z - b.center.z);
             go.isStatic = true;
-            if (_mat) foreach (var r in go.GetComponentsInChildren<Renderer>()) r.sharedMaterials = System.Array.ConvertAll(r.sharedMaterials, m => m && m.name.StartsWith("M_Diorama") ? m : _mat);
+            if (_mat) foreach (var r in go.GetComponentsInChildren<Renderer>()) r.sharedMaterials = System.Array.ConvertAll(r.sharedMaterials, m => m && m.name.Contains("Emissive") && _emi ? _emi : _mat);
             foreach (var c in go.GetComponentsInChildren<Collider>()) Object.DestroyImmediate(c);
             if (solid) { b = Bounds(go); var bc = go.AddComponent<BoxCollider>(); bc.center = go.transform.InverseTransformPoint(b.center); var ls = go.transform.lossyScale; var sz = Quaternion.Inverse(go.transform.rotation) * b.size; bc.size = new Vector3(Mathf.Abs(sz.x / ls.x), Mathf.Abs(sz.y / ls.y), Mathf.Abs(sz.z / ls.z)); }
             return true;

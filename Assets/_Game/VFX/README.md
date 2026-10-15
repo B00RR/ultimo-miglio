@@ -1,73 +1,118 @@
 # VFX & Technical Art – Sprint 1 (Capitolo 1) – Ultimo Miglio
-Unity 6 + URP, Android. Stile "Diorama Solare" (00_BIBBIA, conceptA.jpg, 02_TECH §4-5, 3d/05_3D_PIPELINE).
-Cartella: `Assets/_Game/VFX/` (segue la convenzione esistente `Assets/_Game/...` del progetto; se il Tech Lead sceglie `_Project`, spostare la cartella e aggiornare i path costanti in `Scripts/Editor/*.cs`).
+Unity 6 + URP. Target attuale: **WebGL** (ordine di Lorenzo); Android resta supportato dai tier Base/Standard/Alto.
+**Cap. 1 = solo giorno e tramonto con lanterne, niente notte** (il preset Notte resta nel codice, inutilizzato). Camera cap. 1: ortografica size 4.5, distanza 15, pitch 35.3°, yaw 45°. **Su WebGL il post-process è spento** (dava magenta).
+Stile "Diorama Solare" (00_BIBBIA, conceptA.jpg, 02_TECH §4-5, 3d/05_3D_PIPELINE). Cartella: `Assets/_Game/VFX/`.
 
 ## Contenuto
-| File | Cosa |
+| File | Cosa fa |
 |---|---|
-| `Shaders/UM_ToonDiorama.shader` | Toon URP: rampa 2-3 bande morbide (half-lambert), ombra calda (mai nero), rim crema, ombre ricevute (bordo netto), fog, luci add. per-vertex/pixel, outline inverted-hull (pass `SRPDefaultUnlit`), ShadowCaster/DepthOnly propri. Un solo `UnityPerMaterial` → SRP Batcher compatibile. |
-| `Scripts/Runtime/UM_Palette.cs` | Hex palette (base + derivati luce/FX). |
-| `Scripts/Runtime/UM_LightingRig.cs` | Sole, gradiente ambiente Trilight, fog lineare; preset Day/Golden/Night + `SetNightBlend(t)` per il ciclo giorno. |
-| `Scripts/Runtime/UM_QualityTier.cs` | Lato VFX dei 3 tier di 02_TECH (Base/Standard/Alto): render scale, ombre, outline, bloom, FXAA, scala particelle. |
-| `Scripts/Runtime/UM_FxFactory.cs` | Costruzione procedurale ParticleSystem: package pop, coins, upgrade, dust. |
+| `Shaders/UM_ToonDiorama.shader` | Toon URP: 3 bande morbide (half-lambert), ombre calde (mai nero), rim crema, ombre ricevute con bordo toon filtrato (niente scalettature), fog, luci aggiuntive con falloff morbido (lanterne), variazione di tinta in world-space attivabile (`_NoiseStrength`), outline inverted-hull attivabile per materiale (`_OutlineOn`). ShadowCaster/DepthOnly propri, un solo `UnityPerMaterial` → compatibile SRP Batcher. |
+| `Scripts/Runtime/UM_Palette.cs` | Esadecimali della palette (base + derivati luce/FX). |
+| `Scripts/Runtime/UM_LightingRig.cs` | Sole, ambiente Trilight, fog lineare; preset Giorno/Dorato/Notte + `SetNightBlend(t)`. |
+| `Scripts/Runtime/UM_DayCycle.cs` | Ciclo giorno → ora dorata → tramonto, eventi e API per forzare l'ora. |
+| `Scripts/Runtime/UM_Lantern.cs` | Lanterna: emissivo + luce in dissolvenza al tramonto, luci reali limitate per tier. |
+| `Scripts/Runtime/UM_QualityTier.cs` | Tier Base/Standard/Alto (02_TECH) + **Web**: render scale, ombre, outline, bloom, FXAA, scala particelle. |
+| `Scripts/Runtime/UM_FxFactory.cs` | Particelle procedurali: pop pacco, monete, upgrade, polvere + blob di contatto (AO finta). |
 | `Scripts/Runtime/UM_FxPlayer.cs` | Pool round-robin: `UM_FxPlayer.Play(Fx.Coins, pos)`. |
-| `Scripts/Editor/UM_FxPrefabBuilder.cs` | Crea `Materials/M_FX_Particles`, `M_Diorama_Atlas`, `M_Diorama_Atlas_Emissive`, `M_Char_Atlas` e `Prefabs/fx_*.prefab`. |
-| `Scripts/Editor/UM_PostProcessBuilder.cs` | Crea `Profiles/PP_Diorama_Day/Night.asset` + Volume globale in scena. |
-| `Scripts/Editor/UM_LightingSetup.cs` | Sole + rig in scena, clear color Cielo, impostazioni ombre mobile sull'URP asset. |
-| `*.asmdef` | Assembly runtime/editor (riferimenti URP). |
+| `Scripts/Editor/UM_FxPrefabBuilder.cs` | Crea materiali (`M_Diorama_Atlas`, `_Emissive`, `M_Char_Atlas`, `M_Props_Interactive`, `M_FX_Particles`, `M_FX_Coin`, `M_FX_ContactShadow`) e prefab `fx_*`. |
+| `Scripts/Editor/UM_PostProcessBuilder.cs` | Crea `Profiles/PP_Diorama_Day/Night.asset` + Volume globale; assegna `PostProcessData` al renderer URP se manca. |
+| `Scripts/Editor/UM_LightingSetup.cs` | Sole + rig in scena, sfondo Cielo, ombre mobile/web sull'asset URP (soft Low). |
+| `Scripts/Editor/UM_VfxVerify.cs` | Verifica headless: builder + scena test + PNG + luminanza media. |
+| `Textures/T_FX_Sheet.png` | Foglio sprite 4x2 (512x256): punto, sbuffo, stella, anello (Kenney CC0) + scintilla pre-colorata (originale). |
+| `Textures/T_FX_ContactBlob.png` | Blob radiale 64 px (originale) per l'ombra di contatto. |
 
 ## Installazione
-1. Pacchetti: `com.unity.render-pipelines.universal` (incluso nel template URP). Nessun pacchetto a pagamento; VFX Graph NON usato (Shuriken = più sicuro su GLES3/low-end).
-2. Copiare/lasciare `Assets/_Game/VFX` nel progetto; aprire Unity (o batchmode) per compilare.
-3. Menu **Ultimo Miglio/VFX/**: `Build FX Prefabs + Materials` → `Build Post-Process Profiles` → `Setup Warm Lighting (open scene)`.
-   Batchmode: `-executeMethod UltimoMiglio.VFX.EditorTools.UM_FxPrefabBuilder.BuildAll` (idem `UM_PostProcessBuilder.BuildAll`; il setup luci richiede una scena aperta).
-4. Camera: Post Processing ON nel componente URP Camera. Al boot il Tech Lead chiama `UM_QualityTier.Apply(tier, toonMats)`.
-5. Atlas palette atteso in `Assets/_Game/Art/Textures/T_Palette_Atlas.png` (ASTC 4x4/ETC2, no mip, Point, sRGB); mesh moneta opzionale `Assets/_Game/Art/FX/fx_coin.fbx` (24-48 tri, faro inciso via swatch/normal faceting, bordo `#3B2A20`: richiesta al 3D Artist). Path modificabili nel builder.
+1. Pacchetti: solo `com.unity.render-pipelines.universal`. Niente VFX Graph (richiede compute, non disponibile su WebGL).
+2. Menu **Ultimo Miglio/VFX/**: `Build FX Prefabs + Materials` → `Build Post-Process Profiles` → `Setup Warm Lighting (open scene)`.
+   Batch: `-executeMethod UltimoMiglio.VFX.EditorTools.UM_FxPrefabBuilder.BuildAll` (idem `UM_PostProcessBuilder.BuildAll`).
+3. Camera: Post Processing ON. Al boot il Tech Lead chiama `UM_QualityTier.Apply(tier, materialiToon)`.
+4. Atlas palette: `Assets/_Game/Art/Textures/T_Palette_Atlas.png` (no mip, Point; meta corretto in wt/3d). Moneta: `Assets/_Game/Art/FX/fx_coin.fbx` (si usa la LOD1, 34 tri).
+5. Ombra di contatto: istanziare `Prefabs/fx_contact_shadow.prefab` come figlio di personaggi, robot e pacchi (scala 0.7–0.9).
+
+## Game feel (sprint "My Little Universe")
+Prefab in `Prefabs/` (da assegnare al componente `UM_FxPlayer` nella scena):
+| Prefab | Uso | Costo |
+|---|---|---|
+| `fx_package_pickup` | Nina/NONNO raccoglie un pacco: pop verso l'alto cartone/crema + 2 stelline | ~11 particelle, 0.4 s |
+| `fx_package_deliver` | pacco consegnato (bancone, cliente, furgone): anello giallo sole + coriandoli palette + stella | ~16 particelle, 0.7 s |
+| `fx_upgrade_complete` | pad completato: flash a terra + fontana di scintille | ~17 particelle, 0.8 s |
+| `fx_coin_flyer` | una moneta volante: mesh lira + scia corta (`M_FX_Trail`) + scintille per distanza | 34 tri + scia + ≤6 particelle |
+| `fx_pad_fill_ring` | anello del pad upgrade (`UM_FxRingFill`, `_Fill/_Color/_Pulse/_Flash` compatibili con `ZoneFillRing` della UI) | 1 quad, nessuna texture |
+
+API (namespace `UltimoMiglio.VFX`):
+```csharp
+UM_FxPlayer.Play(UM_FxPlayer.Fx.PackagePickup, worldPos);   // anche PackageDeliver, UpgradeComplete, Coins, Upgrade, PackagePop
+int UM_FxPlayer.FlyCoins(Vector3 worldStart, RectTransform hudTarget, int count = 1, Action onEachArrive = null, Action onAllArrived = null); // HUD uGUI
+int UM_FxPlayer.FlyCoinsToScreen(Vector3 worldStart, Func<Vector2> screenPoint, int count = 1, Action onEachArrive = null, Action onAllArrived = null); // HUD UI Toolkit (pixel, origine in basso a sinistra)
+int UM_FxPlayer.FlyCoinsTo(Vector3 worldStart, Vector3 worldTarget, int count = 1, Action onEachArrive = null, Action onAllArrived = null);
+int UM_FxPlayer.FlyCoinsTo(Vector3 worldStart, Func<Vector3> worldTarget, int count = 1, Action onEachArrive = null, Action onAllArrived = null); // bersaglio mobile
+UM_PadFillRing.SetProgress(float p01);  // insegue morbido; a 1 → flash + Play(UpgradeComplete) + evento OnCompleted
+UM_PadFillRing.ResetRing();  UM_PadFillRing.SetImmediate(float p01, float flash = 0);
+```
+- Volo moneta: Bézier quadratica (altezza arco 1.6 m), easeInOutQuad, 0.6 s, sfasamento 0.06 s tra monete, scala 1→0.55, rotazione 720°/s. Il bersaglio è rivalutato ogni frame (l'HUD può muoversi). Profondità a metà strada verso la camera → non passa dietro i muri.
+- Pool: `poolSize` 4 per burst, `coinFlyerPool` 12 (×0.75 su Web/Standard). Se le monete richieste superano il pool, le eccedenti chiamano subito `onEachArrive`: il conteggio economico resta giusto. Ritorna quante monete sono partite davvero.
+- Per l'HUD UI Toolkit (04_UI) il Tech Lead passa `() => { var c = el.worldBound.center; return new Vector2(c.x * s, Screen.height - c.y * s); }` con `s` = scala del pannello.
+- Materiali: tutti i burst usano `M_FX_Particles` (1 materiale, 1 texture); moneta `M_FX_Coin`; scia `M_FX_Trail`; anello `M_FX_RingFill` (valori per pad via MaterialPropertyBlock: pochi pad, costo trascurabile).
+
+## Ciclo del giorno (cap. 1)
+```csharp
+UM_DayCycle.Instance.StartDay();                                   // nuovo giorno di gioco
+UM_DayCycle.Instance.ForceTimeOfDay(UM_DayCycle.TimeOfDay.Sunset, pause: true, instant: false); // Morning | Day | GoldenHour | Sunset
+UM_DayCycle.Instance.SetTime01(0.9f);                              // 0..1 sull'intera giornata
+UM_DayCycle.Instance.Pause(); .Resume();  eventi OnSunset, OnDayEnd;  proprietà Time01, GoldenBlend, LanternsOn, Current
+lantern.SetOn(true, instant: false);                               // UM_Lantern singola (di solito la pilota il ciclo)
+```
+- Durate da `daycycle.json`: giorno 415 s + tramonto 5 s. Ora dorata dall'80% del giorno, lanterne accese a blend 0.6 (ritardo casuale ≤ 0.6 s, dissolvenza 1.2 s).
+- Tramonto: sole `#FFC27A` 0.85, angolo (22, -65, 0); ambiente `#F2C29A`/`#D9A27E`; fog/sfondo `#F0C8A0`.
+- Lanterne: luci reali max **Web 2, Alto 4, Base/Standard 0** (solo emissivo); scelte ogni 0.5 s le più vicine al centro della vista.
+- Volume "tramonto" opzionale: pesato solo se `UM_QualityTier.PostProcessingEnabled` (mai su WebGL).
 
 ## Palette (05_3D_PIPELINE + conceptA)
 Terracotta `#C8603A` · Giallo sole `#F2B53A` · Menta `#8FC9A8` · Limone `#F4E04D` · Teal OmniFreight `#4E7F86` · Tufo `#D9C4A0` · Pavimento `#E6D2B0` · Legno `#9A6A42` · Cartone `#C99A62` · Scuro caldo `#3B2F2A` · Arancio Nina `#E5743A` · Crema `#FFF4D6` · Cielo `#F3DDB6`.
-Derivati VFX (proposta, da validare): Sole `#FFE6B8`, ambiente sky/equator/ground `#F3DDB6`/`#E2C49C`/`#8C6A50`; notte luna `#C9A98A` int 0.5, ambiente `#7E6A72`/`#6E5A52`/`#41342E`, lanterne `#FFB65C` (luce principale sui personaggi). Esposizione notte ≈45-50% del giorno, mai horror.
-Moneta: lira/gettone di Solara con faro inciso, oro `#F2B53A`, bordo `#3B2A20`. Upgrade: giallo sole `#F4C430`, highlight/scintille limone `#F7E26B`, anello morbido con pulsazione lenta.
+Derivati VFX: Sole `#FFE6B8`; ambiente giorno `#F3DDB6`/`#E2C49C`/`#8C6A50`; notte luna `#C9A98A`, ambiente `#8C7880`/`#7C665C`/`#4A3C35`, lanterne `#FFB65C`; polvere `#B8906A`.
+Moneta: lira/gettone di Solara con faro inciso, oro `#F2B53A`, bordo `#3B2A20`. Upgrade: giallo sole `#F4C430`, nucleo/scintille limone `#F7E26B`.
 
 ## Valori chiave
-- **Sole**: `#FFE6B8`, 1.05 (direct ×0.82, ambient ×0.25 nello shader per headroom LDR), euler (50, -35, 0) → luce da alto-sinistra, ombre in basso a destra come nel concept. Ombre Hard (toon), strength 0.6; Soft solo tier Alto.
-- **Ombre URP**: distanza 25 m, 1 cascata, shadowmap 1024, bias 0.05/0.4; Base/Standard = niente ombre (02_TECH).
-- **Fog** lineare `#F3DDB6` 45→140 m, leggera (foschia calda sulla torre OmniFreight).
-- **Toon**: 3 bande, softness 0.06, shadow tint `#9E7873` @0.55 (moltiplicato: le ombre restano calde), rim crema 0.25 pow 3.5, outline `#3B2F2A` 0.012 m: toggle per materiale `_OutlineOn` (ON in `M_Char_Atlas` e `M_Props_Interactive` per pacchi/furgone/pad; OFF in `M_Diorama_Atlas`), sempre solo tier Alto.
-- **Post (Day/Night)**: Tonemapping Neutral (ACES sposta i toni della palette); Bloom thr 0.92/0.8, int 0.25/0.6, scatter 0.55, quarter res, 3 iter, tint crema; Color Adj exposure -0.1/0.0, contrast 6/8, sat +4/-6, WB +4/+10, filtro caldo; White Balance +8/+12; Vignette `#3B2F2A` 0.20/0.26. HDR off (LDR). Bloom off su Base.
-- **Particelle** (max vivi): pop 10 (16), monete 9+glint (12), upgrade ~16+anello (25), polvere 3/m (8). Tutte unlit, 1 materiale condiviso, niente ombre/collisioni/luci/trail; scala ×0.5 Base, ×0.75 Standard.
+- **Sole**: `#FFE6B8`, 1.05, euler (50, -35, 0) → luce da alto-sinistra come nel concept. Nello shader luce diretta ×0.82, ambiente ×0.25 (margine in LDR).
+- **Notte**: luna 0.5, lanterne 1.7 (luce principale sui personaggi), falloff morbido `smoothstep(0, 0.6)`, peso 0.6.
+- **Fog** lineare `#F3DDB6` 45→140 m (torre OmniFreight leggibile).
+- **Toon**: 3 bande, softness 0.06, tinta ombra `#9E7873` @0.55, rim crema 0.25, bordo ombra `smoothstep(0.3, 0.7)` sull'attenuazione (mantiene il PCF), outline `#3B2F2A` 0.012 m solo su `M_Char_Atlas` e `M_Props_Interactive`.
+- **Variazione pavimento/muri**: `_NoiseStrength` 0.06, `_NoiseScale` 0.35/m su `M_Diorama_Atlas` (2 ottave di value noise, solo ALU, 0 = spento).
+- **Ombra di contatto**: quad 2 tri, `#3B2F2A` alpha 0.45, unlit trasparente, niente SSAO.
+- **Post (Giorno/Notte)**: Tonemapping Neutral; Bloom soglia 0.92/0.8, intensità 0.25/0.6, scatter 0.55, quarter-res, tinta crema; Color Adjustments esposizione -0.1/+0.45 (in LDR non ha effetto: la notte si schiarisce col colorFilter ×1.12), contrasto 6/8, saturazione +4/-6; White Balance +4/+10; Vignette `#3B2F2A` 0.20/0.26. LDR.
+- **Particelle** (max vive): pop 10 (16), monete 9 + bagliore (12), upgrade ~16 scintille 0.11–0.21 m + anello pulsante (25), polvere 3/m, 0.18–0.32 m (8). Unlit, un solo materiale, niente ombre/collisioni/luci/trail.
 
-## Workflow skill (09_SPRINT1 "SKILL DA USARE")
-Appena Unity-MCP è live:
-- `script-update-or-create` per scrivere i `.cs` (validazione Roslyn) invece della copia su disco.
-- `package-add` solo se manca URP (`com.unity.render-pipelines.universal`).
-- `script-execute` per lanciare `UM_FxPrefabBuilder.BuildAll()`, `UM_PostProcessBuilder.BuildAll()`, `UM_LightingSetup.Setup()`.
-- `rql-mutate` per ritocchi valori live (es. `objects | get components | where $ is Light | set intensity = 1.1`).
-- `screenshot-isolated` (prefab FX, materiali su `env_`/`chr_`), `screenshot-camera`/`screenshot-game-view` per la review del Concept Artist.
+## Tier di qualità
+| | Base | Standard | Alto | **Web** |
+|---|---|---|---|---|
+| Render scale | 0.6 | 0.75 | 1.0 | 0.9 + cap devicePixelRatio ≤ 1.5 nel template (`config.devicePixelRatio = Math.min(window.devicePixelRatio, 1.5)`) |
+| Ombre | no | no | soft (Low, 4 tap), 26 m, 2048, 1 cascata | soft (Low), 24 m, 1024, 1 cascata |
+| Outline | no | no | solo `_OutlineOn=1` | solo `_OutlineOn=1` |
+| Post-process | sì | sì | sì | **OFF** (opt-in `UM_QualityTier.AllowPostOnWeb`, solo dopo verifica in build) |
+| Bloom | no | sì | sì | – (post spento) |
+| Particelle | ×0.5 | ×0.75 | ×1 | ×0.75 |
+| MSAA / AA | – | FXAA | 2x | MSAA 2x (niente FXAA: passa dal post) |
+| HDR | off | off | off | off |
+**Distanza ombre**: si misura dalla camera. Con camera ortografica conviene `CameraRigSetup.Distance = 15` (oggi 30): così 24–26 m coprono l'area di gioco e la shadowmap non spreca risoluzione; con Distance 30 le ombre sparirebbero quasi tutte. Da decidere col Tech Lead.
 
-## Changelog
-- v1.1 (feedback Concept Artist 15/10): fog alleggerita (45→140 m); notte più leggibile (sole 0.5, ambiente schiarito, post exposure 0, sat -6, vignette 0.26); outline per-materiale `_OutlineOn` + nuovo `M_Props_Interactive`; 3 bande confermate; moneta lira Solara (oro/bordo marrone); upgrade #F4C430/#F7E26B, anello morbido pulsante; nuovi colori in `UM_Palette`.
-
-## Target WebGL (priorità attuale, ordine di Lorenzo)
-- Unity lanciato con `-buildTarget WebGL` (nessuna build). Shader `UM_ToonDiorama` compatibile WebGL2/GLES3: `#pragma target 3.0`, niente compute/geometry/tessellation/UAV, solo keyword URP standard (main shadows, soft shadows, additional lights, lightmap, fog, instancing). Particelle Shuriken (niente VFX Graph, che richiede compute → non disponibile su WebGL).
-- LDR, niente MSAA (FXAA), bloom quarter-res a 2 iterazioni: il fill-rate del browser è il collo di bottiglia.
-- Rimuovere `com.unity.modules.vibration` dal manifest per target WebGL (non risolve; haptics Android da reintrodurre col target Android).
-
-### Tier `Web` (`UM_QualityTier.Apply(UMTier.Web, mats)`)
-| Voce | Valore |
-|---|---|
-| Render scale | 0.9 + cap devicePixelRatio ≤ 1.5 nel template WebGL (`config.devicePixelRatio = Math.min(window.devicePixelRatio, 1.5)`) |
-| Ombre | Hard, distanza 15 m, 1 cascata, shadowmap 512 |
-| Outline | ON solo su materiali con `_OutlineOn=1` (`M_Char_Atlas`, `M_Props_Interactive`) |
-| Bloom | ON, quarter-res, 2 iterazioni, no HQ filtering |
-| Particelle | ×0.75 |
-| HDR / MSAA | off / off (FXAA) |
-
-## Moneta
-`M_FX_Coin` (URP Particles/Unlit opaco, `_BaseMap` = `T_Palette_Atlas`): le monete mesh (`fx_coin.fbx`, LOD1 34 tri) campionano l'atlas con i propri UV, colore particella bianco → hex dell'atlas esatti. Senza mesh: billboard oro.
+## Note WebGL
+- Shader `#pragma target 3.0`, niente compute/geometry/tessellation/UAV, solo keyword URP standard; il value noise è puro ALU (nessuna texture in più).
+- Post-process spento su WebGL: `UM_QualityTier.Apply(UMTier.Web)` imposta `renderPostProcessing = false` e AA None sulle camere; nessun Volume viene pesato. Riattivarlo solo con `AllowPostOnWeb = true` dopo una build verificata senza magenta.
+- Il renderer `URP_Mobile_Renderer` creato da `ProjectSetup` aveva `postProcessData` nullo: **il post-process non girava** (neanche in main). `UM_PostProcessBuilder` ora lo assegna.
+- Per il target WebGL `com.unity.modules.vibration` nel manifest non si risolve: va tolto o reso per-piattaforma (Tech Lead).
+- La verifica headless gira su OpenGL Core (llvmpipe), non su un vero browser: la resa WebGL2 va confermata con una build quando sarà consentita.
 
 ## Verifica headless
-`UM_VfxVerify.Run` (Editor): esegue i 3 builder, crea una scena test, renderizza PNG (giorno, notte, toon outline vs set, 4 FX) e misura la luminanza media. Serve contesto GL: `xvfb-run -a Unity -batchmode -buildTarget WebGL -projectPath <worktree> -executeMethod UltimoMiglio.VFX.EditorTools.UM_VfxVerify.Run -quit` (senza `-nographics`). Output: env `UM_VFX_OUT`.
+`xvfb-run -a Unity -batchmode -buildTarget WebGL -projectPath <worktree> -executeMethod UltimoMiglio.VFX.EditorTools.UM_VfxVerify.Run -quit` (senza `-nographics`). Output in env `UM_VFX_OUT` (review: `/workspace/ultimo-miglio/art/vfx/`).
 
-- v1.2: tier Web, materiale moneta atlas, verifica headless, note WebGL.
-- v1.3 (verifica headless 15/10): giorno meno sovraesposto (luma 0.91→0.73), luci lanterna morbide, sprite FX da Kenney Particle Pack CC0 (`Textures/T_FX_Sheet.png`, 2x2: punto, sbuffo, stella, anello; vedi LICENZE_ASSET.md), `M_FX_Coin` = ToonDiorama + atlas (era nero col materiale particelle). Misura notte/giorno 43.8%.
+## Workflow skill (09_SPRINT1)
+Con Unity-MCP attivo: `script-update-or-create` per i `.cs`, `script-execute` per i builder, `rql-mutate` per ritocchi live, `screenshot-isolated`/`screenshot-camera`/`screenshot-game-view` per la review del Concept Artist, `package-add` solo se manca URP.
+
+## Changelog
+- v1.0: shader toon, luci, post, 4 particelle, builder.
+- v1.1 (Concept Artist): fog più leggera, notte leggibile, outline per materiale + `M_Props_Interactive`, moneta lira di Solara, colori upgrade.
+- v1.2: tier Web, materiale moneta su atlas, verifica headless, note WebGL.
+- v1.3: giorno meno sovraesposto, sprite Kenney CC0, `M_FX_Coin` su ToonDiorama, lanterne morbide.
+- v1.4 (review 2 Concept Artist): lanterne 1.7 con falloff morbido (luna 0.5); polvere `#B8906A` con alpha più persistente; scintille upgrade +30% con nucleo limone `#F7E26B` e alone `#F4C430`; ombre filtrate (soft Low + bordo toon smoothstep), distanze/risoluzioni per tier; variazione world-space sul set; ombra di contatto `fx_contact_shadow`; assegnato `PostProcessData` (il post non era attivo); esposizione notte +0.45 per il rapporto notte/giorno.
+- v1.5 (sprint game feel): `fx_package_pickup`, `fx_package_deliver`, `fx_upgrade_complete`, `fx_coin_flyer` + API `FlyCoins*`, `fx_pad_fill_ring` + `UM_PadFillRing.SetProgress`; shader `UM_FxRingFill`; notte schiarita col colorFilter (postExposure ignorato in LDR).
+- v1.6: cap. 1 senza notte → `UM_DayCycle` (giorno → tramonto) + `UM_Lantern`; `UM_LightingRig.SetGoldenBlend`; tier Web con post OFF e MSAA 2x; screenshot con camera 15/4.5; `vfx_night.png` sostituito da `vfx_sunset.png`.

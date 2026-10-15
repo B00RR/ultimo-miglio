@@ -48,7 +48,9 @@ namespace UltimoMiglio.EditorTools
             var audio = BuildAudio(root.transform);
             var fxGo = new GameObject("FxPlayer"); fxGo.transform.SetParent(root.transform);
             var fx = fxGo.AddComponent<UM_FxPlayer>();
-            fx.packagePop = FindPrefab("Assets/_Game/VFX/Prefabs", "pop"); fx.coins = FindPrefab("Assets/_Game/VFX/Prefabs", "coin"); fx.upgrade = FindPrefab("Assets/_Game/VFX/Prefabs", "upgrade");
+            GameObject VP(string n) => AssetDatabase.LoadAssetAtPath<GameObject>($"Assets/_Game/VFX/Prefabs/{n}.prefab");
+            fx.packagePop = VP("fx_package_pop"); fx.coins = VP("fx_coins"); fx.upgrade = VP("fx_upgrade");
+            fx.packagePickup = VP("fx_package_pickup"); fx.packageDeliver = VP("fx_package_deliver"); fx.upgradeComplete = VP("fx_upgrade_complete");
 
             // --- prefabs
             var parcelFbx = AssetDatabase.LoadAssetAtPath<GameObject>("Assets/_Game/Art/Props/prop_parcel_box.fbx");
@@ -82,6 +84,8 @@ namespace UltimoMiglio.EditorTools
                 Prim(PrimitiveType.Sphere, "Helmet", nina.transform, new Vector3(0, 1.65f, 0.02f), Vector3.one * 0.42f, chars, UM_Palette.Terracotta);
             }
             var anchor = new GameObject("StackAnchor").transform; anchor.SetParent(nina.transform, false); anchor.localPosition = new Vector3(0, 0.9f, -0.42f);
+            var shadowPf = AssetDatabase.LoadAssetAtPath<GameObject>("Assets/_Game/VFX/Prefabs/fx_contact_shadow.prefab");
+            if (shadowPf) { var sh = (GameObject)PrefabUtility.InstantiatePrefab(shadowPf); sh.transform.SetParent(nina.transform, false); sh.transform.localPosition = new Vector3(0, 0.02f, 0); }
             var stack = nina.AddComponent<PackageStack>(); stack.Anchor = anchor; stack.ParcelPrefab = parcel;
             var ctrl = nina.AddComponent<NinaController>(); ctrl.Stack = stack; ctrl.Animator = ninaAnim; root.Nina = ctrl;
             // HUD (UI/UX, UI Toolkit): HUD.prefab owns the FloatingJoystick (overlay exclusion + graphics)
@@ -175,7 +179,7 @@ namespace UltimoMiglio.EditorTools
             if (!hud) return;
             Set(joy, "cameraTransform", cam.transform);
             var arrow = hudGo.GetComponentInChildren<UltimoMiglio.UI.EdgeArrow>(true);
-            if (arrow) { Set(arrow, "cam", cam); Set(arrow, "nina", nina); }
+            if (arrow) { Set(arrow, "cam", cam); Set(arrow, "nina", nina); var aso = new SerializedObject(arrow); var mp = aso.FindProperty("marginDp"); if (mp != null) { mp.floatValue = 110f; aso.ApplyModifiedPropertiesWithoutUndo(); } }
             var sc = World<UltimoMiglio.UI.World.StackCounter>(nina.gameObject, hud, cam, "StackCounter.uxml", new Vector3(0, 2.2f, 0));
             var cc = World<UltimoMiglio.UI.World.CassaCard>(cassa.gameObject, hud, cam, "CassaCard.uxml", new Vector3(0, 1.6f, 0));
             const string ringPath = "Assets/_Game/Art/Materials/M_ZoneRing.mat";

@@ -19,7 +19,7 @@ Shader "UltimoMiglio/ToonDiorama"
         _RimColor ("Rim Color (Crema)", Color) = (1,0.957,0.839,1)
         _RimPower ("Rim Power", Range(0.5,8)) = 3.5
         _RimStrength ("Rim Strength", Range(0,1)) = 0.25
-        [Header(World Variation)]
+        [Header(Variazione mondo)]
         _NoiseStrength ("Floor/Wall Tint Variation (0=off)", Range(0,0.2)) = 0
         _NoiseScale ("Variation Scale (1/m)", Range(0.05,2)) = 0.35
         [Header(Emission)]
@@ -133,7 +133,7 @@ Shader "UltimoMiglio/ToonDiorama"
                     for (uint li = 0u; li < cnt; ++li) {
                         Light a = GetAdditionalLight(li, i.positionWS);
                         half d = smoothstep(0.0h, 0.6h, saturate(dot(n, a.direction)) * a.distanceAttenuation); // v1.4: wide soft falloff, no hard pool edge
-                        col += albedo.rgb * a.color * d * 0.45h;
+                        col += albedo.rgb * a.color * d * 0.6h; // energy compensates the wider falloff
                     }
                 #endif
                 col += albedo.rgb * i.fogAndVL.xyz;

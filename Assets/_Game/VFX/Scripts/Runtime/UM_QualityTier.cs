@@ -14,6 +14,9 @@ namespace UltimoMiglio.VFX
         /// Particle emission multiplier used by UM_FxFactory.
         public static float ParticleScale => Current == UMTier.Base ? 0.5f : (Current == UMTier.Standard || Current == UMTier.Web) ? 0.75f : 1f;
         /// Web: outline/shadows cheap variants allowed (desktop-class GPUs via WebGL2), DPR capped in the WebGL template.
+        /// Post-process: OFF di default su Web (in WebGL ha dato schermo magenta). Abilitarlo solo dopo verifica in build.
+        public static bool AllowPostOnWeb = false;
+        public static bool PostProcessingEnabled { get; private set; }
         public const float ShadowDistAlto = 26f, ShadowDistWeb = 24f;
         static bool OutlineTier(UMTier t) => t == UMTier.Alto || t == UMTier.Web;
 
@@ -29,7 +32,7 @@ namespace UltimoMiglio.VFX
                 urp.shadowCascadeCount = 1;
                 if (tier == UMTier.Alto) urp.mainLightShadowmapResolution = 2048;
                 if (tier == UMTier.Web) urp.mainLightShadowmapResolution = 1024;
-                urp.msaaSampleCount = tier == UMTier.Alto ? 2 : 1;  // Web: MSAA off, FXAA
+                urp.msaaSampleCount = (tier == UMTier.Alto || tier == UMTier.Web) ? 2 : 1;  // Web: MSAA 2x (niente FXAA: il post è spento)
                 urp.supportsHDR = false;
             }
             var sun = RenderSettings.sun;
@@ -45,11 +48,13 @@ namespace UltimoMiglio.VFX
                     b.active = tier != UMTier.Base;
                     if (tier == UMTier.Web) { b.downscale.Override(BloomDownscaleMode.Quarter); b.maxIterations.Override(2); b.highQualityFiltering.Override(false); }
                 }
+            // Web: post spento (nessun Volume, niente FXAA che passa dal post) salvo opt-in esplicito e verificato.
+            PostProcessingEnabled = tier != UMTier.Web || AllowPostOnWeb;
             foreach (var cam in Object.FindObjectsByType<Camera>(FindObjectsSortMode.None))
             {
                 var d = cam.GetUniversalAdditionalCameraData();
-                d.renderPostProcessing = true;
-                d.antialiasing = tier == UMTier.Base ? AntialiasingMode.None : AntialiasingMode.FastApproximateAntialiasing;
+                d.renderPostProcessing = PostProcessingEnabled;
+                d.antialiasing = (!PostProcessingEnabled || tier == UMTier.Base) ? AntialiasingMode.None : AntialiasingMode.FastApproximateAntialiasing;
             }
         }
     }
