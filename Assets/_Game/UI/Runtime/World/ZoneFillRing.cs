@@ -40,7 +40,9 @@ namespace UltimoMiglio.UI
 
         void Apply()
         {
+            if (!ringRenderer) ringRenderer = GetComponent<Renderer>();
             if (!ringRenderer) return;
+            if (mpb == null) mpb = new MaterialPropertyBlock();
             ringRenderer.GetPropertyBlock(mpb);
             mpb.SetFloat(FillId, fill); mpb.SetColor(ColorId, color); mpb.SetFloat(PulseId, pulse);
             ringRenderer.SetPropertyBlock(mpb);

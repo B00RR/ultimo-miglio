@@ -21,10 +21,10 @@ namespace UltimoMiglio.VFX
         public static readonly Color Crema      = H("#FFF4D6");
         public static readonly Color Cielo      = H("#F3DDB6");
         // VFX/lighting derivati (proposti dal VFX, da validare col Concept Artist)
-        public static readonly Color Sole       = H("#FFE6B8"); // directional giorno
-        public static readonly Color AmbSky     = H("#F3DDB6");
-        public static readonly Color AmbEquator = H("#E2C49C");
-        public static readonly Color AmbGround  = H("#8C6A50");
+        public static readonly Color Sole       = H("#FFD08A"); // v2.0: sole caldo piu saturo
+        public static readonly Color AmbSky     = H("#9FBCD8"); // v2.0: cielo fresco (riempimento freddo)
+        public static readonly Color AmbEquator = H("#D8B898");
+        public static readonly Color AmbGround  = H("#9A6A4E"); // rimbalzo caldo da terra
         public static readonly Color Polvere    = H("#B8906A"); // v1.4: darker, reads on cream floor
         public static readonly Color MonetaOro  = H("#F2B53A"); // lira/gettone di Solara (faro inciso)
         public static readonly Color MonetaBordo= H("#3B2A20"); // bordo marrone moneta
@@ -32,10 +32,11 @@ namespace UltimoMiglio.VFX
         public static readonly Color UpgradeLimone= H("#F7E26B"); // highlight/scintille
         public static readonly Color MonetaLuce = H("#FFF4D6");
         // Tramonto (cap. 1): sole basso arancio-dorato, ambiente pesca, cielo albicocca
-        public static readonly Color SoleTramonto = H("#FFC27A");
-        public static readonly Color TramSky   = H("#F2C29A");
-        public static readonly Color TramEq    = H("#D9A27E");
-        public static readonly Color TramCielo = H("#F0C8A0");
+        public static readonly Color SoleTramonto = H("#FF9F5A");
+        public static readonly Color TramSky   = H("#B79AC8"); // v2.0: cielo tramonto viola
+        public static readonly Color TramEq    = H("#E6A07E");
+        public static readonly Color TramCielo = H("#F4B88E");
+        public static readonly Color Foschia   = H("#F6D7B0"); // nebbia/orizzonte giorno
         // Notte: stessa palette, toni scuri caldi, niente neon
         public static readonly Color LunaCalda  = H("#C9A98A");
         public static readonly Color NottSky    = H("#8C7880");

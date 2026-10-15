@@ -184,8 +184,8 @@ MonoBehaviour:
     robots:
       nonno:
         unlockAtOnboardingSec: 130
-        hireCostLn: 50
-        padLabel: "ASSUMI NONNO \xB7 50 LN"
+        hireCostLn: 15
+        padLabel: "ASSUMI NONNO \xB7 15 LN"
         restockPpmBase: 6
         restockPpmPerLevel: 1.5
         selfServicePpmBase: 0.5
@@ -272,6 +272,19 @@ MonoBehaviour:
         unlockAtOnboardingSec: 0
         costRef: robots.nonno.levels
       padPaymentPersistent: 1
+      zoneIds:
+      - arrivi
+      - shelfTerracotta
+      - bancone
+      - coinDrop
+      - cassa
+      - cassaforte
+      - padHireNonno
+      - padZaino
+      - padScarpe
+      - padInsegna
+      - padNonnoUpgrade
+      - padWallBancone
     offline:
       collectionMethod: cassaWalkOver
       modalSummary: 0
@@ -299,6 +312,7 @@ MonoBehaviour:
           speedBonus: 0
           stackBonus: 0.5
           durationSec: 120
+      offlineAssistNote: '01 v3.4: Assist 12% solo dal cap 4; nei cap 1-3 resta 20%'
     daycycle:
       cycleDurationSec: 420
       dayDurationSec: 415
