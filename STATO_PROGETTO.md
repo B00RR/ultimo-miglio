@@ -134,5 +134,5 @@ Voci più recenti in alto. Formato: `AAAA-MM-GG HH:MM` (Europe/Rome) — [commit
 - Nuovo `PadTag
 - Icone pad bianche 128px per VFX (`ic_pad_*_white.png`): pickup/buy/deliver/upgrade (Lucide ISC + coin CC0).` (UI/Runtime/World) + `UXML/PadTag.uxml` + `USS/PadTag.uss`: cartellino sopra ogni pad con icona, etichetta corta (max 12 car.) e prezzo grande sui pad di acquisto (26 dp vs 16 dp).
 - Enum `PadKind` da Inspector (Pacco/Moneta/Cliente), default dedotto in Reset (UpgradePad/CassaZone → Moneta, nome "banc/client/consegn" → Cliente, altrimenti Pacco).
-- Colori: pacco teal #5E7F86/#3E5A61, moneta sun #F4C430 + ink, cliente terracotta #C8633B/#8E3F22; ZoneFillRing ricolorato con lo stesso colore. Font Fredoka. Icone già presenti (ic_box, ic_coin, ic_customer, Lucide ISC): nessuna nuova risorsa.
+- Colori (Lorenzo): ritiro teal #5E7F86/#3E5A61, acquisto giallo #F4C430 + ink, consegna menta #8FC9A8 + ink; upgrade VFX giallo/limone #F7E26B. Font Fredoka. Icone pad bianche + Lucide ISC.
 - **Non compilato in Unity** (dotnet non disponibile sulla macchina dell'agente). Da agganciare ai pad in scena dal Tech Lead.

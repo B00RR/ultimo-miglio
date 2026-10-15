@@ -15,7 +15,7 @@
 .pad-tag--moneta .pad-tag__label, .pad-tag--moneta .pad-tag__price { color: #3B2A20; }
 .pad-tag--moneta .pad-tag__icon { background-image: url("project://database/Assets/_Game/UI/Icons/ic_coin.png"); -unity-background-image-tint-color: #3B2A20; }
 
-/* Cliente: bianco su terracotta scuro (7,6:1), bordo terracotta */
-.pad-tag--cliente { background-color: #8E3F22; border-color: #C8633B; }
-.pad-tag--cliente .pad-tag__label, .pad-tag--cliente .pad-tag__price { color: #FFFFFF; }
-.pad-tag--cliente .pad-tag__icon { background-image: url("project://database/Assets/_Game/UI/Icons/ic_customer_cream.png"); }
+/* Cliente/consegna: ink su menta #8FC9A8 (Lorenzo), bordo ink */
+.pad-tag--cliente { background-color: #8FC9A8; border-color: #3B2A20; }
+.pad-tag--cliente .pad-tag__label, .pad-tag--cliente .pad-tag__price { color: #3B2A20; }
+.pad-tag--cliente .pad-tag__icon { background-image: url("project://database/Assets/_Game/UI/Icons/ic_customer.png"); -unity-background-image-tint-color: #3B2A20; }

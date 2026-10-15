@@ -8,7 +8,7 @@ namespace UltimoMiglio.UI.World
     {
         Pacco = 0,   // ritiro / magazzino — teal
         Moneta = 1,  // cassa / acquisto — sun
-        Cliente = 2  // bancone / consegna — terracotta
+        Cliente = 2  // bancone / consegna — menta (Lorenzo)
     }
 
     /// <summary>
@@ -16,7 +16,7 @@ namespace UltimoMiglio.UI.World
     /// Icona + etichetta corta (max 12 caratteri) e, sui pad di acquisto, prezzo grande "120 LN".
     /// Colora anche lo ZoneFillRing del pad con lo stesso colore del tipo.
     /// Contrasti (WCAG): bianco su teal scuro #3E5A61 ≈ 7,4:1; ink #3B2A20 su sun #F4C430 ≈ 8,9:1;
-    /// bianco su terracotta scuro #8E3F22 ≈ 7,6:1.
+    /// ink su menta #8FC9A8 (consegna, Lorenzo). Upgrade VFX: giallo sole/limone.
     /// </summary>
     public class PadTag : WorldAnchoredElement
     {
@@ -25,8 +25,8 @@ namespace UltimoMiglio.UI.World
         public static readonly Color Teal = new Color32(0x5E, 0x7F, 0x86, 0xFF);
         public static readonly Color TealDark = new Color32(0x3E, 0x5A, 0x61, 0xFF);
         public static readonly Color Sun = new Color32(0xF4, 0xC4, 0x30, 0xFF);
-        public static readonly Color Terracotta = new Color32(0xC8, 0x63, 0x3B, 0xFF);
-        public static readonly Color TerracottaDark = new Color32(0x8E, 0x3F, 0x22, 0xFF);
+        public static readonly Color Mint = new Color32(0x8F, 0xC9, 0xA8, 0xFF);
+        public static readonly Color Lemon = new Color32(0xF7, 0xE2, 0x6B, 0xFF);
         public static readonly Color Ink = new Color32(0x3B, 0x2A, 0x20, 0xFF);
 
         [SerializeField] PadKind kind = PadKind.Pacco;
@@ -68,7 +68,7 @@ namespace UltimoMiglio.UI.World
         public static string DefaultLabel(PadKind k, bool purchase) =>
             k == PadKind.Pacco ? "Ritira" : k == PadKind.Cliente ? "Servi" : purchase ? "Compra" : "Cassa";
 
-        public static Color RingColor(PadKind k) => k == PadKind.Pacco ? Teal : k == PadKind.Moneta ? Sun : Terracotta;
+        public static Color RingColor(PadKind k) => k == PadKind.Pacco ? Teal : k == PadKind.Moneta ? Sun : Mint;
 
         protected override void Bind(VisualElement e)
         {
