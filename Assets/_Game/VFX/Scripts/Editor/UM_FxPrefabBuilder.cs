@@ -49,6 +49,9 @@ namespace UltimoMiglio.VFX.EditorTools
             Save(UM_FxFactory.BuildPackagePickup(fxMat));
             Save(UM_FxFactory.BuildPackageDeliver(fxMat));
             Save(UM_FxFactory.BuildUpgradeComplete(fxMat));
+            Save(UM_FxFactory.BuildPurchase(fxMat));
+            var sky = Shader.Find("UltimoMiglio/FX/SkyGradient");
+            if (sky) SaveMat(new Material(sky), "M_FX_Sky"); else Debug.LogError("[UM VFX] shader UltimoMiglio/FX/SkyGradient mancante");
             var trail = new Material(Shader.Find(UM_FxFactory.ParticleShader));
             trail.SetFloat("_Surface", 1f); trail.SetFloat("_Blend", 0f); trail.EnableKeyword("_SURFACE_TYPE_TRANSPARENT"); trail.renderQueue = 3000;
             trail = SaveMat(trail, "M_FX_Trail");
@@ -76,6 +79,24 @@ namespace UltimoMiglio.VFX.EditorTools
             if (mDia) { mDia.SetFloat("_NoiseStrength", 0.06f); mDia.SetFloat("_NoiseScale", 0.35f); } // subtle floor/wall variation on set only
             var ip = Mk("M_Props_Interactive", true); ip.SetFloat("_OutlineWidth", 0.01f); // packages, van, pads
             SaveMat(ip, "M_Props_Interactive");
+            BuildLookAssets();
+        }
+
+        /// v2.0 premium: valori di profondita/variazione per materiale (ombre colorate e grading arrivano da shader + UM_LookSettings)
+        public static void BuildLookAssets()
+        {
+            void Set(string n, float tile, float hDark, float wallAO, float top, float rim)
+            {
+                var m = AssetDatabase.LoadAssetAtPath<Material>($"{MatDir}/{n}.mat"); if (!m) return;
+                m.SetColor("_ShadowTint", new Color(0.55f, 0.50f, 0.72f)); m.SetFloat("_ShadowStrength", 0.6f);
+                m.SetFloat("_TileVar", tile); m.SetFloat("_TileSize", 1f); m.SetColor("_FloorTint", new Color(1f, 0.95f, 0.9f));
+                m.SetFloat("_HeightDark", hDark); m.SetFloat("_WallAO", wallAO); m.SetFloat("_TopLight", top); m.SetFloat("_RimStrength", rim);
+                EditorUtility.SetDirty(m);
+            }
+            Set("M_Diorama_Atlas", 0.08f, 0.18f, 0.3f, 0.1f, 0.2f);
+            Set("M_Diorama_Atlas_Emissive", 0.08f, 0.18f, 0.3f, 0.1f, 0.2f);
+            Set("M_Props_Interactive", 0f, 0.1f, 0.15f, 0.12f, 0.3f);
+            Set("M_Char_Atlas", 0f, 0.08f, 0f, 0.05f, 0.35f);
         }
 
         static void ConfigureFxSheet()
