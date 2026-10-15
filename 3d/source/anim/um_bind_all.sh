@@ -13,7 +13,7 @@ WT="${UM_WT:-/workspace/ultimo-miglio/wt/animator}/Assets/_Game/Art/Characters"
 # robot v02 (NONNO muletto, TICO): rig dai vertex group + anti-compenetrazione
 if [ "${UM_BIND_BOTS:-1}" = "1" ]; then
   for c in nonno tico; do
-    "$B" -b export/bot/bot_${c}_v02.blend -P source/anim/um_bind_bot.py -- $c | grep UM_DONE
+    SRC=$(ls export/bot/bot_${c}_v0*.blend | sort | tail -1); echo "bind $c da $SRC"; "$B" -b "$SRC" -P source/anim/um_bind_bot.py -- $c | grep UM_DONE
     "$B" -b source/bot/bot_${c}_final_rig.blend -P source/anim/um_fix_penetration.py -- "$PWD/export/bot/bot_${c}.fbx" 0 4 0 | grep -E "^FIX"
   done
 fi
