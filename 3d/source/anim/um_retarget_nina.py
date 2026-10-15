@@ -134,6 +134,74 @@ if True:   # skinning deterministico (bone heat fallisce su questa mesh)
             if wi>0: vgs[n].add([v.index],wi/tot,'REPLACE')
 bpy.context.view_layer.objects.active=mesh
 bpy.ops.object.vertex_group_limit_total(group_select_mode='ALL',limit=4)
+# Torso/giacca: nessuna influenza delle ossa del braccio (Cheer stirava la giacca dai polsi ai fianchi).
+# Un vertice e' "torso" se sta all'interno della linea spalla->gomito meno il raggio del braccio, oppure e' jacket_edges/scarf.
+_sh=Vector((0.17,0,1.28)); _el=Vector(ARMJ[0])
+def _armx(z):
+    t=max(0.0,min(1.0,(_sh.z-z)/(_sh.z-_el.z))); return _sh.x+(_el.x-_sh.x)*t
+ARMB=[s+n for s in ("Left","Right") for n in ("Arm","ForeArm","Hand")]
+_nt=0
+for v in mesh.data.vertices:
+    c=v.co
+    torso=(ARTV.get(v.index) in ("Chest",) ) or (0.86<c.z<1.24 and abs(c.x)<_armx(c.z)-0.035)
+    if not torso: continue
+    wa=0.0
+    for b in ARMB+(["LeftShoulder","RightShoulder"] if c.z<1.2 else []):
+        g=vgs.get(b) or mesh.vertex_groups.get(b)
+        try: w=g.weight(v.index)
+        except RuntimeError: continue
+        wa+=w; g.remove([v.index])
+    if wa>0:
+        _nt+=1; a_=max(0.0,min(1.0,(c.z-1.0)/0.15))
+        if c.z<0.95: mesh.vertex_groups["Hips"].add([v.index],wa,'ADD')
+        else:
+            mesh.vertex_groups["Spine"].add([v.index],wa*(1-a_),'ADD'); mesh.vertex_groups["Chest"].add([v.index],wa*a_,'ADD')
+print("UM_TORSO arm influence removed from",_nt,"verts")
+# Mesh v02: i pannelli laterali della giacca sono saldati all'avambraccio (spigoli di ~4 cm torso<->braccio).
+# Qualsiasi pesatura li stira quando il braccio si alza: stacchiamo le facce miste duplicando i vertici di confine
+# (stessa posizione/UV, nessun triangolo in piu'); ogni faccia segue solo il lato maggioritario.
+import bmesh
+def _split_arm_torso():
+    gi={g.name:g.index for g in mesh.vertex_groups}
+    AR={gi[n] for n in ARMB if n in gi}; TO={gi[n] for n in ("Hips","Spine","Chest") if n in gi}
+    bm=bmesh.new(); bm.from_mesh(mesh.data); dl=bm.verts.layers.deform.verify(); bm.verts.ensure_lookup_table()
+    def cls(v):
+        d=v[dl]
+        if not d: return None
+        g=max(d.items(),key=lambda kv:kv[1])[0]; return "A" if g in AR else ("T" if g in TO else None)
+    C={v.index:cls(v) for v in bm.verts}; dup={}; nf=0
+    for f in list(bm.faces):
+        cs=[C[v.index] for v in f.verts]
+        if "A" not in cs or "T" not in cs: continue
+        side="A" if cs.count("A")>cs.count("T") else "T"
+        donors=[v for v,c in zip(f.verts,cs) if c==side]
+        avg={}
+        for v in donors:
+            for g,w in v[dl].items(): avg[g]=avg.get(g,0)+w/len(donors)
+        for lp in f.loops:
+            v=lp.vert
+            if C[v.index] in (side,None) and C[v.index]==side: continue
+            if C[v.index]==side: continue
+            key=(v.index,side)
+            if key not in dup:
+                nv=bm.verts.new(v.co); nv[dl].clear()
+                for g,w in avg.items(): nv[dl][g]=w
+                dup[key]=nv
+        verts=[dup.get((v.index,side),v) if C[v.index]!=side else v for v in f.verts]
+        uvs=[[lp[l].uv.copy() for l in bm.loops.layers.uv.values()] for lp in f.loops]
+        nfc=bm.faces.new(verts,f); 
+        for lp,uv in zip(nfc.loops,uvs):
+            for l,u in zip(bm.loops.layers.uv.values(),uv): lp[l].uv=u
+        bm.faces.remove(f); nf+=1
+    loose=[e for e in bm.edges if not e.link_faces]; [bm.edges.remove(e) for e in loose]   # spigoli orfani delle facce rifatte
+    bm.to_mesh(mesh.data); bm.free(); mesh.data.update()
+    print("UM_SPLIT arm/torso faces",nf,"dup verts",len(dup))
+_split_arm_torso()
+# cavallo: i vertici sull'asse (x~0) seguivano una sola coscia -> stiramento x3 in Run; li rendiamo simmetrici
+for v in mesh.data.vertices:
+    if abs(v.co.x)<0.025 and 0.68<v.co.z<0.86:
+        for n in ("LeftUpLeg","RightUpLeg","Hips"):
+            mesh.vertex_groups[n].add([v.index],{"Hips":0.6}.get(n,0.2),'REPLACE')
 bpy.ops.object.vertex_group_normalize_all(lock_active=False)
 unw=sum(1 for v in mesh.data.vertices if not v.groups); print("UM_SKIN unweighted verts",unw,"of",len(mesh.data.vertices))
 # --- re-bake: orientamento assoluto (pose space) copiato osso per osso dal rig sorgente, posizioni dalla gerarchia nuova.

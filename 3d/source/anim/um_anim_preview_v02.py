@@ -30,7 +30,10 @@ for mat in bpy.data.materials:
         t=mat.node_tree.nodes.new("ShaderNodeTexImage"); t.image=bpy.data.images.load(ATL,check_existing=True); t.interpolation='Closest'
         mat.node_tree.links.new(t.outputs[0],mat.node_tree.nodes["Principled BSDF"].inputs[0])
 idx=0
-JOBS=[(rig,nacts,["Idle","Walk","Run","Carry_Idle","Carry_Walk","Deliver","Cheer"])]+([(bot,bacts,["Idle","Drive","Lift","Drop","Happy"])] if bot else [])
+CLOSE=os.environ.get("UM_CLOSE")=="1"   # primo piano busto/giacca per Cheer
+if CLOSE:
+    cam.ortho_scale=0.95; d=Vector((0.35,-1.6,0.35)).normalized(); co.location=Vector((0,0,1.12))+d*8; co.rotation_euler=(-d).to_track_quat('-Z','Y').to_euler()
+JOBS=[(rig,nacts,["Cheer"] if CLOSE else ["Idle","Walk","Run","Carry_Idle","Carry_Walk","Deliver","Cheer"])]+([(bot,bacts,["Idle","Drive","Lift","Drop","Happy"])] if bot and not os.environ.get("UM_NOBOT") else [])
 for R,acts,order in JOBS:
   for o in sc.objects:
       if o.type in ('MESH','ARMATURE') and o!=fl: o.hide_render=not (o==R or o.parent==R)
