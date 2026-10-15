@@ -69,13 +69,14 @@ $UNITY -batchmode -projectPath "$PWD" -runTests -testPlatform PlayMode \
 ## 9. Come lavoriamo
 1. **Ogni attività = una issue GitHub**, con etichette di ruolo (`ruolo:tech`, `ruolo:3d`, `ruolo:animator`, `ruolo:vfx`, `ruolo:ui`), priorità (`priorita:alta`) e ambito (`cap1`, `bug`).
 2. Si lavora su un **ramo per issue/ruolo** (es. `animator`, `ui/hud-sovrapposizioni-12`).
-3. Si apre una **Pull Request verso `main`** che cita la issue (`Chiude #N`).
+3. Si apre una **Pull Request verso `main`** che cita la issue (`Closes #N` o `Refs #N`, vedi punto 10).
 4. **Merge solo con test verdi** (EditMode + PlayMode) e build WebGL che compila.
 5. Il **Tech Lead** fa review e merge (squash).
 6. Quando qualcosa è completato, **aggiorna questo file nella stessa PR**.
 7. **Messaggi di commit in italiano**, brevi e descrittivi.
 8. **Ogni voce/modifica di questo file ha data e ora** (Europe/Rome, formato `AAAA-MM-GG HH:MM`) e, se pushata, il **link al commit** (hash corto). Aggiungi la voce in cima alla sezione *Cronologia*.
 9. Non lavorare nel working tree di un altro agente: usa un clone tuo.
+10. **Parole chiave nelle PR:** ogni PR che risolve una issue scrive nella descrizione `Closes #N`, **una riga per issue**: così GitHub chiude la issue al merge su `main`. Se la issue è risolta solo in parte si scrive `Refs #N` e la issue resta aperta. Le forme in italiano (es. "Chiude #N") **non** sono riconosciute da GitHub. Usa il modello `.github/pull_request_template.md`.
 
 ## 10. Da dove iniziare (nuovo agente)
 1. Leggi questo file, poi `00_BIBBIA.md` e `11_CAP1_COMPLETO.md` nel repo docs.
@@ -86,10 +87,11 @@ $UNITY -batchmode -projectPath "$PWD" -runTests -testPlatform PlayMode \
 ## 11. Cronologia
 Voci più recenti in alto. Formato: `AAAA-MM-GG HH:MM` (Europe/Rome) — [commit] — descrizione.
 
-- 2026-10-15 16:30 — (questo commit) — Producer: aggiornata la Cronologia.
+- 2026-10-15 16:35 — PR producer/regola-closes — Producer: regola `Closes #N` / `Refs #N` in *Come lavoriamo*, modello di PR `.github/pull_request_template.md`, corretti gli orari di due voci; aggiunte le parole chiave alle PR #11 e #14.
+- 2026-10-15 16:25 — [8e4e272](https://github.com/B00RR/ultimo-miglio/commit/8e4e272) — Producer: aggiornata la Cronologia.
 - 2026-10-15 16:26 — Producer: create 13 issue della milestone *Gioco completo* divise per ruolo (#13, #15–#26), etichetta `ruolo:build` creata; #7 e #12 assegnate a *Gioco completo*; commento di piano su #7.
 - 2026-10-15 16:24 — Producer: create le milestone [Capitolo 1 - 15/10 18:00](https://github.com/B00RR/ultimo-miglio/milestone/1) (#1–#6) e [Gioco completo](https://github.com/B00RR/ultimo-miglio/milestone/2).
-- 2026-10-15 16:2x — PR #11 (ramo animator → main) aperta: **in conflitto** su `chr_nina_vela.fbx` e `bot_nonno.fbx`; merge a cura del Tech Lead.
+- 2026-10-15 16:21 — [PR #11](https://github.com/B00RR/ultimo-miglio/pull/11) (ramo animator → main) aperta: **in conflitto** su `chr_nina_vela.fbx` e `bot_nonno.fbx`; merge a cura del Tech Lead.
 - 2026-10-15 16:21 — [c54f667](https://github.com/B00RR/ultimo-miglio/commit/c54f667) — main: merge PR #10, sezione Cronologia.
 - 2026-10-15 16:20 — [643f1f9](https://github.com/B00RR/ultimo-miglio/commit/643f1f9) — main: merge PR #8, aggiunto STATO_PROGETTO.md (PR #9 chiusa come duplicato).
 - 2026-10-15 16:25 — [#8](https://github.com/B00RR/ultimo-miglio/pull/8) + #9 — Aggiunto STATO_PROGETTO.md; create etichette e issue #1–#7.
