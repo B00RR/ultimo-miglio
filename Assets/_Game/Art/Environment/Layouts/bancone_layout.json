@@ -1,0 +1,1241 @@
+{
+ "room": "bancone",
+ "source": "3d/final/vela_figli_final_v04.blend (build_final.py)",
+ "units": "metri",
+ "coords": "Unity sinistrorso Y-up; pos_u=(-x_b, z_b, -y_b), rotY_u=-rotZ_b",
+ "bounds_unity": {
+  "x": [
+   -4.43,
+   0.43
+  ],
+  "y": [
+   0,
+   3.2
+  ],
+  "z": [
+   -4.43,
+   0.43
+  ]
+ },
+ "walls_closed": true,
+ "items": [
+  {
+   "name": "env_floor_2x2_b",
+   "fbx": "Assets/_Game/Art/Environment/Kit/env_floor_2x2_b.fbx",
+   "primitive": "",
+   "swatch": "",
+   "position": [
+    -0.0,
+    0.0,
+    -0.0
+   ],
+   "rotationEuler": [
+    0,
+    0.0,
+    0
+   ],
+   "scale": [
+    1.0,
+    1.0,
+    1.0
+   ],
+   "note": ""
+  },
+  {
+   "name": "env_floor_2x2_a",
+   "fbx": "Assets/_Game/Art/Environment/Kit/env_floor_2x2_a.fbx",
+   "primitive": "",
+   "swatch": "",
+   "position": [
+    -0.0,
+    0.0,
+    -2.0
+   ],
+   "rotationEuler": [
+    0,
+    0.0,
+    0
+   ],
+   "scale": [
+    1.0,
+    1.0,
+    1.0
+   ],
+   "note": ""
+  },
+  {
+   "name": "env_floor_2x2_a",
+   "fbx": "Assets/_Game/Art/Environment/Kit/env_floor_2x2_a.fbx",
+   "primitive": "",
+   "swatch": "",
+   "position": [
+    -2.0,
+    0.0,
+    -0.0
+   ],
+   "rotationEuler": [
+    0,
+    0.0,
+    0
+   ],
+   "scale": [
+    1.0,
+    1.0,
+    1.0
+   ],
+   "note": ""
+  },
+  {
+   "name": "env_floor_2x2_b",
+   "fbx": "Assets/_Game/Art/Environment/Kit/env_floor_2x2_b.fbx",
+   "primitive": "",
+   "swatch": "",
+   "position": [
+    -2.0,
+    0.0,
+    -2.0
+   ],
+   "rotationEuler": [
+    0,
+    0.0,
+    0
+   ],
+   "scale": [
+    1.0,
+    1.0,
+    1.0
+   ],
+   "note": ""
+  },
+  {
+   "name": "env_wall_2m_b",
+   "fbx": "Assets/_Game/Art/Environment/Kit/env_wall_2m_b.fbx",
+   "primitive": "",
+   "swatch": "",
+   "position": [
+    0.15,
+    0.0,
+    -0.0
+   ],
+   "rotationEuler": [
+    0,
+    -90.0,
+    0
+   ],
+   "scale": [
+    1.0,
+    1.0,
+    1.0
+   ],
+   "note": ""
+  },
+  {
+   "name": "env_wall_2m_a",
+   "fbx": "Assets/_Game/Art/Environment/Kit/env_wall_2m_a.fbx",
+   "primitive": "",
+   "swatch": "",
+   "position": [
+    0.15,
+    0.0,
+    -2.0
+   ],
+   "rotationEuler": [
+    0,
+    -90.0,
+    0
+   ],
+   "scale": [
+    1.0,
+    1.0,
+    1.0
+   ],
+   "note": ""
+  },
+  {
+   "name": "env_wall_corner",
+   "fbx": "Assets/_Game/Art/Environment/Kit/env_wall_corner.fbx",
+   "primitive": "",
+   "swatch": "",
+   "position": [
+    0.15,
+    0.0,
+    -4.15
+   ],
+   "rotationEuler": [
+    0,
+    0.0,
+    0
+   ],
+   "scale": [
+    1.0,
+    1.0,
+    1.0
+   ],
+   "note": ""
+  },
+  {
+   "name": "env_wall_arch_4m",
+   "fbx": "Assets/_Game/Art/Environment/Kit/env_wall_arch_4m.fbx",
+   "primitive": "",
+   "swatch": "",
+   "position": [
+    -0.0,
+    0.0,
+    -4.15
+   ],
+   "rotationEuler": [
+    0,
+    0.0,
+    0
+   ],
+   "scale": [
+    1.0,
+    1.0,
+    1.0
+   ],
+   "note": ""
+  },
+  {
+   "name": "env_niche_back",
+   "fbx": "",
+   "primitive": "cube",
+   "swatch": "tufo_c",
+   "position": [
+    -2.0,
+    1.35,
+    -4.95
+   ],
+   "rotationEuler": [
+    0,
+    0.0,
+    0
+   ],
+   "scale": [
+    2.6,
+    2.7,
+    0.12
+   ],
+   "note": "primitiva centrata (cubo 1 m scalato); colore swatch atlas"
+  },
+  {
+   "name": "env_niche_floor",
+   "fbx": "",
+   "primitive": "cube",
+   "swatch": "tufo_c",
+   "position": [
+    -2.0,
+    -0.02,
+    -4.6
+   ],
+   "rotationEuler": [
+    0,
+    0.0,
+    0
+   ],
+   "scale": [
+    2.6,
+    0.04,
+    0.9
+   ],
+   "note": "primitiva centrata (cubo 1 m scalato); colore swatch atlas"
+  },
+  {
+   "name": "env_niche_side_l",
+   "fbx": "",
+   "primitive": "cube",
+   "swatch": "tufo_d",
+   "position": [
+    -0.75,
+    1.35,
+    -4.6
+   ],
+   "rotationEuler": [
+    0,
+    0.0,
+    0
+   ],
+   "scale": [
+    0.12,
+    2.7,
+    0.9
+   ],
+   "note": "primitiva centrata (cubo 1 m scalato); colore swatch atlas"
+  },
+  {
+   "name": "env_niche_side_r",
+   "fbx": "",
+   "primitive": "cube",
+   "swatch": "tufo_d",
+   "position": [
+    -3.25,
+    1.35,
+    -4.6
+   ],
+   "rotationEuler": [
+    0,
+    0.0,
+    0
+   ],
+   "scale": [
+    0.12,
+    2.7,
+    0.9
+   ],
+   "note": "primitiva centrata (cubo 1 m scalato); colore swatch atlas"
+  },
+  {
+   "name": "prop_shelf_2m",
+   "fbx": "Assets/_Game/Art/Environment/Kit/prop_shelf_2m.fbx",
+   "primitive": "",
+   "swatch": "",
+   "position": [
+    -2.0,
+    0.0,
+    -4.62
+   ],
+   "rotationEuler": [
+    0,
+    0.0,
+    0
+   ],
+   "scale": [
+    0.62,
+    0.62,
+    0.62
+   ],
+   "note": ""
+  },
+  {
+   "name": "prop_sign_vela_figli",
+   "fbx": "Assets/_Game/Art/Environment/Kit/prop_sign_vela_figli.fbx",
+   "primitive": "",
+   "swatch": "",
+   "position": [
+    -2.0,
+    3.45,
+    -3.88
+   ],
+   "rotationEuler": [
+    0,
+    0.0,
+    0
+   ],
+   "scale": [
+    1.0,
+    1.0,
+    1.0
+   ],
+   "note": ""
+  },
+  {
+   "name": "prop_lantern_wall",
+   "fbx": "Assets/_Game/Art/Environment/Kit/prop_lantern_wall.fbx",
+   "primitive": "",
+   "swatch": "",
+   "position": [
+    -0.05,
+    2.1,
+    -1.1
+   ],
+   "rotationEuler": [
+    0,
+    -90.0,
+    0
+   ],
+   "scale": [
+    1.0,
+    1.0,
+    1.0
+   ],
+   "note": ""
+  },
+  {
+   "name": "prop_wallshelf",
+   "fbx": "Assets/_Game/Art/Environment/Kit/prop_wallshelf.fbx",
+   "primitive": "",
+   "swatch": "",
+   "position": [
+    -0.05,
+    1.6,
+    -2.75
+   ],
+   "rotationEuler": [
+    0,
+    -90.0,
+    0
+   ],
+   "scale": [
+    1.0,
+    1.0,
+    1.0
+   ],
+   "note": ""
+  },
+  {
+   "name": "prop_books",
+   "fbx": "Assets/_Game/Art/Environment/Kit/prop_books.fbx",
+   "primitive": "",
+   "swatch": "",
+   "position": [
+    -0.17,
+    1.63,
+    -2.65
+   ],
+   "rotationEuler": [
+    0,
+    -90.0,
+    0
+   ],
+   "scale": [
+    1.0,
+    1.0,
+    1.0
+   ],
+   "note": ""
+  },
+  {
+   "name": "prop_plant_small",
+   "fbx": "Assets/_Game/Art/Environment/Kit/prop_plant_small.fbx",
+   "primitive": "",
+   "swatch": "",
+   "position": [
+    -0.17,
+    1.63,
+    -3.05
+   ],
+   "rotationEuler": [
+    0,
+    0.0,
+    0
+   ],
+   "scale": [
+    1.0,
+    1.0,
+    1.0
+   ],
+   "note": ""
+  },
+  {
+   "name": "prop_wallshelf",
+   "fbx": "Assets/_Game/Art/Environment/Kit/prop_wallshelf.fbx",
+   "primitive": "",
+   "swatch": "",
+   "position": [
+    -3.35,
+    1.75,
+    -3.95
+   ],
+   "rotationEuler": [
+    0,
+    0.0,
+    0
+   ],
+   "scale": [
+    1.0,
+    1.0,
+    1.0
+   ],
+   "note": ""
+  },
+  {
+   "name": "prop_plant_small",
+   "fbx": "Assets/_Game/Art/Environment/Kit/prop_plant_small.fbx",
+   "primitive": "",
+   "swatch": "",
+   "position": [
+    -3.35,
+    1.78,
+    -3.83
+   ],
+   "rotationEuler": [
+    0,
+    0.0,
+    0
+   ],
+   "scale": [
+    1.0,
+    1.0,
+    1.0
+   ],
+   "note": ""
+  },
+  {
+   "name": "prop_counter_2m",
+   "fbx": "Assets/_Game/Art/Environment/Kit/prop_counter_2m.fbx",
+   "primitive": "",
+   "swatch": "",
+   "position": [
+    -2.0,
+    0.0,
+    -1.75
+   ],
+   "rotationEuler": [
+    0,
+    0.0,
+    0
+   ],
+   "scale": [
+    1.0,
+    1.0,
+    1.0
+   ],
+   "note": ""
+  },
+  {
+   "name": "prop_register",
+   "fbx": "Assets/_Game/Art/Environment/Kit/prop_register.fbx",
+   "primitive": "",
+   "swatch": "",
+   "position": [
+    -1.2,
+    1.03,
+    -1.72
+   ],
+   "rotationEuler": [
+    0,
+    10.0,
+    0
+   ],
+   "scale": [
+    1.0,
+    1.0,
+    1.0
+   ],
+   "note": ""
+  },
+  {
+   "name": "prop_carico0",
+   "fbx": "Assets/_Game/Art/Environment/Kit/prop_carico0.fbx",
+   "primitive": "",
+   "swatch": "",
+   "position": [
+    -2.25,
+    1.03,
+    -1.72
+   ],
+   "rotationEuler": [
+    0,
+    -8.0,
+    0
+   ],
+   "scale": [
+    1.25,
+    1.25,
+    1.25
+   ],
+   "note": ""
+  },
+  {
+   "name": "prop_safe",
+   "fbx": "Assets/_Game/Art/Environment/Kit/prop_safe.fbx",
+   "primitive": "",
+   "swatch": "",
+   "position": [
+    -0.6,
+    0.0,
+    -3.4
+   ],
+   "rotationEuler": [
+    0,
+    -35.0,
+    0
+   ],
+   "scale": [
+    1.0,
+    1.0,
+    1.0
+   ],
+   "note": ""
+  },
+  {
+   "name": "prop_lemontree_pot",
+   "fbx": "Assets/_Game/Art/Environment/Kit/prop_lemontree_pot.fbx",
+   "primitive": "",
+   "swatch": "",
+   "position": [
+    -0.45,
+    0,
+    -0.5
+   ],
+   "rotationEuler": [
+    0,
+    0.0,
+    0
+   ],
+   "scale": [
+    0.9,
+    0.9,
+    0.9
+   ],
+   "note": ""
+  },
+  {
+   "name": "zone_pad_bancone",
+   "fbx": "",
+   "primitive": "cube",
+   "swatch": "sole",
+   "position": [
+    -3.55,
+    0.012,
+    -1.5
+   ],
+   "rotationEuler": [
+    0,
+    0.0,
+    0
+   ],
+   "scale": [
+    0.9,
+    0.02,
+    0.9
+   ],
+   "note": "primitiva centrata (cubo 1 m scalato); colore swatch atlas"
+  },
+  {
+   "name": "env_wall_2m_a",
+   "fbx": "Assets/_Game/Art/Environment/Kit/env_wall_2m_a.fbx",
+   "primitive": "",
+   "swatch": "",
+   "position": [
+    -2,
+    0,
+    0.15
+   ],
+   "rotationEuler": [
+    0,
+    -180.0,
+    0
+   ],
+   "scale": [
+    1,
+    1,
+    1
+   ],
+   "note": "muro di chiusura aggiunto (non presente nel beauty)"
+  },
+  {
+   "name": "env_wall_2m_b",
+   "fbx": "Assets/_Game/Art/Environment/Kit/env_wall_2m_b.fbx",
+   "primitive": "",
+   "swatch": "",
+   "position": [
+    -4,
+    0,
+    0.15
+   ],
+   "rotationEuler": [
+    0,
+    -180.0,
+    0
+   ],
+   "scale": [
+    1,
+    1,
+    1
+   ],
+   "note": "muro di chiusura aggiunto (non presente nel beauty)"
+  },
+  {
+   "name": "env_wall_2m_b",
+   "fbx": "Assets/_Game/Art/Environment/Kit/env_wall_2m_b.fbx",
+   "primitive": "",
+   "swatch": "",
+   "position": [
+    -4.15,
+    0,
+    -2
+   ],
+   "rotationEuler": [
+    0,
+    90.0,
+    0
+   ],
+   "scale": [
+    1,
+    1,
+    1
+   ],
+   "note": "muro di chiusura aggiunto (non presente nel beauty)"
+  },
+  {
+   "name": "env_wall_2m_a",
+   "fbx": "Assets/_Game/Art/Environment/Kit/env_wall_2m_a.fbx",
+   "primitive": "",
+   "swatch": "",
+   "position": [
+    -4.15,
+    0,
+    -4
+   ],
+   "rotationEuler": [
+    0,
+    90.0,
+    0
+   ],
+   "scale": [
+    1,
+    1,
+    1
+   ],
+   "note": "muro di chiusura aggiunto (non presente nel beauty)"
+  },
+  {
+   "name": "env_wall_corner",
+   "fbx": "Assets/_Game/Art/Environment/Kit/env_wall_corner.fbx",
+   "primitive": "",
+   "swatch": "",
+   "position": [
+    0.15,
+    0,
+    0.15
+   ],
+   "rotationEuler": [
+    0,
+    0.0,
+    0
+   ],
+   "scale": [
+    1,
+    1,
+    1
+   ],
+   "note": "muro di chiusura aggiunto (non presente nel beauty)"
+  },
+  {
+   "name": "env_wall_corner",
+   "fbx": "Assets/_Game/Art/Environment/Kit/env_wall_corner.fbx",
+   "primitive": "",
+   "swatch": "",
+   "position": [
+    -4.15,
+    0,
+    0.15
+   ],
+   "rotationEuler": [
+    0,
+    0.0,
+    0
+   ],
+   "scale": [
+    1,
+    1,
+    1
+   ],
+   "note": "muro di chiusura aggiunto (non presente nel beauty)"
+  },
+  {
+   "name": "env_wall_corner",
+   "fbx": "Assets/_Game/Art/Environment/Kit/env_wall_corner.fbx",
+   "primitive": "",
+   "swatch": "",
+   "position": [
+    -4.15,
+    0,
+    -4.15
+   ],
+   "rotationEuler": [
+    0,
+    0.0,
+    0
+   ],
+   "scale": [
+    1,
+    1,
+    1
+   ],
+   "note": "muro di chiusura aggiunto (non presente nel beauty)"
+  },
+  {
+   "name": "prop_shelf_2m_loaded",
+   "fbx": "Assets/_Game/Art/Environment/Kit/prop_shelf_2m_loaded.fbx",
+   "primitive": "",
+   "swatch": "",
+   "position": [
+    -3.8,
+    0,
+    -3.0
+   ],
+   "rotationEuler": [
+    0,
+    -90.0,
+    0
+   ],
+   "scale": [
+    1,
+    1,
+    1
+   ],
+   "note": "premium v1 set dressing"
+  },
+  {
+   "name": "prop_parcel_stack_a",
+   "fbx": "Assets/_Game/Art/Environment/Kit/prop_parcel_stack_a.fbx",
+   "primitive": "",
+   "swatch": "",
+   "position": [
+    -1.45,
+    0,
+    -3.6
+   ],
+   "rotationEuler": [
+    0,
+    -10.0,
+    0
+   ],
+   "scale": [
+    1,
+    1,
+    1
+   ],
+   "note": "premium v1 set dressing"
+  },
+  {
+   "name": "prop_parcel_box",
+   "fbx": "Assets/_Game/Art/Props/prop_parcel_box.fbx",
+   "primitive": "",
+   "swatch": "",
+   "position": [
+    -0.55,
+    0,
+    -2.3
+   ],
+   "rotationEuler": [
+    0,
+    -15.0,
+    0
+   ],
+   "scale": [
+    1,
+    1,
+    1
+   ],
+   "note": "premium v1 set dressing"
+  },
+  {
+   "name": "prop_parcel_box_flat",
+   "fbx": "Assets/_Game/Art/Props/prop_parcel_box_flat.fbx",
+   "primitive": "",
+   "swatch": "",
+   "position": [
+    -0.55,
+    0.3,
+    -2.3
+   ],
+   "rotationEuler": [
+    0,
+    -40.0,
+    0
+   ],
+   "scale": [
+    1,
+    1,
+    1
+   ],
+   "note": "premium v1 set dressing"
+  },
+  {
+   "name": "prop_parcel_box_long",
+   "fbx": "Assets/_Game/Art/Props/prop_parcel_box_long.fbx",
+   "primitive": "",
+   "swatch": "",
+   "position": [
+    -0.6,
+    0,
+    -1.7
+   ],
+   "rotationEuler": [
+    0,
+    80.0,
+    0
+   ],
+   "scale": [
+    1,
+    1,
+    1
+   ],
+   "note": "premium v1 set dressing"
+  },
+  {
+   "name": "prop_parcel_box",
+   "fbx": "Assets/_Game/Art/Props/prop_parcel_box.fbx",
+   "primitive": "",
+   "swatch": "",
+   "position": [
+    -2.75,
+    0,
+    -3.7
+   ],
+   "rotationEuler": [
+    0,
+    8.0,
+    0
+   ],
+   "scale": [
+    1,
+    1,
+    1
+   ],
+   "note": "premium v1 set dressing"
+  },
+  {
+   "name": "prop_parcel_box_flat",
+   "fbx": "Assets/_Game/Art/Props/prop_parcel_box_flat.fbx",
+   "primitive": "",
+   "swatch": "",
+   "position": [
+    -2.75,
+    0.3,
+    -3.7
+   ],
+   "rotationEuler": [
+    0,
+    -15.0,
+    0
+   ],
+   "scale": [
+    1,
+    1,
+    1
+   ],
+   "note": "premium v1 set dressing"
+  },
+  {
+   "name": "prop_parcel_box_cube",
+   "fbx": "Assets/_Game/Art/Props/prop_parcel_box_cube.fbx",
+   "primitive": "",
+   "swatch": "",
+   "position": [
+    -1.05,
+    0,
+    -0.45
+   ],
+   "rotationEuler": [
+    0,
+    -20.0,
+    0
+   ],
+   "scale": [
+    1,
+    1,
+    1
+   ],
+   "note": "premium v1 set dressing"
+  },
+  {
+   "name": "prop_parcel_box_long",
+   "fbx": "Assets/_Game/Art/Props/prop_parcel_box_long.fbx",
+   "primitive": "",
+   "swatch": "",
+   "position": [
+    -1.6,
+    0,
+    -0.35
+   ],
+   "rotationEuler": [
+    0,
+    5.0,
+    0
+   ],
+   "scale": [
+    1,
+    1,
+    1
+   ],
+   "note": "premium v1 set dressing"
+  },
+  {
+   "name": "prop_parcel_box_flat",
+   "fbx": "Assets/_Game/Art/Props/prop_parcel_box_flat.fbx",
+   "primitive": "",
+   "swatch": "",
+   "position": [
+    -2.75,
+    1.03,
+    -1.8
+   ],
+   "rotationEuler": [
+    0,
+    -5.0,
+    0
+   ],
+   "scale": [
+    0.8,
+    0.8,
+    0.8
+   ],
+   "note": "premium v1 set dressing"
+  },
+  {
+   "name": "prop_rug_bancone",
+   "fbx": "Assets/_Game/Art/Environment/Kit/prop_rug_bancone.fbx",
+   "primitive": "",
+   "swatch": "",
+   "position": [
+    -2.0,
+    0,
+    -0.75
+   ],
+   "rotationEuler": [
+    0,
+    0.0,
+    0
+   ],
+   "scale": [
+    1,
+    1,
+    1
+   ],
+   "note": "premium v1 set dressing"
+  },
+  {
+   "name": "prop_plant_pot_tall",
+   "fbx": "Assets/_Game/Art/Environment/Kit/prop_plant_pot_tall.fbx",
+   "primitive": "",
+   "swatch": "",
+   "position": [
+    -3.75,
+    0,
+    -0.4
+   ],
+   "rotationEuler": [
+    0,
+    0.0,
+    0
+   ],
+   "scale": [
+    1,
+    1,
+    1
+   ],
+   "note": "premium v1 set dressing"
+  },
+  {
+   "name": "prop_plant_pot_round",
+   "fbx": "Assets/_Game/Art/Environment/Kit/prop_plant_pot_round.fbx",
+   "primitive": "",
+   "swatch": "",
+   "position": [
+    -0.4,
+    0,
+    -1.2
+   ],
+   "rotationEuler": [
+    0,
+    0.0,
+    0
+   ],
+   "scale": [
+    1,
+    1,
+    1
+   ],
+   "note": "premium v1 set dressing"
+  },
+  {
+   "name": "prop_planter_box",
+   "fbx": "Assets/_Game/Art/Environment/Kit/prop_planter_box.fbx",
+   "primitive": "",
+   "swatch": "",
+   "position": [
+    -2.9,
+    0,
+    -0.25
+   ],
+   "rotationEuler": [
+    0,
+    0.0,
+    0
+   ],
+   "scale": [
+    1,
+    1,
+    1
+   ],
+   "note": "premium v1 set dressing"
+  },
+  {
+   "name": "prop_sign_hanging_parcel",
+   "fbx": "Assets/_Game/Art/Environment/Kit/prop_sign_hanging_parcel.fbx",
+   "primitive": "",
+   "swatch": "",
+   "position": [
+    -0.03,
+    2.6,
+    -0.4
+   ],
+   "rotationEuler": [
+    0,
+    -90.0,
+    0
+   ],
+   "scale": [
+    1,
+    1,
+    1
+   ],
+   "note": "premium v1 set dressing"
+  },
+  {
+   "name": "prop_sign_board_aperto",
+   "fbx": "Assets/_Game/Art/Environment/Kit/prop_sign_board_aperto.fbx",
+   "primitive": "",
+   "swatch": "",
+   "position": [
+    -3.2,
+    0,
+    -3.8
+   ],
+   "rotationEuler": [
+    0,
+    20.0,
+    0
+   ],
+   "scale": [
+    1,
+    1,
+    1
+   ],
+   "note": "premium v1 set dressing"
+  },
+  {
+   "name": "prop_streetlamp",
+   "fbx": "Assets/_Game/Art/Environment/Kit/prop_streetlamp.fbx",
+   "primitive": "",
+   "swatch": "",
+   "position": [
+    -4.7,
+    0,
+    -4.7
+   ],
+   "rotationEuler": [
+    0,
+    135.0,
+    0
+   ],
+   "scale": [
+    1,
+    1,
+    1
+   ],
+   "note": "premium v1 set dressing"
+  },
+  {
+   "name": "prop_tp_basket",
+   "fbx": "Assets/_Game/Art/Environment/ThirdParty/Props/prop_tp_basket.fbx",
+   "primitive": "",
+   "swatch": "",
+   "position": [
+    -2.95,
+    0,
+    -1.0
+   ],
+   "rotationEuler": [
+    0,
+    -10.0,
+    0
+   ],
+   "scale": [
+    1,
+    1,
+    1
+   ],
+   "note": "premium v1 set dressing"
+  },
+  {
+   "name": "prop_tp_lemon",
+   "fbx": "Assets/_Game/Art/Environment/ThirdParty/Props/prop_tp_lemon.fbx",
+   "primitive": "",
+   "swatch": "",
+   "position": [
+    -1.65,
+    1.03,
+    -1.62
+   ],
+   "rotationEuler": [
+    0,
+    0.0,
+    0
+   ],
+   "scale": [
+    1,
+    1,
+    1
+   ],
+   "note": "premium v1 set dressing"
+  },
+  {
+   "name": "prop_tp_lemon",
+   "fbx": "Assets/_Game/Art/Environment/ThirdParty/Props/prop_tp_lemon.fbx",
+   "primitive": "",
+   "swatch": "",
+   "position": [
+    -1.73,
+    1.03,
+    -1.7
+   ],
+   "rotationEuler": [
+    0,
+    -40.0,
+    0
+   ],
+   "scale": [
+    1,
+    1,
+    1
+   ],
+   "note": "premium v1 set dressing"
+  },
+  {
+   "name": "prop_tp_orange",
+   "fbx": "Assets/_Game/Art/Environment/ThirdParty/Props/prop_tp_orange.fbx",
+   "primitive": "",
+   "swatch": "",
+   "position": [
+    -1.62,
+    1.03,
+    -1.74
+   ],
+   "rotationEuler": [
+    0,
+    0.0,
+    0
+   ],
+   "scale": [
+    1,
+    1,
+    1
+   ],
+   "note": "premium v1 set dressing"
+  }
+ ],
+ "spawns": [
+  {
+   "name": "spawn_nina",
+   "position": [
+    -3.55,
+    0,
+    -1.5
+   ],
+   "rotationEuler": [
+    0,
+    -35.0,
+    0
+   ],
+   "note": "nel beauty Nina era scalata 1.35 solo per il render: in gioco scala 1"
+  },
+  {
+   "name": "spawn_tico_cameo",
+   "position": [
+    -1.0,
+    0,
+    -0.8
+   ],
+   "rotationEuler": [
+    0,
+    -60.0,
+    0
+   ],
+   "note": "TICO entra al cap.4: solo cameo opzionale"
+  }
+ ]
+}
