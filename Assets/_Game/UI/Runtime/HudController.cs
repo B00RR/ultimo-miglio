@@ -122,6 +122,15 @@ namespace UltimoMiglio.UI
         }
 
         public void PulseCurrency() => Pulse(currencyPill);
+        /// <summary>Screen position (pixels, origin bottom-left) of the LN icon: coins fly here.</summary>
+        public Vector2 CurrencyScreenPos()
+        {
+            if (currencyPill == null || currencyPill.panel == null) return new Vector2(80, Screen.height - 50);
+            var root = currencyPill.panel.visualTree.layout; var wb = currencyPill.worldBound;
+            if (root.width <= 0) return new Vector2(80, Screen.height - 50);
+            float sx = Screen.width / root.width, sy = Screen.height / root.height;
+            return new Vector2((wb.xMin + Mathf.Min(40, wb.width * 0.25f)) * sx, Screen.height - wb.center.y * sy);
+        }
 
         public void SetPhoneVisible(bool visible) => SetVisible(phoneButton, visible);
 

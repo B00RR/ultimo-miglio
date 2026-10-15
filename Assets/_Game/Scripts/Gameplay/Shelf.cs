@@ -11,7 +11,7 @@ namespace UltimoMiglio.Gameplay
         protected override void OnZoneTick(float t)
         {
             var s = Nina.Stack;
-            if (Count < Capacity && s.TryPop(out _, Color)) { Add(1); AudioManager.I?.Play(AudioManager.Sfx.Deposit); GameRoot.I.Qa.Log("deposit", $"\"shelf\":\"{Color}\",\"count\":{Count}"); }
+            if (Count < Capacity && s.TryPop(out _, Color, transform.position + new Vector3(0, 1.0f, -1.2f))) { Add(1); AudioManager.I?.Play(AudioManager.Sfx.Deposit); GameRoot.I.Qa.Log("deposit", $"\"shelf\":\"{Color}\",\"count\":{Count}"); }
         }
         public void Add(int n) { Count = Mathf.Min(Capacity, Count + n); Refresh(); }
         public bool Take() { if (Count <= 0) return false; Count--; Refresh(); return true; }

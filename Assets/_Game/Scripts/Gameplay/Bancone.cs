@@ -13,7 +13,7 @@ namespace UltimoMiglio.Gameplay
         {
             var c = Queue.Head; if (c == null || !c.AtCounter) return;
             if ((_serve += TickSec) < ServeSec) return; _serve = 0;
-            if (!Nina.Stack.TryPop(out _, c.Wants) && !Nina.Stack.TryPop(out _)) return;
+            var dst = c.transform.position + Vector3.up * 1.0f; if (!Nina.Stack.TryPop(out _, c.Wants, dst) && !Nina.Stack.TryPop(out _, null, dst)) return;
             Serve(c);
         }
         public void Serve(Customer c)

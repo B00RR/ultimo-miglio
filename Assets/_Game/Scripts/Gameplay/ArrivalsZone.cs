@@ -13,7 +13,7 @@ namespace UltimoMiglio.Gameplay
         {
             if (Stock <= 0) return;
             var c = (ParcelColor)Random.Range(0, 3);
-            if (Nina.Stack.TryPush(c)) { Stock--; UM_FxPlayer.Play(UM_FxPlayer.Fx.PackagePop, transform.position); }
+            if (Nina.Stack.TryPush(c, transform.position + Vector3.up * 0.4f)) { Stock--; UM_FxPlayer.Play(UM_FxPlayer.Fx.PackagePop, transform.position); }
         }
         public bool TakeForRobot(out ParcelColor c) { c = (ParcelColor)Random.Range(0, 3); if (Stock <= 0) return false; Stock--; return true; }
     }

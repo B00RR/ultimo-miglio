@@ -27,7 +27,15 @@ namespace UltimoMiglio.Gameplay
             for (int i = 0; i < MaxVoices; i++) _voices[i] = NewSource("sfx" + i, SfxGroup, false);
             _loop = NewSource("upgradeLoop", SfxGroup, true); _loop.clip = UpgradeLoop;
         }
-        void Start() => StartMusic();
+        public static bool Unlocked; // browsers: audio only after the first user gesture
+        void Start() { }
+        void Update()
+        {
+            if (Unlocked) return;
+            var kb = UnityEngine.InputSystem.Keyboard.current; var ms = UnityEngine.InputSystem.Mouse.current; var ts = UnityEngine.InputSystem.Touchscreen.current;
+            if ((kb != null && kb.anyKey.wasPressedThisFrame) || (ms != null && ms.leftButton.wasPressedThisFrame) || (ts != null && ts.primaryTouch.press.wasPressedThisFrame))
+            { Unlocked = true; StartMusic(); }
+        }
 
         AudioSource NewSource(string n, AudioMixerGroup g, bool loop)
         {
@@ -73,15 +81,15 @@ namespace UltimoMiglio.Gameplay
                 case Sfx.Step: One(Pick(Steps), 0.5f); break;
             }
         }
-        public void StartUpgradeLoop() { if (_loop.clip && !_loop.isPlaying) _loop.Play(); }
+        public void StartUpgradeLoop() { if (Unlocked && _loop.clip && !_loop.isPlaying) _loop.Play(); }
         public void StopUpgradeLoop() { if (_loop.isPlaying) _loop.Stop(); }
 
         static AudioClip Pick(AudioClip[] a) => a == null || a.Length == 0 ? null : a[Random.Range(0, a.Length)];
         void One(AudioClip c, float vol = 1f)
         {
-            if (!c) return;
+            if (!c || !Unlocked) return;
             var s = _voices[_next = (_next + 1) % _voices.Length]; // voice cap (README: coins cap 6 voices)
-            s.pitch = 1f + Random.Range(-0.03f, 0.03f); s.PlayOneShot(c, vol);
+            s.pitch = 1f + Random.Range(-0.05f, 0.05f); s.PlayOneShot(c, vol);
         }
     }
 }

@@ -8,6 +8,6 @@ namespace UltimoMiglio.Gameplay
     public sealed class ShelfPickup : ProximityZone
     {
         public Shelf Shelf;
-        protected override void OnZoneTick(float t) { if (!Nina.Stack.Full && Shelf.Count > 0 && Nina.Stack.TryPush(Shelf.Color)) Shelf.Take(); }
+        protected override void OnZoneTick(float t) { if (!Nina.Stack.Full && Shelf.Count > 0 && Nina.Stack.TryPush(Shelf.Color, Shelf.transform.position + new Vector3(0, 1.0f, -1.2f))) Shelf.Take(); }
     }
 }

@@ -100,3 +100,7 @@ Generato da `qa/playthrough_ch1.py`, che usa la stessa logica di `qa/econ_sim_v3
 - `chapterEnd`: fine capitolo a eff 1,0 / 1,2 / 0,85, con finestra di 2.400 s.
 - `botSteps[]` e `loops`: azioni del bot (`moveTo` + `zoneId` da `zones.json` → `zoneIds`, `holdOnZoneSec`).
 - Tolleranze: onboarding ±5-15 s; acquisti ±15%; fine capitolo ±120 s (copre eff 0,85-1,2).
+
+## Clienti e onboarding (aggiunti il 15/10)
+- `customers.json` → `CustomerTypesConfig`: 4 tipi (normale, frettoloso, anziano, vipMammaRosa), ciascuno con `valueMultiplier`, `patienceSec`, `spawnWeight`, `unlockAtSec`, `visualCue`, `barkKeys`. Il valore medio pesato vale 1,00, quindi l'economia e il golden path restano invariati.
+- `onboarding.json` → `OnboardingConfig`: `steps[]` con `id`, `tSec`, `toleranceSec`, `trigger`, `completeWhen`, `target` (zoneId), `textKeys` (segnaposto `onb.*`), `unlocks`. Specifica leggibile: `onboarding.md`.
