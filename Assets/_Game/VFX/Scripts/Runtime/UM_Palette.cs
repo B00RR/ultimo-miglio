@@ -31,11 +31,16 @@ namespace UltimoMiglio.VFX
         public static readonly Color UpgradeSole  = H("#F4C430");
         public static readonly Color UpgradeLimone= H("#F7E26B"); // highlight/scintille
         public static readonly Color MonetaLuce = H("#FFF4D6");
+        // Tramonto (cap. 1): sole basso arancio-dorato, ambiente pesca, cielo albicocca
+        public static readonly Color SoleTramonto = H("#FFC27A");
+        public static readonly Color TramSky   = H("#F2C29A");
+        public static readonly Color TramEq    = H("#D9A27E");
+        public static readonly Color TramCielo = H("#F0C8A0");
         // Notte: stessa palette, toni scuri caldi, niente neon
         public static readonly Color LunaCalda  = H("#C9A98A");
-        public static readonly Color NottSky    = H("#7E6A72");
-        public static readonly Color NottEq     = H("#6E5A52");
-        public static readonly Color NottGround = H("#41342E");
+        public static readonly Color NottSky    = H("#8C7880");
+        public static readonly Color NottEq     = H("#7C665C");
+        public static readonly Color NottGround = H("#4A3C35");
         public static readonly Color Lanterna   = H("#FFB65C");
     }
 }

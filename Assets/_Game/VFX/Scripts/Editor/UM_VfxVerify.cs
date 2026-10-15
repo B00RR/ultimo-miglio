@@ -41,8 +41,10 @@ namespace UltimoMiglio.VFX.EditorTools
             UM_LightingSetup.Setup();
             var rig = sun.GetComponent<UM_LightingRig>();
 
-            cam.orthographic = true; cam.orthographicSize = 4.2f;
-            cam.transform.position = new Vector3(-7, 9, -7); cam.transform.rotation = Quaternion.Euler(40, 45, 0);
+            // Camera del cap. 1 (Tech Lead): ortografica size 4.5, distanza 15, pitch 35.3, yaw 45
+            cam.orthographic = true; cam.orthographicSize = 4.5f;
+            cam.transform.rotation = Quaternion.Euler(35.3f, 45, 0); cam.transform.position = new Vector3(0, 0.8f, 0) - cam.transform.forward * 15f;
+            cam.nearClipPlane = 0.3f; cam.farClipPlane = 120f;
             cam.GetUniversalAdditionalCameraData().renderPostProcessing = true;
 
             string M = "Assets/_Game/VFX/Materials/";
@@ -90,21 +92,27 @@ namespace UltimoMiglio.VFX.EditorTools
             var night = AssetDatabase.LoadAssetAtPath<VolumeProfile>(UM_PostProcessBuilder.Dir + "/PP_Diorama_Night.asset");
             var day = vol.sharedProfile;
 
-            rig.preset = UM_LightingRig.Preset.Day; rig.Apply();
+            // Ciclo cap. 1: giorno -> tramonto con lanterne (niente notte). Post OFF (tier Web).
+            var lantern = lamp.AddComponent<UM_Lantern>(); lantern.pointLight = lampLight; lantern.emissiveRenderers = new[] { lamp.GetComponent<Renderer>() };
+            var cycle = sunGo.AddComponent<UM_DayCycle>(); cycle.rig = rig; cycle.Bind(); cycle.blendSmoothing = 0;
+            foreach (var t in new[] { 0.1f, 0.5f, 0.85f, 0.95f, 1f })
+            { cycle.SetTime01(t, true, true); Debug.Log($"[UM VFX] DayCycle t={t:F2} golden={cycle.GoldenBlend:F2} lanterns={cycle.LanternsOn} tod={cycle.Current}"); }
+            cycle.ForceTimeOfDay(UM_DayCycle.TimeOfDay.Day, true, true); lantern.SetOn(cycle.LanternsOn, true);
             float lDay = Shot(cam, "vfx_day.png");
-            rig.preset = UM_LightingRig.Preset.Night; rig.Apply(); vol.sharedProfile = night; lampLight.intensity = 1.7f;
-            float lNight = Shot(cam, "vfx_night.png");
-            Debug.Log($"[UM VFX] LUMA day={lDay:F3} night={lNight:F3} ratio={lNight / lDay:P1}");
-            File.WriteAllText(Path.Combine(Out, "luminance.txt"), $"day={lDay:F4}\nnight={lNight:F4}\nratio={lNight / lDay:F3}\n");
+            cycle.ForceTimeOfDay(UM_DayCycle.TimeOfDay.Sunset, true, true); lantern.SetOn(cycle.LanternsOn, true);
+            Debug.Log($"[UM VFX] sunset lantern light={lampLight.intensity:F2} enabled={lampLight.enabled} maxLightsWeb={UM_Lantern.MaxLights}");
+            float lSun = Shot(cam, "vfx_sunset.png");
+            Debug.Log($"[UM VFX] LUMA day={lDay:F3} sunset={lSun:F3} ratio={lSun / lDay:P1} post={UM_QualityTier.PostProcessingEnabled}");
+            File.WriteAllText(Path.Combine(Out, "luminance.txt"), $"giorno={lDay:F4}\ntramonto={lSun:F4}\nrapporto={lSun / lDay:F3}\npost={UM_QualityTier.PostProcessingEnabled}\n");
 
             // Toon close-up: character + packages (outline) vs set (no outline)
-            rig.preset = UM_LightingRig.Preset.Day; rig.Apply(); vol.sharedProfile = day; lampLight.intensity = 0;
-            cam.orthographicSize = 2.0f; cam.transform.position = new Vector3(-6.2f, 8.5f, -6.2f) + new Vector3(1, 0, 1.2f);
+            cycle.ForceTimeOfDay(UM_DayCycle.TimeOfDay.Day, true, true); lantern.SetOn(false, true);
+            cam.orthographicSize = 2.0f; cam.transform.position = new Vector3(0.6f, 0.9f, 1f) - cam.transform.forward * 15f;
             Shot(cam, "vfx_toon_outline_vs_set.png");
 
             // Particles
             Vector3 fxPos = new Vector3(0.6f, 0.05f, -1.6f);
-            cam.orthographicSize = 1.4f; cam.transform.position = fxPos + new Vector3(0, 0.6f, 0) - cam.transform.forward * 15f;
+            cam.orthographicSize = 1.6f; cam.transform.position = fxPos + new Vector3(0, 0.6f, 0) - cam.transform.forward * 15f;
             foreach (var (name, t) in new[] { ("fx_package_pop", 0.12f), ("fx_coins", 0.3f), ("fx_upgrade", 0.6f), ("fx_dust", 0.3f) })
             {
                 var pf = AssetDatabase.LoadAssetAtPath<GameObject>($"Assets/_Game/VFX/Prefabs/{name}.prefab");
@@ -117,6 +125,45 @@ namespace UltimoMiglio.VFX.EditorTools
                 Debug.Log($"[UM VFX] {name} alive={ps.particleCount}");
                 Shot(cam, name.Replace("fx_", "vfx_fx_") + ".png");
                 Object.DestroyImmediate(g);
+            }
+            // --- Game feel ---
+            foreach (var (name, t) in new[] { ("fx_package_pickup", 0.12f), ("fx_package_deliver", 0.15f), ("fx_upgrade_complete", 0.18f) })
+            {
+                var pf = AssetDatabase.LoadAssetAtPath<GameObject>($"Assets/_Game/VFX/Prefabs/{name}.prefab");
+                if (!pf) { Debug.LogError("[UM VFX] manca " + name); continue; }
+                var g = (GameObject)PrefabUtility.InstantiatePrefab(pf); g.SetActive(true); g.transform.position = fxPos;
+                var ps = g.GetComponent<ParticleSystem>(); ps.Simulate(t, true, true, false);
+                Debug.Log($"[UM VFX] {name} alive={ps.particleCount}");
+                Shot(cam, name.Replace("fx_", "vfx_fx_") + ".png");
+                Object.DestroyImmediate(g);
+            }
+            {   // monete in volo: istantanea statica lungo l'arco (la scia richiede tempo reale: non visibile in batch)
+                var pf = AssetDatabase.LoadAssetAtPath<GameObject>("Assets/_Game/VFX/Prefabs/fx_coin_flyer.prefab");
+                var tmp = new System.Collections.Generic.List<GameObject>();
+                Vector3 a = fxPos + Vector3.up * 0.3f + new Vector3(-0.8f, 0, 0.6f), b = fxPos + new Vector3(0.9f, 2.2f, -0.6f), c = (a + b) * 0.5f + Vector3.up * 1.2f;
+                for (int k = 0; k < 6 && pf; k++)
+                {
+                    float e = k / 5f; var g = (GameObject)PrefabUtility.InstantiatePrefab(pf); g.SetActive(true);
+                    g.transform.position = Vector3.Lerp(Vector3.Lerp(a, c, e), Vector3.Lerp(c, b, e), e); g.transform.localScale = Vector3.one * Mathf.Lerp(1f, 0.55f, e * e);
+                    g.transform.GetChild(0).localRotation = Quaternion.Euler(0, k * 50f, 0);
+                    var sp = g.GetComponentInChildren<ParticleSystem>(); if (sp) { var em = sp.emission; em.rateOverTime = 20; sp.Simulate(0.2f, true, true, false); }
+                    tmp.Add(g);
+                }
+                Shot(cam, "vfx_fx_coin_flyer.png");
+                foreach (var g in tmp) Object.DestroyImmediate(g);
+            }
+            {   // anello pad: 35% · 75% · flash al completamento
+                var pf = AssetDatabase.LoadAssetAtPath<GameObject>("Assets/_Game/VFX/Prefabs/fx_pad_fill_ring.prefab");
+                var tmp = new System.Collections.Generic.List<GameObject>();
+                float[] fills = { 0.35f, 0.75f, 1f }; float[] flashes = { 0, 0, 0.8f };
+                for (int k = 0; k < 3 && pf; k++)
+                {
+                    var g = (GameObject)PrefabUtility.InstantiatePrefab(pf); g.SetActive(true);
+                    g.transform.position = fxPos + new Vector3(-1.1f + k * 1.1f, 0, 1.1f - k * 1.1f); g.transform.localScale = Vector3.one * 0.45f;
+                    g.GetComponent<UM_PadFillRing>().SetImmediate(fills[k], flashes[k]); tmp.Add(g);
+                }
+                Shot(cam, "vfx_fx_pad_fill_ring.png");
+                foreach (var g in tmp) Object.DestroyImmediate(g);
             }
             EditorSceneManager.SaveScene(EditorSceneManager.GetActiveScene(), "Assets/_Game/VFX/Scenes_VFX_Test.unity");
             Debug.Log("[UM VFX] verify done -> " + Out);

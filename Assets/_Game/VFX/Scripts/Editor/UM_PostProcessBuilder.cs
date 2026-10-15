@@ -14,6 +14,7 @@ namespace UltimoMiglio.VFX.EditorTools
         [MenuItem("Ultimo Miglio/VFX/Build Post-Process Profiles")]
         public static void BuildAll()
         {
+            EnsurePostProcessData();
             var day = Build("PP_Diorama_Day", false);
             Build("PP_Diorama_Night", true);
             var go = GameObject.Find("PP_GlobalVolume") ?? new GameObject("PP_GlobalVolume");
@@ -22,6 +23,17 @@ namespace UltimoMiglio.VFX.EditorTools
             vol.isGlobal = true; vol.priority = 0; vol.sharedProfile = day;
             AssetDatabase.SaveAssets();
             Debug.Log("[UM VFX] Post-process profiles built in " + Dir);
+        }
+
+        /// URP renderer created via ScriptableObject.CreateInstance has postProcessData = null -> post-processing silently OFF.
+        public static void EnsurePostProcessData()
+        {
+            var urp = GraphicsSettings.defaultRenderPipeline as UniversalRenderPipelineAsset; if (!urp) return;
+            var ppd = AssetDatabase.LoadAssetAtPath<PostProcessData>("Packages/com.unity.render-pipelines.universal/Runtime/Data/PostProcessData.asset");
+            var so = new SerializedObject(urp); var list = so.FindProperty("m_RendererDataList");
+            for (int i = 0; i < list.arraySize; i++)
+                if (list.GetArrayElementAtIndex(i).objectReferenceValue is UniversalRendererData rd && rd.postProcessData == null && ppd)
+                { rd.postProcessData = ppd; EditorUtility.SetDirty(rd); Debug.Log("[UM VFX] assigned PostProcessData to " + rd.name); }
         }
 
         static VolumeProfile Build(string name, bool night)
@@ -45,10 +57,11 @@ namespace UltimoMiglio.VFX.EditorTools
             bl.maxIterations.Override(3);                  // mobile: few mips
 
             var ca = Add<ColorAdjustments>(p);
-            ca.postExposure.Override(night ? 0.0f : -0.1f); // darkness comes from lighting, not post: never horror-dark
+            ca.postExposure.Override(night ? 0.45f : -0.1f); // darkness comes from lighting, not post: never horror-dark
             ca.contrast.Override(night ? 8f : 6f);
             ca.saturation.Override(night ? -6f : 4f);
-            ca.colorFilter.Override(night ? new Color(1f, 0.92f, 0.85f) : new Color(1f, 0.98f, 0.95f)); // warm, subtle
+            // In LDR postExposure NON agisce (si applica solo in HDR): la luminosità notte si regola col colorFilter (>1 = schiarisce).
+            ca.colorFilter.Override(night ? new Color(1f, 0.92f, 0.85f) * 1.12f : new Color(1f, 0.98f, 0.95f));
 
             var wb = Add<WhiteBalance>(p);
             wb.temperature.Override(night ? 10f : 4f);

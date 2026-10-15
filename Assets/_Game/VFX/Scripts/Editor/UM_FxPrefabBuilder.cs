@@ -40,10 +40,22 @@ namespace UltimoMiglio.VFX.EditorTools
             blob.SetFloat("_Surface", 1f); blob.SetFloat("_Blend", 0f); blob.EnableKeyword("_SURFACE_TYPE_TRANSPARENT");
             blob.SetFloat("_SrcBlend", (float)UnityEngine.Rendering.BlendMode.SrcAlpha); blob.SetFloat("_DstBlend", (float)UnityEngine.Rendering.BlendMode.OneMinusSrcAlpha);
             blob.SetFloat("_ZWrite", 0f); blob.renderQueue = 2990;
-            var bc = UM_Palette.ScuroCaldo; bc.a = 0.35f; blob.SetColor("_BaseColor", bc);
+            var bc = UM_Palette.ScuroCaldo; bc.a = 0.45f; blob.SetColor("_BaseColor", bc);
             if (blobTex) blob.SetTexture("_BaseMap", blobTex);
             blob = SaveMat(blob, "M_FX_ContactShadow");
             Save(UM_FxFactory.BuildContactShadow(blob));
+
+            // --- Game feel ---
+            Save(UM_FxFactory.BuildPackagePickup(fxMat));
+            Save(UM_FxFactory.BuildPackageDeliver(fxMat));
+            Save(UM_FxFactory.BuildUpgradeComplete(fxMat));
+            var trail = new Material(Shader.Find(UM_FxFactory.ParticleShader));
+            trail.SetFloat("_Surface", 1f); trail.SetFloat("_Blend", 0f); trail.EnableKeyword("_SURFACE_TYPE_TRANSPARENT"); trail.renderQueue = 3000;
+            trail = SaveMat(trail, "M_FX_Trail");
+            Save(UM_FxFactory.BuildCoinFlyer(coin, coinMat, fxMat, trail));
+            var ringSh = Shader.Find("UltimoMiglio/FX/RingFill");
+            if (ringSh) Save(UM_FxFactory.BuildPadFillRing(SaveMat(new Material(ringSh), "M_FX_RingFill")));
+            else Debug.LogError("[UM VFX] shader UltimoMiglio/FX/RingFill mancante");
             AssetDatabase.SaveAssets(); AssetDatabase.Refresh();
             Debug.Log("[UM VFX] FX prefabs built in " + PrefabDir);
         }

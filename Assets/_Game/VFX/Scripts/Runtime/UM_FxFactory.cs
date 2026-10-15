@@ -183,5 +183,118 @@ namespace UltimoMiglio.VFX
             s.size = new ParticleSystem.MinMaxCurve(1f, AnimationCurve.EaseInOut(0, 0.5f, 1, 1.2f));
             return ps.gameObject;
         }
+
+        // ===================== GAME FEEL (sprint My Little Universe) =====================
+
+        /// Raccolta pacco: piccolo "pop" verso l'alto (cartone + crema) + 2 stelline. ~11 particelle, 0.4 s.
+        public static GameObject BuildPackagePickup(Material mat = null)
+        {
+            var ps = Make("fx_package_pickup", mat, 14, out _); Tile(ps, TileDot);
+            var m = ps.main;
+            m.duration = 0.25f; m.startLifetime = new ParticleSystem.MinMaxCurve(0.25f, 0.4f);
+            m.startSpeed = new ParticleSystem.MinMaxCurve(1.8f, 3.2f);
+            m.startSize = new ParticleSystem.MinMaxCurve(0.07f, 0.13f);
+            m.startColor = Grad(UM_Palette.Cartone, UM_Palette.Crema);
+            m.gravityModifier = 0.6f;
+            var e = ps.emission; e.SetBursts(new[] { new ParticleSystem.Burst(0, (short)N(9)) });
+            var sh = ps.shape; sh.shapeType = ParticleSystemShapeType.Cone; sh.angle = 25f; sh.radius = 0.15f; sh.rotation = new Vector3(-90, 0, 0);
+            ShrinkOut(ps);
+            var st = Make("stars", mat, 3, out _); st.transform.SetParent(ps.transform, false); Tile(st, TileStar);
+            var sm = st.main; sm.duration = 0.2f; sm.startLifetime = 0.3f; sm.startSpeed = new ParticleSystem.MinMaxCurve(0.5f, 1f);
+            sm.startSize = new ParticleSystem.MinMaxCurve(0.25f, 0.35f); sm.startColor = UM_Palette.Crema;
+            var se = st.emission; se.SetBursts(new[] { new ParticleSystem.Burst(0, 2) });
+            var ss = st.shape; ss.shapeType = ParticleSystemShapeType.Sphere; ss.radius = 0.25f;
+            ShrinkOut(st);
+            return ps.gameObject;
+        }
+
+        /// Consegna pacco (bancone/cliente/furgone): anello a terra giallo sole + coriandoli palette che ricadono + stella centrale. ~17 particelle, 0.7 s.
+        public static GameObject BuildPackageDeliver(Material mat = null)
+        {
+            var ps = Make("fx_package_deliver", mat, 20, out _); Tile(ps, TileDot);
+            var m = ps.main;
+            m.duration = 0.3f; m.startLifetime = new ParticleSystem.MinMaxCurve(0.5f, 0.7f);
+            m.startSpeed = new ParticleSystem.MinMaxCurve(2.5f, 4f);
+            m.startSize = new ParticleSystem.MinMaxCurve(0.08f, 0.14f);
+            var g = new Gradient(); // coriandoli: terracotta, giallo sole, menta, limone
+            g.SetKeys(new[] { new GradientColorKey(UM_Palette.Terracotta, 0), new GradientColorKey(UM_Palette.GialloSole, 0.33f), new GradientColorKey(UM_Palette.Menta, 0.66f), new GradientColorKey(UM_Palette.Limone, 1) },
+                      new[] { new GradientAlphaKey(1, 0), new GradientAlphaKey(1, 1) });
+            m.startColor = new ParticleSystem.MinMaxGradient(g) { mode = ParticleSystemGradientMode.RandomColor };
+            m.gravityModifier = 1.4f;
+            var e = ps.emission; e.SetBursts(new[] { new ParticleSystem.Burst(0, (short)N(14)) });
+            var sh = ps.shape; sh.shapeType = ParticleSystemShapeType.Cone; sh.angle = 35f; sh.radius = 0.2f; sh.rotation = new Vector3(-90, 0, 0);
+            ShrinkOut(ps);
+            var ring = Make("ring", mat, 1, out var rr); ring.transform.SetParent(ps.transform, false); Tile(ring, TileRing);
+            rr.renderMode = ParticleSystemRenderMode.HorizontalBillboard; rr.maxParticleSize = 3f;
+            var rm = ring.main; rm.duration = 0.4f; rm.startLifetime = 0.4f; rm.startSpeed = 0; rm.startSize = 1.6f; rm.startColor = UM_Palette.UpgradeSole;
+            var re = ring.emission; re.SetBursts(new[] { new ParticleSystem.Burst(0, 1) });
+            var rs = ring.sizeOverLifetime; rs.enabled = true; rs.size = new ParticleSystem.MinMaxCurve(1f, AnimationCurve.EaseInOut(0, 0.25f, 1, 1f));
+            FadeOut(ring, UM_Palette.UpgradeSole, 0.3f);
+            var st = Make("star", mat, 1, out _); st.transform.SetParent(ps.transform, false); st.transform.localPosition = Vector3.up * 0.4f; Tile(st, TileStar);
+            var sm = st.main; sm.duration = 0.2f; sm.startLifetime = 0.25f; sm.startSpeed = 0; sm.startSize = 0.7f; sm.startColor = UM_Palette.Crema;
+            var se = st.emission; se.SetBursts(new[] { new ParticleSystem.Burst(0, 1) });
+            ShrinkOut(st);
+            return ps.gameObject;
+        }
+
+        /// Upgrade completato sul pad: flash a terra + scintille (TileSpark) a fontana. ~18 particelle, 0.8 s.
+        public static GameObject BuildUpgradeComplete(Material mat = null)
+        {
+            var ps = Make("fx_upgrade_complete", mat, 22, out _); Tile(ps, TileSpark);
+            var m = ps.main;
+            m.duration = 0.3f; m.startLifetime = new ParticleSystem.MinMaxCurve(0.6f, 0.8f);
+            m.startSpeed = new ParticleSystem.MinMaxCurve(3f, 4.5f);
+            m.startSize = new ParticleSystem.MinMaxCurve(0.14f, 0.24f);
+            m.startColor = Color.white; m.gravityModifier = 1.2f;
+            var e = ps.emission; e.SetBursts(new[] { new ParticleSystem.Burst(0, (short)N(16)) });
+            var sh = ps.shape; sh.shapeType = ParticleSystemShapeType.Cone; sh.angle = 30f; sh.radius = 0.5f; sh.rotation = new Vector3(-90, 0, 0);
+            ShrinkOut(ps);
+            var fl = Make("flash", mat, 1, out var fr); fl.transform.SetParent(ps.transform, false); Tile(fl, TileDot);
+            fr.renderMode = ParticleSystemRenderMode.HorizontalBillboard; fr.maxParticleSize = 3f;
+            var fm = fl.main; fm.duration = 0.3f; fm.startLifetime = 0.3f; fm.startSpeed = 0; fm.startSize = 2.4f;
+            var fc = UM_Palette.UpgradeLimone; fc.a = 0.8f; fm.startColor = fc;
+            var fe = fl.emission; fe.SetBursts(new[] { new ParticleSystem.Burst(0, 1) });
+            FadeOut(fl, fc, 0.1f);
+            return ps.gameObject;
+        }
+
+        /// Moneta volante verso l'HUD: mesh lira (o billboard) + scia corta + scintille per distanza. Mossa da UM_CoinFlight.
+        public static GameObject BuildCoinFlyer(Mesh coinMesh, Material coinMat, Material fxMat, Material trailMat)
+        {
+            var go = new GameObject("fx_coin_flyer");
+            var body = new GameObject("coin"); body.transform.SetParent(go.transform, false);
+            if (coinMesh) { body.AddComponent<MeshFilter>().sharedMesh = coinMesh; var mr = body.AddComponent<MeshRenderer>(); mr.sharedMaterial = coinMat;
+                mr.shadowCastingMode = UnityEngine.Rendering.ShadowCastingMode.Off; mr.receiveShadows = false; }
+            var tr = go.AddComponent<TrailRenderer>();
+            tr.sharedMaterial = trailMat; tr.time = 0.18f; tr.minVertexDistance = 0.08f; tr.numCapVertices = 0; tr.numCornerVertices = 0;
+            tr.widthCurve = AnimationCurve.EaseInOut(0, 0.12f, 1, 0f);
+            var tg = new Gradient(); tg.SetKeys(new[] { new GradientColorKey(UM_Palette.UpgradeLimone, 0), new GradientColorKey(UM_Palette.MonetaOro, 1) },
+                                                new[] { new GradientAlphaKey(0.9f, 0), new GradientAlphaKey(0, 1) });
+            tr.colorGradient = tg; tr.shadowCastingMode = UnityEngine.Rendering.ShadowCastingMode.Off; tr.receiveShadows = false; tr.emitting = false;
+            var sp = Make("sparkle", fxMat, 6, out _); sp.transform.SetParent(go.transform, false); Tile(sp, TileStar);
+            var sm = sp.main; sm.loop = true; sm.playOnAwake = false; sm.duration = 1f; sm.startLifetime = 0.25f; sm.startSpeed = 0.2f;
+            sm.startSize = new ParticleSystem.MinMaxCurve(0.12f, 0.2f); sm.startColor = UM_Palette.MonetaLuce; sm.stopAction = ParticleSystemStopAction.None;
+            var se = sp.emission; se.rateOverDistance = 2.5f;
+            ShrinkOut(sp);
+            go.AddComponent<UM_CoinFlight>();
+            return go;
+        }
+
+        /// Anello di riempimento pad: quad a terra con UM_FxRingFill + UM_PadFillRing (SetProgress 0..1, flash a fine).
+        public static GameObject BuildPadFillRing(Material ringMat, float diameter = 2.2f)
+        {
+            var g = GameObject.CreatePrimitive(PrimitiveType.Quad); g.name = "fx_pad_fill_ring";
+            Object.DestroyImmediate(g.GetComponent<Collider>());
+            var q = new GameObject("fx_pad_fill_ring_root");
+            g.transform.SetParent(q.transform, false);
+            g.transform.localRotation = Quaternion.Euler(90, 0, 0); g.transform.localPosition = new Vector3(0, 0.015f, 0);
+            g.transform.localScale = Vector3.one * diameter;
+            var r = g.GetComponent<MeshRenderer>(); r.sharedMaterial = ringMat;
+            r.shadowCastingMode = UnityEngine.Rendering.ShadowCastingMode.Off; r.receiveShadows = false;
+            q.AddComponent<UM_PadFillRing>().ring = r;
+            q.name = "fx_pad_fill_ring";
+            g.name = "ring_quad";
+            return q;
+        }
     }
 }
