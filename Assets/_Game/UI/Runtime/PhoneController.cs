@@ -67,7 +67,7 @@ namespace UltimoMiglio.UI
         {
             // Android Back maps to Keyboard.escapeKey in the Input System.
             var kb = Keyboard.current;
-            if (IsOpen && kb != null && kb.escapeKey.wasPressedThisFrame) Back();
+            if (kb != null) { if (IsOpen && (kb.escapeKey.wasPressedThisFrame || kb.tabKey.wasPressedThisFrame)) Close(); else if (!IsOpen && (kb.tabKey.wasPressedThisFrame || kb.escapeKey.wasPressedThisFrame)) OpenPhone(); }
         }
 
         /// <summary>Returns true if the Back press was consumed (phone was open).</summary>

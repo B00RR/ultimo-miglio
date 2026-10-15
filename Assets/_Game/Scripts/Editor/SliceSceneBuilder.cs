@@ -58,7 +58,7 @@ namespace UltimoMiglio.EditorTools
             // --- Nina
             var nina = new GameObject("Nina"); nina.transform.position = new Vector3(0, 0, 0);
             var cc = nina.AddComponent<CharacterController>(); cc.center = new Vector3(0, 0.8f, 0); cc.height = 1.6f; cc.radius = 0.3f;
-            var ninaAnim = Rig(nina.transform, "chr_nina_vela");
+            var ninaAnim = Rig(nina.transform, "chr_nina_vela", 0f);
             if (!ninaAnim)
             {
                 Prim(PrimitiveType.Capsule, "Body", nina.transform, new Vector3(0, 0.8f, 0), new Vector3(0.6f, 0.8f, 0.6f), chars, UM_Palette.AranceNina);
@@ -102,11 +102,7 @@ namespace UltimoMiglio.EditorTools
 
             // --- pads (near the Cassa, 01 §3)
             var padRow = banPos + new Vector3(-1.5f, 0, 4.5f);
-            Pad("Pad_AssumiNonno", UpgradeKind.NonnoHire, padRow, (float)AssetDatabase.LoadAssetAtPath<ChapterDataAsset>(ChapterDataImporter.AssetPath).Data.robots.nonno.unlockAtOnboardingSec, props);
-            Pad("Pad_NonnoLivello", UpgradeKind.NonnoLevel, padRow, 0, props);
-            Pad("Pad_Zaino", UpgradeKind.Zaino, padRow + new Vector3(1.8f, 0, 0), 0, props);
-            Pad("Pad_Scarpe", UpgradeKind.Scarpe, padRow + new Vector3(3.6f, 0, 0), 0, props);
-            Pad("Pad_Insegna", UpgradeKind.Insegna, padRow + new Vector3(1.8f, 0, 1.8f), 0, props);
+            Pad("Pad_Zaino", UpgradeKind.Zaino, padRow, 0, props);
 
             // --- NONNO
             var nonno = new GameObject("NONNO"); nonno.transform.position = arrPos + new Vector3(2.5f, 0, -2);
@@ -191,14 +187,14 @@ namespace UltimoMiglio.EditorTools
         }
 
         /// <summary>Animator delivery (Art/Characters): model is -Z forward → rotated 180° Y; no root motion.</summary>
-        static Animator Rig(Transform parent, string name)
+        static Animator Rig(Transform parent, string name, float yaw = 180f)
         {
             const string dir = "Assets/_Game/Art/Characters";
             var fbx = AssetDatabase.LoadAssetAtPath<GameObject>($"{dir}/{name}.fbx");
             var ctl = AssetDatabase.LoadAssetAtPath<RuntimeAnimatorController>($"{dir}/{name}.controller");
             if (!fbx || !ctl) { Debug.LogWarning($"[Scene] rig {name} missing (fbx={(bool)fbx}, controller={(bool)ctl}): graybox"); return null; }
             var go = (GameObject)PrefabUtility.InstantiatePrefab(fbx, parent);
-            go.transform.localPosition = Vector3.zero; go.transform.localRotation = Quaternion.Euler(0, 180, 0);
+            go.transform.localPosition = Vector3.zero; go.transform.localRotation = Quaternion.Euler(0, yaw, 0);
             var mat = AssetDatabase.LoadAssetAtPath<Material>("Assets/_Game/VFX/Materials/M_Char_Atlas.mat");
             if (mat) foreach (var r in go.GetComponentsInChildren<Renderer>()) r.sharedMaterials = System.Array.ConvertAll(r.sharedMaterials, _ => mat);
             var an = go.GetComponent<Animator>() ?? go.AddComponent<Animator>();

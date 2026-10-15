@@ -1,0 +1,1 @@
+namespace UltimoMiglio.EditorTools { public static class LoopTestPrep { public static void Run() { ProjectSetup.EnsureUrp(); SliceSceneBuilder.Build(); UnityEditor.AssetDatabase.SaveAssets(); UnityEditor.EditorApplication.Exit(0); } } }
