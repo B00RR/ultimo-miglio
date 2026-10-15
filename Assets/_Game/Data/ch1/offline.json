@@ -1,0 +1,32 @@
+{
+  "source": "01_CORE_LOOP v3.3",
+  "chapter": 1,
+  "collectionMethod": "cassaWalkOver",
+  "modalSummary": false,
+  "rateShareOfRobotThroughput": 0.5,
+  "cassaCapacityShareOfTranche": 0.04,
+  "cassaCapacityLn": 336,
+  "offlineShareOfChapterCoinsMax": 0.2,
+  "offlineShareOfChapterCoinsMaxAssist": 0.12,
+  "adDoubleMaxPerDay": 2,
+  "adDoubleAlsoWithBulloni": true,
+  "pedaggioApplies": true,
+  "turnoDiNotte": {
+    "unlockChapter": 3,
+    "costLn": 2500,
+    "cassaCapacityShareOfTranche": 0.06
+  },
+  "boostTotems": {
+    "unlockChapter": 4,
+    "maxPerSession": 1,
+    "maxPerDay": 4,
+    "caffeTurbo": {
+      "speedBonus": 0.3,
+      "durationSec": 120
+    },
+    "zainoGonfio": {
+      "stackBonus": 0.5,
+      "durationSec": 120
+    }
+  }
+}

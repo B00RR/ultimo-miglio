@@ -1,0 +1,11 @@
+{
+  "name": "UltimoMiglio.UI",
+  "rootNamespace": "UltimoMiglio.UI",
+  "references": ["Unity.InputSystem"],
+  "includePlatforms": [],
+  "excludePlatforms": [],
+  "allowUnsafeCode": false,
+  "autoReferenced": true,
+  "versionDefines": [],
+  "noEngineReferences": false
+}

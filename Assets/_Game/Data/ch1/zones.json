@@ -1,0 +1,40 @@
+{
+  "source": "01_CORE_LOOP v3.3",
+  "chapter": 1,
+  "distancesM": {
+    "arriviToShelves": 6.0,
+    "shelvesToBancone": 9.4
+  },
+  "timingsSec": {
+    "zoneDwellBeforeAction": 0.5,
+    "pickPerParcel": 0.1,
+    "dropPerParcel": 0.1,
+    "servePerCustomer": 1.0,
+    "coinPickupPerTrip": 1.5,
+    "padFillMax": 3.0
+  },
+  "pads": [
+    {
+      "id": "hireNonno",
+      "costLn": 50,
+      "unlockAtOnboardingSec": 130
+    },
+    {
+      "id": "zaino",
+      "costRef": "upgrades.zaino"
+    },
+    {
+      "id": "scarpe",
+      "costRef": "upgrades.scarpe"
+    },
+    {
+      "id": "insegna",
+      "costRef": "upgrades.insegna"
+    },
+    {
+      "id": "nonnoUpgrade",
+      "costRef": "robots.nonno.levels"
+    }
+  ],
+  "padPaymentPersistent": true
+}

@@ -1,0 +1,23 @@
+{
+  "source": "01_CORE_LOOP v3.3",
+  "chapter": 1,
+  "parcelValueLn": 10,
+  "parcelValueGrowthPerChapter": 1.5,
+  "customersPerMin": 30,
+  "customerPatienceSec": 20,
+  "customersAtNight": false,
+  "combo": {
+    "stepPerCustomer": 0.1,
+    "maxMultiplier": 2.0,
+    "resetGapSec": 5.0,
+    "resetGapSecAssist": 7.0
+  },
+  "insegnaValueBonusPerLevel": 0.06,
+  "reputationVipValueBonusPerLevel": 0.05,
+  "playerSpendShare": 0.4,
+  "nina": {
+    "baseSpeedMps": 3.0,
+    "fullStackSlowdown": 0.1,
+    "startStackCapacity": 5
+  }
+}
