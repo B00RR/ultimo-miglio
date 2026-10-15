@@ -132,3 +132,12 @@ Con Unity-MCP attivo: `script-update-or-create` per i `.cs`, `script-execute` pe
 - Upgrade = sole `#F4C430` (alternativa `UM_Palette.UiMenta` `#8FC9A8`).
 - `UM_PadFillRing.kind` (`Purchase`/`Upgrade`/`Pickup`/`Delivery`) e `SetKind(kind)`: imposta il colore UI su pulsazione e riempimento (via MaterialPropertyBlock, un solo materiale). Default `Purchase` = sole.
 - Costanti in `UM_Palette`: `UiPacco`, `UiSole`, `UiCliente`, `UiMenta`. Rigenerare i prefab (*Ultimo Miglio/VFX/Build FX Prefabs + Materials*).
+
+## v2.2 – Icone fluttuanti + colori Lorenzo (17:28)
+- Nuovo `UM_PadIcon` su ogni oggetto pad: billboard a 1.6 m, bob 0.12 m / 1.2 s, pulsazione scala, disco colorato + glifo.
+  - API: `SetKind(Kind)`, `SetIcon(Texture2D)`, `SetPlayerNear(bool)`, `SetVisible(bool)`, `AssignDefaultIcon()` (editor).
+  - Icone UI/UX per path: `Assets/_Game/UI/Icons/ic_pad_{pickup,buy,deliver,upgrade}_white.png` (non copiate; se mancano, glifo procedurale).
+  - Spazio sopra l'icona lasciato libero per etichette/prezzi UI.
+- Colori (correzione Lorenzo): Pickup teal `#5E7F86`; Delivery menta `#8FC9A8` (NO terracotta); Purchase sole `#F4C430`; Upgrade limone `#F7E26B` (distinto dalla consegna).
+- `UM_PadFillRing.ColorOf` e `fx_package_deliver` aggiornati (coriandoli menta + crema, anello menta).
+- Setup: aggiungere `UM_PadIcon` a ciascun pad; *Ultimo Miglio/VFX/Setup Scene* assegna le icone UI/UX presenti.
