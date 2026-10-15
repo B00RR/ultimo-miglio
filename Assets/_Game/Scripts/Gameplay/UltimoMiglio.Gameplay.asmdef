@@ -1,0 +1,1 @@
+{ "name": "UltimoMiglio.Gameplay", "rootNamespace": "UltimoMiglio.Gameplay", "references": ["UltimoMiglio.Core","UltimoMiglio.UI","UltimoMiglio.VFX","Unity.InputSystem","Unity.Cinemachine","Unity.AI.Navigation","Unity.TextMeshPro","UnityEngine.UI"], "autoReferenced": true }

@@ -1,0 +1,1 @@
+{ "name": "UltimoMiglio.VFX.Editor", "references": ["UltimoMiglio.VFX","Unity.RenderPipelines.Universal.Runtime","Unity.RenderPipelines.Core.Runtime"], "includePlatforms": ["Editor"], "autoReferenced": true }

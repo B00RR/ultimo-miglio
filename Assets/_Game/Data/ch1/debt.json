@@ -1,0 +1,38 @@
+{
+  "source": "01_CORE_LOOP v3.3",
+  "chapter": 1,
+  "trancheLn": 8400,
+  "requiredPadLn": 0,
+  "dueCalendarDay": 24,
+  "windowActiveMin": 40.0,
+  "minWindowFromPrevPaymentActiveMin": 40.0,
+  "calendarDaysPerCycle": 4.2583,
+  "yearDays": 365,
+  "tranchesTotal": 15,
+  "earlyPayment": {
+    "minCyclesEarly": 1,
+    "reputationLevels": 1,
+    "bulloni": 5
+  },
+  "proroga": {
+    "tokensGrantedAtActStart": 1,
+    "tokensMax": 3,
+    "extensionActiveMin": 7.0,
+    "appliesToCurrentTrancheOnly": true,
+    "autoUse": true,
+    "purchasable": false
+  },
+  "late": {
+    "trancheSurcharge": 0.1,
+    "pedaggioCoinPenalty": 0.15,
+    "pedaggioAppliesToOffline": true
+  },
+  "assist": {
+    "trancheDiscount": 0.1,
+    "trancheDiscountFromChapter": 4,
+    "calendarDaysPerCycle": 4.0,
+    "windowActiveMin": 42.6,
+    "comboResetGapSec": 7.0,
+    "offlineShareMax": 0.12
+  }
+}

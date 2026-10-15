@@ -1,0 +1,1 @@
+{ "name": "UltimoMiglio.VFX", "references": ["Unity.RenderPipelines.Universal.Runtime","Unity.RenderPipelines.Core.Runtime"], "autoReferenced": true }

@@ -1,0 +1,166 @@
+/* Diorama Solare - Ultimo Miglio HUD (04_UI §6). Units = mockup px on the 1170x2532 reference
+   (PanelSettings: Scale With Screen Size, 1170x2532, match width). 3 px ≈ 1 dp. */
+:root {
+    --terracotta: #C8633B; --sun: #F4C430; --mint: #8FC9A8; --lemon: #F7E26B;
+    --cream: #F3E3C3; --cream-hi: #FFF9EE; --panel-a: #FBF1DC; --panel-b: #F1DFBE;
+    --brown: #3B2A20; --teal: #5E7F86; --plum: #5B3A5E; --tomato: #D9472B; --amber: #FFB347;
+    --phone-shell: #2E2621; --phone-a: #4A3428; --phone-b: #2B2230;
+    --border: 4px;
+    /* Font: Inter SDF with Roboto fallback is set on the Theme/PanelSettings text settings (see README_HUD.md). */
+    color: var(--brown);
+    font-size: 32px;
+}
+
+/* ---------- layout ---------- */
+.fill { position: absolute; left: 0; top: 0; right: 0; bottom: 0; }
+.row { flex-direction: row; align-items: center; }
+.layer { position: absolute; left: 0; top: 0; right: 0; bottom: 0; }
+#safe-root { flex-grow: 1; }
+.top-bar { flex-direction: row; justify-content: space-between; align-items: flex-start; padding: 24px 36px 0 36px; }
+.top-left { flex-direction: column; align-items: flex-start; }
+
+/* ---------- panels ---------- */
+.panel {
+    background-color: var(--panel-a);
+    border-width: var(--border); border-color: var(--brown);
+    border-radius: 48px;
+}
+.pill { border-radius: 999px; padding: 10px 28px; border-width: var(--border); border-color: var(--brown); background-color: var(--panel-a); flex-direction: row; align-items: center; }
+.shadow { /* solid brown drop shadow: a sibling ".shadow-plate" offset 6px is used where needed */ }
+
+/* ---------- currency pill ---------- */
+#currency-pill { padding: 12px 34px 12px 22px; }
+.currency { flex-direction: row; align-items: center; margin-right: 26px; }
+.currency-value { font-size: 52px; -unity-font-style: bold; letter-spacing: -1px; margin-left: 10px; }
+.icon { width: 52px; height: 52px; -unity-background-scale-mode: scale-to-fit; flex-shrink: 0; }
+.icon--sm { width: 36px; height: 36px; }
+.icon-coin { background-image: url("project://database/Assets/_Game/UI/Icons/ic_coin.png"); -unity-background-image-tint-color: var(--terracotta); }
+.icon-bolt { background-image: url("project://database/Assets/_Game/UI/Icons/ic_bolt.png"); -unity-background-image-tint-color: var(--teal); }
+.icon-token { background-image: url("project://database/Assets/_Game/UI/Icons/ic_star.png"); -unity-background-image-tint-color: var(--plum); }
+.icon-phone { background-image: url("project://database/Assets/_Game/UI/Icons/ic_phone.png"); }
+.icon-door { background-image: url("project://database/Assets/_Game/UI/Icons/ic_door.png"); }
+.icon-toll { background-image: url("project://database/Assets/_Game/UI/Icons/ic_toll_cream.png"); }
+.icon-safe { background-image: url("project://database/Assets/_Game/UI/Icons/ic_safe.png"); }
+.icon-cash { background-image: url("project://database/Assets/_Game/UI/Icons/ic_cash.png"); }
+.icon-robot { background-image: url("project://database/Assets/_Game/UI/Icons/ic_robot.png"); }
+.icon-box { background-image: url("project://database/Assets/_Game/UI/Icons/ic_box.png"); }
+.icon-van { background-image: url("project://database/Assets/_Game/UI/Icons/ic_truck.png"); }
+.icon-customer { background-image: url("project://database/Assets/_Game/UI/Icons/ic_customer.png"); }
+.icon-pad { background-image: url("project://database/Assets/_Game/UI/Icons/ic_down.png"); }
+.icon-lock { background-image: url("project://database/Assets/_Game/UI/Icons/ic_lock.png"); }
+.icon-coffee { background-image: url("project://database/Assets/_Game/UI/Icons/ic_coffee.png"); }
+.icon-bag { background-image: url("project://database/Assets/_Game/UI/Icons/ic_bag.png"); }
+.icon-video { background-image: url("project://database/Assets/_Game/UI/Icons/ic_video.png"); }
+.icon-back { background-image: url("project://database/Assets/_Game/UI/Icons/ic_back_cream.png"); }
+.icon-arrow { background-image: url("project://database/Assets/_Game/UI/Icons/ic_arrow_cream.png"); }
+
+/* ---------- Pedaggio chip (teal, contextual) ---------- */
+#toll-chip { background-color: var(--teal); margin-top: 16px; padding: 8px 26px 8px 18px; }
+#toll-value { color: var(--cream-hi); font-size: 34px; -unity-font-style: bold; margin-left: 8px; }
+.toll-tag { background-color: var(--teal); color: var(--cream-hi); border-width: 3px; border-color: var(--brown); border-radius: 999px; padding: 2px 12px; font-size: 24px; -unity-font-style: bold; margin-left: 8px; }
+
+/* ---------- phone button ---------- */
+#phone-button { width: 124px; height: 124px; border-radius: 40px; background-color: var(--panel-a); border-width: var(--border); border-color: var(--brown); align-items: center; justify-content: center; }
+#phone-button .icon { width: 64px; height: 64px; }
+.badge { position: absolute; top: -12px; right: -12px; min-width: 44px; height: 44px; border-radius: 22px; background-color: var(--terracotta); color: #FFFFFF; border-width: 4px; border-color: var(--panel-a); -unity-text-align: middle-center; font-size: 24px; -unity-font-style: bold; padding: 0 6px; }
+
+/* ---------- room label, toast ---------- */
+#room-pill { position: absolute; top: 40px; align-self: center; padding: 8px 26px; transition-property: opacity; transition-duration: 0.3s; }
+#room-name { font-size: 30px; -unity-font-style: bold; margin-left: 10px; }
+#toast { margin-top: 14px; padding: 10px 26px; background-color: var(--brown); border-color: var(--brown); transition-property: opacity; transition-duration: 0.3s; }
+#toast-text { color: var(--cream-hi); font-size: 30px; -unity-font-style: bold; }
+.faded { opacity: 0; }
+.pulse { scale: 1.08 1.08; }
+#currency-pill, #toll-chip { transition-property: scale, opacity; transition-duration: 0.18s, 0.25s; }
+.pop-out { scale: 1.3 1.3; opacity: 0; }
+
+/* ---------- Cassaforte card ---------- */
+#safe-card { position: absolute; left: 60px; right: 60px; bottom: 160px; padding: 34px 40px; }
+#safe-toll { background-color: var(--teal); border-radius: 24px; padding: 10px 18px; margin-bottom: 16px; }
+#safe-toll-text { color: var(--cream-hi); font-size: 24px; -unity-font-style: bold; letter-spacing: 1px; white-space: normal; }
+#safe-title { font-size: 44px; -unity-font-style: bold; }
+#safe-day { font-size: 26px; -unity-font-style: bold; letter-spacing: 1px; color: var(--teal); }
+#safe-installment { font-size: 32px; margin-top: 8px; }
+.progress { height: 28px; border-radius: 14px; background-color: var(--cream); border-width: 3px; border-color: var(--brown); margin-top: 14px; overflow: hidden; }
+.progress-fill { height: 100%; background-color: var(--sun); width: 0%; }
+#safe-close { position: absolute; top: 18px; right: 22px; width: 64px; height: 64px; -unity-text-align: middle-center; font-size: 40px; }
+
+/* ---------- joystick ---------- */
+#joystick-base { position: absolute; width: 340px; height: 340px; border-radius: 170px; background-color: rgba(243, 227, 195, 0.3); border-width: var(--border); border-color: rgba(59, 42, 32, 0.6); align-items: center; justify-content: center; display: none; }
+#joystick-knob { width: 164px; height: 164px; border-radius: 82px; background-color: var(--terracotta); border-width: var(--border); border-color: var(--brown); }
+
+/* ---------- edge arrow & marker ---------- */
+#edge-arrow { position: absolute; translate: -50% -50%; align-items: center; }
+#edge-arrow-head { width: 96px; height: 96px; border-radius: 48px; background-color: var(--terracotta); border-width: var(--border); border-color: var(--brown); align-items: center; justify-content: center; }
+#edge-arrow-head .icon { width: 56px; height: 56px; }
+#edge-arrow-label { margin-top: 8px; padding: 6px 20px; font-size: 28px; -unity-font-style: bold; }
+#target-marker { position: absolute; width: 56px; height: 56px; translate: -50% -100%; border-radius: 28px; background-color: var(--terracotta); border-width: var(--border); border-color: var(--brown); }
+
+/* ---------- world-anchored ---------- */
+.world-anchored { position: absolute; translate: -50% -100%; }
+.pad-card { padding: 18px 28px; align-items: center; min-width: 300px; border-radius: 44px; }
+#pad-title { font-size: 26px; -unity-font-style: bold; letter-spacing: 1px; }
+#pad-price { font-size: 40px; -unity-font-style: bold; letter-spacing: -1px; }
+#pad-lock { font-size: 28px; -unity-font-style: bold; color: var(--teal); }
+.pad-card .progress { width: 240px; }
+.pad-card--locked { opacity: 0.75; background-color: #D9CDB6; }
+.stack-pill { padding: 6px 22px; font-size: 32px; -unity-font-style: bold; }
+.stack--max #stack-count { color: var(--cream-hi); }
+.stack--max .stack-pill { background-color: var(--terracotta); scale: 1.06 1.06; }
+#buff-chip { margin-left: 8px; padding: 4px 14px; background-color: var(--mint); }
+.cassa-card { padding: 14px 26px; align-items: center; }
+#cassa-amount { font-size: 40px; -unity-font-style: bold; }
+#cassa-state { font-size: 22px; -unity-font-style: bold; letter-spacing: 1px; opacity: 0.65; }
+.cassa--full .cassa-card { background-color: var(--terracotta); }
+.cassa--full #cassa-amount, .cassa--full #cassa-state { color: var(--cream-hi); opacity: 1; }
+#cassa-x2 { margin-top: 8px; background-color: var(--mint); padding: 4px 18px; font-size: 26px; -unity-font-style: bold; }
+.collect-popup { position: absolute; flex-direction: row; align-items: center; translate: -50% -100%; }
+.collect-amount { font-size: 44px; -unity-font-style: bold; color: var(--sun); -unity-text-outline-width: 3px; -unity-text-outline-color: var(--brown); }
+
+/* ================= PHONE ================= */
+#phone-scrim { background-color: rgba(43, 34, 48, 0.35); }
+#phone { position: absolute; top: 140px; right: 36px; width: 900px; height: 1800px; border-radius: 96px; background-color: var(--phone-shell); padding: 24px; border-width: var(--border); border-color: var(--brown);
+    transform-origin: 100% 0; scale: 0.2 0.2; opacity: 0; transition-property: scale, opacity; transition-duration: 0.4s, 0.2s; transition-timing-function: ease-out-back, ease-out; }
+#phone.phone--open { scale: 1 1; opacity: 1; }
+#phone-screen { flex-grow: 1; border-radius: 76px; background-color: var(--phone-a); padding: 40px 44px; overflow: hidden; }
+/* gradient #4A3428 -> #2B2230: use PhoneScreenGradient.png as background-image if desired */
+#phone-header { height: 96px; flex-direction: row; align-items: center; }
+#phone-back { width: 96px; height: 96px; align-items: center; justify-content: center; }
+#phone-title { color: var(--cream-hi); font-size: 52px; -unity-font-style: bold; }
+.phone-text { color: var(--cream-hi); }
+#home-day { color: var(--cream-hi); font-size: 30px; -unity-font-style: bold; letter-spacing: 1px; }
+#home-time { color: var(--cream-hi); font-size: 120px; -unity-font-style: bold; letter-spacing: -2px; }
+#home-installment { color: var(--cream); font-size: 28px; margin-bottom: 24px; }
+.phone-card { background-color: rgba(255, 249, 238, 0.08); border-radius: 44px; padding: 26px 30px; margin-bottom: 20px; border-width: 2px; border-color: rgba(255, 249, 238, 0.12); }
+.phone-card Label { color: var(--cream-hi); white-space: normal; }
+.app-grid { flex-direction: row; flex-wrap: wrap; justify-content: space-between; margin: 20px 0; }
+.tile { width: 31%; height: 230px; border-radius: 44px; margin-bottom: 26px; align-items: center; justify-content: center; border-width: var(--border); border-color: var(--brown); }
+.tile .icon { width: 84px; height: 84px; }
+.tile-name { font-size: 26px; -unity-font-style: bold; margin-top: 10px; }
+.tile-lock { font-size: 22px; -unity-font-style: bold; }
+.tile--messaggi { background-color: var(--mint); }
+.tile--ordini { background-color: var(--lemon); }
+.tile--flotta { background-color: var(--sun); }
+.tile--quartiere { background-color: var(--cream); }
+.tile--bottega { background-color: var(--terracotta); }
+.tile--razzo { background-color: #B9A7C9; }
+.tile--locked { background-color: #6E6259; opacity: 0.6; }
+.tile--locked .icon { background-image: url("project://database/Assets/_Game/UI/Icons/ic_lock.png"); }
+.chip { background-color: rgba(255, 249, 238, 0.15); border-radius: 999px; padding: 4px 16px; margin-right: 10px; font-size: 24px; -unity-font-style: bold; color: var(--cream-hi); }
+.chip--sun { background-color: var(--sun); color: var(--brown); }
+.chip--mint { background-color: var(--mint); color: var(--brown); }
+.order-customer { font-size: 24px; -unity-font-style: bold; letter-spacing: 1px; opacity: 0.7; }
+.order-title { font-size: 36px; -unity-font-style: bold; margin-bottom: 12px; }
+.robot-name { font-size: 36px; -unity-font-style: bold; margin-right: 16px; }
+.robot-stats { font-size: 26px; opacity: 0.8; margin-top: 8px; }
+.cta { height: 168px; border-radius: 999px; background-color: var(--terracotta); color: var(--cream-hi); border-width: var(--border); border-color: var(--brown); font-size: 40px; -unity-font-style: bold; margin-top: 16px; -unity-text-align: middle-center; }
+.bubble { max-width: 80%; border-radius: 40px; padding: 20px 28px; margin-bottom: 14px; font-size: 30px; white-space: normal; }
+.bubble--them { align-self: flex-start; background-color: rgba(255, 249, 238, 0.12); color: var(--cream-hi); }
+.bubble--nina { align-self: flex-end; background-color: var(--sun); color: var(--brown); }
+.accent-civetta { background-color: var(--plum); }
+.accent-viktor { background-color: var(--teal); }
+.accent-rosa { background-color: var(--lemon); color: var(--brown); }
+.quick-reply { border-radius: 999px; background-color: var(--cream-hi); color: var(--brown); border-width: var(--border); border-color: var(--brown); font-size: 30px; -unity-font-style: bold; height: 112px; margin-top: 10px; }
+#messaggi-contact { color: var(--cream-hi); font-size: 34px; -unity-font-style: bold; margin-bottom: 16px; }
+#flotta-cassa { font-size: 30px; -unity-font-style: bold; }
+#flotta-nextpad { color: var(--cream); font-size: 28px; margin-top: 12px; white-space: normal; }

@@ -1,0 +1,201 @@
+{
+  "source": "01_CORE_LOOP v3.3",
+  "chapter": 1,
+  "zaino": {
+    "levels": [
+      {
+        "level": 0,
+        "stackCapacity": 5,
+        "costLn": 0
+      },
+      {
+        "level": 1,
+        "stackCapacity": 6,
+        "costLn": 40
+      },
+      {
+        "level": 2,
+        "stackCapacity": 7,
+        "costLn": 80
+      },
+      {
+        "level": 3,
+        "stackCapacity": 8,
+        "costLn": 160
+      },
+      {
+        "level": 4,
+        "stackCapacity": 9,
+        "costLn": 320
+      },
+      {
+        "level": 5,
+        "stackCapacity": 10,
+        "costLn": 640
+      },
+      {
+        "level": 6,
+        "stackCapacity": 12,
+        "costLn": 1280
+      },
+      {
+        "level": 7,
+        "stackCapacity": 14,
+        "costLn": 2560
+      },
+      {
+        "level": 8,
+        "stackCapacity": 16,
+        "costLn": 5120
+      },
+      {
+        "level": 9,
+        "stackCapacity": 18,
+        "costLn": 10240
+      },
+      {
+        "level": 10,
+        "stackCapacity": 20,
+        "costLn": 20480
+      },
+      {
+        "level": 11,
+        "stackCapacity": 22,
+        "costLn": 40960
+      },
+      {
+        "level": 12,
+        "stackCapacity": 24,
+        "costLn": 81920
+      },
+      {
+        "level": 13,
+        "stackCapacity": 27,
+        "costLn": 163840
+      },
+      {
+        "level": 14,
+        "stackCapacity": 30,
+        "costLn": 327680
+      }
+    ]
+  },
+  "scarpe": {
+    "levels": [
+      {
+        "level": 0,
+        "speedBonus": 0.0,
+        "costLn": 0
+      },
+      {
+        "level": 1,
+        "speedBonus": 0.06,
+        "costLn": 60
+      },
+      {
+        "level": 2,
+        "speedBonus": 0.12,
+        "costLn": 162
+      },
+      {
+        "level": 3,
+        "speedBonus": 0.18,
+        "costLn": 437
+      },
+      {
+        "level": 4,
+        "speedBonus": 0.24,
+        "costLn": 1181
+      },
+      {
+        "level": 5,
+        "speedBonus": 0.3,
+        "costLn": 3189
+      },
+      {
+        "level": 6,
+        "speedBonus": 0.36,
+        "costLn": 8609
+      },
+      {
+        "level": 7,
+        "speedBonus": 0.42,
+        "costLn": 23245
+      },
+      {
+        "level": 8,
+        "speedBonus": 0.48,
+        "costLn": 62762
+      },
+      {
+        "level": 9,
+        "speedBonus": 0.54,
+        "costLn": 169458
+      },
+      {
+        "level": 10,
+        "speedBonus": 0.6,
+        "costLn": 457536
+      }
+    ]
+  },
+  "insegna": {
+    "levels": [
+      {
+        "level": 0,
+        "customerValueBonus": 0.0,
+        "costLn": 0
+      },
+      {
+        "level": 1,
+        "customerValueBonus": 0.06,
+        "costLn": 90
+      },
+      {
+        "level": 2,
+        "customerValueBonus": 0.12,
+        "costLn": 243
+      },
+      {
+        "level": 3,
+        "customerValueBonus": 0.18,
+        "costLn": 656
+      },
+      {
+        "level": 4,
+        "customerValueBonus": 0.24,
+        "costLn": 1771
+      },
+      {
+        "level": 5,
+        "customerValueBonus": 0.3,
+        "costLn": 4783
+      },
+      {
+        "level": 6,
+        "customerValueBonus": 0.36,
+        "costLn": 12914
+      },
+      {
+        "level": 7,
+        "customerValueBonus": 0.42,
+        "costLn": 34868
+      },
+      {
+        "level": 8,
+        "customerValueBonus": 0.48,
+        "costLn": 94143
+      },
+      {
+        "level": 9,
+        "customerValueBonus": 0.54,
+        "costLn": 254187
+      },
+      {
+        "level": 10,
+        "customerValueBonus": 0.6,
+        "costLn": 686304
+      }
+    ]
+  }
+}

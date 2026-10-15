@@ -1,0 +1,8 @@
+<ui:UXML xmlns:ui="UnityEngine.UIElements"><Style src="project://database/Assets/_Game/UI/USS/DioramaSolare.uss" />
+    <ui:VisualElement class="panel pad-card" picking-mode="Ignore">
+        <ui:VisualElement class="row" picking-mode="Ignore"><ui:VisualElement name="pad-icon" class="icon icon-robot" picking-mode="Ignore" /><ui:Label name="pad-title" text="ASSUMI NONNO" picking-mode="Ignore" /></ui:VisualElement>
+        <ui:Label name="pad-price" text="0 / 0 LN" picking-mode="Ignore" />
+        <ui:Label name="pad-lock" text="" picking-mode="Ignore" />
+        <ui:VisualElement class="progress" picking-mode="Ignore"><ui:VisualElement name="pad-progress-fill" class="progress-fill" picking-mode="Ignore" /></ui:VisualElement>
+    </ui:VisualElement>
+</ui:UXML>

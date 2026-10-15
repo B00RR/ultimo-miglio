@@ -1,0 +1,1 @@
+{ "name": "UltimoMiglio.UI.Demo", "rootNamespace": "UltimoMiglio.UI.Demo", "references": ["UltimoMiglio.UI", "Unity.InputSystem"], "autoReferenced": false }

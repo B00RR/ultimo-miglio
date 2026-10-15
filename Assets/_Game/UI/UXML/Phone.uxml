@@ -1,0 +1,51 @@
+<ui:UXML xmlns:ui="UnityEngine.UIElements" editor-extension-mode="False">
+    <Style src="project://database/Assets/_Game/UI/USS/DioramaSolare.uss" />
+    <ui:VisualElement name="phone-layer" class="fill">
+        <ui:VisualElement name="phone-scrim" class="fill">
+            <ui:VisualElement name="phone">
+                <ui:VisualElement name="phone-screen">
+                    <ui:VisualElement name="phone-header">
+                        <ui:VisualElement name="phone-back"><ui:VisualElement class="icon icon-back" /></ui:VisualElement>
+                        <ui:Label name="phone-title" text="" />
+                    </ui:VisualElement>
+                    <ui:ScrollView name="screen-home">
+                        <ui:Label name="home-day" text="Giorno 1/365 · Solara" />
+                        <ui:Label name="home-time" text="08:00" />
+                        <ui:Label name="home-installment" text="" />
+                        <ui:VisualElement name="home-notification-card" class="phone-card"><ui:Label name="home-notification" text="" /></ui:VisualElement>
+                        <ui:VisualElement class="app-grid">
+                            <ui:VisualElement name="tile-messaggi" class="tile tile--messaggi"><ui:VisualElement class="icon icon-chat" /><ui:Label class="tile-name" text="Messaggi" /><ui:Label class="tile-lock" text="" /><ui:Label class="badge" text="" style="display: none;" /></ui:VisualElement>
+                            <ui:VisualElement name="tile-ordini" class="tile tile--ordini"><ui:VisualElement class="icon icon-box" /><ui:Label class="tile-name" text="Ordini" /><ui:Label class="tile-lock" text="" /><ui:Label class="badge" text="" style="display: none;" /></ui:VisualElement>
+                            <ui:VisualElement name="tile-flotta" class="tile tile--flotta"><ui:VisualElement class="icon icon-robot" /><ui:Label class="tile-name" text="Flotta" /><ui:Label class="tile-lock" text="" /><ui:Label class="badge" text="" style="display: none;" /></ui:VisualElement>
+                            <ui:VisualElement name="tile-quartiere" class="tile tile--quartiere"><ui:VisualElement class="icon icon-customer" /><ui:Label class="tile-name" text="Quartiere" /><ui:Label class="tile-lock" text="" /><ui:Label class="badge" text="" style="display: none;" /></ui:VisualElement>
+                            <ui:VisualElement name="tile-bottega" class="tile tile--bottega"><ui:VisualElement class="icon icon-bag" /><ui:Label class="tile-name" text="Bottega" /><ui:Label class="tile-lock" text="" /><ui:Label class="badge" text="" style="display: none;" /></ui:VisualElement>
+                            <ui:VisualElement name="tile-razzo" class="tile tile--razzo"><ui:VisualElement class="icon icon-lock" /><ui:Label class="tile-name" text="Razzo" /><ui:Label class="tile-lock" text="" /><ui:Label class="badge" text="" style="display: none;" /></ui:VisualElement>
+                        </ui:VisualElement>
+                        <ui:VisualElement class="phone-card"><ui:Label name="home-quest" text="" /></ui:VisualElement>
+                    </ui:ScrollView>
+                    <ui:ScrollView name="screen-ordini" style="display: none;">
+                        <ui:VisualElement name="ordini-list" />
+                        <ui:Button name="ordini-cta" class="cta" text="Mostra la strada" />
+                    </ui:ScrollView>
+                    <ui:VisualElement name="screen-messaggi" style="display: none; flex-grow: 1;">
+                        <ui:Label name="messaggi-contact" text="" />
+                        <ui:ScrollView name="messaggi-list" style="flex-grow: 1;" />
+                        <ui:VisualElement name="messaggi-replies" />
+                    </ui:VisualElement>
+                    <ui:ScrollView name="screen-flotta" style="display: none;">
+                        <ui:VisualElement name="flotta-list" />
+                        <ui:VisualElement class="phone-card">
+                            <ui:Label name="flotta-cassa" text="" />
+                            <ui:VisualElement class="progress"><ui:VisualElement name="flotta-cassa-fill" class="progress-fill" /></ui:VisualElement>
+                            <ui:Label name="flotta-nextpad" text="" />
+                        </ui:VisualElement>
+                        <ui:Button name="flotta-cta" class="cta" text="Mostra la strada" />
+                    </ui:ScrollView>
+                    <ui:VisualElement name="screen-quartiere" style="display: none;" />
+                    <ui:VisualElement name="screen-bottega" style="display: none;" />
+                    <ui:VisualElement name="screen-razzo" style="display: none;" />
+                </ui:VisualElement>
+            </ui:VisualElement>
+        </ui:VisualElement>
+    </ui:VisualElement>
+</ui:UXML>

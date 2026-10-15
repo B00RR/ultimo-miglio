@@ -1,0 +1,13 @@
+{
+  "source": "01_CORE_LOOP v3.3",
+  "chapter": 1,
+  "cycleDurationSec": 420,
+  "dayDurationSec": 415,
+  "sunsetTransitionSec": 5,
+  "nightDurationSec": 0,
+  "nightFromChapter": 6,
+  "nightDurationSecFromCh6": 120,
+  "dayDurationSecFromCh6": 300,
+  "calendarDaysPerCycle": 4.2583,
+  "timeAdvancesOnlyWhileActive": true
+}
