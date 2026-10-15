@@ -36,9 +36,9 @@ namespace UltimoMiglio.UI.EditorTools
             var ps = AssetDatabase.LoadAssetAtPath<PanelSettings>(path);
             if (!ps) { ps = ScriptableObject.CreateInstance<PanelSettings>(); AssetDatabase.CreateAsset(ps, path); }
             ps.scaleMode = PanelScaleMode.ScaleWithScreenSize;
-            ps.referenceResolution = new Vector2Int(1170, 2532);       // 04_UI §1 grid (390x844 dp @3x)
+            ps.referenceResolution = new Vector2Int(1920, 1080);  // landscape web build
             ps.screenMatchMode = PanelScreenMatchMode.MatchWidthOrHeight;
-            ps.match = 0f;                                             // match width (portrait)
+            ps.match = 0.5f;
             ps.sortingOrder = sortOrder;
             if (!ps.themeStyleSheet)
             {
