@@ -20,6 +20,7 @@ namespace UltimoMiglio.UI.World
     /// </summary>
     public class PadTag : WorldAnchoredElement
     {
+        protected override bool RequireOnPad => true; // HUD minimale #38
         public const int MaxLabelChars = 12;
 
         public static readonly Color Teal = new Color32(0x5E, 0x7F, 0x86, 0xFF);
