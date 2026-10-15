@@ -15,13 +15,35 @@ namespace UltimoMiglio.VFX.EditorTools
         public static void BuildAll()
         {
             Ensure(Root, "Prefabs"); Ensure(Root, "Materials");
-            var fxMat = SaveMat(new Material(UM_FxFactory.SharedMaterial), "M_FX_Particles");
+            ConfigureFxSheet(); ConfigureTex(Root + "/Textures/T_FX_ContactBlob.png", 64);
+            var fxSrc = new Material(UM_FxFactory.SharedMaterial);
+            var sheet = AssetDatabase.LoadAssetAtPath<Texture2D>(Root + "/Textures/T_FX_Sheet.png");
+            if (sheet) fxSrc.SetTexture("_BaseMap", sheet); // one texture, one material for every FX = batching
+            var fxMat = SaveMat(fxSrc, "M_FX_Particles");
             BuildToonMaterials();
             Save(UM_FxFactory.BuildPackagePop(fxMat));
             Mesh coin = null; foreach (var o in AssetDatabase.LoadAllAssetsAtPath("Assets/_Game/Art/FX/fx_coin.fbx")) { if (o is Mesh m && (coin == null || m.name.Contains("LOD1"))) coin = m; } // Solara lira; particles use 34-tri LOD1
-            Save(UM_FxFactory.BuildCoins(coin, fxMat));
+            var atlasTex = AssetDatabase.LoadAssetAtPath<Texture2D>("Assets/_Game/Art/Textures/T_Palette_Atlas.png");
+// Coins = toon shader + palette atlas (lit like the set, exact atlas hexes, no outline). URP Particles/Unlit with
+            // white vertex colour also works, but the toon version reads as a real object next to Nina.
+            var coinMat = new Material(Shader.Find("UltimoMiglio/ToonDiorama"));
+            if (atlasTex) coinMat.SetTexture("_BaseMap", atlasTex);
+            coinMat.SetFloat("_OutlineOn", 0f); coinMat.SetShaderPassEnabled("SRPDefaultUnlit", false);
+            coinMat.SetFloat("_RimStrength", 0.4f);
+            coinMat = SaveMat(coinMat, "M_FX_Coin");
+            Save(UM_FxFactory.BuildCoins(coin, fxMat, coinMat));
             Save(UM_FxFactory.BuildUpgrade(fxMat));
             Save(UM_FxFactory.BuildDust(fxMat));
+            // Contact AO blob (URP Unlit transparent, warm dark, alpha 0.35)
+            var blobTex = AssetDatabase.LoadAssetAtPath<Texture2D>(Root + "/Textures/T_FX_ContactBlob.png");
+            var blob = new Material(Shader.Find("Universal Render Pipeline/Unlit"));
+            blob.SetFloat("_Surface", 1f); blob.SetFloat("_Blend", 0f); blob.EnableKeyword("_SURFACE_TYPE_TRANSPARENT");
+            blob.SetFloat("_SrcBlend", (float)UnityEngine.Rendering.BlendMode.SrcAlpha); blob.SetFloat("_DstBlend", (float)UnityEngine.Rendering.BlendMode.OneMinusSrcAlpha);
+            blob.SetFloat("_ZWrite", 0f); blob.renderQueue = 2990;
+            var bc = UM_Palette.ScuroCaldo; bc.a = 0.35f; blob.SetColor("_BaseColor", bc);
+            if (blobTex) blob.SetTexture("_BaseMap", blobTex);
+            blob = SaveMat(blob, "M_FX_ContactShadow");
+            Save(UM_FxFactory.BuildContactShadow(blob));
             AssetDatabase.SaveAssets(); AssetDatabase.Refresh();
             Debug.Log("[UM VFX] FX prefabs built in " + PrefabDir);
         }
@@ -38,8 +60,26 @@ namespace UltimoMiglio.VFX.EditorTools
             SaveMat(em, "M_Diorama_Atlas_Emissive");
             var ch = Mk("M_Char_Atlas", true); // characters + robots ch.SetFloat("_RimStrength", 0.35f); ch.SetFloat("_OutlineWidth", 0.008f);
             SaveMat(ch, "M_Char_Atlas");
+            var mDia = AssetDatabase.LoadAssetAtPath<Material>(MatDir + "/M_Diorama_Atlas.mat");
+            if (mDia) { mDia.SetFloat("_NoiseStrength", 0.06f); mDia.SetFloat("_NoiseScale", 0.35f); } // subtle floor/wall variation on set only
             var ip = Mk("M_Props_Interactive", true); ip.SetFloat("_OutlineWidth", 0.01f); // packages, van, pads
             SaveMat(ip, "M_Props_Interactive");
+        }
+
+        static void ConfigureFxSheet()
+        {
+            var ti = AssetImporter.GetAtPath(Root + "/Textures/T_FX_Sheet.png") as TextureImporter;
+            if (!ti) return;
+            ti.textureType = TextureImporterType.Default; ti.alphaIsTransparency = true; ti.mipmapEnabled = true;
+            ti.wrapMode = TextureWrapMode.Clamp; ti.maxTextureSize = 256; ti.sRGBTexture = true;
+            ti.textureCompression = TextureImporterCompression.Compressed; // ASTC/ETC2 on WebGL2 per platform override
+            ti.SaveAndReimport();
+        }
+
+        static void ConfigureTex(string path, int max)
+        {
+            var ti = AssetImporter.GetAtPath(path) as TextureImporter; if (!ti) return;
+            ti.alphaIsTransparency = true; ti.wrapMode = TextureWrapMode.Clamp; ti.maxTextureSize = max; ti.SaveAndReimport();
         }
 
         static Material SaveMat(Material m, string name)

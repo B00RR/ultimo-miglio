@@ -25,7 +25,7 @@ namespace UltimoMiglio.VFX
         public static readonly Color AmbSky     = H("#F3DDB6");
         public static readonly Color AmbEquator = H("#E2C49C");
         public static readonly Color AmbGround  = H("#8C6A50");
-        public static readonly Color Polvere    = H("#D9C4A0");
+        public static readonly Color Polvere    = H("#B8906A"); // v1.4: darker, reads on cream floor
         public static readonly Color MonetaOro  = H("#F2B53A"); // lira/gettone di Solara (faro inciso)
         public static readonly Color MonetaBordo= H("#3B2A20"); // bordo marrone moneta
         public static readonly Color UpgradeSole  = H("#F4C430");

@@ -26,10 +26,13 @@ namespace UltimoMiglio.VFX.EditorTools
             if (urp)
             {
                 // Mobile shadows (tier Alto default; UM_QualityTier zeroes distance on Base/Standard)
-                urp.shadowDistance = 25f;          // ortho 3/4 camera over the diorama
+                urp.shadowDistance = UM_QualityTier.ShadowDistAlto; // camera dist 15 + play depth
                 urp.shadowCascadeCount = 1;
-                urp.mainLightShadowmapResolution = 1024;
-                // Soft shadows: enable in URP asset inspector (Alto only uses them)
+                urp.mainLightShadowmapResolution = 2048;
+                var so = new SerializedObject(urp);  // supportsSoftShadows setter is internal in URP 17
+                so.FindProperty("m_SoftShadowsSupported").boolValue = true;
+                so.FindProperty("m_SoftShadowQuality").intValue = 1; // Low = 4 taps, WebGL2/mobile safe
+                so.ApplyModifiedPropertiesWithoutUndo();
                 urp.maxAdditionalLightsCount = 4;  // night lanterns; prefer baked
                 urp.supportsHDR = false;           // LDR keeps bandwidth low; bloom works in LDR
                 EditorUtility.SetDirty(urp);

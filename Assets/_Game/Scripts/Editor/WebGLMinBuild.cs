@@ -10,7 +10,16 @@ namespace UltimoMiglio.EditorTools
     {
         public static void Build()
         {
-            ProjectSetup.EnsureUrp(); AssetDatabase.SaveAssets();
+            ProjectSetup.EnsureUrp();
+            var urp = UnityEngine.Rendering.GraphicsSettings.defaultRenderPipeline as UnityEngine.Rendering.Universal.UniversalRenderPipelineAsset;
+            if (urp) { urp.supportsHDR = false; urp.msaaSampleCount = 1; urp.renderScale = 1f; EditorUtility.SetDirty(urp);
+                var rd = AssetDatabase.LoadAssetAtPath<UnityEngine.Rendering.Universal.UniversalRendererData>("Assets/_Game/Settings/URP_Mobile_Renderer.asset");
+                if (rd) { rd.renderingMode = UnityEngine.Rendering.Universal.RenderingMode.Forward; EditorUtility.SetDirty(rd); } }
+            var gs = AssetDatabase.LoadAllAssetsAtPath("ProjectSettings/GraphicsSettings.asset")[0]; var so = new SerializedObject(gs);
+            var arr = so.FindProperty("m_AlwaysIncludedShaders");
+            foreach (var n in new[] { "UltimoMiglio/ToonDiorama", "Universal Render Pipeline/Lit", "Universal Render Pipeline/Unlit" }) { var sh = Shader.Find(n); if (!sh) continue; bool has = false; for (int i = 0; i < arr.arraySize; i++) if (arr.GetArrayElementAtIndex(i).objectReferenceValue == sh) has = true; if (!has) { arr.InsertArrayElementAtIndex(arr.arraySize); arr.GetArrayElementAtIndex(arr.arraySize - 1).objectReferenceValue = sh; } }
+            so.ApplyModifiedProperties();
+            AssetDatabase.SaveAssets();
             SliceSceneBuilder.Build();
             EditorUserBuildSettings.SwitchActiveBuildTarget(BuildTargetGroup.WebGL, BuildTarget.WebGL);
             EditorUserBuildSettings.development = false;

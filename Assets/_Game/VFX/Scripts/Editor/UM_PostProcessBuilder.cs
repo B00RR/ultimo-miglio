@@ -45,13 +45,13 @@ namespace UltimoMiglio.VFX.EditorTools
             bl.maxIterations.Override(3);                  // mobile: few mips
 
             var ca = Add<ColorAdjustments>(p);
-            ca.postExposure.Override(night ? 0.0f : 0.05f); // darkness comes from lighting, not post: never horror-dark
+            ca.postExposure.Override(night ? 0.0f : -0.1f); // darkness comes from lighting, not post: never horror-dark
             ca.contrast.Override(night ? 8f : 6f);
-            ca.saturation.Override(night ? -6f : 8f);
-            ca.colorFilter.Override(night ? new Color(1f, 0.90f, 0.82f) : new Color(1f, 0.97f, 0.92f)); // warm
+            ca.saturation.Override(night ? -6f : 4f);
+            ca.colorFilter.Override(night ? new Color(1f, 0.92f, 0.85f) : new Color(1f, 0.98f, 0.95f)); // warm, subtle
 
             var wb = Add<WhiteBalance>(p);
-            wb.temperature.Override(night ? 12f : 8f);
+            wb.temperature.Override(night ? 10f : 4f);
 
             var vg = Add<Vignette>(p);
             vg.color.Override(UM_Palette.ScuroCaldo);
