@@ -46,9 +46,18 @@ namespace UltimoMiglio.UI
         Rect lastSafeArea;
         Vector2Int lastScreen;
 
-        void OnEnable()
+        bool bound;
+
+        void OnEnable() { bound = false; TryBind(); }
+
+        // UIDocument builds its tree in its own OnEnable; order vs this component is not guaranteed
+        // (WebGL showed every contextual panel visible at once). Retry until the tree exists.
+        bool TryBind()
         {
-            Root = GetComponent<UIDocument>().rootVisualElement;
+            if (bound) return true;
+            var doc = GetComponent<UIDocument>();
+            Root = doc ? doc.rootVisualElement : null;
+            if (Root == null || Root.Q("currency-pill") == null) return false;
             SafeRoot = Root.Q("safe-root") ?? Root;
             currencyPill = Root.Q("currency-pill");
             lnLabel = Root.Q<Label>("ln-value");
@@ -70,14 +79,26 @@ namespace UltimoMiglio.UI
             tollChip?.RegisterCallback<ClickEvent>(_ => PedaggioTapped?.Invoke());
             safeCard?.Q("safe-close")?.RegisterCallback<ClickEvent>(_ => HideSafeCard());
 
-            HidePedaggio(true);
+            SetVisible(tollChip, false);
             SetVisible(roomPill, false); SetVisible(toast, false); SetVisible(safeCard, false);
-            SetPhoneBadge(0);
+            SetVisible(phoneButton, true);
+            SetVisible(Root.Q("phone-key-hint"), !Application.isMobilePlatform); // desktop/WebGL: "TAB" hint
+            SetPhoneBadge(cBadge);
+            SetCurrencies(cLn, cBolt, cTok);
             Root.RegisterCallback<GeometryChangedEvent>(_ => RefreshSafeArea(true));
+            bound = true;
+            RefreshSafeArea(true);
+            Bound?.Invoke();
+            return true;
         }
+
+        /// <summary>Raised once the UXML tree is bound (APIs called earlier are no-ops).</summary>
+        public event Action Bound;
+        public bool IsBound => bound;
 
         void Update()
         {
+            if (!TryBind()) return;
             if (Screen.safeArea != lastSafeArea || lastScreen.x != Screen.width || lastScreen.y != Screen.height)
                 RefreshSafeArea(false);
         }
@@ -90,8 +111,10 @@ namespace UltimoMiglio.UI
 
         // ---------------- Permanent overlay ----------------
         /// <summary>Gettoni are shown only when non-null (night, chapter 6+).</summary>
+        double cLn, cBolt; double? cTok; int cBadge;
         public void SetCurrencies(double ln, double bulloni, double? gettoni = null)
         {
+            cLn = ln; cBolt = bulloni; cTok = gettoni;
             if (lnLabel != null) lnLabel.text = HudFormat.Amount(ln);
             if (boltLabel != null) boltLabel.text = HudFormat.Amount(bulloni);
             SetVisible(tokenGroup, gettoni.HasValue);
@@ -104,6 +127,7 @@ namespace UltimoMiglio.UI
 
         public void SetPhoneBadge(int count)
         {
+            cBadge = count;
             if (phoneBadge == null) return;
             SetVisible(phoneBadge, count > 0);
             phoneBadge.text = count > 9 ? "9+" : count.ToString();

@@ -11,7 +11,7 @@ namespace UltimoMiglio.UI
     /// dead zone 8 dp, radius 56 dp, dragged base, 150 ms fade. Ignores touches on HUD overlays, on the open
     /// phone and on the 24 dp side gesture strips. Output: <see cref="Value"/> (screen space, normalized) and
     /// <see cref="WorldDirection"/> (rotated by camera yaw, default 45°). Visuals are drawn in the HUD document.
-    /// In the Editor mouse is simulated via TouchSimulation.
+    /// Desktop/WebGL: mouse click-drag uses the same floating-stick path; WASD/arrows feed the same Value (no visuals).
     /// </summary>
     public class FloatingJoystick : MonoBehaviour
     {
@@ -26,7 +26,7 @@ namespace UltimoMiglio.UI
         public event Action Released;
 
         public Vector2 Value { get; private set; }
-        public bool IsActive => fingerId >= 0;
+        public bool IsActive => fingerId != -1 || KeyboardActive;
         public Vector3 WorldDirection
         {
             get
@@ -44,9 +44,8 @@ namespace UltimoMiglio.UI
         void OnEnable()
         {
             EnhancedTouchSupport.Enable();
-#if UNITY_EDITOR || UNITY_WEBGL || UNITY_STANDALONE // mouse drives the joystick on desktop browsers
-            UnityEngine.InputSystem.EnhancedTouch.TouchSimulation.Enable();
-#endif
+            // Desktop/WebGL: mouse click-drag and WASD/arrows are read directly in Update (no TouchSimulation,
+            // which would double-count browser-emulated mouse events on touch devices).
             ETouch.onFingerDown += OnDown;
             ETouch.onFingerMove += OnMove;
             ETouch.onFingerUp += OnUp;
@@ -71,39 +70,68 @@ namespace UltimoMiglio.UI
             return false;
         }
 
+        const int MouseId = -100;
+        [SerializeField] bool keyboardInput = true, mouseInput = true;
+        public bool KeyboardActive { get; private set; }
+
         void OnDown(Finger f)
         {
-            if (fingerId >= 0 || Excluded(f.screenPosition)) return; // first touch wins
-            fingerId = f.index; basePx = f.screenPosition; Value = Vector2.zero;
-            Draw(f.screenPosition);
+            if (fingerId != -1 || Excluded(f.screenPosition)) return; // first touch wins
+            Begin(f.index, f.screenPosition);
         }
 
-        void OnMove(Finger f)
+        void Begin(int id, Vector2 pos) { fingerId = id; basePx = pos; Value = Vector2.zero; Draw(pos); }
+
+        void OnMove(Finger f) { if (f.index == fingerId) Track(f.screenPosition); }
+
+        void Track(Vector2 screenPosition)
         {
-            if (f.index != fingerId) return;
             float dp = SafeAreaUtil.DpToPx, r = radiusDp * dp, dz = deadZoneDp * dp;
-            Vector2 d = f.screenPosition - basePx;
-            if (d.magnitude > r) { basePx = f.screenPosition - d.normalized * r; d = d.normalized * r; } // dragged base
+            Vector2 d = screenPosition - basePx;
+            if (d.magnitude > r) { basePx = screenPosition - d.normalized * r; d = d.normalized * r; } // dragged base
             float m = d.magnitude;
             Value = m <= dz ? Vector2.zero : d / m * Mathf.Pow((m - dz) / (r - dz), responseExponent);
-            Draw(f.screenPosition);
+            Draw(screenPosition);
         }
 
         void OnUp(Finger f) { if (f.index == fingerId) ForceRelease(); }
 
         void ForceRelease()
         {
-            if (fingerId < 0) return;
+            if (fingerId == -1) return;
             fingerId = -1; Value = Vector2.zero; Released?.Invoke();
         }
 
         void Update()
         {
             if (baseEl == null && hud && hud.Root != null) { baseEl = hud.Root.Q("joystick-base"); knobEl = hud.Root.Q("joystick-knob"); }
+            PollDesktop();
             if (IsActive) Moved?.Invoke(Value);
-            float target = IsActive ? 1f : 0f;
+            float target = fingerId != -1 ? 1f : 0f; // keyboard has no on-screen stick
             alpha = Mathf.MoveTowards(alpha, target, fadeSeconds > 0 ? Time.unscaledDeltaTime / fadeSeconds : 1f);
             if (baseEl != null) { baseEl.style.opacity = alpha; baseEl.style.display = alpha > 0.001f ? DisplayStyle.Flex : DisplayStyle.None; }
+        }
+
+        void PollDesktop()
+        {
+            bool phoneOpen = phone && phone.IsOpen;
+            var mouse = mouseInput ? UnityEngine.InputSystem.Mouse.current : null;
+            if (mouse != null)
+            {
+                Vector2 mp = mouse.position.ReadValue();
+                if (fingerId == -1 && !phoneOpen && mouse.leftButton.wasPressedThisFrame && ETouch.activeTouches.Count == 0 && !Excluded(mp)) Begin(MouseId, mp);
+                else if (fingerId == MouseId) { if (mouse.leftButton.isPressed && !phoneOpen) Track(mp); else ForceRelease(); }
+            }
+            KeyboardActive = false;
+            var kb = keyboardInput ? UnityEngine.InputSystem.Keyboard.current : null;
+            if (kb != null && fingerId == -1 && !phoneOpen)
+            {
+                float x = (kb.dKey.isPressed || kb.rightArrowKey.isPressed ? 1f : 0f) - (kb.aKey.isPressed || kb.leftArrowKey.isPressed ? 1f : 0f);
+                float y = (kb.wKey.isPressed || kb.upArrowKey.isPressed ? 1f : 0f) - (kb.sKey.isPressed || kb.downArrowKey.isPressed ? 1f : 0f);
+                var v = Vector2.ClampMagnitude(new Vector2(x, y), 1f);
+                if (v.sqrMagnitude > 0f) { KeyboardActive = true; Value = v; }
+                else if (Value != Vector2.zero) { Value = Vector2.zero; Released?.Invoke(); }
+            }
         }
 
         void Draw(Vector2 fingerPx)

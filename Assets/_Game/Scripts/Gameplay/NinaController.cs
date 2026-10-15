@@ -24,7 +24,7 @@ namespace UltimoMiglio.Gameplay
             if (!GameRoot.Ready) return;
             var eco = GameRoot.I.Eco;
             Vector3 dir = ScriptedInput.sqrMagnitude > 0 ? Vector3.ClampMagnitude(ScriptedInput, 1) : (Joystick ? Joystick.WorldDirection : Vector3.zero);
-#if UNITY_EDITOR || UNITY_WEBGL || UNITY_STANDALONE
+#if UM_NINA_OWN_KEYBOARD // FloatingJoystick (UI) now reads WASD/arrows/mouse: avoid double input
             if (dir == Vector3.zero) { var k = new Vector3(Input2.H, 0, Input2.V); dir = Quaternion.Euler(0, 45, 0) * Vector3.ClampMagnitude(k, 1); }
 #endif
             float max = (float)eco.NinaSpeed(Stack ? Stack.Count : 0);

@@ -42,9 +42,18 @@ namespace UltimoMiglio.UI
         Label title;
         string currentOrderId, nextPadId;
 
-        void OnEnable()
+        bool bound;
+        [SerializeField, Tooltip("Max share of the panel height used by the phone (pillarboxed 9:16 column)")] float maxHeightShare = 0.9f;
+        [SerializeField] float maxWidthShare = 0.94f;
+
+        void OnEnable() { bound = false; TryBind(); }
+
+        bool TryBind()
         {
-            root = GetComponent<UIDocument>().rootVisualElement;
+            if (bound) return true;
+            var doc = GetComponent<UIDocument>();
+            root = doc ? doc.rootVisualElement : null;
+            if (root == null || root.Q("phone") == null) return false;
             scrim = root.Q("phone-scrim");
             phone = root.Q("phone");
             header = root.Q("phone-header");
@@ -59,15 +68,36 @@ namespace UltimoMiglio.UI
             }
             root.Q("ordini-cta")?.RegisterCallback<ClickEvent>(_ => ShowTheWay(PhoneApp.Ordini, currentOrderId));
             root.Q("flotta-cta")?.RegisterCallback<ClickEvent>(_ => ShowTheWay(PhoneApp.Flotta, nextPadId));
-            SetDisplay(root.Q("phone-layer"), false);
+            root.RegisterCallback<GeometryChangedEvent>(_ => LayoutPhone());
+            SetDisplay(root.Q("phone-layer"), IsOpen);
+            bound = true;
             RefreshTiles();
+            LayoutPhone();
+            return true;
+        }
+
+        /// <summary>Phone is authored at a fixed 900x1600 (9:16) inside #phone-frame; the frame is uniformly scaled
+        /// to fit maxHeightShare of the panel height and maxWidthShare of its width → centred 9:16 pillarbox on
+        /// landscape desktop, near full-bleed column on portrait phones. Text keeps its proportions.</summary>
+        public const float PhoneW = 900f, PhoneH = 1600f;
+        void LayoutPhone()
+        {
+            var frame = root?.Q("phone-frame");
+            if (frame == null) return;
+            float W = root.layout.width, H = root.layout.height;
+            if (float.IsNaN(W) || W <= 0 || H <= 0) return;
+            float k = Mathf.Min(H * maxHeightShare / PhoneH, W * maxWidthShare / PhoneW);
+            frame.style.scale = new Scale(new Vector3(k, k, 1f));
         }
 
         void Update()
         {
-            // Android Back maps to Keyboard.escapeKey in the Input System.
+            if (!TryBind()) return;
+            // Android Back maps to Keyboard.escapeKey in the Input System. Desktop/WebGL: TAB toggles, ESC backs out.
             var kb = Keyboard.current;
-            if (kb != null) { if (IsOpen && (kb.escapeKey.wasPressedThisFrame || kb.tabKey.wasPressedThisFrame)) Close(); else if (!IsOpen && (kb.tabKey.wasPressedThisFrame || kb.escapeKey.wasPressedThisFrame)) OpenPhone(); }
+            if (kb == null) return;
+            if (kb.tabKey.wasPressedThisFrame) { if (IsOpen) Close(); else OpenPhone(); }
+            else if (IsOpen && kb.escapeKey.wasPressedThisFrame) Back();
         }
 
         /// <summary>Returns true if the Back press was consumed (phone was open).</summary>
@@ -78,6 +108,7 @@ namespace UltimoMiglio.UI
             if (!IsOpen)
             {
                 IsOpen = true; stack.Clear(); stack.Push(PhoneApp.Home);
+                if (!TryBind()) { IsOpen = false; return; }
                 var layer = root.Q("phone-layer");
                 SetDisplay(layer, true);
                 phone?.RemoveFromClassList("phone--open");
@@ -91,6 +122,7 @@ namespace UltimoMiglio.UI
         {
             if (!IsOpen) return;
             IsOpen = false; stack.Clear();
+            if (root == null) { Closed?.Invoke(); return; }
             phone?.RemoveFromClassList("phone--open");
             root.Q("phone-layer")?.schedule.Execute(() => { if (!IsOpen) SetDisplay(root.Q("phone-layer"), false); }).StartingIn(250);
             Closed?.Invoke();

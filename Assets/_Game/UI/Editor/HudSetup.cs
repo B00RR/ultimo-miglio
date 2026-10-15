@@ -36,9 +36,8 @@ namespace UltimoMiglio.UI.EditorTools
             var ps = AssetDatabase.LoadAssetAtPath<PanelSettings>(path);
             if (!ps) { ps = ScriptableObject.CreateInstance<PanelSettings>(); AssetDatabase.CreateAsset(ps, path); }
             ps.scaleMode = PanelScaleMode.ScaleWithScreenSize;
-            ps.referenceResolution = new Vector2Int(1920, 1080);  // landscape web build
-            ps.screenMatchMode = PanelScreenMatchMode.MatchWidthOrHeight;
-            ps.match = 0.5f;
+            ps.referenceResolution = new Vector2Int(1080, 1920);       // portrait reference; ResponsivePanel overrides at runtime
+            ps.screenMatchMode = PanelScreenMatchMode.Shrink;          // static fallback = fit both axes
             ps.sortingOrder = sortOrder;
             if (!ps.themeStyleSheet)
             {
@@ -57,12 +56,14 @@ namespace UltimoMiglio.UI.EditorTools
             var hudDoc = hudGo.AddComponent<UIDocument>();
             hudDoc.panelSettings = hudPanel;
             hudDoc.visualTreeAsset = AssetDatabase.LoadAssetAtPath<VisualTreeAsset>(Root + "/UXML/Hud.uxml");
+            hudGo.AddComponent<ResponsivePanel>();
             var hud = hudGo.AddComponent<HudController>();
 
             var phoneGo = new GameObject("PhoneDocument"); phoneGo.transform.SetParent(go.transform);
             var phoneDoc = phoneGo.AddComponent<UIDocument>();
             phoneDoc.panelSettings = phonePanel;
             phoneDoc.visualTreeAsset = AssetDatabase.LoadAssetAtPath<VisualTreeAsset>(Root + "/UXML/Phone.uxml");
+            phoneGo.AddComponent<ResponsivePanel>();
             var phone = phoneGo.AddComponent<PhoneController>();
 
             var joyGo = new GameObject("FloatingJoystick"); joyGo.transform.SetParent(go.transform);

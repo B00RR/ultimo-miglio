@@ -53,6 +53,8 @@ MonoBehaviour:
   edgeExclusionDp: 24
   fadeSeconds: 0.15
   responseExponent: 1.25
+  keyboardInput: 1
+  mouseInput: 1
 --- !u!1 &1904009229579503492
 GameObject:
   m_ObjectHideFlags: 0
@@ -63,6 +65,7 @@ GameObject:
   m_Component:
   - component: {fileID: 6622381664739038032}
   - component: {fileID: 9003764048506726735}
+  - component: {fileID: 6224634260634424830}
   - component: {fileID: 6359808862508143165}
   m_Layer: 0
   m_Name: HudDocument
@@ -109,6 +112,21 @@ MonoBehaviour:
   m_PivotReferenceSize: 0
   m_Pivot: 0
   m_WorldSpaceCollider: {fileID: 0}
+--- !u!114 &6224634260634424830
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1904009229579503492}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 6605882080e091f9abbc8901124b41a7, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: UltimoMiglio.UI::UltimoMiglio.UI.ResponsivePanel
+  landscapeShortSideRef: 1200
+  minScale: 0.42
+  maxScale: 2.5
 --- !u!114 &6359808862508143165
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -133,6 +151,7 @@ GameObject:
   m_Component:
   - component: {fileID: 502804034865973059}
   - component: {fileID: 244693256718810562}
+  - component: {fileID: 6680359996329749411}
   - component: {fileID: 2416898518661643464}
   m_Layer: 0
   m_Name: PhoneDocument
@@ -179,6 +198,21 @@ MonoBehaviour:
   m_PivotReferenceSize: 0
   m_Pivot: 0
   m_WorldSpaceCollider: {fileID: 0}
+--- !u!114 &6680359996329749411
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2008949517777870227}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 6605882080e091f9abbc8901124b41a7, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: UltimoMiglio.UI::UltimoMiglio.UI.ResponsivePanel
+  landscapeShortSideRef: 1200
+  minScale: 0.42
+  maxScale: 2.5
 --- !u!114 &2416898518661643464
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -191,6 +225,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 1931295cf479b14908f73f58013f2be8, type: 3}
   m_Name: 
   m_EditorClassIdentifier: UltimoMiglio.UI::UltimoMiglio.UI.PhoneController
+  maxHeightShare: 0.9
+  maxWidthShare: 0.94
 --- !u!1 &2715884415248152583
 GameObject:
   m_ObjectHideFlags: 0

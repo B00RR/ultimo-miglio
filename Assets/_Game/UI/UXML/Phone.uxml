@@ -1,14 +1,14 @@
 <ui:UXML xmlns:ui="UnityEngine.UIElements" editor-extension-mode="False">
     <Style src="project://database/Assets/_Game/UI/USS/DioramaSolare.uss" />
-    <ui:VisualElement name="phone-layer" class="fill">
+    <ui:VisualElement name="phone-layer" class="fill" style="display: none;">
         <ui:VisualElement name="phone-scrim" class="fill">
-            <ui:VisualElement name="phone">
+            <ui:VisualElement name="phone-frame" picking-mode="Ignore"><ui:VisualElement name="phone">
                 <ui:VisualElement name="phone-screen">
                     <ui:VisualElement name="phone-header">
                         <ui:VisualElement name="phone-back"><ui:VisualElement class="icon icon-back" /></ui:VisualElement>
                         <ui:Label name="phone-title" text="" />
                     </ui:VisualElement>
-                    <ui:ScrollView name="screen-home">
+                    <ui:ScrollView mode="Vertical" horizontal-scroller-visibility="Hidden" name="screen-home">
                         <ui:Label name="home-day" text="Giorno 1/365 · Solara" />
                         <ui:Label name="home-time" text="08:00" />
                         <ui:Label name="home-installment" text="" />
@@ -23,16 +23,16 @@
                         </ui:VisualElement>
                         <ui:VisualElement class="phone-card"><ui:Label name="home-quest" text="" /></ui:VisualElement>
                     </ui:ScrollView>
-                    <ui:ScrollView name="screen-ordini" style="display: none;">
+                    <ui:ScrollView mode="Vertical" horizontal-scroller-visibility="Hidden" name="screen-ordini" style="display: none;">
                         <ui:VisualElement name="ordini-list" />
                         <ui:Button name="ordini-cta" class="cta" text="Mostra la strada" />
                     </ui:ScrollView>
                     <ui:VisualElement name="screen-messaggi" style="display: none; flex-grow: 1;">
                         <ui:Label name="messaggi-contact" text="" />
-                        <ui:ScrollView name="messaggi-list" style="flex-grow: 1;" />
+                        <ui:ScrollView mode="Vertical" horizontal-scroller-visibility="Hidden" name="messaggi-list" style="flex-grow: 1;" />
                         <ui:VisualElement name="messaggi-replies" />
                     </ui:VisualElement>
-                    <ui:ScrollView name="screen-flotta" style="display: none;">
+                    <ui:ScrollView mode="Vertical" horizontal-scroller-visibility="Hidden" name="screen-flotta" style="display: none;">
                         <ui:VisualElement name="flotta-list" />
                         <ui:VisualElement class="phone-card">
                             <ui:Label name="flotta-cassa" text="" />
@@ -45,7 +45,7 @@
                     <ui:VisualElement name="screen-bottega" style="display: none;" />
                     <ui:VisualElement name="screen-razzo" style="display: none;" />
                 </ui:VisualElement>
-            </ui:VisualElement>
+            </ui:VisualElement></ui:VisualElement>
         </ui:VisualElement>
     </ui:VisualElement>
 </ui:UXML>
