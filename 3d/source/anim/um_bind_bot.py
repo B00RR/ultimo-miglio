@@ -69,8 +69,10 @@ def make(name,n,fn,loop):
         t=(f%n)/n if loop else f/n
         for pb in arm.pose.bones: pb.location=(0,0,0); pb.rotation_mode='QUATERNION'; pb.rotation_quaternion=(1,0,0,0); pb.scale=(1,1,1)
         fn(t)
-        if CHAR=="nonno":   # punte dei baffi (|x| 0.358) dentro i montanti (x 0.30-0.36) gia' a riposo: base 0.82 in larghezza
-            sx=arm.pose.bones["mustache"].scale; arm.pose.bones["mustache"].scale=(sx[0]*0.82,sx[1],sx[2])
+        # v03: baffi ristretti e portati avanti dall'artista -> scala al 100% (rimosso il ripiego 0.82 della v02)
+        MUST_W=float(os.environ.get("UM_MUST_W","1.0"))
+        if CHAR=="nonno" and MUST_W!=1.0:
+            sx=arm.pose.bones["mustache"].scale; arm.pose.bones["mustache"].scale=(sx[0]*MUST_W,sx[1],sx[2])
         for pb in arm.pose.bones:
             for k in ("location","rotation_quaternion","scale"): pb.keyframe_insert(k,frame=f)
     act.frame_range=(0,n); act.use_frame_range=True; act.use_cyclic=loop; CLIPS.append((name,n,loop))
