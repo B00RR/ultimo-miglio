@@ -1,7 +1,7 @@
 {
   "name": "UltimoMiglio.UI",
   "rootNamespace": "UltimoMiglio.UI",
-  "references": ["Unity.InputSystem"],
+  "references": ["UltimoMiglio.Core", "Unity.InputSystem"],
   "includePlatforms": [],
   "excludePlatforms": [],
   "allowUnsafeCode": false,

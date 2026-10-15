@@ -42,7 +42,7 @@ namespace UltimoMiglio.Gameplay
                     c.T.position += d.normalized * Mathf.Min(d.magnitude, MagnetSpeed * Time.deltaTime);
                     if (d.sqrMagnitude < 0.09f)
                     {
-                        if (c.Real) GameRoot.I.Eco.CollectActive(c.Ln);
+                        if (c.Real) GameRoot.I.Eco.CollectActive(c.Ln, c.T.position.ToWP());
                         if ((_pickupSfx++ & 1) == 0) AudioManager.I?.Play(AudioManager.Sfx.CoinPickup);
                         c.T.gameObject.SetActive(false); _pool.Push(c.T); _live.RemoveAt(i);
                     }

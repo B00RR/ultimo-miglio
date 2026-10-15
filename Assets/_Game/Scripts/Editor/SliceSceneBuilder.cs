@@ -24,6 +24,8 @@ namespace UltimoMiglio.EditorTools
         {
             ChapterDataImporter.Import();
             TryRun("UltimoMiglio.VFX.EditorTools.UM_FxPrefabBuilder", "BuildAll");
+            if (!AssetDatabase.LoadAssetAtPath<GameObject>(HudPrefabPath)) TryRun("UltimoMiglio.UI.EditorTools.HudSetup", "BuildAll"); // may open its demo scene: run before NewScene
+            try { FontSetup.Apply(); } catch (System.Exception ex) { Debug.LogWarning("[Scene] fonts: " + ex.Message); }
             Directory.CreateDirectory(PrefabDir); Directory.CreateDirectory(Path.GetDirectoryName(ScenePath));
             var scene = EditorSceneManager.NewScene(NewSceneSetup.EmptyScene, NewSceneMode.Single);
             var zones = AssetDatabase.LoadAssetAtPath<ChapterDataAsset>(ChapterDataImporter.AssetPath).Data.zones;
@@ -61,7 +63,13 @@ namespace UltimoMiglio.EditorTools
             var anchor = new GameObject("StackAnchor").transform; anchor.SetParent(nina.transform, false); anchor.localPosition = new Vector3(0, 0.9f, -0.42f);
             var stack = nina.AddComponent<PackageStack>(); stack.Anchor = anchor; stack.ParcelPrefab = parcel;
             var ctrl = nina.AddComponent<NinaController>(); ctrl.Stack = stack; root.Nina = ctrl;
-            var joy = new GameObject("FloatingJoystick").AddComponent<UltimoMiglio.UI.FloatingJoystick>(); ctrl.Joystick = joy;
+            // HUD (UI/UX, UI Toolkit): HUD.prefab owns the FloatingJoystick (overlay exclusion + graphics)
+            var hudPrefab = AssetDatabase.LoadAssetAtPath<GameObject>(HudPrefabPath);
+            GameObject hudGo = hudPrefab ? (GameObject)PrefabUtility.InstantiatePrefab(hudPrefab) : null;
+            var hud = hudGo ? hudGo.GetComponentInChildren<UltimoMiglio.UI.HudController>(true) : null;
+            var joy = hudGo ? hudGo.GetComponentInChildren<UltimoMiglio.UI.FloatingJoystick>(true) : null;
+            if (!joy) { Debug.LogWarning("[Scene] HUD.prefab missing: bare joystick"); joy = new GameObject("FloatingJoystick").AddComponent<UltimoMiglio.UI.FloatingJoystick>(); }
+            ctrl.Joystick = joy;
 
             // --- zones
             var arrPos = new Vector3(-5, 0, 6);
@@ -113,6 +121,7 @@ namespace UltimoMiglio.EditorTools
             var urpCam = cam.AddComponent<UnityEngine.Rendering.Universal.UniversalAdditionalCameraData>(); urpCam.renderPostProcessing = true;
             cam.AddComponent<AudioListener>();
             var rig = new GameObject("CameraRig").AddComponent<CameraRigSetup>(); rig.Target = nina.transform; rig.Build(camera);
+            WireHud(hudGo, hud, joy, camera, nina.transform, cassa.transform);
             TryRun("UltimoMiglio.VFX.EditorTools.UM_LightingSetup", "Setup");
             TryRun("UltimoMiglio.VFX.EditorTools.UM_PostProcessBuilder", "BuildAll");
             if (!Object.FindAnyObjectByType<Light>()) { var l = new GameObject("Sun").AddComponent<Light>(); l.type = LightType.Directional; l.transform.rotation = Quaternion.Euler(50, -35, 0); l.color = UM_Palette.Sole; }
@@ -125,6 +134,52 @@ namespace UltimoMiglio.EditorTools
             EditorBuildSettings.scenes = new[] { new EditorBuildSettingsScene(ScenePath, true) };
             AssetDatabase.SaveAssets();
             Debug.Log("[Scene] built " + ScenePath);
+        }
+
+        const string HudPrefabPath = "Assets/_Game/UI/Prefabs/HUD.prefab", UiRoot = "Assets/_Game/UI";
+
+        static void WireHud(GameObject hudGo, UltimoMiglio.UI.HudController hud, UltimoMiglio.UI.FloatingJoystick joy, Camera cam, Transform nina, Transform cassa)
+        {
+            if (!hud) return;
+            Set(joy, "cameraTransform", cam.transform);
+            var arrow = hudGo.GetComponentInChildren<UltimoMiglio.UI.EdgeArrow>(true);
+            if (arrow) { Set(arrow, "cam", cam); Set(arrow, "nina", nina); }
+            var sc = World<UltimoMiglio.UI.World.StackCounter>(nina.gameObject, hud, cam, "StackCounter.uxml", new Vector3(0, 2.2f, 0));
+            var cc = World<UltimoMiglio.UI.World.CassaCard>(cassa.gameObject, hud, cam, "CassaCard.uxml", new Vector3(0, 1.6f, 0));
+            const string ringPath = "Assets/_Game/Art/Materials/M_ZoneRing.mat";
+            var ringMat = AssetDatabase.LoadAssetAtPath<Material>(ringPath);
+            if (!ringMat) { Directory.CreateDirectory(Path.GetDirectoryName(ringPath)); ringMat = new Material(Shader.Find("UltimoMiglio/UI/ZoneRing") ?? Shader.Find("Universal Render Pipeline/Unlit")); AssetDatabase.CreateAsset(ringMat, ringPath); }
+            foreach (var z in Object.FindObjectsByType<ProximityZone>(FindObjectsSortMode.None))
+            {
+                var quad = GameObject.CreatePrimitive(PrimitiveType.Quad); Object.DestroyImmediate(quad.GetComponent<Collider>());
+                quad.name = "Ring"; quad.transform.SetParent(z.transform, false); quad.transform.localPosition = new Vector3(0, 0.03f, 0);
+                quad.transform.localRotation = Quaternion.Euler(90, 0, 0); var bc = z.GetComponent<BoxCollider>(); quad.transform.localScale = new Vector3(bc.size.x, bc.size.z, 1);
+                quad.GetComponent<Renderer>().sharedMaterial = ringMat;
+                var ring = quad.AddComponent<UltimoMiglio.UI.ZoneFillRing>(); Set(ring, "ringRenderer", quad.GetComponent<Renderer>()); z.Ring = ring;
+                if (z is UpgradePad up)
+                {
+                    var card = World<UltimoMiglio.UI.World.UpgradePadCard>(z.gameObject, hud, cam, "PadCard.uxml", new Vector3(0, 1.2f, 0));
+                    var so = new SerializedObject(card); so.FindProperty("title").stringValue = PadTitle(up.Kind); so.FindProperty("padFill").objectReferenceValue = ring; so.ApplyModifiedPropertiesWithoutUndo();
+                    up.Card = card;
+                }
+            }
+            var bridge = hudGo.AddComponent<UltimoMiglio.UI.Bridge.HudGameBridge>();
+            bridge.Hud = hud; bridge.Phone = hudGo.GetComponentInChildren<UltimoMiglio.UI.PhoneController>(true); bridge.Joystick = joy;
+            bridge.StackCounter = sc; bridge.CassaCard = cc; bridge.EdgeArrow = arrow; bridge.Cassa = cassa;
+        }
+        static string PadTitle(UpgradeKind k) => k switch { UpgradeKind.NonnoHire => "ASSUMI NONNO", UpgradeKind.NonnoLevel => "NONNO +1", UpgradeKind.Zaino => "ZAINO", UpgradeKind.Scarpe => "SCARPE", _ => "INSEGNA" };
+        static T World<T>(GameObject host, UltimoMiglio.UI.HudController hud, Camera cam, string uxml, Vector3 offset) where T : UltimoMiglio.UI.World.WorldAnchoredElement
+        {
+            var c = host.AddComponent<T>(); var so = new SerializedObject(c);
+            so.FindProperty("hud").objectReferenceValue = hud; so.FindProperty("cam").objectReferenceValue = cam; so.FindProperty("anchor").objectReferenceValue = host.transform;
+            so.FindProperty("template").objectReferenceValue = AssetDatabase.LoadAssetAtPath<UnityEngine.UIElements.VisualTreeAsset>($"{UiRoot}/UXML/{uxml}");
+            so.FindProperty("worldOffset").vector3Value = offset; so.ApplyModifiedPropertiesWithoutUndo(); return c;
+        }
+        static void Set(Object o, string field, Object value)
+        {
+            if (!o) return; var so = new SerializedObject(o); var p = so.FindProperty(field);
+            if (p == null) { Debug.LogWarning($"[Scene] {o.GetType().Name}.{field} not found"); return; }
+            p.objectReferenceValue = value; so.ApplyModifiedPropertiesWithoutUndo();
         }
 
         static void Pad(string name, UpgradeKind k, Vector3 pos, float unlock, Material m)

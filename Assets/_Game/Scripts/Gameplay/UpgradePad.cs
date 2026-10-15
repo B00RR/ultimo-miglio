@@ -9,6 +9,7 @@ namespace UltimoMiglio.Gameplay
     {
         public UpgradeKind Kind; public GameObject ShowWhenAvailable; public float UnlockAtActiveSec;
         public System.Action<UpgradeKind> Completed;
+        public UltimoMiglio.UI.World.UpgradePadCard Card;
         bool _paying;
         protected override void OnIdleUpdate()
         {
@@ -16,6 +17,7 @@ namespace UltimoMiglio.Gameplay
             foreach (var r in GetComponentsInChildren<Renderer>(true)) r.enabled = avail;
             GetComponent<Collider>().enabled = avail;
             if (Ring && !Nina) Ring.SetFill((float)eco.PadFill(Kind));
+            if (Card) { Card.gameObject.SetActive(avail); if (avail) Card.SetProgress(eco.S.PadPaid[(int)Kind], eco.Cost(Kind)); }
         }
         protected override void OnZoneTick(float t)
         {

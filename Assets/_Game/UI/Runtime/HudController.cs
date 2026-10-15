@@ -27,7 +27,6 @@ namespace UltimoMiglio.UI
     [RequireComponent(typeof(UIDocument))]
     public class HudController : MonoBehaviour
     {
-        [SerializeField] HudConfigSource configSource;
         [SerializeField] float roomLabelSeconds = 1.5f;   // 04_UI §1.2 (UX timing, not balance)
         [SerializeField] float toastSeconds = 2.5f;       // 04_UI §3.4
 
@@ -36,7 +35,8 @@ namespace UltimoMiglio.UI
         public event Action PedaggioTapped;
         public event Action SafeCardClosed;
 
-        public IHudConfig Config => configSource ? configSource.Config : null;
+        /// <summary>Set by the bridge (ChapterDataHudConfig). Optional: every API also takes explicit values.</summary>
+        public IHudConfig Config { get; set; }
         public VisualElement Root { get; private set; }
         public VisualElement SafeRoot { get; private set; }
 
@@ -121,10 +121,13 @@ namespace UltimoMiglio.UI
 
         // ---------------- Pedaggio ----------------
         /// <summary>Show the OmniFreight toll chip. fraction = toll share (0.15 → "-15%"); NaN → read from config.</summary>
-        public void ShowPedaggio(float fraction = float.NaN)
+        public void ShowPedaggio(float fraction = float.NaN) => ShowPedaggio(fraction, false);
+
+        /// <summary>preview = onboarding step 10: chip shown greyed and not tappable, toll not active.</summary>
+        public void ShowPedaggio(float fraction, bool preview)
         {
-            if (float.IsNaN(fraction) && Config != null && !float.IsNaN(Config.TollMultiplier))
-                fraction = 1f - Config.TollMultiplier;
+            if (tollChip != null) { tollChip.EnableInClassList("toll-chip--preview", preview); tollChip.pickingMode = preview ? PickingMode.Ignore : PickingMode.Position; }
+            if (float.IsNaN(fraction) && Config != null) fraction = Config.TollFraction;
             if (tollLabel != null) tollLabel.text = float.IsNaN(fraction) ? "Pedaggio" : "-" + HudFormat.Percent(fraction);
             SetVisible(tollChip, true);
             Pulse(tollChip);

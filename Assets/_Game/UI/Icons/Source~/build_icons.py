@@ -1,7 +1,7 @@
 # Line icons (Lucide-style, 24 grid). Lifted from mockups/icons.py + extras. Run: python3 build_icons.py
 import cairosvg, os
 I = {}
-exec(open(os.path.join(os.path.dirname(__file__), '../../../../../mockups/icons.py')).read().split('def ic')[0], I)
+exec(open(os.path.join(os.path.dirname(__file__), '../../../../../../mockups/icons.py')).read().split('def ic')[0], I)
 P = dict(I['I'])
 P.update({
  'phone':'<rect x="6" y="2" width="12" height="20" rx="2.5"/><path d="M11 18h2"/>',
@@ -23,5 +23,5 @@ for name, body in P.items():
     for suf, col in (('', '#3B2A20'), ('_cream', '#FFF9EE')):
         svg = f'<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="{col}" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">{body}</svg>'
         if not suf: open(f'svg/{name}.svg','w').write(svg)
-        cairosvg.svg2png(bytestring=svg.encode(), write_to=f'ic_{name}{suf}.png', output_width=96, output_height=96)
+        cairosvg.svg2png(bytestring=svg.encode(), write_to=f'../ic_{name}{suf}.png', output_width=96, output_height=96)
 print(len(P), 'icons')
