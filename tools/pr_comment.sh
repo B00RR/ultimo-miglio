@@ -1,10 +1,10 @@
 #!/usr/bin/env bash
 # Pubblica (o aggiorna) un commento con l'esito di test e build su una PR.
-# Uso: tools/pr_comment.sh <numero_PR> [url_build]
+# Uso: tools/pr_comment.sh <numero_PR> [url_build] [url_run]
 # Richiede: gh autenticato (o GH_TOKEN), python3. Legge Logs/*-results.xml e Logs/webgl_build.log.
 set -euo pipefail
 cd "$(dirname "$0")/.."
-PR="${1:?numero PR mancante}"; URL="${2:-}"
+PR="${1:?numero PR mancante}"; URL="${2:-}"; export UM_RUN="${3:-}"
 REPO="${UM_REPO:-B00RR/ultimo-miglio}"
 BODY=$(python3 - "$URL" <<'PY'
 import sys, os, glob, xml.etree.ElementTree as ET, datetime, subprocess
@@ -32,6 +32,8 @@ if os.path.exists(log):
     esito = riga[-1].strip() if riga else "esito non trovato nel log"
     L += ["", f"**Build WebGL:** {'✅' if 'Succeeded' in esito else '❌'} `{esito}`"]
 if url: L += ["", f"**Link giocabile:** {url}"]
+if os.environ.get("UM_RUN"): L += ["", f"**Run:** {os.environ['UM_RUN']}"]
+if os.environ.get("UM_NOTA"): L += ["", os.environ["UM_NOTA"]]
 if falliti: L += ["", "### Test falliti", *falliti]
 print("\n".join(L))
 PY
