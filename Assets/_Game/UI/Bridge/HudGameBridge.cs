@@ -91,6 +91,7 @@ namespace UltimoMiglio.UI.Bridge
         {
             var gr = GameRoot.I; var s = gr.Eco.S;
             if (s.Wallet != lastWallet) { if (!double.IsNaN(lastWallet) && s.Wallet > lastWallet) Hud.PulseCurrency(); lastWallet = s.Wallet; Hud.SetCurrencies(s.Wallet, s.Bulloni); }
+            Hud.ShowRoomLabel("Giorno 1");
 
             if (!toastShown) { toastShown = true; if (s.CassaLn >= 1) Hud.ShowOfflineToast(System.Math.Floor(s.CassaLn)); }
 

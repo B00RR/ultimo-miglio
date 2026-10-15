@@ -247,7 +247,7 @@ namespace UltimoMiglio.EditorTools
             var arrow = hudGo.GetComponentInChildren<UltimoMiglio.UI.EdgeArrow>(true);
             if (arrow) { Set(arrow, "cam", cam); Set(arrow, "nina", nina); var aso = new SerializedObject(arrow); var mp = aso.FindProperty("marginDp"); if (mp != null) { mp.floatValue = 110f; aso.ApplyModifiedPropertiesWithoutUndo(); } }
             var sc = World<UltimoMiglio.UI.World.StackCounter>(nina.gameObject, hud, cam, "StackCounter.uxml", new Vector3(0, 2.2f, 0));
-            var cc = World<UltimoMiglio.UI.World.CassaCard>(cassa.gameObject, hud, cam, "CassaCard.uxml", new Vector3(0, 1.6f, 0));
+            UltimoMiglio.UI.World.CassaCard cc = null; // demo: niente schede grandi
             const string ringPath = "Assets/_Game/Art/Materials/M_ZoneRing.mat";
             var ringMat = AssetDatabase.LoadAssetAtPath<Material>(ringPath);
             if (!ringMat) { Directory.CreateDirectory(Path.GetDirectoryName(ringPath)); ringMat = new Material(Shader.Find("UltimoMiglio/UI/ZoneRing") ?? Shader.Find("Universal Render Pipeline/Unlit")); AssetDatabase.CreateAsset(ringMat, ringPath); }
@@ -258,12 +258,7 @@ namespace UltimoMiglio.EditorTools
                 quad.transform.localRotation = Quaternion.Euler(90, 0, 0); var bc = z.GetComponent<BoxCollider>(); quad.transform.localScale = new Vector3(bc.size.x, bc.size.z, 1);
                 quad.GetComponent<Renderer>().sharedMaterial = ringMat;
                 var ring = quad.AddComponent<UltimoMiglio.UI.ZoneFillRing>(); Set(ring, "ringRenderer", quad.GetComponent<Renderer>()); z.Ring = ring;
-                if (z is UpgradePad up)
-                {
-                    var card = World<UltimoMiglio.UI.World.UpgradePadCard>(z.gameObject, hud, cam, "PadCard.uxml", new Vector3(0, 1.2f, 0));
-                    var so = new SerializedObject(card); so.FindProperty("title").stringValue = PadTitle(up.Kind); so.FindProperty("padFill").objectReferenceValue = ring; so.ApplyModifiedPropertiesWithoutUndo();
-                    up.Card = card;
-                }
+                // demo: niente UpgradePadCard
             }
             var bridge = hudGo.AddComponent<UltimoMiglio.UI.Bridge.HudGameBridge>();
             bridge.Hud = hud; bridge.Phone = hudGo.GetComponentInChildren<UltimoMiglio.UI.PhoneController>(true); bridge.Joystick = joy;

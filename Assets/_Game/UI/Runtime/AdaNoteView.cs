@@ -12,7 +12,7 @@ namespace UltimoMiglio.UI
     public sealed class AdaNoteView
     {
         public const int MaxChars = 90;
-        public const float MinVisibleSec = 1.5f, FadeSec = 0.25f, MinBodyDp = 16f, MinTitleDp = 20f;
+        public const float MinVisibleSec = 1.5f, FadeSec = 0.25f, MinBodyDp = 14f, MinTitleDp = 12f, MaxHeightDp = 40f;
 
         struct Item { public string text; public float seconds; public bool sticky; }
         readonly Queue<Item> queue = new Queue<Item>();
@@ -30,7 +30,7 @@ namespace UltimoMiglio.UI
             var col = new VisualElement { pickingMode = PickingMode.Ignore }; col.AddToClassList("ada-col");
             who = new Label(speaker) { pickingMode = PickingMode.Ignore }; who.AddToClassList("ada-name");
             body = new Label { pickingMode = PickingMode.Ignore }; body.AddToClassList("ada-text");
-            col.Add(who); col.Add(body); note.Add(face); note.Add(col); band.Add(note);
+            who.style.display = DisplayStyle.None; face.style.display = DisplayStyle.None; col.Add(body); note.Add(col); band.Add(note);
             band.style.display = DisplayStyle.None;
             root.Add(band);
         }
@@ -65,7 +65,7 @@ namespace UltimoMiglio.UI
             string t = it.text ?? "";
             if (t.Length > MaxChars) { Debug.LogWarning($"[AdaNote] {t.Length} caratteri > {MaxChars}: tagliato. Accorciare il testo nei dati."); t = t.Substring(0, MaxChars - 1) + "…"; }
             current = it; hasCurrent = true; shownAt = Time.unscaledTime; hideAt = -1;
-            body.text = t;
+            if (t.Length > 42) t = t.Substring(0, 41) + "…"; body.text = t;
             band.style.display = DisplayStyle.Flex;
             note.RemoveFromClassList("ada-note--out"); note.AddToClassList("ada-note--in");
             note.schedule.Execute(() => note.RemoveFromClassList("ada-note--in")).StartingIn(16); // USS transition: from in → rest
@@ -89,7 +89,14 @@ namespace UltimoMiglio.UI
             float H = root.layout.height;
             float top = safeTop + 120f;
             if (!float.IsNaN(H) && H > 0) top = Mathf.Min(top, H * 0.5f - 140f);
-            band.style.top = Mathf.Max(safeTop, top);
+            band.style.top = Mathf.Max(safeTop, 56f);
+            band.style.left = 8; band.style.right = 8; band.style.width = StyleKeyword.Auto;
+            note.style.maxHeight = MaxHeightDp;
+            body.style.fontSize = MinBodyDp;
+            body.style.whiteSpace = WhiteSpace.NoWrap;
+            note.style.paddingTop = 4; note.style.paddingBottom = 4; note.style.paddingLeft = 12; note.style.paddingRight = 12;
+            body.style.whiteSpace = WhiteSpace.NoWrap;
+            note.style.paddingTop = 4; note.style.paddingBottom = 4;
         }
     }
 }

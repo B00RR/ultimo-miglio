@@ -96,3 +96,16 @@
 #settings-button .icon, .settings-btn .icon { width: 28px; height: 28px; }
 .top-bar { flex-direction: row; align-items: flex-start; }
 .icon-gear { background-image: url("project://database/Assets/_Game/UI/Icons/ic_gear.png"); -unity-background-image-tint-color: var(--c-ink); }
+
+/* fix-demo: HUD minimo */
+#toll-chip, #toast, #safe-card, .pad-card, .cassa-card, .pad-tag { display: none; }
+#room-pill { display: flex; height: 28px; min-width: 0; padding: 0 12px; top: 0; }
+#room-name { font-size: 14px; }
+.ada-band { top: 52px; max-height: 40px; }
+.ada-note { max-height: 40px; padding: 4px 12px; }
+.ada-face, .ada-name { display: none; }
+.ada-text { font-size: 14px; white-space: nowrap; }
+#settings-button { width: 40px; height: 40px; }
+#phone-button { width: 48px; height: 48px; }
+#currency-pill { height: 40px; padding: 0 14px 0 10px; }
+.currency-value { font-size: 22px; }
