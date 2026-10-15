@@ -3,8 +3,8 @@
   "chapter": 1,
   "nonno": {
     "unlockAtOnboardingSec": 130,
-    "hireCostLn": 50,
-    "padLabel": "ASSUMI NONNO · 50 LN",
+    "hireCostLn": 15,
+    "padLabel": "ASSUMI NONNO · 15 LN",
     "restockPpmBase": 6.0,
     "restockPpmPerLevel": 1.5,
     "selfServicePpmBase": 0.5,
