@@ -1,5 +1,5 @@
 {
-  "_nota": "Testi definitivi onboarding cap.1 (Narrative). Voce: Oma Tilde, dai biglietti lasciati nel deposito, parla a Kaia. Max 70 caratteri. SliceSceneBuilder legge speaker, steps[] PER ID (mappati sui 16 passi di onboarding.json, #101) e fine: non cambiare le chiavi. Le chiavi in rinviati_cap2 (telefono) entrano nel cap. 2.",
+  "_nota": "Testi definitivi onboarding cap.1 (Narrative). Voce: Oma Tilde, dai biglietti lasciati nel deposito, parla a Kaia. Max 70 caratteri. SliceSceneBuilder legge speaker, steps[] PER ID (16 passi, chiavi step:<id>; l'ordine nel file non conta, IdToStep #101) e fine: non cambiare le chiavi. Le chiavi in rinviati_cap2 (telefono) entrano nel cap. 2.",
   "speaker": "Oma Tilde",
   "steps": [
     {
@@ -24,16 +24,44 @@
     },
     {
       "id": "unlock_nonno",
-      "text": "OLDO brontola, ma lavora. Sveglialo dal pad, digli ciao."
+      "text": "OLDO brontola, ma lavora. Sveglialo dal pad: 50 LN e ti aiuta."
     },
     {
       "id": "upgrade_zaino",
-      "text": "Sali sul pad ZAINO: più pacchi, meno giri. Fidati."
+      "text": "Resta sul pad Zaino finché si riempie: più pacchi, meno giri."
+    },
+    {
+      "id": "combo",
+      "text": "Servi senza fermarti, tesoro: i clienti contenti pagano meglio."
+    },
+    {
+      "id": "nonno_intro",
+      "text": "Quello che dorme è OLDO. L'ho costruito io, sii gentile."
+    },
+    {
+      "id": "nonno_confirm",
+      "text": "Guardalo: gli scaffali li riempie lui. Tu pensa ai clienti."
+    },
+    {
+      "id": "pad_nuovi",
+      "text": "Scarpe o Insegna? Scegli tu, Kaia. Io avrei preso l'Insegna."
+    },
+    {
+      "id": "cassa",
+      "text": "Passa dalla Cassa: ti ho lasciato una mancia. Non dirlo a OLDO."
+    },
+    {
+      "id": "debito",
+      "text": "Quelli della GrayBox vogliono la rata. Versala in Cassaforte."
+    },
+    {
+      "id": "muro",
+      "text": "Vedi quel muro? Dietro c'è spazio. Il Sunn Depot può crescere."
     }
   ],
   "fine": "Brava, Kaia. Il resto lo scopri da te. Io l'ho sempre saputo.",
   "lettere": {
-    "onb.cold.letterAda": "Kaia, tesoro,\nse leggi, la serranda l'hai alzata tu. Bene.\nIl Sunn Depot ora è tuo: pacchi, debiti e quel brontolone di OLDO.\nSul bancone c'è un pacco. Non è per i clienti. Lascialo lì, per ora.\nLui saprà aspettare. Tu no, lo so: comincia dagli Arrivi.\nTi voglio bene.\nNonna Tilde",
+    "onb.cold.letterAda": "Kaia, tesoro,\nse leggi, la serranda l'hai alzata tu. Bene.\nIl Sunn Depot ora è tuo: pacchi, debiti e quel brontolone di OLDO.\nSul bancone c'è un pacco. Non è per i clienti. Lascialo lì, per ora.\nLui saprà aspettare. Tu no, lo so: comincia dagli Arrivi.\nTi voglio bene.\nOma Tilde",
     "onb.cold.letterOmni": "GrayBox Inc. · Gentile sig.ra Rio,\navete 1 anno per rendere redditizio il deposito.\nPoi lo acquisiremo. Cordialmente, M. Vane"
   },
   "suggerimenti": {
@@ -44,7 +72,7 @@
     "onb.coins.walk": "Cammina sulle monete",
     "onb.zaino.hint": "Zaino più grande, più pacchi per giro",
     "onb.combo": "Servi di fila, senza pause: ogni cliente rende di più!",
-    "onb.nonno.intro": "Quel brontolone che dorme è OLDO. L'ha fatto Oma.",
+    "onb.nonno.intro": "Quel brontolone che dorme è OLDO. L'ha fatto Oma Tilde.",
     "onb.nonno.what": "OLDO porta i pacchi dagli Arrivi agli scaffali.",
     "onb.nonno.cost": "Stai sul pad: con 50 LN OLDO si sveglia.",
     "onb.nonno.notEnough": "Mancano LN: servi qualche cliente al Bancone.",
@@ -59,7 +87,7 @@
     "onb.wall.goal": "Prossimo obiettivo: abbatti il muro",
     "onb.zaino.notEnough": "Per lo Zaino servono 40 LN. Ancora qualche cliente!",
     "onb.pads.new": "Pad nuovi! Scarpe per correre, Insegna per clienti più ricchi.",
-    "onb.cassa.tip": "Sulla Cassa c'è una mancia di Oma Tilde: 30 LN. Prendila.",
+    "onb.cassa.tip": "Passa sulla Cassa: c'è una mancia di 30 LN per te.",
     "onb.debt.adaExplain": "La rata si versa qui, alla Cassaforte. Entro il Giorno 24, Kaia."
   },
   "rinviati_cap2": {

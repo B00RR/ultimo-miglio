@@ -161,7 +161,9 @@ namespace UltimoMiglio.Gameplay
         internal static readonly System.Collections.Generic.Dictionary<string, Step> IdToStep = new()
         {   // id dei testi (onboarding_testi.json "step:<id>") → passo
             { "move", Step.Move }, { "pickup", Step.PickUp }, { "shelve", Step.Shelve }, { "serve", Step.Serve }, { "coins", Step.Coins },
-            { "unlock_nonno", Step.HireNonno }, { "upgrade_zaino", Step.ZainoPad }
+            { "unlock_nonno", Step.HireNonno }, { "upgrade_zaino", Step.ZainoPad },
+            { "combo", Step.Combo }, { "nonno_intro", Step.NonnoIntro }, { "nonno_confirm", Step.NonnoConfirm }, { "pad_nuovi", Step.PadNuovi },
+            { "cassa", Step.CassaPass }, { "debito", Step.DebtCard }, { "muro", Step.WallPad }
         };
         /// <summary>#101: testi per id (onboarding_testi.json) → array a 16 passi. Sostituisce il vecchio array a 7 passi (#4).</summary>
         public static string[] TextsById(System.Collections.Generic.IEnumerable<(string id, string text)> steps)
