@@ -59,3 +59,34 @@ Formato Given/When/Then; ogni criterio è misurabile dal bot di playtest (`botSt
 
 ## Definition of Done del cap. 1 (design)
 Tutti i criteri A-D verdi su 3 run consecutivi del bot; nessun blocco del flusso > 5 s senza suggerimento; nessun testo segnaposto a schermo.
+
+## E. Onboarding graduale: criteri dei gate (rev. 16/10)
+| ID | Given | When | Then |
+|---|---|---|---|
+| GATE-01 | nuova partita | parte il passo `move` | sono visibili solo Nina e il joystick; tutti gli elementi di `lockedAtStart` (`onboarding.json`) sono nascosti |
+| GATE-02 | qualsiasi passo N | il gate di N non è avvenuto | nessun elemento di `reveals` del passo N+1 è visibile o interattivo (0 occorrenze nei log) |
+| GATE-03 | gate di N avvenuto | — | il passo N+1 parte entro 1 s e rivela solo i suoi elementi |
+| GATE-04 | giocatore fermo su un passo | 10 / 20 / 40 s ±1 | parte il livello di aiuto corrispondente (`hintEscalation`), con evento di log |
+| GATE-05 | passo `combo` | 40 s senza combo x1,2 | il passo avanza comunque (gate morbido); tutti gli altri gate non avanzano mai a tempo |
+| GATE-06 | bot golden path | tutti i gate | tempi invariati: Zaino 1 1:23 ±20 s, NONNO 2:10 ±5 s, primo versamento 4:00 ±10 s, rata 34:00 ±120 s |
+| GATE-07 | `padNuovi` non ancora avviato | — | pad Scarpe e Insegna invisibili |
+
+## F. Protocollo playtest dal vivo (giocatore nuovo)
+**Chi:** 5 tester per giro (bastano a trovare circa l'80% dei problemi di usabilità), mai visto il gioco né i documenti, almeno 2 non giocatori abituali di gestionali. Dispositivo: telefono Android medio, verticale, audio acceso.
+**Regole per il facilitatore:**
+1. Unica frase iniziale: "È un gioco nuovo. Gioca come faresti a casa e dì ad alta voce quello che pensi e quello che provi a fare." Nessun'altra spiegazione.
+2. Non rispondere alle domande sul gioco ("Cosa faresti tu?"). Intervieni solo se il tester è bloccato da più di 60 s, annotandolo come **blocco**.
+3. Registra schermo + voce (think-aloud); se il tester tace per più di 15 s, chiedi "A cosa stai pensando?".
+4. Ferma la sessione a fine onboarding (passo `freePlay`) o dopo 10 minuti.
+
+**Cosa si misura per ogni passo** (dai log dei gate + video): durata del passo (dal reveal al gate); livello massimo di aiuto scattato (nessuno / 10 / 20 / 40 s); **punti di confusione** = momenti di più di 10 s senza un'azione utile o con frasi tipo "non so cosa fare" / "e adesso?"; verbalizzazione della meccanica (sa dire cosa ha appena imparato?).
+**Domande finali (2 minuti):** "Cosa fa NONNO?", "Come si compra un miglioramento?", "Cosa succede se non paghi la rata?", "C'è stato un momento in cui non sapevi cosa fare?". Risposta corretta = idea giusta con parole proprie.
+
+**Criterio di superamento (per tester):**
+- **mai più di 10 s senza sapere cosa fare** (nessun punto di confusione oltre 10 s);
+- nessun blocco (intervento del facilitatore);
+- aiuto da 40 s scattato al massimo 1 volta in tutto l'onboarding;
+- ogni passo entro il suo `maxSec`;
+- almeno 3 domande finali su 4 corrette, sempre compresa "Cosa fa NONNO?".
+
+**Criterio di superamento del giro:** almeno 4 tester su 5 passano; per ogni passo dove 2 o più tester superano i 10 s di confusione si apre un ticket con video e minuto. Template di report: tabella tester × passo (durata, aiuto massimo, confusione sì/no, citazione).
