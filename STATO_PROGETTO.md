@@ -1,7 +1,7 @@
 # STATO PROGETTO — Ultimo Miglio
 
 > Punto di ingresso unico per chiunque (persona o agente) lavori su questo repo. Aggiornalo **nella stessa PR** in cui completi qualcosa.
-> Ultimo aggiornamento: 2026-10-16 16:15 (Europe/Rome).
+> Ultimo aggiornamento: 2026-10-16 16:25 (Europe/Rome).
 
 ## 1. Il gioco
 - **Ultimo Miglio**: gioco mobile **Android**, **Unity 6 (6000.3) URP**.
@@ -157,6 +157,7 @@ Ogni ruolo lavora solo sulle issue con la propria etichetta `ruolo:*`, sempre co
 
 Voci più recenti in alto. Formato: `AAAA-MM-GG HH:MM` (Europe/Rome) — [commit] — descrizione.
 
+- 2026-10-16 16:25 — UI/UX — [aa5f033](https://github.com/B00RR/ultimo-miglio/commit/aa5f033c699f420dfd939519cc67dc485bc3b2af) — fix #185 (ramo `ui/185-angoli-9slice`): gli angoli bianchi dei riquadri arrotondati venivano dal 9-slice di `tex_cardboard_panel.png` e `tex_wood_panel.png`, PNG RGB senza alpha (angoli opachi) più il bordo sprite a 0 e, sui Button, lo sprite bianco del tema. Ora i pannelli sono RGBA con angoli trasparenti, mesh Full Rect, RGBA32 su WebGL; test EditMode `UiTextureAlpha185Tests`.
 - 2026-10-16 16:15 — Producer — Responsabili e scadenze per #185-#191, #170, #171, #179, #192, #168, #165, #125, #97. Assignee su GitHub non usabili (un solo account B00RR): il responsabile è scritto in un commento su ogni issue.
 - 2026-10-16 15:22 — Producer — Regola di Lorenzo (vincolo 8): merge su main solo Code Reviewer, DevOn, Lorenzo; main protetto. Avvisati tutti.
 - 2026-10-16 15:20 — Producer — Regola nuova di Lorenzo sull'autore dei commit (vincolo 7): ruolo + `@bokobay.invalid`, avvisati tutti gli agenti attivi.

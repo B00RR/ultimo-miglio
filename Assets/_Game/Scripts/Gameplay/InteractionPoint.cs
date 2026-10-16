@@ -6,7 +6,7 @@ namespace UltimoMiglio.Gameplay
 {
     public enum PoiKind { Prendi, Consegna, Acquisto }
 
-    /// <summary>My Little Universe-style interaction point: raised rounded ground pad with a thick ink rim that pulses
+    /// <summary>My Little Universe-style interaction point: flat inset ground ring (#187, tufo + tinted fill, no ink rim) that pulses
     /// (scale + emission), coloured by kind (prendi = blu, consegna = verde, acquisto = giallo), plus a floating billboard
     /// chip (icon + max 2 words, Fredoka) drawn in the HUD world layer. The current tutorial target gets a bigger,
     /// brighter pad and a vertical beacon; the others stay calm. Purely visual: gameplay stays in ProximityZone.</summary>
@@ -19,7 +19,23 @@ namespace UltimoMiglio.Gameplay
         public static readonly Color Blu = new(0.784f, 0.388f, 0.231f), Verde = new(0.561f, 0.788f, 0.659f), Giallo = new(0.957f, 0.769f, 0.188f), Ink = new(0.231f, 0.184f, 0.165f);
         static readonly Color Crema = new(0.953f, 0.890f, 0.765f); // #F3E3C3: schiarimenti caldi (mai verso il bianco/grigio freddo)
 
-        Transform _rim, _fill, _beacon; Material _fillMat, _beaconMat; Color _col;
+        // #187: visuale creata in edit time dallo SliceSceneBuilder e salvata in scena (anello zone_inset_ring + colonna faro).
+        // Materiali condivisi (asset, uno per tipo); le tinte di stato/pulse passano da MaterialPropertyBlock: niente new Material / renderer.material a runtime.
+        [SerializeField] Transform _ring; [SerializeField] Renderer _ringR; [SerializeField] Transform _beacon; [SerializeField] Renderer _beaconR;
+        /// <summary>Indice della submesh di riempimento in zone_inset_ring.fbx (0 = anello tufo, 1 = disco tingibile).</summary>
+        public const int FillSubmesh = 1;
+        public static readonly int BaseColorId = Shader.PropertyToID("_BaseColor"), ColorId = Shader.PropertyToID("_Color");
+        MaterialPropertyBlock _mpb, _beaconMpb; Color _col; Transform _fill;
+        public Transform RingVisual => _ring;
+        /// <summary>Raggio visivo (bordo esterno dell'anello) rispetto a Radius: lo stesso 1,075 usato dal vecchio POI_Rim.</summary>
+        public const float VisualScale = 1.075f;
+
+        /// <summary>Chiamato SOLO in edit time dallo scene builder: collega anello e faro già creati e salvati in scena.</summary>
+        public void BindVisuals(Transform ring, Transform beacon)
+        {
+            _ring = ring; _ringR = ring ? ring.GetComponentInChildren<Renderer>() : null;
+            _beacon = beacon; _beaconR = beacon ? beacon.GetComponent<Renderer>() : null;
+        }
         VisualElement _chip, _chipCol, _chevron, _bar, _barFill; Label _text, _barLabel;
         /// <summary>#94: aiuto livello 1 (10 s fermo): il bersaglio pulsa più forte (pad a terra + pillola).</summary>
         public bool HintPulse { get; set; }
@@ -57,18 +73,9 @@ namespace UltimoMiglio.Gameplay
             HideFloatingChips();
             HideLegacyZoneSquare();
             _col = KindColor; _phase = Random.value * 6f;
-            var sh = Shader.Find("Universal Render Pipeline/Unlit");
-            Material M(Color c) { var m = new Material(sh); m.SetColor("_BaseColor", c); if (m.HasProperty("_Color")) m.SetColor("_Color", c); return m; }
-            // Bordo bruno sottile (non disco pieno scuro)
-            _rim = Disc("POI_Rim", M(Ink), new Vector3(Radius * 2.15f, 0.06f, Radius * 2.15f), 0.035f);
-            _fillMat = M(_col);
-            // Riempimento saturo leggibile (Purchase = sole pieno; pickup/consegna teal/menta)
-            float fillA = Kind == PoiKind.Acquisto ? 0.92f : 0.78f;
-            _fillMat.color = new Color(_col.r, _col.g, _col.b, fillA);
-            _fill = Disc("POI_Fill", _fillMat, new Vector3(Radius * 1.95f, 0.08f, Radius * 1.95f), 0.05f);
-            _beaconMat = M(Color.Lerp(_col, Crema, 0.35f));
-            _beacon = Disc("POI_Beacon", _beaconMat, new Vector3(0.14f, 1.6f, 0.14f), 1.6f);
-            _beacon.gameObject.SetActive(false);
+            _mpb = new MaterialPropertyBlock(); _beaconMpb = new MaterialPropertyBlock();
+            _fill = _ring; // compat: LateUpdate esce se la scena non ha la visuale (es. test che aggiungono il componente a mano)
+            if (_beacon) _beacon.gameObject.SetActive(false);
             _tut = FindAnyObjectByType<TutorialManager>();
             if (PadIcon) PadIcon.SetVisible(false);
             var pt = GetComponent<UltimoMiglio.UI.World.PadTag>(); if (pt) pt.enabled = false;
@@ -78,14 +85,6 @@ namespace UltimoMiglio.Gameplay
         {
             Color.RGBToHSV(c, out float h, out float sat, out float v);
             return Color.HSVToRGB(h, Mathf.Clamp01(sat * k), Mathf.Clamp01(v * 1.05f));
-        }
-
-        Transform Disc(string n, Material m, Vector3 s, float y)
-        {
-            var g = GameObject.CreatePrimitive(PrimitiveType.Cylinder); g.name = n; Destroy(g.GetComponent<Collider>());
-            g.transform.SetParent(transform, false); g.transform.localPosition = new Vector3(0, y, 0); g.transform.localScale = s;
-            var r = g.GetComponent<Renderer>(); r.sharedMaterial = m; r.shadowCastingMode = UnityEngine.Rendering.ShadowCastingMode.Off;
-            return g.transform;
         }
 
         bool Available() => !Pad || (GameRoot.Ready && !double.IsInfinity(GameRoot.I.Eco.Cost(Pad.Kind)) && GameRoot.I.ActiveTime >= Pad.UnlockAtActiveSec);
@@ -137,21 +136,27 @@ namespace UltimoMiglio.Gameplay
         {
             if (!_fill) return;
             bool avail = Available();
-            if (_rim.gameObject.activeSelf != avail) { _rim.gameObject.SetActive(avail); _fill.gameObject.SetActive(avail); }
+            if (_ring.gameObject.activeSelf != avail) _ring.gameObject.SetActive(avail);
             var target = _tut ? _tut.CurrentTarget : null;
             _active = avail && target && (target.position - transform.position).sqrMagnitude < 9f;
-            _beacon.gameObject.SetActive(_active);
+            bool beaconOn = _active && Kind != PoiKind.Acquisto && _beacon; // la colonna 3D attraversava la pillola prezzo: niente faro sui pad acquisto
+            if (_beacon && _beacon.gameObject.activeSelf != beaconOn) _beacon.gameObject.SetActive(beaconOn);
             float t = Time.time * (_active ? 4.5f : 2.2f) + _phase, k = 0.5f + 0.5f * Mathf.Sin(t);
             float big = _active ? 1.12f : 1f, amp = HintPulse ? 0.16f : _active ? 0.07f : 0.04f; // #94: pulsazione forte all'aiuto 10 s
-            float sc = big * (1f + amp * k);
-            _rim.localScale = new Vector3(Radius * 2.15f * sc, 0.06f, Radius * 2.15f * sc);
-            _fill.localScale = new Vector3(Radius * 1.95f * sc, 0.08f, Radius * 1.95f * sc);
-            float baseA = Kind == PoiKind.Acquisto ? 0.92f : 0.78f;
-            var fill = Color.Lerp(_col, Crema, (_active ? 0.22f : 0.08f) * k);
-            fill.a = baseA * (0.88f + 0.12f * k); // pulse leggibile
-            _fillMat.SetColor("_BaseColor", fill); if (_fillMat.HasProperty("_Color")) _fillMat.SetColor("_Color", fill);
-            if (Kind == PoiKind.Acquisto) _beacon.gameObject.SetActive(false); // la colonna 3D attraversava la pillola prezzo: ora freccia UI sopra la pillola
-            if (_active && _beacon.gameObject.activeSelf) { _beacon.localScale = new Vector3(0.18f, 2.2f + 0.3f * k, 0.18f); _beaconMat.SetColor("_BaseColor", Color.Lerp(_col, Crema, 0.3f + 0.4f * k)); }
+            float d = Radius * 2f * VisualScale * big * (1f + amp * k); // mesh Ø 1 m a scala 1
+            _ring.localScale = new Vector3(d, 1f, d);
+            if (_ringR)
+            {
+                float baseA = Kind == PoiKind.Acquisto ? 0.92f : 0.78f;
+                var fill = Color.Lerp(_col, Crema, (_active ? 0.22f : 0.08f) * k);
+                fill.a = baseA * (0.88f + 0.12f * k); // pulse leggibile
+                _ringR.GetPropertyBlock(_mpb, FillSubmesh); _mpb.SetColor(BaseColorId, fill); _mpb.SetColor(ColorId, fill); _ringR.SetPropertyBlock(_mpb, FillSubmesh);
+            }
+            if (beaconOn)
+            {
+                _beacon.localScale = new Vector3(0.18f, 2.2f + 0.3f * k, 0.18f);
+                if (_beaconR) { var bc = Color.Lerp(_col, Crema, 0.3f + 0.4f * k); _beaconMpb.SetColor(BaseColorId, bc); _beaconMpb.SetColor(ColorId, bc); _beaconR.SetPropertyBlock(_beaconMpb); }
+            }
 
             EnsureChip();
             if (_chip == null || !_cam) return;
