@@ -1,7 +1,7 @@
 # STATO PROGETTO — Ultimo Miglio
 
 > Punto di ingresso unico per chiunque (persona o agente) lavori su questo repo. Aggiornalo **nella stessa PR** in cui completi qualcosa.
-> Ultimo aggiornamento: 2026-10-16 04:11 (Europe/Rome).
+> Ultimo aggiornamento: 2026-10-16 11:10 (Europe/Rome).
 
 ## 1. Il gioco
 - **Ultimo Miglio**: gioco mobile **Android**, **Unity 6 (6000.3) URP**.
@@ -23,6 +23,7 @@
 - **In pausa**: Game Designer, QA, Sound Designer, Narrative, LiveOps, Concept Artist (i loro documenti restano validi).
 
 ## 4. FATTO
+- **UI #71 telefono (PR ui/71-telefono-contrasto, in revisione)**: testi della home in bruno #3B2A20 (10,8:1 su crema) e noce per le righe secondarie, schede vuote (notifica, obiettivo) e riga rata nascoste finché non hanno testo. Il telefono resta fuori dall'HUD di gioco (DevOn #64).
 - Scheletro progetto Unity 6 + vertical slice cap. 1 (EconomyCore con test EditMode, gameplay, audio, import dati, script build/cattura).
 - HUD integrato agli eventi core (LN, Mora, giorno, bulloni), font Inter/Roboto (OFL), HUD responsive (1920x1080 / 1366x768 / 960x600).
 - Ramo/build **WebGL** (`webgl-min`, ora su `main`): fix magenta (URP Forward, niente post‑process, shader sempre inclusi), template web a finestra intera, input tastiera unico via FloatingJoystick, camera ortografica 4.5.

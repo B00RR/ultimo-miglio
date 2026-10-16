@@ -180,9 +180,11 @@ namespace UltimoMiglio.UI
             SetText("home-day", "Giorno " + d.day + "/" + (d.daysPerYear > 0 ? d.daysPerYear : 365) + " · Solara");
             SetText("home-time", d.time);
             SetText("home-installment", d.installmentLine);
+            SetDisplay(root.Q("home-installment"), !string.IsNullOrEmpty(d.installmentLine)); // #71: niente barre/righe vuote
             SetText("home-notification", d.notification);
             SetDisplay(root.Q("home-notification-card"), !string.IsNullOrEmpty(d.notification));
             SetText("home-quest", d.questLine);
+            SetDisplay(root.Q("home-quest-card"), !string.IsNullOrEmpty(d.questLine)); // #71
         }
 
         public void SetOrders(IList<OrderItem> orders)

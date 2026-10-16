@@ -54,3 +54,12 @@
     color: #FFF9EE;
     -unity-font-definition: url("project://database/Assets/_Game/UI/Fonts/Fredoka-Bold.ttf");
 }
+
+/* #71: schermo crema → testi bruno #3B2A20 (contrasto 10,8:1 su #F3E3C3, 9,3:1 su #E8D3AC; prima crema su crema 1,2:1).
+   Sovrascrive i colori "notte" di DioramaSolare.uss (Phone.uss è caricato dopo, stessa specificità). */
+#home-day, #home-time, #home-installment, #messaggi-contact, #flotta-cassa, #flotta-nextpad, .phone-text { color: #3B2A20; }
+#home-installment, #flotta-nextpad { color: #7A4A2E; } /* noce: secondario, 5,8:1 su crema */
+.phone-card Label { color: #3B2A20; }
+.bubble--them { background-color: #E8D3AC; color: #3B2A20; }
+.chip { background-color: #E8D3AC; color: #3B2A20; }
+#phone-back .icon { -unity-background-image-tint-color: #3B2A20; }
