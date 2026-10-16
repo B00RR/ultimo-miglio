@@ -15,6 +15,9 @@ namespace UltimoMiglio.Core
         public double NinaBaseSpeed, FullStackSlowdown;
         public int[] ZainoCapacity; public double[] ZainoCost, ScarpeBonus, ScarpeCost, InsegnaBonus, InsegnaCost;
         public double NonnoHireCost, NonnoUnlockSec;
+        // Ricompense intermedie (economy.json → rewards)
+        public int[] ParcelMilestones = new int[0]; public double[] ParcelMilestoneBonusLn = new double[0];
+        public double[] DebtMilestoneShares = new double[0]; public double CassaFirstVisitTipLn; public double NextPadArrowFromSec; public string[] NextPadArrowCandidates = new string[0];
         public double[] NonnoRestockPpm, NonnoSelfServicePpm, NonnoCost; public int NonnoMaxLevel;
         public double OfflineRateShare, CassaCapacityShareOfTranche, OfflineShareOfChapterMax; public int AdDoubleMaxPerDay;
         public double MaxOfflineSec = 7 * 24 * 3600; // tech guard (not balance)
@@ -53,6 +56,11 @@ namespace UltimoMiglio.Core
                 ProrogaExtensionActiveMin = d.debt.proroga.extensionActiveMin, ProrogaTokensAtActStart = d.debt.proroga.tokensGrantedAtActStart, ProrogaTokensMax = d.debt.proroga.tokensMax,
                 MoraTrancheSurcharge = d.debt.late.trancheSurcharge, PedaggioCoinPenalty = d.debt.late.pedaggioCoinPenalty, PedaggioAppliesToOffline = d.debt.late.pedaggioAppliesToOffline,
                 EarlyPaymentMinCycles = d.debt.earlyPayment.minCyclesEarly, EarlyPaymentBulloni = d.debt.earlyPayment.bulloni,
+                ParcelMilestones = e.rewards?.parcelMilestones?.Select(m => m.parcels).ToArray() ?? new int[0],
+                ParcelMilestoneBonusLn = e.rewards?.parcelMilestones?.Select(m => m.bonusLn).ToArray() ?? new double[0],
+                DebtMilestoneShares = e.rewards?.debtMilestones?.Select(m => m.share).ToArray() ?? new double[0],
+                CassaFirstVisitTipLn = e.rewards?.cassaFirstVisitTipLn ?? 0, NextPadArrowFromSec = e.rewards?.nextPadArrow?.fromSec ?? 0,
+                NextPadArrowCandidates = e.rewards?.nextPadArrow?.candidates ?? new string[0],
             };
         }
     }
