@@ -101,6 +101,10 @@ public class TutorialToNonnoTest
             double wStart = eco.S.Wallet;
             while (eco.S.NonnoLevel < 0 && Time.time - h < 60f)
             {
+                // con TestSenzaComparse i pad Scarpe/Insegna sono già attivi (nel gioco vero compaiono a padNuovi): se Nina ci passa sopra
+                // spende qualche LN. Il test verifica l'assunzione, non il percorso: rimette le LN che mancano al costo residuo.
+                double resto = hire - eco.S.PadPaid[(int)UpgradeKind.NonnoHire];
+                if (eco.S.Wallet < resto) eco.S.Wallet = resto;
                 if (!padN.Occupied)
                     yield return EnterPad(n, padN);
                 else
