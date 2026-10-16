@@ -1,7 +1,7 @@
 # STATO PROGETTO — Ultimo Miglio
 
 > Punto di ingresso unico per chiunque (persona o agente) lavori su questo repo. Aggiornalo **nella stessa PR** in cui completi qualcosa.
-> Ultimo aggiornamento: 2026-10-16 04:11 (Europe/Rome).
+> Ultimo aggiornamento: 2026-10-16 11:15 (Europe/Rome).
 
 ## 1. Il gioco
 - **Ultimo Miglio**: gioco mobile **Android**, **Unity 6 (6000.3) URP**.
@@ -215,3 +215,8 @@ Voci più recenti in alto. Formato: `AAAA-MM-GG HH:MM` (Europe/Rome) — [commit
 - Catture anteprima 390x844 (HTML/Playwright, non Unity): `docs/ui/catture/pr36/`.
 - Deciso (Tech Lead): pannello unico `SettingsController`; `Bridge/SettingsPanel` resta (usato da `HudGameBridge`) ma senza listener `OnSettingsRequested`. Ingranaggio = toggle (QA P3, `qa/playtest_web_live_p0.md` S01). Zoom su chiave unica `cam_zoom_v3` (`DepotCameraFit.PrefZoom`).
 - Riferimento #35 (chiusa). Correlate aperte: #64, #67.
+
+## Aggiornamento 16/10 11:15 — 11_CAP1_COMPLETO allineato all'HUD minimo (UI, issue #138, branch ui/138-cap1-hud-minimo)
+- Copia di riferimento: `docs/design/11_CAP1_COMPLETO.md` (decisione del Producer); quella in `ultimo-miglio-docs` diventa un rimando (docs#2/#3).
+- UI/UX: HUD Cap. 1 solo LN, giorno, riga obiettivo, joystick e pad; telefono di Nina rimandato a Gioco completo (#64); combo solo "+N" sopra Nina per 1,5 s, x1,2 non mostrato; debito solo a fine giornata e nel fumetto di Ada; colori pad ritiro `#5E7F86`, consegna `#8FC9A8`, acquisto `#F4C430`, potenziamento `#F7E26B`. UI/UX 5 → 4 gp.
+- Sound: SFX UI telefono (swipe, notifica) segnati Gioco completo; "test speaker telefono" → test su speaker di smartphone. Nessun nuovo asset: **da rivedere col Sound Designer**.
