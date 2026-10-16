@@ -38,6 +38,7 @@
 - Documentazione di design: bibbia, core loop, tech, UI, retention, sprint 1, gestionale, longevità, cap. 1 completo, protocollo Unity.
 
 ## 5. IN CORSO (oggi 16/10)
+- **UI #172 HUD direzione C, insegna di noce (ramo `ui/172-hud-insegna-noce`)**: insegna appesa, cartellino GIORNO, ordine che si ritrae a icona dopo 3 s, joystick e pad PRENDI in terracotta. Debito e telefono fuori dall'HUD. Font Baloo 2 (OFL). API di onboarding invariate. Catture 390×844 e 360×800 nel job CI `catture`, poi in `docs/qa/hud_insegna_c/`.
 - **main @ 7dd1767** — QA live **v5 VIA** (PR #55: #47 deposito + #48 luce/camera). Build QA su `build/WebGL` :8777; art night su `build/WebGL_next` :8778 (non toccare).
 - P2 aperti da QA v5: camera follow (Nina esce/coperta), pillola prezzo LN sotto riga obiettivo.
 - **Merge del ramo `animator`** (fix camminata): conflitto su `chr_nina_vela.fbx` e `bot_nonno.fbx`.
