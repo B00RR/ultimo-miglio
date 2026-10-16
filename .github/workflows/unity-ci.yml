@@ -1,11 +1,10 @@
 # Pipeline Ultimo Miglio (issue #12)
-# - Ogni PR verso main: test EditMode + PlayMode (game-ci) e commento con l'esito sulla PR.
-# - PR verso main: SOLO test EditMode + PlayMode (una sola invocazione game-ci, testMode: all) + commento.
+# - PR verso main: SOLO test EditMode + PlayMode sul runner self-hosted del box (Editor locale, Library persistente) + commento.
 # - Push su main e avvio manuale: test + build WebGL (verifica, artifact). Le modifiche solo .md/docs non avviano la CI.
 # - Deploy su B00RR/ultimo-miglio-web (GitHub Pages) SOLO con avvio manuale (workflow_dispatch): niente deploy automatico al merge.
-# game-ci v4 con licenza Personal vuole UNITY_LICENSE (.ulf) + UNITY_EMAIL/UNITY_PASSWORD: senza .ulf la build si ferma con
-# "Missing Unity License File and no Serial was found" (run 38865014865). Con la .ulf i test erano verdi (run 38757501264).
-# Secret richiesti: UNITY_LICENSE, UNITY_EMAIL, UNITY_PASSWORD; PAGES_DEPLOY_KEY (deploy key con scrittura sul repo web).
+# Test e build girano sul runner self-hosted [self-hosted, unity] (box): Editor 6000.3.26f1 locale con licenza già attiva,
+# niente container game-ci. tools/ci_unity.sh gestisce lock (/tmp/unity-ci.lock) e attesa di altri Unity (max 20 min).
+# Secret richiesti: PAGES_DEPLOY_KEY (deploy key con scrittura sul repo web).
 name: Unity CI (WebGL)
 on:
   pull_request:
@@ -28,68 +27,29 @@ env:
   TZ: Europe/Rome
 
 jobs:
-  licenza:
-    runs-on: ubuntu-24.04
-    outputs:
-      ok: ${{ steps.c.outputs.ok }}
-    steps:
-      - id: c
-        env:
-          L: ${{ secrets.UNITY_LICENSE }}
-          E: ${{ secrets.UNITY_EMAIL }}
-          P: ${{ secrets.UNITY_PASSWORD }}
-        run: |
-          mancano=""
-          [ -n "$L" ] || mancano="$mancano UNITY_LICENSE"
-          [ -n "$E" ] || mancano="$mancano UNITY_EMAIL"
-          [ -n "$P" ] || mancano="$mancano UNITY_PASSWORD"
-          if [ -z "$mancano" ]; then echo "ok=true" >> "$GITHUB_OUTPUT"
-          else echo "ok=false" >> "$GITHUB_OUTPUT"; echo "::error::Secret mancanti:$mancano. Vedi LEGGIMI_BUILD.md §3."; exit 1; fi
-
   test:
-    needs: licenza
-    if: needs.licenza.outputs.ok == 'true'
-    runs-on: ubuntu-24.04
+    runs-on: [self-hosted, unity]
+    timeout-minutes: 60
     steps:
-      # L'immagine unityci/editor (~15 GB) non entra senza spazio: pulizia limitata alle cartelle più grandi e veloci da togliere
-      - uses: jlumbroso/free-disk-space@v1.3.1
-        with: { tool-cache: false, android: true, dotnet: true, haskell: true, large-packages: false, docker-images: false, swap-storage: false }
+      # Checkout persistente: clean false mantiene Library tra le run
       - uses: actions/checkout@v4
-      # LFS con cache: si scaricano solo gli oggetti nuovi (risparmio banda LFS)
-      - name: Elenco oggetti LFS
-        run: git lfs ls-files -l | cut -d' ' -f1 | sort > .lfs-assets-id
-      - uses: actions/cache@v4
-        with:
-          path: .git/lfs
-          key: lfs-${{ hashFiles('.lfs-assets-id') }}
-          restore-keys: lfs-
-      - run: git lfs pull
-      - uses: actions/cache@v4
-        with:
-          path: Library
-          # Chiave stabile (progetto nella radice del repo): cambia solo con pacchetti/impostazioni
-          key: Library-${{ runner.os }}-test-${{ hashFiles('Packages/packages-lock.json', 'Packages/manifest.json', 'ProjectSettings/**') }}
-          restore-keys: |
-            Library-${{ runner.os }}-test-
-      - uses: game-ci/unity-test-runner@v4
-        env:
-          UNITY_LICENSE: ${{ secrets.UNITY_LICENSE }}
-          UNITY_EMAIL: ${{ secrets.UNITY_EMAIL }}
-          UNITY_PASSWORD: ${{ secrets.UNITY_PASSWORD }}
-        with:
-          unityVersion: ${{ env.UNITY_VERSION }}
-          testMode: all
-          # Immagine con modulo WebGL: gli script Editor usano UnityEditor.WebGL
-          customImage: unityci/editor:ubuntu-6000.3.26f1-webgl-3
-          artifactsPath: test-results
-          githubToken: ${{ secrets.GITHUB_TOKEN }}
-          checkName: Test Unity
+        with: { clean: false, lfs: true }
+      - name: Test EditMode + PlayMode (Editor del box, stessa Library)
+        run: |
+          rm -rf test-results && mkdir -p test-results
+          rc=0
+          for m in EditMode PlayMode; do
+            tools/ci_unity.sh -buildTarget WebGL -runTests -testPlatform $m \
+              -testResults "$PWD/test-results/${m,,}-results.xml" -logFile "$PWD/test-results/${m,,}.log" || rc=1
+            test -f "test-results/${m,,}-results.xml" || { echo "::error::Risultati $m mancanti"; tail -50 "test-results/${m,,}.log"; rc=1; }
+          done
+          exit $rc
       - uses: actions/upload-artifact@v4
         if: always()
         with: { name: test-results, path: test-results }
 
   commento:
-    needs: [licenza, test]
+    needs: [test]
     if: always() && github.event_name == 'pull_request'
     runs-on: ubuntu-24.04
     steps:
@@ -101,60 +61,31 @@ jobs:
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           UM_REPO: ${{ github.repository }}
-          LICENZA_OK: ${{ needs.licenza.outputs.ok }}
         run: |
           mkdir -p Logs
           for f in $(find test-results -name '*.xml' 2>/dev/null); do
             case "$f" in *[Ee]dit[Mm]ode*) cp "$f" Logs/editmode-results.xml;; *[Pp]lay[Mm]ode*) cp "$f" Logs/playmode-results.xml;; esac
           done
           RUN="${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}"
-          [ "$LICENZA_OK" = true ] || export UM_NOTA="⚠️ Test non eseguiti: licenza Unity non configurata nei secret (vedi LEGGIMI_BUILD.md §3)."
           tools/pr_comment.sh ${{ github.event.pull_request.number }} "" "$RUN"
 
   build:
-    needs: licenza
-    # Sulle PR niente build WebGL (solo test): build su push a main e avvio manuale
-    if: needs.licenza.outputs.ok == 'true' && github.event_name != 'pull_request'
-    runs-on: ubuntu-24.04
+    needs: test
+    # Sulle PR niente build WebGL (solo test): build su push a main e avvio manuale, sul box con la stessa Library
+    if: github.event_name != 'pull_request'
+    runs-on: [self-hosted, unity]
+    timeout-minutes: 60
     steps:
-      # L'immagine unityci/editor (~15 GB) non entra senza spazio: pulizia limitata alle cartelle più grandi e veloci da togliere
-      - uses: jlumbroso/free-disk-space@v1.3.1
-        with: { tool-cache: false, android: true, dotnet: true, haskell: true, large-packages: false, docker-images: false, swap-storage: false }
       - uses: actions/checkout@v4
-      - run: git lfs ls-files -l | cut -d' ' -f1 | sort > .lfs-assets-id
-      - uses: actions/cache@v4
-        with:
-          path: .git/lfs
-          key: lfs-${{ hashFiles('.lfs-assets-id') }}
-          restore-keys: lfs-
-      - run: git lfs pull
-      - uses: actions/cache@v4
-        with:
-          path: Library
-          key: Library-${{ runner.os }}-WebGL-${{ hashFiles('Packages/packages-lock.json', 'Packages/manifest.json', 'ProjectSettings/**') }}
-          restore-keys: |
-            Library-${{ runner.os }}-WebGL-
-      - uses: game-ci/unity-builder@v4
-        env:
-          UNITY_LICENSE: ${{ secrets.UNITY_LICENSE }}
-          UNITY_EMAIL: ${{ secrets.UNITY_EMAIL }}
-          UNITY_PASSWORD: ${{ secrets.UNITY_PASSWORD }}
-        with:
-          unityVersion: ${{ env.UNITY_VERSION }}
-          targetPlatform: WebGL
-          customImage: unityci/editor:ubuntu-6000.3.26f1-webgl-3
-          # Metodo ufficiale del Tech Lead (shader, Look48, HUD, scena): output in Builds/WebGL_min
-          buildMethod: UltimoMiglio.EditorTools.WebGLMinBuild.Build
-          # .lfs-assets-id (cache LFS) rende il working tree "sporco": niente versioning semantico da git
-          versioning: None
-          allowDirtyBuild: true
+        with: { clean: false, lfs: true }
+      - name: Build WebGL (UltimoMiglio.EditorTools.WebGLMinBuild.Build -> Builds/WebGL_min)
+        run: |
+          rm -rf Builds/WebGL_min
+          tools/ci_unity.sh -quit -buildTarget WebGL -executeMethod UltimoMiglio.EditorTools.WebGLMinBuild.Build -logFile "$PWD/webgl_build.log" || { tail -80 webgl_build.log; exit 1; }
       - name: Controllo build non compressa
         run: |
           test -f Builds/WebGL_min/index.html
           if ls Builds/WebGL_min/Build/*.br Builds/WebGL_min/Build/*.gz 2>/dev/null; then echo "::error::Build compressa"; exit 1; fi
-      # Il container Unity scrive Builds/ come root: senza chown lo step patch fallisce con "Permission denied" (run 38865499000)
-      - name: Permessi sui file della build
-        run: sudo chown -R "$(id -u):$(id -g)" Builds
       - name: Patch mobile su index.html (come um-web/pubblica.sh USE_BUILD_INDEX=1)
         run: tools/patch_index_mobile.sh Builds/WebGL_min/index.html
       - name: Deploy su GitHub Pages (B00RR/ultimo-miglio-web) - solo avvio manuale
