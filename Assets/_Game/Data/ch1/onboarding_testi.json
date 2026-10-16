@@ -1,5 +1,5 @@
 {
-  "_nota": "Testi definitivi onboarding cap.1 (Narrative). Voce: Nonna Ada, dai biglietti lasciati nel deposito, parla a Nina. Max 70 caratteri. Unity legge speaker, steps[].text (in ordine, 7 passi) e fine: non cambiare ordine né chiavi.",
+  "_nota": "Testi definitivi onboarding cap.1 (Narrative). Voce: Nonna Ada, dai biglietti lasciati nel deposito, parla a Nina. Max 70 caratteri. SliceSceneBuilder legge speaker, steps[].text IN ORDINE (7 passi, ordine del codice: ... monete, NONNO, Zaino) e fine: non cambiare ordine né chiavi.",
   "speaker": "Nonna Ada",
   "steps": [
     {
@@ -23,12 +23,12 @@
       "text": "Raccogli le monete. Una alla volta si fa un anno."
     },
     {
-      "id": "upgrade_zaino",
-      "text": "Sali sul pad ZAINO: più pacchi, meno giri. Fidati."
-    },
-    {
       "id": "unlock_nonno",
       "text": "NONNO brontola, ma lavora. Sveglialo dal pad, digli ciao."
+    },
+    {
+      "id": "upgrade_zaino",
+      "text": "Sali sul pad ZAINO: più pacchi, meno giri. Fidati."
     }
   ],
   "fine": "Brava, Nina. Il resto lo scopri da te. Io l'ho sempre saputo.",

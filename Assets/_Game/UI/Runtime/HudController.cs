@@ -37,10 +37,11 @@ namespace UltimoMiglio.UI
 
         /// <summary>Set by the bridge (ChapterDataHudConfig). Optional: every API also takes explicit values.</summary>
         public IHudConfig Config { get; set; }
+        public System.Action OnSettingsRequested;
         public VisualElement Root { get; private set; }
         public VisualElement SafeRoot { get; private set; }
 
-        Label lnLabel, boltLabel, tokenLabel, tollLabel, roomLabel, toastLabel, phoneBadge;
+        Label lnLabel, boltLabel, tokenLabel, tollLabel, roomLabel, toastLabel, phoneBadge, dayLabel, tutorialObjective;
         VisualElement currencyPill, tokenGroup, tollChip, roomPill, toast, phoneButton, safeCard, popupLayer;
         Coroutine roomCo, toastCo;
         Rect lastSafeArea;
@@ -52,6 +53,8 @@ namespace UltimoMiglio.UI
 
         // UIDocument builds its tree in its own OnEnable; order vs this component is not guaranteed
         // (WebGL showed every contextual panel visible at once). Retry until the tree exists.
+        bool IsMinimal => Root != null && Root.ClassListContains("hud--minimal");
+
         bool TryBind()
         {
             if (bound) return true;
@@ -61,12 +64,16 @@ namespace UltimoMiglio.UI
             SafeRoot = Root.Q("safe-root") ?? Root;
             currencyPill = Root.Q("currency-pill");
             lnLabel = Root.Q<Label>("ln-value");
+            dayLabel = Root.Q<Label>("day-value");
+            tutorialObjective = Root.Q<Label>("tutorial-objective");
             boltLabel = Root.Q<Label>("bolt-value");
             tokenGroup = Root.Q("token-group");
             tokenLabel = Root.Q<Label>("token-value");
             tollChip = Root.Q("toll-chip");
             tollLabel = Root.Q<Label>("toll-value");
             phoneButton = Root.Q("phone-button");
+            var settingsButton = Root.Q("settings-button");
+            settingsButton?.RegisterCallback<ClickEvent>(_ => OnSettingsRequested?.Invoke());
             phoneBadge = Root.Q<Label>("phone-badge");
             roomPill = Root.Q("room-pill");
             roomLabel = Root.Q<Label>("room-name");
@@ -81,10 +88,12 @@ namespace UltimoMiglio.UI
 
             SetVisible(tollChip, false);
             SetVisible(roomPill, false); SetVisible(toast, false); SetVisible(safeCard, false);
-            SetVisible(phoneButton, true);
-            SetVisible(Root.Q("phone-key-hint"), !Application.isMobilePlatform); // desktop/WebGL: "TAB" hint
+            // HUD minimo Concept: niente telefono (Phone.uss); solo Impostazioni discreta
+            SetVisible(phoneButton, false);
+            SetVisible(Root.Q("phone-key-hint"), false);
             SetPhoneBadge(cBadge);
             SetCurrencies(cLn, cBolt, cTok);
+            SetDay(cDay, cDaysPerYear);
             Root.RegisterCallback<GeometryChangedEvent>(_ => RefreshSafeArea(true));
             bound = true;
             RefreshSafeArea(true);
@@ -99,6 +108,7 @@ namespace UltimoMiglio.UI
         void Update()
         {
             if (!TryBind()) return;
+            EnsureAda(); MirrorTutorialBanner();
             if (Screen.safeArea != lastSafeArea || lastScreen.x != Screen.width || lastScreen.y != Screen.height)
                 RefreshSafeArea(false);
         }
@@ -107,6 +117,9 @@ namespace UltimoMiglio.UI
         {
             lastSafeArea = Screen.safeArea; lastScreen = new Vector2Int(Screen.width, Screen.height);
             SafeAreaUtil.ApplyPadding(SafeRoot);
+            // HUD v2: room label 76 dp below the safe top (absolute offsets start at the padding-box edge)
+            var tc = Root?.Q(className: "top-center");
+            if (tc != null && SafeRoot != null) tc.style.top = SafeRoot.resolvedStyle.paddingTop + 76f;
         }
 
         // ---------------- Permanent overlay ----------------
@@ -119,6 +132,15 @@ namespace UltimoMiglio.UI
             if (boltLabel != null) boltLabel.text = HudFormat.Amount(bulloni);
             SetVisible(tokenGroup, gettoni.HasValue);
             if (gettoni.HasValue && tokenLabel != null) tokenLabel.text = HudFormat.Amount(gettoni.Value);
+        }
+
+        int cDay = 1, cDaysPerYear = 365;
+        /// <summary>Giorno compatto in pillola (HUD minimale #38): "G12".</summary>
+        public void SetDay(int day, int daysPerYear = 365)
+        {
+            cDay = day > 0 ? day : 1;
+            cDaysPerYear = daysPerYear > 0 ? daysPerYear : 365;
+            if (dayLabel != null) dayLabel.text = "G" + cDay;
         }
 
         public void PulseCurrency() => Pulse(currencyPill);
@@ -138,7 +160,7 @@ namespace UltimoMiglio.UI
         {
             cBadge = count;
             if (phoneBadge == null) return;
-            SetVisible(phoneBadge, count > 0);
+            SetVisible(phoneBadge, !IsMinimal && count > 0);
             phoneBadge.text = count > 9 ? "9+" : count.ToString();
         }
 
@@ -159,6 +181,7 @@ namespace UltimoMiglio.UI
         /// <summary>preview = onboarding step 10: chip shown greyed and not tappable, toll not active.</summary>
         public void ShowPedaggio(float fraction, bool preview)
         {
+            if (IsMinimal) { SetVisible(tollChip, false); return; }
             if (tollChip != null) { tollChip.EnableInClassList("toll-chip--preview", preview); tollChip.pickingMode = preview ? PickingMode.Ignore : PickingMode.Position; }
             if (float.IsNaN(fraction) && Config != null) fraction = Config.TollFraction;
             if (tollLabel != null) tollLabel.text = float.IsNaN(fraction) ? "Pedaggio" : "-" + HudFormat.Percent(fraction);
@@ -176,10 +199,43 @@ namespace UltimoMiglio.UI
         // ---------------- Contextual ----------------
         public void ShowRoomLabel(string roomName)
         {
+            if (IsMinimal) { SetVisible(roomPill, false); return; }
             if (roomLabel == null) return;
-            roomLabel.text = roomName;
+            roomLabel.text = FormatRoom(roomName);
             if (roomCo != null) StopCoroutine(roomCo);
             roomCo = StartCoroutine(ShowFor(roomPill, roomLabelSeconds));
+        }
+
+        /// <summary>"Bancone · 12" → "BANCONE · 12"; over 22 chars the part after " · " wraps to a 2nd line (never an ellipsis).</summary>
+        public static string FormatRoom(string name)
+        {
+            if (string.IsNullOrEmpty(name)) return "";
+            string t = name.ToUpperInvariant();
+            int i = t.LastIndexOf(" · ", System.StringComparison.Ordinal);
+            if (t.Length > 22 && i > 0) t = t.Substring(0, i) + "\n" + t.Substring(i + 3);
+            return t;
+        }
+
+        // ---------------- Nonna Ada notes (HUD v2) ----------------
+        AdaNoteView adaNote; ResponsivePanel responsive; VisualElement legacyBanner; string lastAdaText;
+        /// <summary>One note at a time, queued (UI_SPEC_BIGLIETTI). sticky = stays until CompleteAdaNote().</summary>
+        public void ShowAdaNote(string text, bool sticky = true, float seconds = 0f) { EnsureAda(); adaNote?.Show(text, sticky, seconds); lastAdaText = text; }
+        public void EnqueueAdaNote(string text, float seconds) { EnsureAda(); adaNote?.Enqueue(text, seconds); }
+        public void CompleteAdaNote() { adaNote?.Complete(); lastAdaText = null; }
+        void EnsureAda() { if (adaNote == null && Root != null) { adaNote = AdaNoteView.Attach(Root); responsive = GetComponent<ResponsivePanel>(); } }
+
+        /// <summary>TutorialManager (Gameplay) still builds an inline-styled "tutorial-banner" at the bottom: hide it and
+        /// mirror its text into the v2 note (upper band). No Gameplay file changes needed.</summary>
+        void MirrorTutorialBanner()
+        {
+            if (legacyBanner == null && Root != null) legacyBanner = Root.Q("tutorial-banner");
+            if (legacyBanner != null)
+            {
+                legacyBanner.style.visibility = Visibility.Hidden;
+                legacyBanner.style.display = DisplayStyle.None;
+            }
+            // tutorial-objective is owned by TutorialManager — do not blank it here (QA v2 live bug)
+            adaNote?.Tick(responsive ? responsive.Scale : 1f);
         }
 
         public void ShowToast(string text, float seconds = -1)
@@ -200,6 +256,7 @@ namespace UltimoMiglio.UI
             SetText(safeCard, "safe-toll-text", "PEDAGGIO OMNIFREIGHT -" + HudFormat.Percent(d.tollFraction) + " · salda la rata per toglierlo");
             SetText(safeCard, "safe-title", "Cassaforte · Cap. " + d.chapter);
             SetText(safeCard, "safe-day", "Giorno " + d.day + "/" + (d.daysPerYear > 0 ? d.daysPerYear : 365));
+            SetDay(d.day, d.daysPerYear > 0 ? d.daysPerYear : 365);
             string amount = double.IsNaN(d.installmentAmount) ? "" : " · " + HudFormat.Amount(d.installmentAmount) + " LN";
             SetText(safeCard, "safe-installment", "Rata " + d.installmentIndex + amount + (d.installmentDueDay > 0 ? " · scade Giorno " + d.installmentDueDay : ""));
             float pct = d.trancheTotal > 0 ? Mathf.Clamp01((float)(d.tranchePaid / d.trancheTotal)) : 0f;
