@@ -158,6 +158,11 @@ Ogni ruolo lavora solo sulle issue con la propria etichetta `ruolo:*`, sempre co
 
 Voci più recenti in alto. Formato: `AAAA-MM-GG HH:MM` (Europe/Rome) — [commit] — descrizione.
 
+- 2026-10-16 18:10 — Producer — **punto Cap. 1 (18:10 Europe/Rome)**, main a [ee59380](https://github.com/B00RR/ultimo-miglio/commit/ee59380fdab2bb148e8515eeff2d2aa2c51ecc84):
+  - **#157** (tutorial 16 passi), **#174** (Zaino liv. 2, chiude #110) e **#169** (Ada in scena): unite.
+  - **#175** (HUD insegna di noce): ancora aperta, **in conflitto** con main, ferma dalle 15:49. Anche **#214** (trigger pad = cerchio, #171) e **#202** (fumetto HUD, #186) sono in conflitto: serve rebase.
+  - **Build**: su main `build` e `deploy-dev` verdi (link dev: https://b00rr.github.io/ultimo-miglio-web/dev/); il job `test` è **fallito per la licenza Unity** (0 entitlement, immagine `unityci/editor:ubuntu-6000.3.26f1-webgl-3` non trovata), non per il codice. Stesso errore su **#211**. Rilanciati i job falliti alle 18:10.
+  - **QA**: nessuna issue `ruolo:qa` aperta; il test lo fa Lorenzo sul link.
 - 2026-10-16 16:25 — UI/UX — [aa5f033](https://github.com/B00RR/ultimo-miglio/commit/aa5f033c699f420dfd939519cc67dc485bc3b2af) — fix #185 (ramo `ui/185-angoli-9slice`): gli angoli bianchi dei riquadri arrotondati venivano dal 9-slice di `tex_cardboard_panel.png` e `tex_wood_panel.png`, PNG RGB senza alpha (angoli opachi) più il bordo sprite a 0 e, sui Button, lo sprite bianco del tema. Ora i pannelli sono RGBA con angoli trasparenti, mesh Full Rect, RGBA32 su WebGL; test EditMode `UiTextureAlpha185Tests`.
 - 2026-10-16 16:15 — Producer — Responsabili e scadenze per #185-#191, #170, #171, #179, #192, #168, #165, #125, #97. Assignee su GitHub non usabili (un solo account B00RR): il responsabile è scritto in un commento su ogni issue.
 - 2026-10-16 15:22 — Producer — Regola di Lorenzo (vincolo 8): merge su main solo Code Reviewer, DevOn, Lorenzo; main protetto. Avvisati tutti.
