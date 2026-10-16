@@ -38,6 +38,15 @@ public class EconomyCoreTests
         e.S.Wallet = 1e6; Assert.IsFalse(e.PadTick(UpgradeKind.Zaino, 5), "il pad non deve completare oltre il livello 7");
         Assert.AreEqual(7, e.S.Zaino); Assert.AreEqual(1.0, e.PadFill(UpgradeKind.Zaino), 1e-9);
     }
+    [Test] public void Onboarding16_OgniPassoHaIlBigliettoDiTilde()
+    {
+        var j = System.IO.File.ReadAllText("Assets/_Game/Data/ch1/onboarding_testi.json");
+        var steps = UnityEngine.JsonUtility.FromJson<TestiOnb>(j).steps;
+        var t = UltimoMiglio.Gameplay.TutorialManager.TextsById(System.Linq.Enumerable.Select(steps, x => (x.id, x.text)));
+        for (int i = 1; i < (int)UltimoMiglio.Gameplay.TutorialManager.Step.FreePlay; i++) Assert.IsFalse(string.IsNullOrEmpty(t[i]), $"passo {(UltimoMiglio.Gameplay.TutorialManager.Step)i} senza biglietto");
+    }
+    [System.Serializable] class TestiStep { public string id, text; }
+    [System.Serializable] class TestiOnb { public TestiStep[] steps; }
     [Test] public void PadInstallmentPersistsWhenWalletEmpty()
     {
         var e = New(); e.S.Wallet = 20;
