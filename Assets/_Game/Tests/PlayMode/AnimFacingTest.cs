@@ -146,7 +146,7 @@ public class ClientiRigTest
     [UnityTest] public IEnumerator Clienti_SonoIRiggatiNonCapsule()
     {
         // Solo le chiavi del gioco: i volumi (vol_music/vol_sfx, #36) restano intatti
-        PlayerPrefs.DeleteKey(TutorialManager.PrefKey); PlayerPrefs.DeleteKey("um_save_v1"); PlayerPrefs.DeleteKey(DepotCameraFit.PrefZoom);
+        PlayerPrefs.DeleteKey(TutorialManager.PrefKey); TutorialManager.TestSenzaComparse = true; // #101 PlayerPrefs.DeleteKey("um_save_v1"); PlayerPrefs.DeleteKey(DepotCameraFit.PrefZoom);
         yield return SceneManager.LoadSceneAsync("Ch1_Deposito");
         for (int i = 0; i < 60 && !GameRoot.Ready; i++) yield return null;
         var q = Object.FindAnyObjectByType<CustomerQueue>(); Assert.IsNotNull(q); Assert.IsNotNull(q.Prefab, "CustomerQueue.Prefab rotto");
