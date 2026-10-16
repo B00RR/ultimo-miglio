@@ -166,8 +166,8 @@ Shader "UltimoMiglio/ToonDiorama"
                     half3 slab = h < 0.5h ? lerp(_FloorTint.rgb, _FloorTintB.rgb, h * 2.0h) : lerp(_FloorTintB.rgb, _FloorTintC.rgb, h * 2.0h - 1.0h);
                     albedo.rgb = lerp(albedo.rgb * _FloorTint.rgb, slab, _FloorBaseMix);
                     albedo.rgb *= 1.0h + ((half)Hash21(cell + 7.1) - 0.5h) * 2.0h * _TileVar;
-                    // #81 guida: fuga ogni lastra + fuga #E8D3AC ~30% (fw clampato: niente rete densa in camera)
-                    float2 tuv2 = tuv; // #81: una fuga per lastra (lastre ~0,25 m, guida §3)
+                    // Concept: togli 1 fuga ogni 2 + fuga #E8D3AC ~30% (fw clampato: niente rete densa in camera)
+                    float2 tuv2 = tuv * 0.5;
                     half2 fw2 = min(fw * 0.5h, half2(0.045h, 0.045h));
                     half2 e = (half2)abs(frac(tuv2) - 0.5);
                     half grout = max(smoothstep(0.5h - fw2.x, 0.5h, e.x), smoothstep(0.5h - fw2.y, 0.5h, e.y));

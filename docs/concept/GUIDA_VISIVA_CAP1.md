@@ -38,7 +38,7 @@ Autore: Concept Artist · Stato: v1 · Riferimento approvato principale: `concep
 ## 3. Deposito / Bancone
 - Materiali: **tufo** crema, **archi**, **legno** noce; insegna **«Vela & Figli» con il faro** nel logo.
 - **Carico 0** sul banco con **cuciture emissive ambra** e **bloom isolato solo sul banco**.
-- **Lastre pavimento piccole (~0,25 m)**, variazione tonale lieve crema/tufo, non un unico arancio saturo.
+- **Lastre pavimento grandi (3,5 m)** (v1.1, via Concept Artist su #126), 3 toni crema/tufo per lastra (`#F3E3C3` / `#E8D3AC` / `#E9D2A8`), **una fuga su due** (fuga ogni 7 m) in `#E8D3AC` con opacità ~30%. Non un unico arancio saturo.
 - Set dressing: **vasi in terracotta e limoni**, casse, scaffali in legno.
 
 ![Beauty bancone v03 (APPROVATO)](img/ref_3d_beauty_bancone_v03_1170x2532.jpg)

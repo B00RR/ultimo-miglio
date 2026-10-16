@@ -198,6 +198,6 @@ Voci più recenti in alto. Formato: `AAAA-MM-GG HH:MM` (Europe/Rome) — [commit
 - Riferimento #35 (chiusa). Correlate aperte: #64, #67.
 
 ## Aggiornamento 16/10 11:10 — Build riallineata alla guida visiva (VFX, issue #81, branch `vfx/81-allinea-guida`)
-- Decisione DevOn: **vince la guida**. La guida torna alla v1 (annullata la v1.1 di #86) e il codice si adegua: sole `#FFE6B8`, ombra `#9E7873` (29 materiali), legno `#74503A`, lastre pavimento 0,25 m con una fuga per lastra, notte al 47% del giorno.
+- Decisione DevOn: **vince la guida**. La guida torna alla v1 (annullata la v1.1 di #86) e il codice si adegua: sole `#FFE6B8`, ombra `#9E7873` (29 materiali), legno `#74503A`, lastre pavimento 3,5 m con una fuga su due (eccezione approvata dal Concept Artist), notte al 47% del giorno.
 - Atlas `T_Palette_Atlas.png`: 8 swatch del vecchio pipeline portati ai valori della guida (sostituiti solo i pixel esattamente uguali); 9 materiali Graybox aggiornati allo stesso modo.
-- In attesa del via libera finale del Concept Artist prima della review.
+- VIA arte del Concept Artist ottenuto (blocker lastre risolto); merge al Code Reviewer.

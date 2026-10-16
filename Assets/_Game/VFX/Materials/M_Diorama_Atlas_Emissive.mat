@@ -46,7 +46,7 @@ Material:
     - _ShadowCool: 0.2
     - _ShadowSoft: 0.35
     - _ShadowStrength: 0.72
-    - _TileSize: 0.25
+    - _TileSize: 3.5
     - _TileVar: 0.015
     - _TopLight: 0.1
     - _WallAO: 0.3
