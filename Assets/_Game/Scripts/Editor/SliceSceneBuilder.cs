@@ -88,6 +88,7 @@ namespace UltimoMiglio.EditorTools
                     var ca = m.GetComponent<Animator>() ?? m.AddComponent<Animator>();
                     var av = AssetDatabase.LoadAllAssetsAtPath(path).OfType<Avatar>().FirstOrDefault(); if (av) ca.avatar = av;
                     ca.runtimeAnimatorController = cctl; ca.applyRootMotion = false; ca.cullingMode = AnimatorCullingMode.AlwaysAnimate;
+                    AddBody(go); // #111: corpo solido
                     var pc = SavePrefab(go, v == "base" ? "Customer" : $"Customer_{v}").AddComponentPrefab<Customer>();
                     NonnoRobot.StripNavMeshAgents(pc.gameObject); custVariants.Add(pc);
                 }
@@ -96,7 +97,7 @@ namespace UltimoMiglio.EditorTools
             {
                 Debug.LogWarning("[Scene] clienti riggati mancanti: capsula");
                 var capGo = Prim(PrimitiveType.Capsule, "Customer", null, Vector3.zero, new Vector3(0.5f, 0.8f, 0.5f), chars, UM_Palette.Menta); Object.DestroyImmediate(capGo.GetComponent<Collider>());
-                custVariants.Add(SavePrefab(capGo, "Customer").AddComponentPrefab<Customer>());
+                AddBody(capGo); custVariants.Add(SavePrefab(capGo, "Customer").AddComponentPrefab<Customer>());
             }
             var cust = custVariants[0];
 
@@ -164,6 +165,7 @@ namespace UltimoMiglio.EditorTools
 
             // --- NONNO
             var nonno = new GameObject("NONNO"); nonno.transform.position = arrPos + new Vector3(2.5f, 0, -2);
+            { var col = nonno.AddComponent<CapsuleCollider>(); col.center = new Vector3(0, 0.5f, 0); col.height = 1.0f; col.radius = NonnoRobot.BodyRadius; } // #111
             var nonnoAnim = Rig(nonno.transform, "bot_nonno", 0f) /* #59: forche su +Z, il 180° lo faceva camminare all'indietro */;
             if (!nonnoAnim)
             {
@@ -202,6 +204,7 @@ namespace UltimoMiglio.EditorTools
             tut.Arrivi = arrivals.transform; tut.Scaffale = shelves[0].transform; tut.Bancone = bancone.transform;
             tut.Monete = new GameObject("Tut_Monete").transform; tut.Monete.position = banPos + Vector3.right * 0.8f;
             foreach (var pz in Object.FindObjectsByType<UpgradePad>(FindObjectsSortMode.None)) { if (pz.Kind == UpgradeKind.Zaino) tut.PadZaino = pz.transform; if (pz.Kind == UpgradeKind.NonnoHire) tut.PadNonno = pz.transform; }
+            AdaScenePlacement.Place(banPos, root.transform); // #118: Nonna Ada 3D a fianco del Bancone (null-safe)
             TryRun("UltimoMiglio.VFX.EditorTools.UM_TutorialMarkerSetup", "Setup"); // #4: marker tutorial con materiali assegnati (in build Shader.Find non trova shader non referenziati)
 
             TryRun("UltimoMiglio.VFX.EditorTools.UM_FxPrefabBuilder", "BuildAll");
@@ -343,6 +346,8 @@ namespace UltimoMiglio.EditorTools
             var sh = Shader.Find("UltimoMiglio/ToonDiorama") ?? Shader.Find("Universal Render Pipeline/Lit");
             return new Material(sh) { name = vfxName, color = fallback };
         }
+        /// <summary>#111: CapsuleCollider del cliente (Nina e gli altri clienti non lo attraversano).</summary>
+        static void AddBody(GameObject go) { var col = go.AddComponent<CapsuleCollider>(); col.center = new Vector3(0, 0.8f, 0); col.height = 1.6f; col.radius = Customer.BodyRadius; }
         static GameObject SavePrefab(GameObject go, string name)
         {
             var p = PrefabUtility.SaveAsPrefabAsset(go, $"{PrefabDir}/{name}.prefab"); Object.DestroyImmediate(go); return p;

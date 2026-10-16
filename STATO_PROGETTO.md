@@ -1,7 +1,7 @@
 # STATO PROGETTO — Ultimo Miglio
 
 > Punto di ingresso unico per chiunque (persona o agente) lavori su questo repo. Aggiornalo **nella stessa PR** in cui completi qualcosa.
-> Ultimo aggiornamento: 2026-10-16 14:01 (Europe/Rome).
+> Ultimo aggiornamento: 2026-10-16 14:19 (Europe/Rome).
 
 ## 1. Il gioco
 - **Ultimo Miglio**: gioco mobile **Android**, **Unity 6 (6000.3) URP**.
@@ -19,8 +19,8 @@
 
 ## 3. Team
 - **Direttore**: DevOn (coordina, decide priorità).
-- **Attivi (5)**: Tech Lead, 3D Artist, Animator, VFX & Technical Artist, UI/UX.
-- **In pausa**: Game Designer, QA, Sound Designer, Narrative, LiveOps, Concept Artist (i loro documenti restano validi).
+- **Attivi (6)**: Tech Lead, Game Designer (sulla #157 insieme al Tech Lead), 3D Artist, Animator, VFX & Technical Artist, UI/UX.
+- **In pausa**: QA, Sound Designer, Narrative, LiveOps, Concept Artist (i loro documenti restano validi).
 
 ## 4. FATTO
 - **UI #110 pad Zaino (PR ui/110-pad-zaino, in revisione)**: dopo un acquisto il pad non paga il livello successivo finché Nina non esce e rientra (niente più portafoglio prosciugato); la pillola col prezzo resta visibile anche con Nina sul pad. Costi Zaino invariati, già allineati a #75 (40, 80, 160…; `upgrades.json` non toccato). Da verificare in Unity.
@@ -97,6 +97,7 @@ $UNITY -batchmode -projectPath "$PWD" -runTests -testPlatform PlayMode \
 
 
 ## Regole di lavoro (approvate da Lorenzo, 16/10)
+- Nessun agente scrive più a Lorenzo, né nella sua chat né altrove, neppure per bug risolti, PR unite o via del QA. Tutti si rivolgono solo al Producer, e il Producer parla solo con DevOn, che porta a Lorenzo decisioni, blocchi gravi e il link pronto. Unica eccezione: chi riceve una domanda diretta di Lorenzo risponde solo a quella.
 - Ogni issue e PR, nuova o già aperta, ha sempre le etichette (ruolo/area, tipo bug/feature/docs, priorità) e una milestone. Chi la apre le mette subito. Il Code Reviewer non unisce PR senza etichette.
 - Nessun segreto, chiave o password nei file del repo (che ora è pubblico): solo nei GitHub Secrets.
 - PR piccole, una cosa per PR, rebase su main ogni giorno.
@@ -147,7 +148,7 @@ Ogni ruolo lavora solo sulle issue con la propria etichetta `ruolo:*`, sempre co
 
 Voci più recenti in alto. Formato: `AAAA-MM-GG HH:MM` (Europe/Rome) — [commit] — descrizione.
 
-- 2026-10-16 14:03 — Tech Lead — [fdfe718](https://github.com/B00RR/ultimo-miglio/commit/fdfe718bd22971fa0c7e956635c6525c702a63db) — PR #157 (#101): onboarding a 16 passi (cold open, Zaino prima di OLDO) allineato a main (Bokobay, #161, #167). Aggiunti i pad Scarpe/Insegna (padNuovi), tempi di onboarding.json (coldOpen 15 s, t>=127/170 s, nonnoConfirm 3 s), coins a raccolta, combo '+N' solo al passo combo, niente LN regalate fuori dai test (TestAccelera), log [ONB] con ln/spent/need/have. Scena rigenerata con SliceSceneBuilder. Locale: EditMode 51/51, PlayMode 17/17.
+- 2026-10-16 14:19 — Regola fissa di Lorenzo: nessun agente gli scrive; tutto passa dal Producer a DevOn.
 - 2026-10-16 14:01 — Regole di consumo approvate da Lorenzo: coordinamento al Producer, pausa per chi ha finito, Sound, LiveOps e Concept in pausa fino al capitolo 2, CI esclusa per le PR di soli documenti.
 - 2026-10-16 13:28 — Regole di lavoro approvate da Lorenzo: etichette e milestone obbligatorie, niente segreti nel repo, PR piccole, test veloci prima della CI, responsabile e scadenza per ogni via, meno messaggi, pausa per chi non ha issue.
 - 2026-10-16 11:54 — Tech Lead — [c859f94](https://github.com/B00RR/ultimo-miglio/commit/c859f94ea08537f7a4d55aa3b9ba418f1202c3de) — PR #103 rewards: soglie pacchi 100/250/450, traguardi debito 25/50/75%, mancia Cassa 30 LN, freccia prossimo pad da 480 s; test EditMode EconomyRewardsTests.
