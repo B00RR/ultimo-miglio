@@ -158,6 +158,7 @@ Ogni ruolo lavora solo sulle issue con la propria etichetta `ruolo:*`, sempre co
 
 Voci più recenti in alto. Formato: `AAAA-MM-GG HH:MM` (Europe/Rome) — [commit] — descrizione.
 
+- **16/10/2026 20:08 (Europe/Rome)**: unita in squash la #232 (Tech Lead, Closes #221: NONNO carica solo quanto entra negli scaffali, salta quelli pieni e non butta più il carico). Commit [2150050](https://github.com/B00RR/ultimo-miglio/commit/2150050f972ea47052030b6c601f5e933870ec01). Dato il via a Build & Release per la build in radice.
 - **16/10/2026 20:04 (Europe/Rome)**: unita in squash la #230 (UI/UX, Closes #224: il pulsante Salta tutorial non copre più l'ingranaggio). Commit [9f35fca](https://github.com/B00RR/ultimo-miglio/commit/9f35fca).
 - **16/10/2026 19:57 (Europe/Rome)**: unita in squash la #227 (Build & Release: cache-bust `?v=<sha>` negli index, deploy-dev solo con test e build verdi, `keep_files` al posto di `force_orphan`; Refs #179, #185). Commit [d5789d5](https://github.com/B00RR/ultimo-miglio/commit/d5789d59201e1a445f45ebf6fb5c0ee29c1bd492).
 - 2026-10-16 19:53 — Code Reviewer — [454eb61](https://github.com/B00RR/ultimo-miglio/commit/454eb61) — unita #228 (chiude #185, VFX): margine trasparente di 2 px sui pannelli 9-slice, angoli arrotondati senza bianco; manca l'ok della UI/UX sul telefono dopo il deploy.
