@@ -158,6 +158,7 @@ Ogni ruolo lavora solo sulle issue con la propria etichetta `ruolo:*`, sempre co
 
 Voci più recenti in alto. Formato: `AAAA-MM-GG HH:MM` (Europe/Rome) — [commit] — descrizione.
 
+- **16/10/2026 21:17 (Europe/Rome)**: main di nuovo verde su 2515ee0 (#242). Unita in squash la #238 (Animator, Closes #222: il gate dello scaffale nel tutorial aspetta un deposito vero). Commit [27003ef](https://github.com/B00RR/ultimo-miglio/commit/27003ef45612d277089433d71be2fee409e1ea03).
 - **16/10/2026 21:05 (Europe/Rome)**: unita in squash la #242 (Tech Lead, Closes #226: NONNO tiene 0,20 m di margine da Nina agli Arrivi, distanza minima da 0,69 a 0,96 m, soglia del test invariata). Corregge il main rosso su 2150050. Commit [2515ee0](https://github.com/B00RR/ultimo-miglio/commit/2515ee0d10bb30a3be78a252486a81f208746783).
 - **16/10/2026 20:08 (Europe/Rome)**: unita in squash la #232 (Tech Lead, Closes #221: NONNO carica solo quanto entra negli scaffali, salta quelli pieni e non butta più il carico). Commit [2150050](https://github.com/B00RR/ultimo-miglio/commit/2150050f972ea47052030b6c601f5e933870ec01). Dato il via a Build & Release per la build in radice.
 - **16/10/2026 20:04 (Europe/Rome)**: unita in squash la #230 (UI/UX, Closes #224: il pulsante Salta tutorial non copre più l'ingranaggio). Commit [9f35fca](https://github.com/B00RR/ultimo-miglio/commit/9f35fca).
