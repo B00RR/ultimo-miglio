@@ -67,17 +67,20 @@ def main():
     ok("#FFFFFF" not in up and "#FFF " not in up and "#FFF;" not in up, "niente bianco puro nel foglio")
     ok("tex_wood_panel" not in uss and "tex_cardboard_panel" not in uss, "le etichette non riusano i pannelli #185")
     ok("white-space: normal !important" in uss and "ellipsis" not in uss, "fumetto a capo, senza ellissi")
-    ok("border-radius: 20px" in uss and "tex_capsula_noce_48.png" not in uss, "valute a capsula; il fumetto non usa lo sprite di luce")
-    ok("background-color: #F3E3C3 !important" in uss and "color: #3B2A20 !important" in uss, "fumetto carta crema, testo bruno")
-    ok("height: auto !important" in uss and "max-height: none !important" in uss and "padding-bottom: 16px !important" in uss, "fumetto senza tetto, padding sotto la discesa")
+    ok("tex_fumetto_crema.png" in uss and "tex_capsula_noce_48.png" not in uss, "fumetto crema nello sprite; niente sprite di luce")
+    ok("color: #3B2A20 !important" in uss and "tex_capsula_noce_32.png" in uss, "testo del fumetto bruno, Muoviti sulla capsula 32")
+    ok("height: auto !important" in uss and "max-height: none !important" in uss and "padding-bottom: 20px !important" in uss, "fumetto senza tetto, padding che lascia i 4 px di ombra")
     ok("text-overflow: clip !important" in uss and "overflow: visible !important" in uss, "testo intero, non tagliato")
-    ok("rgba(158, 120, 115, 0.6)" in uss and "left: 0 !important" in uss and "right: 0 !important" in uss and "top: 4px !important" in uss and "bottom: -4px !important" in uss, "ombra figlia, left/right 0, 4 dp in basso, 60%")
+    ok("-unity-slice-bottom: 24px !important" in uss and "-unity-slice-bottom: 20px !important" in uss, "lo slice basso include l'ombra")
+    ok("ombra-portata" not in uss and "border-radius: 0 !important" in uss, "niente elemento ombra: la forma è l'alpha dello sprite")
     ok("-unity-text-outline-width: 0 !important" in uss and "color: #F3E3C3 !important" in uss, "Muoviti crema, senza contorno chiaro")
-    ok("right: 78px" in uss and "#9E7873" in uss, "vuoto prima dell'ingranaggio e ombra portata")
+    ok("right: 78px" in uss and "#9E7873" in uss, "vuoto prima dell'ingranaggio")
     ada = text("Assets/_Game/UI/Runtime/AdaNoteView.cs")
-    ok("ada-carta" in ada and "note.Add(shadow)" in ada and "ada-plate" not in ada, "ombra e carta sono figlie del fumetto")
+    ok("ada-carta" not in ada and "ombra-portata" not in ada and "note.Add(face)" in ada, "il fumetto non ha figli ombra")
     hud_uxml = text("Assets/_Game/UI/UXML/Hud.uxml")
-    ok("objective-pill" in hud_uxml and "ombra-portata--32" not in hud_uxml, "l'ombra di Muoviti sta nella pillola")
+    ok("objective-pill" in hud_uxml and "ombra-portata" not in hud_uxml, "Muoviti senza elemento ombra")
+    tut = text("Assets/_Game/Scripts/Gameplay/TutorialManager.cs")
+    ok("ombra-portata" not in tut and "_hintSrc = null" in tut, "suggerimento senza elemento ombra, cache #191")
     hud = text("Assets/_Game/UI/USS/HudV2.uss")
     ok("white-space: nowrap !important" not in hud, "HudV2 non forza più la riga unica")
     tokens = text("Assets/_Game/UI/Tokens.uss")
@@ -111,9 +114,12 @@ def main():
         im = Image.open(ROOT / "Assets/_Game/UI/Textures" / name).convert("RGBA")
         raggio = altezza // 2
         meta = text(f"Assets/_Game/UI/Textures/{name}.meta")
-        ok(im.size[1] == altezza and f"spriteBorder: {{x: {raggio}, y: {raggio}, z: {raggio}, w: {raggio}}}" in meta, f"capsula {name} raggio {raggio}")
+        bordo = f"spriteBorder: {{x: {raggio}, y: {raggio + 4}, z: {raggio}, w: {raggio}}}"
+        ok(im.size[1] == altezza + 4 and bordo in meta, f"capsula {name} corpo {altezza} più ombra 4")
         angoli = [im.getpixel((0, 0)), im.getpixel((im.width - 1, 0)), im.getpixel((0, im.height - 1)), im.getpixel((im.width - 1, im.height - 1))]
+        ombra = im.getpixel((im.width // 2, im.height - 2))
         ok(all(p[3] < 40 for p in angoli) and im.getpixel((im.width // 2, im.height // 2))[3] > 240, f"angoli vuoti {name}")
+        ok(ombra == (158, 120, 115, 153), f"ombra cotta {name}")
         bianchi = freddi = 0
         raw = im.tobytes()
         for i in range(0, len(raw), 4):
@@ -125,6 +131,15 @@ def main():
             if (b > r + 18 and b > g + 8 and b > 90) or (r > 140 and b > 140 and b > g + 30 and r > g + 25):
                 freddi += 1
         ok(bianchi == 0 and freddi == 0, f"colori caldi {name}")
+
+    bub = Image.open(ROOT / "Assets/_Game/UI/Textures/tex_fumetto_crema.png").convert("RGBA")
+    bmeta = text("Assets/_Game/UI/Textures/tex_fumetto_crema.png.meta")
+    ok(bub.size == (80, 52) and "spriteBorder: {x: 20, y: 24, z: 20, w: 20}" in bmeta, "fumetto 9-slice con l'ombra nello slice basso")
+    ok("spriteMeshType: 0" in bmeta and "alphaIsTransparency: 1" in bmeta and "textureFormat: 4" in bmeta, "fumetto Full Rect, alpha tenuto anche su WebGL")
+    ok(bub.getpixel((40, 26)) == (243, 227, 195, 255), "centro del fumetto crema opaco #F3E3C3")
+    ok(bub.getpixel((40, 50)) == (158, 120, 115, 153), "ombra del fumetto #9E7873 al 60%")
+    angoli_b = [bub.getpixel((0, 0)), bub.getpixel((79, 0)), bub.getpixel((0, 51)), bub.getpixel((79, 51))]
+    ok(all(p[3] == 0 for p in angoli_b) and bub.getchannel("A").getextrema()[0] < 255, "angoli del fumetto vuoti, canale alpha usato")
 
     if FAIL:
         print(f"\n{len(FAIL)} controlli falliti")

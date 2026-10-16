@@ -17,7 +17,6 @@
             <ui:VisualElement class="top-bar" picking-mode="Ignore">
                 <ui:VisualElement class="top-left" picking-mode="Ignore">
                     <ui:VisualElement name="currency-slot" class="currency-slot">
-                        <ui:VisualElement class="ombra-portata ombra-portata--40" picking-mode="Ignore" />
                     <ui:VisualElement name="currency-pill" class="pill">
                         <ui:VisualElement class="currency"><ui:VisualElement class="icon icon-coin" /><ui:Label name="ln-value" class="currency-value" text="0" /></ui:VisualElement>
                         <ui:VisualElement name="day-group" class="currency day-group"><ui:Label name="day-value" class="day-value" text="G1" /></ui:VisualElement>
@@ -33,7 +32,6 @@
             </ui:VisualElement>
             <ui:VisualElement name="objective-slot" class="objective-slot" picking-mode="Ignore">
                 <ui:VisualElement name="objective-pill" class="objective-pill" picking-mode="Ignore">
-                    <ui:VisualElement class="ombra-portata" picking-mode="Ignore" />
                     <ui:Label name="tutorial-objective" class="tutorial-objective" text="Muoviti" picking-mode="Ignore" />
                 </ui:VisualElement>
             </ui:VisualElement>

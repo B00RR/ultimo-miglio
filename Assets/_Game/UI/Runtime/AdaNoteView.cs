@@ -27,18 +27,14 @@ namespace UltimoMiglio.UI
             band = new VisualElement { name = "ada-band", pickingMode = PickingMode.Ignore }; band.AddToClassList("ada-band");
             var wrap = new VisualElement { name = "ada-wrap", pickingMode = PickingMode.Ignore }; wrap.AddToClassList("ada-wrap");
             note = new VisualElement { name = "ada-note", pickingMode = PickingMode.Ignore }; note.AddToClassList("ada-note");
-            var shadow = new VisualElement { name = "ada-shadow", pickingMode = PickingMode.Ignore };
-            shadow.AddToClassList("ombra-portata");
-            var carta = new VisualElement { name = "ada-carta", pickingMode = PickingMode.Ignore };
-            carta.AddToClassList("ada-carta");
             var face = new VisualElement { name = "ada-face", pickingMode = PickingMode.Ignore };
             face.AddToClassList("ada-face"); face.AddToClassList("ada-face--portrait"); // ritratto tex_ada_portrait.png via USS
             var col = new VisualElement { pickingMode = PickingMode.Ignore }; col.AddToClassList("ada-col");
             who = new Label(UltimoMiglio.Core.DisplayNames.Apply(speaker)) { pickingMode = PickingMode.Ignore }; who.AddToClassList("ada-name");
             body = new Label { pickingMode = PickingMode.Ignore }; body.AddToClassList("ada-text");
             who.style.display = DisplayStyle.None;
-            // Ombra e carta sono figlie del fumetto: left/right 0 = la sua sagoma, non quella del wrap.
-            note.Add(shadow); note.Add(carta); note.Add(face); col.Add(body); note.Add(col); wrap.Add(note); band.Add(wrap);
+            // L'ombra è nel PNG del fumetto: un figlio si disegnerebbe sopra il crema.
+            note.Add(face); col.Add(body); note.Add(col); wrap.Add(note); band.Add(wrap);
             band.style.display = DisplayStyle.None;
             root.Add(band);
         }
@@ -87,7 +83,7 @@ namespace UltimoMiglio.UI
 
         void Next() { if (queue.Count > 0) Present(queue.Dequeue()); }
 
-        /// <summary>Fumetto sotto la riga alta (safe area + 68 dp). Carta crema, alto quanto le righe, senza tetto. Stili in Etichette.uss.</summary>
+        /// <summary>Fumetto sotto la riga alta (safe area + 68 dp). Crema opaco nello sprite, alto quanto le righe, senza tetto. Stili in Etichette.uss.</summary>
         void Layout(float scale)
         {
             var safe = root.Q("safe-root");

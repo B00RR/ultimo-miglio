@@ -51,20 +51,20 @@ public class Etichette186Tests
         StringAssert.Contains("text-shadow", uss);
         StringAssert.Contains("white-space: normal !important", uss);
         StringAssert.Contains("text-overflow: clip", uss);
-        StringAssert.Contains("border-radius: 20px", uss);
+        StringAssert.Contains("tex_fumetto_crema.png", uss);
         StringAssert.Contains("tex_capsula_noce_40.png", uss);
-        StringAssert.Contains("background-color: #F3E3C3 !important", uss);
+        StringAssert.Contains("tex_capsula_noce_32.png", uss);
         StringAssert.Contains("color: #3B2A20 !important", uss);
         StringAssert.Contains("rgba(158, 120, 115, 0.6)", uss);
-        StringAssert.Contains("left: 0 !important", uss);
-        StringAssert.Contains("right: 0 !important", uss);
-        StringAssert.Contains("top: 4px !important", uss);
-        StringAssert.Contains("bottom: -4px !important", uss);
+        StringAssert.Contains("-unity-slice-bottom: 24px !important", uss);
+        StringAssert.Contains("-unity-slice-bottom: 20px !important", uss);
+        StringAssert.Contains("border-radius: 0 !important", uss);
         StringAssert.Contains("height: auto !important", uss);
         StringAssert.Contains("max-height: none !important", uss);
         StringAssert.Contains("-unity-text-outline-width: 0 !important", uss);
-        StringAssert.Contains("padding-bottom: 16px !important", uss);
+        StringAssert.Contains("padding-bottom: 20px !important", uss);
         StringAssert.Contains("text-overflow: clip !important", uss);
+        StringAssert.DoesNotContain("ombra-portata", uss);
         StringAssert.DoesNotContain("tex_capsula_noce_48.png", uss);
         StringAssert.DoesNotContain("ellipsis", uss);
         StringAssert.DoesNotContain("#FFFFFF", uss.ToUpperInvariant());
@@ -110,7 +110,7 @@ public class Etichette186Tests
     [Test]
     public void Capsule_RaggioMetaAltezza_E_AngoliVuoti()
     {
-        // altezza dello sprite = 2 * raggio: la capsula resta capsula, non un rettangolo con raggio 16.
+        // Il corpo è una capsula (raggio = metà altezza). I 4 px in più in basso sono l'ombra cotta.
         ControllaCapsula("_Game/UI/Textures/tex_capsula_noce_32.png", 32);
         ControllaCapsula("_Game/UI/Textures/tex_capsula_noce_40.png", 40);
         ControllaCapsula("_Game/UI/Textures/tex_capsula_noce_48.png", 48);
@@ -120,13 +120,18 @@ public class Etichette186Tests
         string ctrl = File.ReadAllText(Data("_Game/UI/Runtime/HudController.cs"));
         StringAssert.Contains("padT + 18f", ctrl);
         StringAssert.Contains("78f", ctrl);
+        string uxml = File.ReadAllText(Data("_Game/UI/UXML/Hud.uxml"));
+        StringAssert.DoesNotContain("ombra-portata", uxml);
+        StringAssert.DoesNotContain("ombra-portata", File.ReadAllText(Data("_Game/UI/Runtime/AdaNoteView.cs")));
+        StringAssert.DoesNotContain("ombra-portata", File.ReadAllText(Data("_Game/Scripts/Gameplay/TutorialManager.cs")));
     }
 
-    static void ControllaCapsula(string rel, int altezza)
+    [Test]
+    public void Fumetto_CremaOpaco_OmbraCotta()
     {
-        int raggio = altezza / 2;
+        const string rel = "_Game/UI/Textures/tex_fumetto_crema.png";
         string meta = File.ReadAllText(Data(rel + ".meta"));
-        StringAssert.Contains($"spriteBorder: {{x: {raggio}, y: {raggio}, z: {raggio}, w: {raggio}}}", meta);
+        StringAssert.Contains("spriteBorder: {x: 20, y: 24, z: 20, w: 20}", meta);
         StringAssert.Contains("spriteMeshType: 0", meta);
         StringAssert.Contains("alphaIsTransparency: 1", meta);
         var bytes = File.ReadAllBytes(Data(rel));
@@ -134,11 +139,37 @@ public class Etichette186Tests
         try
         {
             Assert.IsTrue(tex.LoadImage(bytes), rel);
-            Assert.AreEqual(altezza, tex.height, rel);
+            Assert.AreEqual(52, tex.height, rel);
+            Assert.Less(tex.GetPixel(0, tex.height - 1).a, 0.15f, "angolo del fumetto opaco");
+            Assert.Less(tex.GetPixel(tex.width - 1, 0).a, 0.15f, "angolo del fumetto opaco");
+            var mid = tex.GetPixel(tex.width / 2, tex.height / 2);
+            Assert.AreEqual(243f / 255f, mid.r, 0.01f, "crema");
+            Assert.AreEqual(227f / 255f, mid.g, 0.01f, "crema");
+            Assert.AreEqual(195f / 255f, mid.b, 0.01f, "crema");
+            Assert.Greater(mid.a, 0.95f, "il fumetto non è trasparente");
+            AssertOmbra(tex, rel);
+        }
+        finally { Object.DestroyImmediate(tex); }
+    }
+
+    static void ControllaCapsula(string rel, int corpo)
+    {
+        int raggio = corpo / 2;
+        string meta = File.ReadAllText(Data(rel + ".meta"));
+        StringAssert.Contains($"spriteBorder: {{x: {raggio}, y: {raggio + 4}, z: {raggio}, w: {raggio}}}", meta);
+        StringAssert.Contains("spriteMeshType: 0", meta);
+        StringAssert.Contains("alphaIsTransparency: 1", meta);
+        var bytes = File.ReadAllBytes(Data(rel));
+        var tex = new Texture2D(2, 2, TextureFormat.RGBA32, false);
+        try
+        {
+            Assert.IsTrue(tex.LoadImage(bytes), rel);
+            Assert.AreEqual(corpo + 4, tex.height, rel);
             Assert.Less(tex.GetPixel(0, tex.height - 1).a, 0.15f, rel + " angolo opaco");
             Assert.Less(tex.GetPixel(tex.width - 1, 0).a, 0.15f, rel + " angolo opaco");
             Assert.Greater(tex.GetPixel(tex.width / 2, tex.height / 2).a, 0.95f, rel + " centro bucato");
             Assert.Greater(tex.GetPixel(tex.width / 2, tex.height - 2).a, 0.95f, rel + " bordo bucato");
+            AssertOmbra(tex, rel);
             var px = tex.GetPixels32();
             int bianchi = 0, freddi = 0;
             foreach (var c in px)
@@ -153,6 +184,16 @@ public class Etichette186Tests
             Assert.AreEqual(0, freddi, rel + " pixel freddi");
         }
         finally { Object.DestroyImmediate(tex); }
+    }
+
+    static void AssertOmbra(Texture2D tex, string rel)
+    {
+        // GetPixel ha origine in basso: y = 2 è dentro i 4 px di ombra, non sul filo antialias.
+        var ombra = tex.GetPixel(tex.width / 2, 2);
+        Assert.AreEqual(158f / 255f, ombra.r, 0.01f, rel + " ombra");
+        Assert.AreEqual(120f / 255f, ombra.g, 0.01f, rel + " ombra");
+        Assert.AreEqual(115f / 255f, ombra.b, 0.01f, rel + " ombra");
+        Assert.AreEqual(153f / 255f, ombra.a, 0.02f, rel + " ombra");
     }
 
     static void AssertOfl(string rel, string copyright)

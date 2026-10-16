@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
-"""Sprite capsula #186. Raggio = metà altezza, angoli trasparenti, luce in alto.
+"""Sprite #186 con l'ombra già nel PNG. Niente elemento ombra in UI Toolkit:
+   un figlio si disegna sopra il fondo. Angoli esterni alpha 0.
    Non tocca i 9-slice della #185 (tex_cardboard_panel / tex_wood_panel)."""
 import struct
 import zlib
@@ -17,41 +18,93 @@ SPRITES = (
     ("tex_capsula_terracotta_32.png", 128, 32, ((244, 186, 140), (200, 99, 59), (110, 42, 22)), "a1c0c86318618632a1c0c86318618632"),
 )
 GOLD = (242, 181, 58)  # #F2B53A
+SHADOW = 4
+SHADOW_RGB = (158, 120, 115)  # #9E7873
+SHADOW_A = 0.6
+CREAM = (243, 227, 195)  # #F3E3C3
+INK = (59, 42, 32)  # #3B2A20
+# fumetto: corpo 48, raggio 20 (resta una fascia dritta da stirare), ombra nei 4 px in basso
+BUBBLE = ("tex_fumetto_crema.png", 80, 48, 20, "a1c0f3e318632186a1c0f3e318632186")
 
 
 def lerp(a, b, t):
     return tuple(int(a[i] + (b[i] - a[i]) * t) for i in range(3))
 
 
-def capsule_dist(x, y, w, h):
-    r = h / 2
+def cover(x, y, w, h, r):
+    """Copertura 0..1 di un rettangolo stondato. r = h/2 è una capsula."""
     cx = min(max(x, r), w - r)
-    return ((x - cx) ** 2 + (y - r) ** 2) ** 0.5
+    cy = min(max(y, r), h - r)
+    d = ((x - cx) ** 2 + (y - cy) ** 2) ** 0.5
+    return max(0.0, min(1.0, r - d + 0.6))
 
 
-def paint(w, h, top, body, bottom):
-    r = h / 2
+def paint_body(w, h, top, body, bottom, radius=None, cream=False):
+    r = h / 2 if radius is None else radius
     buf = bytearray(w * h * 4)
     for y in range(h):
-        t = y / (h - 1)
-        if t < 0.28:
+        t = y / max(1, h - 1)
+        if cream:
+            col = CREAM
+        elif t < 0.28:
             col = lerp(top, body, t / 0.28)
         else:
             col = lerp(body, bottom, (t - 0.28) / 0.72)
         for x in range(w):
-            d = capsule_dist(x + 0.5, y + 0.5, w, h)
-            a = max(0.0, min(1.0, r - d + 0.6))
+            a = cover(x + 0.5, y + 0.5, w, h, r)
             if a <= 0:
                 continue
-            # venatura calda, niente bianco
-            n = ((x * 13 + y * 29) ^ (x * 7)) & 7
-            rgb = tuple(max(0, min(244, col[i] + (n - 3))) for i in range(3))
-            edge = r - d
-            if 1.1 < edge < 2.6 and y > h * 0.55:
-                rgb = lerp(rgb, GOLD, 0.9)
+            rgb = col
+            if not cream:
+                n = ((x * 13 + y * 29) ^ (x * 7)) & 7
+                rgb = tuple(max(0, min(244, col[i] + (n - 3))) for i in range(3))
+                # bordo del rettangolo stondato, non del solo semicerchio
+                cx = min(max(x + 0.5, r), w - r)
+                cy = min(max(y + 0.5, r), h - r)
+                edge = r - (((x + 0.5 - cx) ** 2 + (y + 0.5 - cy) ** 2) ** 0.5)
+                if 1.1 < edge < 2.6 and y > h * 0.55:
+                    rgb = lerp(rgb, GOLD, 0.9)
+            else:
+                cx = min(max(x + 0.5, r), w - r)
+                cy = min(max(y + 0.5, r), h - r)
+                edge = r - (((x + 0.5 - cx) ** 2 + (y + 0.5 - cy) ** 2) ** 0.5)
+                if 0 < edge < 2.2:
+                    rgb = INK
             i = (y * w + x) * 4
-            buf[i:i + 4] = bytes((rgb[0], rgb[1], rgb[2], int(a * 255)))
-    return bytes(buf)
+            buf[i:i + 4] = bytes((rgb[0], rgb[1], rgb[2], int(round(a * 255))))
+    return buf
+
+
+def with_shadow(body, w, h):
+    """Corpo in alto, stessa sagoma 4 px più in basso, #9E7873 al 60%. Il corpo copre l'ombra."""
+    out_h = h + SHADOW
+    out = bytearray(w * out_h * 4)
+    for y in range(h):
+        row = body[y * w * 4:(y + 1) * w * 4]
+        sy = y + SHADOW
+        for x in range(w):
+            a = row[x * 4 + 3]
+            if a == 0:
+                continue
+            i = (sy * w + x) * 4
+            out[i:i + 4] = bytes((SHADOW_RGB[0], SHADOW_RGB[1], SHADOW_RGB[2], int(round(a * SHADOW_A))))
+    for y in range(h):
+        for x in range(w):
+            s = (y * w + x) * 4
+            ba = body[s + 3]
+            if ba == 0:
+                continue
+            i = s  # il corpo sta a y invariato
+            if ba == 255:
+                out[i:i + 4] = body[s:s + 4]
+                continue
+            da = out[i + 3]
+            inv = 255 - ba
+            out[i] = (body[s] * ba + out[i] * inv) // 255
+            out[i + 1] = (body[s + 1] * ba + out[i + 1] * inv) // 255
+            out[i + 2] = (body[s + 2] * ba + out[i + 2] * inv) // 255
+            out[i + 3] = ba + (da * inv) // 255
+    return bytes(out), out_h
 
 
 def png(w, h, rgba):
@@ -61,8 +114,7 @@ def png(w, h, rgba):
     return b"\x89PNG\r\n\x1a\n" + chunk(b"IHDR", struct.pack(">IIBBBBB", w, h, 8, 6, 0, 0, 0)) + chunk(b"IDAT", zlib.compress(raw, 9)) + chunk(b"IEND", b"")
 
 
-def meta(name, w, h, guid):
-    r = h // 2
+def meta(name, w, h, guid, left, bottom, right, top):
     stem = name[:-4]
     return f"""fileFormatVersion: 2
 guid: {guid}
@@ -118,7 +170,7 @@ TextureImporter:
   alignment: 0
   spritePivot: {{x: 0.5, y: 0.5}}
   spritePixelsToUnits: 100
-  spriteBorder: {{x: {r}, y: {r}, z: {r}, w: {r}}}
+  spriteBorder: {{x: {left}, y: {bottom}, z: {right}, w: {top}}}
   spriteGenerateFallbackPhysicsShape: 0
   alphaUsage: 1
   alphaIsTransparency: 1
@@ -188,7 +240,7 @@ TextureImporter:
         height: {h}
       alignment: 0
       pivot: {{x: 0.5, y: 0.5}}
-      border: {{x: {r}, y: {r}, z: {r}, w: {r}}}
+      border: {{x: {left}, y: {bottom}, z: {right}, w: {top}}}
       customData: 
       outline: []
       physicsShape: []
@@ -222,13 +274,23 @@ TextureImporter:
 """
 
 
+def write_sprite(name, w, body_h, guid, rgba, img_h, left, bottom, right, top):
+    (OUT / name).write_bytes(png(w, img_h, rgba))
+    (OUT / (name + ".meta")).write_text(meta(name, w, img_h, guid, left, bottom, right, top), encoding="utf-8")
+    print(name, w, img_h, "slice", left, bottom, right, top)
+
+
 def main():
     OUT.mkdir(parents=True, exist_ok=True)
     for name, w, h, cols, guid in SPRITES:
-        rgba = paint(w, h, *cols)
-        (OUT / name).write_bytes(png(w, h, rgba))
-        (OUT / (name + ".meta")).write_text(meta(name, w, h, guid), encoding="utf-8")
-        print(name, w, h, "raggio", h // 2)
+        body = paint_body(w, h, *cols)
+        rgba, img_h = with_shadow(body, w, h)
+        r = h // 2
+        write_sprite(name, w, h, guid, rgba, img_h, r, r + SHADOW, r, r)
+    bname, bw, bh, br, bguid = BUBBLE
+    body = paint_body(bw, bh, CREAM, CREAM, CREAM, radius=br, cream=True)
+    rgba, img_h = with_shadow(body, bw, bh)
+    write_sprite(bname, bw, bh, bguid, rgba, img_h, br, br + SHADOW, br, br)
 
 
 if __name__ == "__main__":

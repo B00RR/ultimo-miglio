@@ -219,12 +219,10 @@ namespace UltimoMiglio.Gameplay
             if (_hint != null || !_hud || _hud.Root == null) return;
             _hint = new VisualElement { name = "tut-hint", pickingMode = PickingMode.Ignore }; _hint.AddToClassList("tut-hint");
             var slot = new VisualElement { pickingMode = PickingMode.Ignore }; slot.AddToClassList("tut-hint__slot");
-            var shadow = new VisualElement { pickingMode = PickingMode.Ignore };
-            shadow.AddToClassList("ombra-portata"); shadow.AddToClassList("ombra-portata--32");
             var pill = new VisualElement { pickingMode = PickingMode.Ignore }; pill.AddToClassList("tut-hint__pill");
             var go = new VisualElement { pickingMode = PickingMode.Ignore }; go.AddToClassList("tut-hint__go");
             _hintText = new Label { pickingMode = PickingMode.Ignore }; _hintSrc = null; _hintText.AddToClassList("tut-hint__text");
-            pill.Add(go); pill.Add(_hintText); slot.Add(shadow); slot.Add(pill); _hint.Add(slot);
+            pill.Add(go); pill.Add(_hintText); slot.Add(pill); _hint.Add(slot);
             (_hud.SafeRoot ?? _hud.Root).Add(_hint);
         }
 

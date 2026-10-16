@@ -52,7 +52,7 @@ TextureImporter:
   alignment: 0
   spritePivot: {x: 0.5, y: 0.5}
   spritePixelsToUnits: 100
-  spriteBorder: {x: 20, y: 20, z: 20, w: 20}
+  spriteBorder: {x: 20, y: 24, z: 20, w: 20}
   spriteGenerateFallbackPhysicsShape: 0
   alphaUsage: 1
   alphaIsTransparency: 1
@@ -119,10 +119,10 @@ TextureImporter:
         x: 0
         y: 0
         width: 160
-        height: 40
+        height: 44
       alignment: 0
       pivot: {x: 0.5, y: 0.5}
-      border: {x: 20, y: 20, z: 20, w: 20}
+      border: {x: 20, y: 24, z: 20, w: 20}
       customData: 
       outline: []
       physicsShape: []
