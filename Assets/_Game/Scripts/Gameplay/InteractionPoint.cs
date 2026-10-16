@@ -70,6 +70,8 @@ namespace UltimoMiglio.Gameplay
 
         void Start()
         {
+            if (!Ring && !Pad && (Ring = GetComponentInChildren<UltimoMiglio.VFX.UM_PadFillRing>(true))) // ricollega se la scena ha perso il riferimento (anello rotto in batchmode)
+            { Ring.playCompleteBurst = false; Ring.SetKind(Kind == PoiKind.Consegna ? UltimoMiglio.VFX.UM_PadFillRing.Kind.Delivery : UltimoMiglio.VFX.UM_PadFillRing.Kind.Pickup); } // come SliceSceneBuilder
             HideFloatingChips();
             HideLegacyZoneSquare();
             _col = KindColor; _phase = Random.value * 6f;

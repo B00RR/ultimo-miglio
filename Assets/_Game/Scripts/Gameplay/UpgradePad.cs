@@ -17,6 +17,8 @@ namespace UltimoMiglio.Gameplay
         void Awake()
         {
             _renderers = GetComponentsInChildren<Renderer>(true); _col = GetComponent<Collider>();
+            // Riferimento perso se la scena è stata generata con il prefab dell'anello rotto (m_Script fileID 0): ricollega dal figlio
+            if (!FillRing) FillRing = GetComponentInChildren<UM_PadFillRing>(true);
             EnsurePriceVisible();
         }
         void OnEnable() { EnsurePriceVisible(); }
