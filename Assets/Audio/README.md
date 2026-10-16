@@ -21,6 +21,8 @@ Original procedural work, owned by the Ultimo Miglio project and released as **C
 | sfx_ui_tap_01..02 | tap UI (bottoni Impostazioni, anteprima slider Suoni) – `audio/tools/gen_ui_tutorial.py` |
 | sfx_ui_arrow_appear | comparsa freccia/evidenziazione obiettivo tutorial |
 | sfx_ui_step_complete | step tutorial completato (arpeggio Re maggiore) |
+| sfx_combo_plus_01..08 | tick "+N" sopra Kaia Rio (85 ms; _02 = 110 ms con più corpo, coincide col passo combo x1,2). Scala maggiore di Re da Re5: N=1..8 → Re Mi Fa# Sol La Si Do# Re6. Da `audio/tools/gen_combo_debt.py` |
+| sfx_debt_stamp_01..03 | timbro del debito, 400 ms: cartone + banco di legno, leggera coda metallica; 3 varianti (pitch ±6%), da usare a rotazione. Da `audio/tools/gen_combo_debt.py` |
 
 ## Music/ (stereo 44.1 kHz, WAV 16-bit masters + OGG Vorbis 120 kbps)
 `mus_day_vela_e_figli_{base,perc,mel,full}` – "Vela & Figli", 100 BPM, D major, 32 bars = 76.800 s = 3,386,880 samples, all stems identical length, sample-aligned, seamless loop (reverb/release tails wrapped into the start). Same limiter gain applied to all stems so base+perc+mel = full. Full mix -16 LUFS integrated, peak -1.2 dBFS.
