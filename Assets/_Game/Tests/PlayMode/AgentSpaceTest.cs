@@ -12,6 +12,8 @@ using UltimoMiglio.Gameplay;
 public class AgentSpaceTest
 {
     const float Tol = 0.05f;
+    /// <summary>Isolamento: niente stato statico (HudReveal) né timeScale che passi ai test successivi.</summary>
+    [TearDown] public void TearDown() { UltimoMiglio.UI.HudReveal.ResetAll(); Time.timeScale = 1f; }
     static float NinaR(NinaController n) => n.GetComponent<CharacterController>().radius;
     static float Flat(Vector3 a, Vector3 b) { a.y = b.y = 0; return Vector3.Distance(a, b); }
     static IEnumerator Load()

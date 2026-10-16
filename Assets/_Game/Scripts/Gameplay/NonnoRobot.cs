@@ -145,6 +145,7 @@ namespace UltimoMiglio.Gameplay
             // Anti-stallo #111: incastrato su un solido statico per 2 s aggira di lato con collisioni (niente teletrasporto, mai attraverso i solidi)
             if ((transform.position - _lastPos).sqrMagnitude < 1e-5f) _stuckT += Time.deltaTime;
             else if (applied.sqrMagnitude > 1e-8f) _stuckT = 0;
+            if (_stuckT > 2f && d.sqrMagnitude < 1.44f) { _stuckT = 0; return true; } // a ridosso della meta ma fermato da un solido (corpo 0,45 m): carica/scarica da lì
             if (_stuckT > 2f) { var step = Vector3.ClampMagnitude(d.normalized * WalkSpeed * Time.deltaTime, d.magnitude); var sd = AgentMove.Sidestep(transform, step, BodyRadius); if (sd.sqrMagnitude > 1e-10f) { _stuckT = 0; _curSpeed = sd.magnitude / Mathf.Max(Time.deltaTime, 1e-5f); } }
             _lastPos = transform.position;
             return false;
