@@ -39,7 +39,7 @@ namespace UltimoMiglio.Gameplay
         public Step Current { get; private set; }
         public string CurrentObjectiveText => Current < Step.Fine && (int)Current < Objectives.Length ? Objectives[(int)Current] : (Current == Step.Fine ? "Deposito aperto!" : "");
         Vector3 _startPos; int _shelfBase, _servedBase, _padBase; double _walletBase, _debtBase; float _endT, _stepStart; bool _cassaSeen;
-        int _hints, _lvl3; float _nolnpAt = -99f;
+        int _hintCount, _lvl3; float _nolnpAt = -99f;
         /// <summary>Passi letti da onboarding.json (null = asset non importato: valgono <see cref="StepIds"/>).</summary>
         public UltimoMiglio.Core.Data.OnboardingStep[] Steps { get; private set; }
         /// <summary>Tempo di gioco attivo (s) usato nelle righe [ONB]: non scorre in pausa/menu.</summary>
@@ -55,7 +55,7 @@ namespace UltimoMiglio.Gameplay
         public void NotifyHint(int lvl, float idle, string kind)
         {
             if (Current >= Step.Fine || !HasHints(Current)) return;
-            _hints++; if (lvl >= 3) _lvl3++;
+            _hintCount++; if (lvl >= 3) _lvl3++;
             Onb("hint", Current, "lvl", lvl, "idle", (double)idle, "kind", kind);
         }
         Transform _marker, _markerArrow; VisualElement _banner; Label _bannerText, _objective;
@@ -262,7 +262,7 @@ namespace UltimoMiglio.Gameplay
         {
             if (Current >= Step.Fine) return;
             Onb("skip", Current, "from", IdOf(Current));
-            Onb("end", Step.FreePlay, "total", OnbTime, "hints", _hints, "lvl3", _lvl3);
+            Onb("end", Step.FreePlay, "total", OnbTime, "hints", _hintCount, "lvl3", _lvl3);
             UltimoMiglio.UI.HudReveal.ShowAll(); CameraPeek.Cancel();
             if (_hud) _hud.CompleteAdaNote();
             Enter(Step.Chiuso);
@@ -287,7 +287,7 @@ namespace UltimoMiglio.Gameplay
             if (s == Step.Coins && eco != null && eco.S.Wallet < 4)
                 eco.S.Wallet = System.Math.Max(eco.S.Wallet, 4);
             if (s < Step.Chiuso) Onb("start", s, "reveals", RevealsOf(s).Length);
-            if (s == Step.FreePlay) Onb("end", s, "total", OnbTime, "hints", _hints, "lvl3", _lvl3);
+            if (s == Step.FreePlay) Onb("end", s, "total", OnbTime, "hints", _hintCount, "lvl3", _lvl3);
             Debug.Log($"[Tutorial] step {(int)s} {s}: {CurrentText}");
             StepChanged?.Invoke(s);
             RevealFor(s);
