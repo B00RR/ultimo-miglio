@@ -22,7 +22,7 @@ public class AnimFacingTest
     }
 
     /// <summary>Cancella solo le chiavi di gioco (salvataggio + tutorial), non volumi/zoom delle impostazioni (#36).</summary>
-    internal static void ResetGameKeys() { PlayerPrefs.DeleteKey("um_save_v1" /* GameRoot.SaveKey */); PlayerPrefs.DeleteKey(TutorialManager.PrefKey); PlayerPrefs.SetInt(TutorialManager.PrefGraduale, 0) /* #94: test non di onboarding → niente rivelazione graduale */; UltimoMiglio.Gameplay.TutorialManager.TestSenzaComparse = true; UltimoMiglio.Gameplay.TutorialManager.TestAccelera = true; /* #101: niente comparse graduali, tempi corti */ PlayerPrefs.Save(); }
+    internal static void ResetGameKeys() { PlayerPrefs.DeleteKey("um_save_v1" /* GameRoot.SaveKey */); PlayerPrefs.DeleteKey(TutorialManager.PrefKey); PlayerPrefs.SetInt(TutorialManager.PrefGraduale, 0) /* #94: test non di onboarding → niente rivelazione graduale */; PlayerPrefs.Save(); }
     static IEnumerator Load()
     {
         ResetGameKeys(); Time.timeScale = 1f;
@@ -143,10 +143,11 @@ public class AnimFacingTest
 /// <summary>#2: in scena i clienti sono i 6 personaggi riggati (non capsule), Humanoid valido, AlwaysAnimate, senza root motion.</summary>
 public class ClientiRigTest
 {
+    [TearDown] public void TearDown() => UltimoMiglio.UI.HudReveal.ResetAll(); // isolamento: lo stato statico non passa ai test successivi
     [UnityTest] public IEnumerator Clienti_SonoIRiggatiNonCapsule()
     {
         // Solo le chiavi del gioco: i volumi (vol_music/vol_sfx, #36) restano intatti
-        PlayerPrefs.DeleteKey(TutorialManager.PrefKey); TutorialManager.TestSenzaComparse = true; TutorialManager.TestAccelera = true; /* #101 */ PlayerPrefs.DeleteKey("um_save_v1"); PlayerPrefs.DeleteKey(DepotCameraFit.PrefZoom);
+        AnimFacingTest.ResetGameKeys(); PlayerPrefs.DeleteKey(DepotCameraFit.PrefZoom); // solo chiavi di gioco (non i volumi #36) e niente rivelazione graduale #94: altrimenti NONNO resta nascosto anche nei test successivi
         yield return SceneManager.LoadSceneAsync("Ch1_Deposito");
         for (int i = 0; i < 60 && !GameRoot.Ready; i++) yield return null;
         var q = Object.FindAnyObjectByType<CustomerQueue>(); Assert.IsNotNull(q); Assert.IsNotNull(q.Prefab, "CustomerQueue.Prefab rotto");
