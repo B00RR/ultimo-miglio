@@ -125,7 +125,7 @@ namespace UltimoMiglio.EditorTools
                 body.AddComponent<NavMeshObstacle>().carving = true;
                 // #58: BoxCollider semplice (il CharacterController scivola sui box, B5)
                 // #47: scaffale caricato se presente
-                if (kitOk && DepotKit.Place(AssetDatabase.LoadAssetAtPath<GameObject>("Assets/_Game/Art/Environment/Kit/prop_shelf_2m_loaded.fbx") ? "Kit/prop_shelf_2m_loaded" : "Kit/prop_shelf_2m", null, body.transform.position - new Vector3(0, 0.9f, 0), 0, false)) { body.GetComponent<Renderer>().enabled = false; Object.DestroyImmediate(body.GetComponent<Collider>()); } // #82: niente collider doppio, resta il NavMeshObstacle
+                if (kitOk && DepotKit.Place(AssetDatabase.LoadAssetAtPath<GameObject>("Assets/_Game/Art/Environment/Kit/prop_shelf_2m_loaded.fbx") ? "Kit/prop_shelf_2m_loaded" : "Kit/prop_shelf_2m", null, body.transform.position - new Vector3(0, 0.9f, 0), 0, false)) body.GetComponent<Renderer>().enabled = false; // #58: il BoxCollider del box resta (secondo collider voluto)
                 Box("Code", body.transform, new Vector3(0, 0.55f, 0.52f), new Vector3(0.9f, 0.08f, 0.1f), world, cols[i]);
                 shelves[i] = Zone<Shelf>($"Zona_Scaffale_{(char)('A' + i)}", p + new Vector3(0, 0, 0.6f), new Vector3(1.8f, 1, 1.2f), cols[i], props);
                 shelves[i].Color = (ParcelColor)i; shelves[i].Count = 4;
@@ -137,7 +137,7 @@ namespace UltimoMiglio.EditorTools
             var banMesh = Box("Bancone_Mesh", null, banPos + new Vector3(0, 0.5f, -0.9f), new Vector3(2.4f, 1f, 0.7f), world, UM_Palette.Terracotta); banMesh.AddComponent<NavMeshObstacle>().carving = true;
            // #58: BoxCollider solido
             // #47: counter + Carico0 + rug
-            if (kitOk && DepotKit.Place("Kit/prop_counter_2m", null, banPos + new Vector3(0, 0, -0.9f), 0, false)) { banMesh.GetComponent<Renderer>().enabled = false; Object.DestroyImmediate(banMesh.GetComponent<Collider>()); /* #82 */ DepotKit.Place("Kit/prop_register", null, banPos + new Vector3(0.6f, 1.0f, -0.9f), 0, false, true); DepotKit.Place("Kit/prop_carico0", null, banPos + new Vector3(-0.15f, 1.0f, -0.9f), 8, false, true); DepotKit.Place("ThirdParty/Props/prop_tp_lemon", null, banPos + new Vector3(-0.8f, 1.0f, -0.9f), 0, false, true); DepotKit.Place("Kit/prop_rug_bancone", null, banPos + new Vector3(0, 0.005f, 0.2f), 0, false); }
+            if (kitOk && DepotKit.Place("Kit/prop_counter_2m", null, banPos + new Vector3(0, 0, -0.9f), 0, false)) { banMesh.GetComponent<Renderer>().enabled = false; /* #58: il BoxCollider di Bancone_Mesh resta */ DepotKit.Place("Kit/prop_register", null, banPos + new Vector3(0.6f, 1.0f, -0.9f), 0, false, true); DepotKit.Place("Kit/prop_carico0", null, banPos + new Vector3(-0.15f, 1.0f, -0.9f), 8, false, true); DepotKit.Place("ThirdParty/Props/prop_tp_lemon", null, banPos + new Vector3(-0.8f, 1.0f, -0.9f), 0, false, true); DepotKit.Place("Kit/prop_rug_bancone", null, banPos + new Vector3(0, 0.005f, 0.2f), 0, false); }
             var bancone = Zone<Bancone>("Zona_Bancone", banPos, new Vector3(2.4f, 1, 1.2f), UM_Palette.Terracotta, props);
             var coins = new GameObject("Coins").AddComponent<CoinSpawner>(); coins.CoinPrefab = coin; bancone.Coins = coins;
             var queue = new GameObject("CustomerQueue").AddComponent<CustomerQueue>(); queue.Prefab = cust;
@@ -187,10 +187,11 @@ namespace UltimoMiglio.EditorTools
             // --- onboarding (Nonna Ada)
             var tut = new GameObject("Tutorial").AddComponent<TutorialManager>(); tut.transform.SetParent(root.transform);
             var tj = AssetDatabase.LoadAssetAtPath<TextAsset>("Assets/_Game/Data/ch1/onboarding_testi.json");
-            if (tj) { var td = JsonUtility.FromJson<TutTexts>(tj.text); tut.Speaker = td.speaker; tut.Texts = td.steps.Select(x => x.text).ToArray(); tut.EndText = td.fine; }
+            if (tj) { var td = JsonUtility.FromJson<TutTexts>(tj.text); tut.Speaker = td.speaker; tut.Texts = td.steps.Select(x => x.text).ToArray(); tut.EndText = td.fine; tut.TestiJson = tj; }
             tut.Arrivi = arrivals.transform; tut.Scaffale = shelves[0].transform; tut.Bancone = bancone.transform;
             tut.Monete = new GameObject("Tut_Monete").transform; tut.Monete.position = banPos + Vector3.right * 0.8f;
             foreach (var pz in Object.FindObjectsByType<UpgradePad>(FindObjectsSortMode.None)) { if (pz.Kind == UpgradeKind.Zaino) tut.PadZaino = pz.transform; if (pz.Kind == UpgradeKind.NonnoHire) tut.PadNonno = pz.transform; }
+            TryRun("UltimoMiglio.VFX.EditorTools.UM_TutorialMarkerSetup", "Setup"); // #4: marker tutorial con materiali assegnati (in build Shader.Find non trova shader non referenziati)
 
             TryRun("UltimoMiglio.VFX.EditorTools.UM_FxPrefabBuilder", "BuildAll");
             // --- punti di interazione stile My Little Universe (pad a terra + chip billboard)
@@ -352,16 +353,21 @@ namespace UltimoMiglio.EditorTools
         static AudioManager BuildAudio(Transform parent)
         {
             var am = new GameObject("AudioManager").AddComponent<AudioManager>(); am.transform.SetParent(parent);
+            WireAudioClips(am); return am;
+        }
+        /// <summary>Assegna tutte le clip all'AudioManager (usato dal builder e da Audio/WireScene, che non rigenera la scena).</summary>
+        public static void WireAudioClips(AudioManager am)
+        {
             AudioClip C(string n) => AssetDatabase.LoadAssetAtPath<AudioClip>($"Assets/_Game/Audio/{n}.ogg") ?? AssetDatabase.LoadAssetAtPath<AudioClip>($"Assets/Audio/{(n.StartsWith("mus_") ? "Music" : "SFX")}/{n}.ogg");
             AudioClip[] R(string pfx, int n) => Enumerable.Range(1, n).Select(i => C($"{pfx}_{i:00}")).Where(c => c).ToArray();
             am.MusicStems = new[] { C("mus_day_vela_e_figli_base"), C("mus_day_vela_e_figli_perc"), C("mus_day_vela_e_figli_mel") };
             am.MusicFull = C("mus_day_vela_e_figli_full");
             am.Pickup = R("sfx_parcel_pickup", 8); am.Deposit = R("sfx_parcel_deposit", 4); am.CoinDrop = R("sfx_coin_drop", 4); am.CoinPickup = R("sfx_coin_pickup", 4);
-            am.NonnoMumble = R("sfx_nonno_mumble", 3); am.Steps = R("sfx_step_stone", 4).Concat(R("sfx_step_wood", 4)).ToArray();
+            am.NonnoMumble = R("sfx_nonno_mumble", 3); am.Steps = R("sfx_step_stone", 4); // pavimento a lastre: solo pietra (wood per pedane future)
+            am.UiTap = R("sfx_ui_tap", 2); am.TutorialArrow = C("sfx_ui_arrow_appear"); am.TutorialStep = C("sfx_ui_step_complete");
             am.StackMax = C("sfx_stack_max"); am.Bell = C("sfx_customer_bell"); am.Served = C("sfx_customer_served");
             am.UpgradeLoop = C("sfx_upgrade_tick_loop"); am.UpgradeComplete = C("sfx_upgrade_complete");
             am.ComboX15 = C("sfx_combo_x1_5"); am.ComboX2 = C("sfx_combo_x2"); am.NonnoStart = C("sfx_nonno_start");
-            return am;
         }
     }
 

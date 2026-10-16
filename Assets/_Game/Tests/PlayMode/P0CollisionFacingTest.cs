@@ -173,12 +173,12 @@ public class P0CollisionFacingTest
         Assert.GreaterOrEqual(n, 10, "pochi collider kit: " + n);
         Assert.IsEmpty(fails, "collider fuori dai bounds della mesh: " + string.Join(" | ", fails));
         var ban = GameObject.Find("Bancone_Mesh"); Assert.IsNotNull(ban);
-        Assert.IsNull(ban.GetComponent<Collider>(), "Bancone_Mesh: collider doppio sopra prop_counter_2m");
+        Assert.IsNotNull(ban.GetComponent<Collider>(), "Bancone_Mesh: il secondo collider resta (regressione #58)");
         Assert.IsNotNull(ban.GetComponent<NavMeshObstacle>(), "Bancone_Mesh: NavMeshObstacle da mantenere");
         foreach (var name in new[] { "Scaffale_A", "Scaffale_B" })
         {
             var sc = GameObject.Find(name); if (!sc) continue;
-            Assert.IsNull(sc.GetComponent<Collider>(), name + ": collider doppio sopra prop_shelf");
+            Assert.IsNotNull(sc.GetComponent<Collider>(), name + ": il secondo collider resta (regressione #58)");
             Assert.IsNotNull(sc.GetComponent<NavMeshObstacle>(), name + ": NavMeshObstacle da mantenere");
         }
     }
