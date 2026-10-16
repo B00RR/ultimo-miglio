@@ -131,6 +131,7 @@ Ogni ruolo lavora solo sulle issue con la propria etichetta `ruolo:*`, sempre co
 
 Voci più recenti in alto. Formato: `AAAA-MM-GG HH:MM` (Europe/Rome) — [commit] — descrizione.
 
+- 2026-10-16 11:55 — UI/UX — [faf9f88](https://github.com/B00RR/ultimo-miglio/commit/faf9f88) — PR #139 (Closes #138): `11_CAP1_COMPLETO` allineato all'HUD minimo (LN, giorno, riga obiettivo, joystick, pad; telefono → Gioco completo #64; combo "+N" 1,5 s; debito a fine giornata; SFX telefono segnati Gioco completo, da rivedere col Sound Designer). Seguito review: colori dei pad rimandati a GUIDA_VISIVA_CAP1 §2 e PR #123.
 - 2026-10-16 11:50 — Code Reviewer — [4caa545](https://github.com/B00RR/ultimo-miglio/commit/4caa5452fa083d9ecafb1c591a4257d8d979fbd5) — unita in squash la [PR #147](https://github.com/B00RR/ultimo-miglio/pull/147) (docs: sezione *Regole del computer*, repo docs archiviato). Solo `.md`; conflitto su STATO_PROGETTO.md risolto con merge di main nel branch.
 - 2026-10-16 11:50 — Code Reviewer — [8a2268e](https://github.com/B00RR/ultimo-miglio/commit/8a2268e61628a9ca3e14b79914948723b96c894c) — unita in squash la [PR #145](https://github.com/B00RR/ultimo-miglio/pull/145) (regola 1 solo Unity sul box, `flock /tmp/unity-box.lock`). Solo `.md`.
 - 2026-10-16 11:49 — Code Reviewer — [b5f6ba5](https://github.com/B00RR/ultimo-miglio/commit/b5f6ba5864023f012c1f592163100e7931789a76) — unita in squash la [PR #143](https://github.com/B00RR/ultimo-miglio/pull/143) (anteprime QA `tutorial_hud_77` con pad NONNO a 50 LN). Solo documentazione QA, nessun C#. Closes #142.
@@ -250,8 +251,3 @@ Voci più recenti in alto. Formato: `AAAA-MM-GG HH:MM` (Europe/Rome) — [commit
 - Deciso (Tech Lead): pannello unico `SettingsController`; `Bridge/SettingsPanel` resta (usato da `HudGameBridge`) ma senza listener `OnSettingsRequested`. Ingranaggio = toggle (QA P3, `qa/playtest_web_live_p0.md` S01). Zoom su chiave unica `cam_zoom_v3` (`DepotCameraFit.PrefZoom`).
 - Riferimento #35 (chiusa). Correlate aperte: #64, #67.
 - 2026-10-16 — PR #85 (3D Artist, Refs #2): solo clienti v03-uv in `3d/export/chr/` (rider cappello limone, 3 toni pelle; residente/rider/turista/vip, vertici invariati) + review docs/review/2. Nonna Ada tolta: la consegna l'Animator (#93).
-
-## Aggiornamento 16/10 11:15 — 11_CAP1_COMPLETO allineato all'HUD minimo (UI, issue #138, branch ui/138-cap1-hud-minimo)
-- Copia di riferimento: `docs/design/11_CAP1_COMPLETO.md` (decisione del Producer); quella in `ultimo-miglio-docs` diventa un rimando (docs#2/#3).
-- UI/UX: HUD Cap. 1 solo LN, giorno, riga obiettivo, joystick e pad; telefono di Nina rimandato a Gioco completo (#64); combo solo "+N" sopra Nina per 1,5 s, x1,2 non mostrato; debito solo a fine giornata e nel fumetto di Ada; colori pad ritiro `#5E7F86`, consegna `#8FC9A8`, acquisto `#F4C430`, potenziamento `#F7E26B`. UI/UX 5 → 4 gp.
-- Sound: SFX UI telefono (swipe, notifica) segnati Gioco completo; "test speaker telefono" → test su speaker di smartphone. Nessun nuovo asset: **da rivedere col Sound Designer**.
