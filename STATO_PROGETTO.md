@@ -1,7 +1,7 @@
 # STATO PROGETTO — Ultimo Miglio
 
 > Punto di ingresso unico per chiunque (persona o agente) lavori su questo repo. Aggiornalo **nella stessa PR** in cui completi qualcosa.
-> Ultimo aggiornamento: 2026-10-15 18:15 (Europe/Rome).
+> Ultimo aggiornamento: 2026-10-16 02:00 (Europe/Rome).
 
 ## 1. Il gioco
 - **Ultimo Miglio**: gioco mobile **Android**, **Unity 6 (6000.3) URP**.
@@ -33,7 +33,7 @@
 - Ramo `animator` (non ancora su main): Nina rig Humanoid 24 ossa + clip (camminata nel verso giusto, Carry, Cheer), NONNO v03 (rig Generic), TICO v02, 6 clienti con rig di Nina e controller `chr_cliente`, verifica anti‑compenetrazione.
 - Documentazione di design: bibbia, core loop, tech, UI, retention, sprint 1, gestionale, longevità, cap. 1 completo, protocollo Unity.
 
-## 5. IN CORSO (oggi 15/10)
+## 5. IN CORSO (oggi 16/10)
 - **Consegna cap. 1 giocabile in WebGL entro le 17:45–18:00.**
 - Rifinitura tutorial Nonna Ada (7 passi) e game feel.
 - **Merge del ramo `animator`** (fix camminata): conflitto su `chr_nina_vela.fbx` e `bot_nonno.fbx`.
@@ -86,6 +86,8 @@ $UNITY -batchmode -projectPath "$PWD" -runTests -testPlatform PlayMode \
 
 ## 11. Cronologia
 Voci più recenti in alto. Formato: `AAAA-MM-GG HH:MM` (Europe/Rome) — [commit] — descrizione.
+
+- 2026-10-16 02:00 — [17f1fb7](https://github.com/B00RR/ultimo-miglio/commit/17f1fb7) — Tech Lead (PR #45 / fix-qa): fix Bancone→LN immediato (CollectActive+Burst), obiettivo top, strip NavMeshAgent, shader AlwaysIncluded/URP no dither; EditMode 35/35 + PlayMode 6/6; Closes #41 #42 #43 #44. In coda integrazioni #53 UI → #52 VFX → #47 art (dopo VIA live).
 
 - 2026-10-15 16:35 — PR producer/regola-closes — Producer: regola `Closes #N` / `Refs #N` in *Come lavoriamo*, modello di PR `.github/pull_request_template.md`, corretti gli orari di due voci; aggiunte le parole chiave alle PR #11 e #14.
 - 2026-10-15 16:25 — [8e4e272](https://github.com/B00RR/ultimo-miglio/commit/8e4e272) — Producer: aggiornata la Cronologia.
