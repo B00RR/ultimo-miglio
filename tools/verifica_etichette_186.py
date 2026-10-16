@@ -99,6 +99,7 @@ def main():
         if (b > r + 18 and b > g + 8 and b > 90) or (r > 140 and b > 140 and b > g + 30 and r > g + 25):
             freddi += 1
     ok(bianchi == 0 and freddi == 0, "texture insegna senza bianco, blu o viola")
+    ok(png.getchannel("A").getextrema()[0] < 255, "insegna con alpha davvero usato (il test #185)")
 
     for name, altezza in (
         ("tex_capsula_noce_32.png", 32),
