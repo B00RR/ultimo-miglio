@@ -49,8 +49,9 @@ namespace UltimoMiglio.Gameplay
             RegisterWorldReveals();
             // Graduale solo per una partita NUOVA (nessun passo salvato) o iniziata già in graduale; salvataggi precedenti = tutto visibile
             bool nuova = !PlayerPrefs.HasKey(PrefKey);
-            if (RivelaGraduale && nuova) { PlayerPrefs.SetInt(PrefGraduale, 1); PlayerPrefs.Save(); }
-            bool graduale = RivelaGraduale && Current < Step.Fine && (nuova || PlayerPrefs.GetInt(PrefGraduale, 0) == 1);
+            bool escluso = PlayerPrefs.HasKey(PrefGraduale) && PlayerPrefs.GetInt(PrefGraduale) == 0; // test/QA: um_onb_graduale = 0 → tutto visibile subito
+            if (RivelaGraduale && nuova && !escluso) { PlayerPrefs.SetInt(PrefGraduale, 1); PlayerPrefs.Save(); }
+            bool graduale = RivelaGraduale && !escluso && Current < Step.Fine && (nuova || PlayerPrefs.GetInt(PrefGraduale, 0) == 1);
             if (graduale) UltimoMiglio.UI.HudReveal.HideAll(LockedAtStart);
             for (var k = Step.Muoviti; k < Current; k++) RevealFor(k); // ripresa da PlayerPrefs: ciò che è già stato rivelato resta visibile
             Enter(Current);
