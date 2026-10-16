@@ -68,7 +68,7 @@ Esistenti (PR #62): tutte le `onb.*` e i biglietti `step:<id>` citati sopra.
 | 0,85 | ~1:25 | 2:10 | 36:00 | 35,7 min | ok |
 | 1,00 | 1:23 | 2:10 | 34:00 | 33,5 min | ok (golden path) |
 | 1,20 | <1:23 | 2:10 | 32:00 | 31,3 min | ok |
-Al golden path il portafoglio vale 41 LN a 1:23 e 211 LN cumulati a 2:10: tutti i 15 acquisti del cap 1 (fino a Zaino 7 a 28:47) sono pagabili in tempo con la quota del 40%.
+Al golden path, fino al primo versamento alla Cassaforte (passo debtCard, circa 4:00) il 100% delle LN va nel portafoglio (ECO-06, #223): circa 102 LN a 1:23 (erano 41 LN con la vecchia quota del 40% dalla prima vendita) e 211 LN cumulati a 2:10. Al primo versamento il 60% del portafoglio va al debito, poi la quota del giocatore è il 40%: tutti i 15 acquisti del cap 1 (fino a Zaino 7 a 28:47) restano pagabili in tempo.
 
 
 ## Chiavi di testo toccate dall'HUD minimo (per il Narrative)
