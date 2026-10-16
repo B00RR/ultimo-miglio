@@ -26,6 +26,9 @@ namespace UltimoMiglio.Core
         public int CustomersServed, CustomersLost;
         public bool ChapterComplete;
         public int ParcelMilestonesHit, DebtMilestonesHit, Reputation; public bool CassaTipGiven; // #103 rewards (save)
+        /// <summary>#223: true finché il tutorial non arriva alla carta del debito (passo debtCard): tutto l'incasso va nel portafoglio, niente quota al debito.
+        /// Default false: salvataggi vecchi e partite senza tutorial restano con lo split attivo.</summary>
+        public bool DebtSplitLocked;
         public int debt_ms;              // #136: bitmask delle tappe del debito già mostrate (nel salvataggio: si azzera con la partita nuova)
         public double Bulloni; public int ProrogaTokens = -1; public double DueActiveSec = -1; public bool Mora; public int Day = 1;
     }
@@ -120,6 +123,7 @@ namespace UltimoMiglio.Core
 
         void Split(double ln)
         {
+            if (S.DebtSplitLocked) { S.Wallet += ln; return; } // #223: trattenuta sul debito solo dopo il passo debtCard
             S.Wallet += ln * Cfg.PlayerSpendShare;
             double toDebt = ln * (1 - Cfg.PlayerSpendShare);
             S.DebtPaid += toDebt;
