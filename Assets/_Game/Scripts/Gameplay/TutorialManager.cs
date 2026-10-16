@@ -297,10 +297,16 @@ namespace UltimoMiglio.Gameplay
         public string CurrentText => Current < Step.Fine ? (Texts != null && (int)Current < Texts.Length ? Texts[(int)Current] : CurrentHintText()) : Current == Step.Fine ? EndText : null;
         string CurrentHintText() { var h = CurrentHint(); return string.IsNullOrEmpty(h) ? null : h; }
 
+        /// <summary>#223: la trattenuta sul debito resta spenta prima della carta del debito (passo debtCard).</summary>
+        public static bool DebtSplitLockedAt(Step s) => s < Step.DebtCard;
+        /// <summary>#223: il passo debtCard si chiude solo con un versamento fatto DOPO l'inizio del passo (non basta DebtPaid &gt; 0 da prima).</summary>
+        public static bool DebtCardGate(double debtPaid, double debtBaseAtStepStart) => debtPaid > debtBaseAtStepStart + 1e-9;
+
         void Enter(Step s)
         {
             Current = s; PlayerPrefs.SetInt(PrefKey, (int)s); PlayerPrefs.SetInt(PrefVer, Versione); PlayerPrefs.Save();
             var eco = GameRoot.Ready ? GameRoot.I.Eco : null;
+            if (eco != null) eco.S.DebtSplitLocked = DebtSplitLockedAt(s); // #223
             if (GameRoot.I && GameRoot.I.Nina) _startPos = GameRoot.I.Nina.transform.position;
             AggiornaCache(true); _shelfBase = ShelfTotal(); _servedBase = eco?.S.CustomersServed ?? 0; _walletBase = eco?.S.Wallet ?? 0; _endT = 0; _stepStart = Time.time;
             _debtBase = eco?.S.DebtPaid ?? 0; _padBase = eco == null ? 0 : eco.S.Scarpe + eco.S.Insegna; _cassaSeen = false; _coinBase = CoinSpawner.Raccolte;
@@ -464,7 +470,7 @@ namespace UltimoMiglio.Gameplay
                 Step.NonnoConfirm => (NonnoWorking() && inStep >= NonnoConfirmCamSec) || inStep >= NonnoConfirmMaxSec ? "nonnoFirstRestock" : null,
                 Step.PadNuovi => eco.S.Scarpe + eco.S.Insegna > _padBase || (double.IsInfinity(eco.Cost(UpgradeKind.Scarpe)) && double.IsInfinity(eco.Cost(UpgradeKind.Insegna))) ? "padPurchasedAny" : null,
                 Step.CassaPass => _cassaSeen || !Cassa() ? "cassaPassed" : null,
-                Step.DebtCard => eco.S.DebtPaid > _debtBase || eco.S.DebtPaid > 0 ? "firstDebtDeposit" : null,
+                Step.DebtCard => DebtCardGate(eco.S.DebtPaid, _debtBase) ? "firstDebtDeposit" : null,
                 Step.WallPad => inStep >= WallPadSec ? "goalSeen" : null,
                 Step.FreePlay => (_endT += Time.deltaTime) > EndSeconds ? "freePlayShown" : null,
                 _ => null
