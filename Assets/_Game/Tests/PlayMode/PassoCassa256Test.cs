@@ -53,7 +53,8 @@ public class PassoCassa256Test
             // #97 (3D Artist): Ada sta a sud del muro del Bancone (banPos+1,45). Dalla Cassa la linea retta finisce contro env_wall_2m_b
             // e a est il varco arco–vaso di limoni (prop_lemontree_pot) è di 0,45 m, meno del diametro di Kaia. L'unico giro passa dal
             // varco ovest (BFS fisico con capsula r 0,3 sulla scena: 11,4 m). Tappe prese da quel percorso.
-            foreach (var w in new[] { new Vector3(2.5f, 0, -2.85f), new Vector3(0.5f, 0, -2.85f), new Vector3(-0.5f, 0, -3.65f), new Vector3(-0.5f, 0, -4.65f), new Vector3(0.15f, 0, -5.35f), new Vector3(1.15f, 0, -5.5f), new Vector3(3.15f, 0, -5.55f) })
+            // Dalla #251 il bersaglio di debtCard è la Cassaforte (prop_safe, a nord del muro): le tappe servono solo se il bersaglio è Ada.
+            if (t13.name == "NonnaAda") foreach (var w in new[] { new Vector3(2.5f, 0, -2.85f), new Vector3(0.5f, 0, -2.85f), new Vector3(-0.5f, 0, -3.65f), new Vector3(-0.5f, 0, -4.65f), new Vector3(0.15f, 0, -5.35f), new Vector3(1.15f, 0, -5.5f), new Vector3(3.15f, 0, -5.55f) })
                 yield return Tappa(nina, w, TutorialManager.Step.WallPad, 8f, "tappa " + w);
             yield return Cammina(nina, t13.position, TutorialManager.Step.WallPad, 30f, "Cassaforte " + t13.name);
             Assert.AreEqual(TutorialManager.Step.WallPad, tut.Current, "debtCard non chiuso alla Cassaforte\n" + Stato(tut));
