@@ -102,8 +102,8 @@ namespace UltimoMiglio.EditorTools
             Place("../Props/prop_parcel_box_cube", _parent, shelfC + new Vector3(1.2f, 0, -1.4f), -25, true);
             Place("../Props/prop_parcel_box_flat", _parent, shelfC + new Vector3(1.2f, 0, -1.4f), 30, false, true);
             // Bancone: limoni e pila ai lati, lavagna e lampione lungo la coda (lato -x, la coda va verso +x)
-            Place("Kit/prop_lemontree_pot", _parent, banPos + new Vector3(-1.75f, 0, -0.5f), 0, true); // #97: varco ovest chiuso (vaso a 0.18 dalla pila, 0.23 dal Bancone): spostarlo di 0.35 a ovest lasciava 0.58 m
-            Place("Kit/prop_parcel_stack_a", _parent, banPos + new Vector3(-1.8f, 0, 0.6f), 25, true);
+            Place("Kit/prop_lemontree_pot", _parent, banPos + new Vector3(-2.5f, 0, -1.6f), 0, true); // #82 (Game Designer): varco ovest riaperto, il giro da est costava fino a +6,8 m dai pad (detour_82.py)
+            Place("Kit/prop_parcel_stack_a", _parent, banPos + new Vector3(-2.2f, 0, 0.9f), 25, true); // #82: varco ovest di 1,26 m fra pila e angolo del banco
             Place("Kit/prop_sign_board_aperto", _parent, banPos + new Vector3(-1.2f, 0, -2.4f), 30, true);
             Place("Kit/prop_streetlamp", _parent, banPos + new Vector3(-1.9f, 0, -3.4f), 0, true);
             Place("Kit/prop_plant_pot_round", _parent, banPos + new Vector3(-2.4f, 0, 1.6f), 0, true); // #187: spostato a ovest, fra Bancone e Cassa non c'era spazio con anello = trigger

@@ -30,7 +30,7 @@ def zones(new):
 def props(new):  # ostacoli (cerchio r o rettangolo cx,cz,w,d) da DepotKit/SliceSceneBuilder
     P=[("vaso limoni (deposito)",("c",(-3.1+1.4,7.4),0.35)),("pila pacchi N",("c",(-3.0,7.5),0.5)),("planter",("r",(0,7.7),1.2,0.5)),
        ("vaso limoni corsia",("c",(-8.6,-0.6),0.35)),("vaso tondo corsia",("c",(-1.4,-0.6),0.3)),("pacco cubo",("c",(-6.1,-1.4),0.3)),("pacco cubo",("c",(-3.8,-1.4),0.3)),
-       ("Bancone (banco)",("r",ad(ban,(0,-0.9)),2.4,0.7)),("vaso limoni Bancone",("c",ad(ban,(-1.75,-0.5)),0.35)),("pila Bancone",("c",ad(ban,(-1.8,0.6)),0.5)),
+       ("Bancone (banco)",("r",ad(ban,(0,-0.9)),2.4,0.7)),("vaso limoni Bancone",("c",ad(ban,(-2.5,-1.6)),0.35)),("pila Bancone",("c",ad(ban,(-2.2,0.9)),0.5)),
        ("lavagna",("c",ad(ban,(-1.2,-2.4)),0.35)),("lampione",("c",ad(ban,(-1.9,-3.4)),0.15)),
        ("vaso tondo Bancone",("c",ad(ban,(-2.6,1.4) if new else (1.6,0.7)),0.3)),
        ("muro Bancone",("r",ad(ban,(0.8,1.45)),4.4,0.48)),("arco Bancone",("r",ad(ban,(3.2,-0.3)),0.48,4.0)),
