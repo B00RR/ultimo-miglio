@@ -198,7 +198,10 @@ jobs:
           publish_branch: main
           publish_dir: Builds/WebGL_min
           enable_jekyll: false
-          force_orphan: true
+          # keep_files: preserva dev/ e prova/ del sito (force_orphan li cancellava). exclude_assets filtra solo
+          # publish_dir, non protegge la destinazione. I nomi fissi della build (index.html, Build/, TemplateData/)
+          # vengono sovrascritti; eventuali file vecchi della radice con altri nomi restano.
+          keep_files: true
           commit_message: "Build WebGL da ultimo-miglio@${{ github.sha }}"
       - uses: actions/upload-artifact@v4
         with: { name: webgl, path: Builds/WebGL_min, retention-days: 3 }
