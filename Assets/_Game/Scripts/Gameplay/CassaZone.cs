@@ -10,7 +10,9 @@ namespace UltimoMiglio.Gameplay
         public CoinSpawner Coins; public bool OfferDouble; // rewarded/Bulloni flow plugs in here (Services, not in sprint 1)
         protected override void OnZoneStart()
         {
-            var eco = GameRoot.I.Eco; if (eco.S.CassaLn <= 0) return;
+            var eco = GameRoot.I.Eco;
+            double tip = eco.CassaFirstVisitTip(); // #103: mancia alla prima visita (va nel portafoglio)
+            if (eco.S.CassaLn <= 0) return;
             long day = System.DateTimeOffset.UtcNow.ToUnixTimeSeconds() / 86400;
             double ln = eco.CollectCassa(OfferDouble, day, transform.position.ToWP());
             Coins.Burst(transform.position, ln);

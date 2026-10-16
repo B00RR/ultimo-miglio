@@ -15,6 +15,7 @@ public class P0CollisionFacingTest
         PlayerPrefs.DeleteAll(); UltimoMiglio.Gameplay.TutorialManager.TestSenzaComparse = true; /* #101: niente comparse graduali */
         var save = System.IO.Path.Combine(Application.persistentDataPath, "save_v1.json");
         if (System.IO.File.Exists(save)) System.IO.File.Delete(save);
+        PlayerPrefs.SetInt(UltimoMiglio.Gameplay.TutorialManager.PrefGraduale, 0); // #94: test non di onboarding → niente rivelazione graduale
         yield return SceneManager.LoadSceneAsync("Ch1_Deposito");
         for (int i = 0; i < 90 && !GameRoot.Ready; i++) yield return null;
         Assert.IsTrue(GameRoot.Ready, "GameRoot not ready");
