@@ -50,3 +50,5 @@
 .poi-chevron--on { display: flex; }
 .poi-chip-col--flip { translate: -50% 0; }
 .poi-chip-col--flip .poi-chevron { rotate: 180deg; }
+.poi-chevron--off { rotate: 180deg; }
+.poi-chip-col--flip .poi-chevron--off { rotate: 0deg; }

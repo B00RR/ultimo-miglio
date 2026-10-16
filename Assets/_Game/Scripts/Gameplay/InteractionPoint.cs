@@ -128,8 +128,23 @@ namespace UltimoMiglio.Gameplay
             _barLabel = new Label { pickingMode = PickingMode.Ignore }; _barLabel.AddToClassList("poi-bar__label");
             _bar.Add(track); _bar.Add(_barLabel);
             _chipCol.Add(_chevron); _chipCol.Add(_bar); _chipCol.Add(_chip); layer.Add(_chipCol);
+            SetPadOff(PadOff); // #240: la pillola creata dopo l'acquisto nasce già spenta
             var arrow = _hud.Root.Q("edge-arrow"); arrow?.BringToFront(); // the off-screen arrow is never under a chip/card
         }
+
+        /// #240: pad spento dopo l'acquisto. Prezzo grigio (UM_PadOffStyle.Price) e freccia #9E8F7E rivolta verso l'esterno.
+        public bool PadOff { get; private set; }
+        public void SetPadOff(bool off)
+        {
+            PadOff = off;
+            if (_text != null) _text.style.color = off ? UltimoMiglio.VFX.UM_PadOffStyle.Price : Ink;
+            if (_chevron != null)
+            {
+                _chevron.style.unityBackgroundImageTintColor = off ? UltimoMiglio.VFX.UM_PadOffStyle.Arrow : Color.white;
+                _chevron.EnableInClassList("poi-chevron--off", off);
+            }
+        }
+        public Color PriceColor => PadOff ? UltimoMiglio.VFX.UM_PadOffStyle.Price : Ink;
 
         int _shownLeft = int.MinValue, _shownPaid = int.MinValue, _shownCost = int.MinValue;
         UltimoMiglio.UI.World.PadTag _tag; bool _tagLooked;
