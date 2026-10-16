@@ -80,7 +80,9 @@ def make(name,n,fn,loop):
 FORK_MAX=0.40   # cima forche (0.36+0.40=0.76 m) sotto la linea dei baffi (0.78): il viso resta visibile
 if CHAR=="nonno":
     def stache(t,amp=0.12,freq=1): setrot("mustache", y=0.35*amp*S(TAU*freq*t)); setloc("mustache",(0,0,0.15*amp*S(TAU*freq*2*t))); setscl("mustache",(1-0.4*amp*abs(S(TAU*freq*t)),1,1))
-    def wheels(a): setrot("wheels_front",x=-a); setrot("wheels_rear",x=-a*1.2)   # ruote posteriori piu' piccole
+    # #59: verso positivo = rotolamento in avanti (fronte -Y): con x=-a le ruote giravano in retromarcia.
+    # Posteriori: 1 giro intero per ciclo (con 1.2 il loop di Drive scattava di 72 gradi a ogni giro).
+    def wheels(a): setrot("wheels_front",x=a); setrot("wheels_rear",x=a)
     def idle(t):          # respiro del motore, sguardo intorno, pisolino e risveglio coi baffi che tremano
         p=t*TAU; setloc("body",(0,0,0.008*S(2*p))); setrot("body",y=0.01*S(p))
         nap=win(t,.45,.58)*(1-win(t,.74,.78))
