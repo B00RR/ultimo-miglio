@@ -158,6 +158,7 @@ Ogni ruolo lavora solo sulle issue con la propria etichetta `ruolo:*`, sempre co
 
 Voci più recenti in alto. Formato: `AAAA-MM-GG HH:MM` (Europe/Rome) — [commit] — descrizione.
 
+- 2026-10-16 18:27 — Code Reviewer — [5b07b83](https://github.com/B00RR/ultimo-miglio/commit/5b07b83e2a1cab85941a77e0b0a4028d929fc598) — unita #211 (chiude #210): la guida del tutorial usa una cache di scaffali, pad e personaggi invece di FindObjectsByType a ogni frame. Su main ci sono #207 e #211: dato il via a Build & Release. Unite anche #125, #209, #207, #208, #213 e #215.
 - 2026-10-16 18:10 — Producer — **punto Cap. 1 (18:10 Europe/Rome)**, main a [ee59380](https://github.com/B00RR/ultimo-miglio/commit/ee59380fdab2bb148e8515eeff2d2aa2c51ecc84):
   - **#157** (tutorial 16 passi), **#174** (Zaino liv. 2, chiude #110) e **#169** (Ada in scena): unite.
   - **#175** (HUD insegna di noce): ancora aperta, **in conflitto** con main, ferma dalle 15:49. Anche **#214** (trigger pad = cerchio, #171) e **#202** (fumetto HUD, #186) sono in conflitto: serve rebase.
