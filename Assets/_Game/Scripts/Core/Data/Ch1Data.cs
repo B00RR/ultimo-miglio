@@ -4,7 +4,12 @@ using System;
 // UnityEngine.JsonUtility in Gameplay/Editor. Generic Track<T> avoided: concrete *Track classes for JsonUtility safety.
 namespace UltimoMiglio.Core.Data
 {
-    [Serializable] public class EconomyData { public double parcelValueLn, parcelValueGrowthPerChapter, customersPerMin, customerPatienceSec; public bool customersAtNight; public ComboData combo; public double insegnaValueBonusPerLevel, reputationVipValueBonusPerLevel, playerSpendShare; public NinaData nina; }
+    [Serializable] public class EconomyData { public double parcelValueLn, parcelValueGrowthPerChapter, customersPerMin, customerPatienceSec; public bool customersAtNight; public ComboData combo; public double insegnaValueBonusPerLevel, reputationVipValueBonusPerLevel, playerSpendShare; public NinaData nina; public RewardsData rewards; }
+    // Ricompense intermedie cap. 1 (PR #75, issue #103/#104)
+    [Serializable] public class RewardsData { public string source; public ParcelMilestone[] parcelMilestones; public string parcelMilestonesNote; public DebtMilestone[] debtMilestones; public double cassaFirstVisitTipLn; public NextPadArrowData nextPadArrow; }
+    [Serializable] public class ParcelMilestone { public int parcels; public double bonusLn; }
+    [Serializable] public class DebtMilestone { public double share; public string reward; public int amount; public string itemId; }
+    [Serializable] public class NextPadArrowData { public double fromSec; public string[] candidates; public string rule; }
     [Serializable] public class ComboData { public double stepPerCustomer, maxMultiplier, resetGapSec, resetGapSecAssist; }
     [Serializable] public class NinaData { public double baseSpeedMps, fullStackSlowdown; public int startStackCapacity; }
 
@@ -17,7 +22,7 @@ namespace UltimoMiglio.Core.Data
     [Serializable] public class ZainoLevel { public int level, stackCapacity; public double costLn; }
     [Serializable] public class ScarpeLevel { public int level; public double speedBonus, costLn; }
     [Serializable] public class InsegnaLevel { public int level; public double customerValueBonus, costLn; }
-    [Serializable] public class ZainoTrack { public ZainoLevel[] levels; }
+    [Serializable] public class ZainoTrack { public ZainoLevel[] levels; public string costNote; }
     [Serializable] public class ScarpeTrack { public ScarpeLevel[] levels; }
     [Serializable] public class InsegnaTrack { public InsegnaLevel[] levels; }
     [Serializable] public class UpgradesData { public ZainoTrack zaino; public ScarpeTrack scarpe; public InsegnaTrack insegna; }
