@@ -131,6 +131,9 @@ Ogni ruolo lavora solo sulle issue con la propria etichetta `ruolo:*`, sempre co
 
 Voci più recenti in alto. Formato: `AAAA-MM-GG HH:MM` (Europe/Rome) — [commit] — descrizione.
 
+- 2026-10-16 11:50 — Code Reviewer — [4caa545](https://github.com/B00RR/ultimo-miglio/commit/4caa5452fa083d9ecafb1c591a4257d8d979fbd5) — unita in squash la [PR #147](https://github.com/B00RR/ultimo-miglio/pull/147) (docs: sezione *Regole del computer*, repo docs archiviato). Solo `.md`; conflitto su STATO_PROGETTO.md risolto con merge di main nel branch.
+- 2026-10-16 11:50 — Code Reviewer — [8a2268e](https://github.com/B00RR/ultimo-miglio/commit/8a2268e61628a9ca3e14b79914948723b96c894c) — unita in squash la [PR #145](https://github.com/B00RR/ultimo-miglio/pull/145) (regola 1 solo Unity sul box, `flock /tmp/unity-box.lock`). Solo `.md`.
+- 2026-10-16 11:49 — Code Reviewer — [b5f6ba5](https://github.com/B00RR/ultimo-miglio/commit/b5f6ba5864023f012c1f592163100e7931789a76) — unita in squash la [PR #143](https://github.com/B00RR/ultimo-miglio/pull/143) (anteprime QA `tutorial_hud_77` con pad NONNO a 50 LN). Solo documentazione QA, nessun C#. Closes #142.
 - 2026-10-16 11:50 — Producer — aggiornate *Regole del computer*: stop solo ai propri processi/subagenti (mai agli altri; stop agli altri solo DevOn/Producer); da PR #145 portati runner self-hosted spento, soglia load 16 e Unity anche in batchmode; corretto §10.1 (`docs/design/11_CAP1_COMPLETO.md`; `00_BIBBIA.md` ancora da migrare).
 - 2026-10-16 11:48 — Regole del computer decise da DevOn su richiesta di Lorenzo (carico box 158/8 core); repo docs archiviato.
 - 2026-10-16 11:50 — Tech Lead — regola §10.11 "1 solo Unity sul box" con `flock /tmp/unity-box.lock` e soglia di load 16, dopo il blocco del box (load 200) delle 11:45. Il runner self-hosted è spento per oggi.
