@@ -18,6 +18,18 @@ namespace UltimoMiglio.Gameplay
         public void Cheer() { if (Animator) Animator.SetTrigger(CheerId); }
 
         void Awake() { _cc = GetComponent<CharacterController>(); }
+        public static readonly Vector3 SafeSpawn = new(0f, 0.05f, -1f);
+        /// <summary>#60: allo start (anche dopo reset storage) Nina deve stare nell'area giocabile, mai dietro il muro N o dentro un collider.</summary>
+        void Start() { EnsurePlayableSpawn(); }
+        public void EnsurePlayableSpawn()
+        {
+            var p = transform.position;
+            bool outside = p.x < -8.6f || p.x > 7.0f || p.z < -10.2f || p.z > 7.0f || p.y < -1f || p.y > 2f;
+            if (!outside) return;
+            bool was = _cc && _cc.enabled; if (_cc) _cc.enabled = false;
+            transform.SetPositionAndRotation(SafeSpawn, Quaternion.identity); _vel = Vector3.zero; _vy = 0;
+            if (_cc) _cc.enabled = was;
+        }
 
         void Update()
         {
@@ -35,7 +47,7 @@ namespace UltimoMiglio.Gameplay
             _cc.Move((_vel + Vector3.up * _vy) * Time.deltaTime);
             // B3 P2: non uscire sotto l'HUD in alto — clamp playable (Arrivi z≈6 resta raggiungibile)
             var p = transform.position;
-            float nx = Mathf.Clamp(p.x, -8.2f, 8.2f);
+            float nx = Mathf.Clamp(p.x, -8.6f, 7.0f) /* #58: muro E reale a x 7.6 */;
             float nz = Mathf.Clamp(p.z, -10.2f, 7.0f);
             if (Mathf.Abs(nx - p.x) > 0.001f || Mathf.Abs(nz - p.z) > 0.001f)
             {
