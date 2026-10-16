@@ -133,7 +133,7 @@ Ogni ruolo lavora solo sulle issue con la propria etichetta `ruolo:*`, sempre co
 
 Voci più recenti in alto. Formato: `AAAA-MM-GG HH:MM` (Europe/Rome) — [commit] — descrizione.
 
-- 2026-10-16 13:20 — UI/UX — ramo `ui/110-zaino-prezzo-liv2` — #110 riaperto dal QA v10: dopo l'acquisto lo Zaino 2 non prosciuga più gli LN (sosta chiusa in `PadTick`, prezzo intero 80/160, pillola sempre visibile). Test EditMode `ZainoPad110Tests`.
+- 2026-10-16 13:38 — UI/UX — [PR #174](https://github.com/B00RR/ultimo-miglio/pull/174) (`ui/110-zaino-prezzo-liv2`) — #110 riaperto dal QA v10: dopo l'acquisto lo Zaino 2 non prosciuga più gli LN (sosta chiusa in `PadTick`, prezzo intero 80/160, pillola sempre visibile). Test EditMode `ZainoPad110Tests`.
 - 2026-10-16 11:54 — Tech Lead — [c859f94](https://github.com/B00RR/ultimo-miglio/commit/c859f94ea08537f7a4d55aa3b9ba418f1202c3de) — PR #103 rewards: soglie pacchi 100/250/450, traguardi debito 25/50/75%, mancia Cassa 30 LN, freccia prossimo pad da 480 s; test EditMode EconomyRewardsTests.
 - 2026-10-16 12:12 — Code Reviewer — [4a1b26b](https://github.com/B00RR/ultimo-miglio/commit/4a1b26b6256d5f16153e713698f1ac4d3cfd5b72) — unita in squash la [PR #153](https://github.com/B00RR/ultimo-miglio/pull/153) (Audio: sfx combo +N e timbro del debito per la #137). Job `test` verde, asset OGG + README/licenze. Refs #136.
 - 2026-10-16 12:11 — Code Reviewer — [4e49b30](https://github.com/B00RR/ultimo-miglio/commit/4e49b30c6d5d867a12130ac42ff75c2ebf3d97eb) — unita in squash la [PR #88](https://github.com/B00RR/ultimo-miglio/pull/88) (feat(#2): clienti veri al posto delle capsule, 6 varianti riggate). Job `test` verde, diff rivisto (CustomerQueue.Variants, SliceSceneBuilder, ClientiRigTest). Closes #2.
