@@ -33,7 +33,7 @@ namespace UltimoMiglio.VFX
             float dayInt = Mathf.Lerp(1.15f, 0.95f, g); // Concept: meno wash arancio, contrasto da ombre
 
             sun.color = Color.Lerp(dayCol, UM_Palette.LunaCalda, n);
-            sun.intensity = Mathf.Lerp(dayInt, 0.5f, n);
+            sun.intensity = Mathf.Lerp(dayInt, dayInt * 0.47f, n); // #81: notte ~47% dell'esposizione del giorno (guida §9)
             var dayRot = Quaternion.Slerp(Quaternion.Euler(sunEulerDay), Quaternion.Euler(sunEulerGolden), g);
             transform.rotation = Quaternion.Slerp(dayRot, Quaternion.Euler(sunEulerNight), n);
             sun.shadows = LightShadows.Soft;          // PCF low; toon edge done in shader. UM_QualityTier disables on Base/Standard
