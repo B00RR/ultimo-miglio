@@ -1,6 +1,6 @@
 # Pipeline Ultimo Miglio (issue #12)
 # - Ogni PR verso main: test EditMode + PlayMode (game-ci) e commento con l'esito sulla PR.
-# - PR verso main: SOLO test EditMode + PlayMode (una sola invocazione game-ci, testMode: all) + commento.
+# - PR verso main: EditMode sempre, PlayMode solo se cambiano gameplay/scene/prefab/pacchetti/impostazioni (una sola invocazione game-ci) + commento.
 # - Push su main e avvio manuale: test + build WebGL (verifica, artifact). Le modifiche solo .md/docs non avviano la CI.
 # - Deploy su B00RR/ultimo-miglio-web (GitHub Pages) SOLO con avvio manuale (workflow_dispatch): niente deploy automatico al merge.
 # game-ci v4 con licenza Personal vuole UNITY_LICENSE (.ulf) + UNITY_EMAIL/UNITY_PASSWORD: senza .ulf la build si ferma con
@@ -46,14 +46,35 @@ jobs:
           if [ -z "$mancano" ]; then echo "ok=true" >> "$GITHUB_OUTPUT"
           else echo "ok=false" >> "$GITHUB_OUTPUT"; echo "::error::Secret mancanti:$mancano. Vedi LEGGIMI_BUILD.md §3."; exit 1; fi
 
+  # Sulle PR PlayMode solo se cambiano gameplay/scene/prefab/test PlayMode/pacchetti/impostazioni; push e avvio manuale: tutto
+  modifiche:
+    runs-on: ubuntu-24.04
+    permissions: { contents: read, pull-requests: read }
+    outputs:
+      playmode: ${{ github.event_name != 'pull_request' || steps.f.outputs.playmode == 'true' }}
+    steps:
+      - uses: dorny/paths-filter@v3
+        id: f
+        if: github.event_name == 'pull_request'
+        with:
+          filters: |
+            playmode:
+              - 'Assets/_Game/Scripts/**'
+              - 'Assets/_Game/Scenes/**'
+              - 'Assets/_Game/Prefabs/**'
+              - 'Assets/_Game/Tests/PlayMode/**'
+              - 'Packages/**'
+              - 'ProjectSettings/**'
+
   test:
-    needs: licenza
+    needs: [licenza, modifiche]
     if: needs.licenza.outputs.ok == 'true'
     runs-on: ubuntu-24.04
     steps:
-      # L'immagine unityci/editor (~15 GB) non entra senza spazio: pulizia limitata alle cartelle più grandi e veloci da togliere
-      - uses: jlumbroso/free-disk-space@v1.3.1
-        with: { tool-cache: false, android: true, dotnet: true, haskell: true, large-packages: false, docker-images: false, swap-storage: false }
+      # testMode all = una sola importazione di Library per EditMode + PlayMode (più veloce di una matrice: niente doppio pull/import)
+      - name: Modalità test
+        id: modo
+        run: echo "mode=${{ needs.modifiche.outputs.playmode == 'true' && 'all' || 'editmode' }}" >> "$GITHUB_OUTPUT"
       - uses: actions/checkout@v4
       # LFS con cache: si scaricano solo gli oggetti nuovi (risparmio banda LFS)
       - name: Elenco oggetti LFS
@@ -64,7 +85,9 @@ jobs:
           key: lfs-${{ hashFiles('.lfs-assets-id') }}
           restore-keys: lfs-
       - run: git lfs pull
-      - uses: actions/cache@v4
+      # Cache Library: hit verificato (run 38908075647, ~780 MB in 10 s). Restore/save separati per salvarla anche con test rossi
+      - uses: actions/cache/restore@v4
+        id: lib
         with:
           path: Library
           # Chiave stabile (progetto nella radice del repo): cambia solo con pacchetti/impostazioni
@@ -78,12 +101,17 @@ jobs:
           UNITY_PASSWORD: ${{ secrets.UNITY_PASSWORD }}
         with:
           unityVersion: ${{ env.UNITY_VERSION }}
-          testMode: all
+          testMode: ${{ steps.modo.outputs.mode }}
           # Immagine con modulo WebGL: gli script Editor usano UnityEditor.WebGL
           customImage: unityci/editor:ubuntu-6000.3.26f1-webgl-3
           artifactsPath: test-results
           githubToken: ${{ secrets.GITHUB_TOKEN }}
           checkName: Test Unity
+      - uses: actions/cache/save@v4
+        if: always() && steps.lib.outputs.cache-hit != 'true'
+        with:
+          path: Library
+          key: ${{ steps.lib.outputs.cache-primary-key }}
       - uses: actions/upload-artifact@v4
         if: always()
         with: { name: test-results, path: test-results }
@@ -117,9 +145,7 @@ jobs:
     if: needs.licenza.outputs.ok == 'true' && github.event_name != 'pull_request'
     runs-on: ubuntu-24.04
     steps:
-      # L'immagine unityci/editor (~15 GB) non entra senza spazio: pulizia limitata alle cartelle più grandi e veloci da togliere
-      - uses: jlumbroso/free-disk-space@v1.3.1
-        with: { tool-cache: false, android: true, dotnet: true, haskell: true, large-packages: false, docker-images: false, swap-storage: false }
+      # ubuntu-24.04 ha già ~86 GB liberi (run 38908075647): free-disk-space (1-2,5 min) non serve più
       - uses: actions/checkout@v4
       - run: git lfs ls-files -l | cut -d' ' -f1 | sort > .lfs-assets-id
       - uses: actions/cache@v4
