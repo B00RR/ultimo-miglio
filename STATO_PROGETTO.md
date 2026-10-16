@@ -41,6 +41,8 @@
 - I **clienti sono ancora capsule** → sostituire con i personaggi del ramo animator.
 - Rifinitura tutorial Nonna Ada e game feel; resto cap. 1.
 
+- **Nonna Ada riggata (Animator, PR anim-ada-rig, Refs #2)**: mesh v2 del 3D Artist (1.466 tri, ramo art/2-personaggi) sul rig Humanoid di Nina (stessi giunti §9), pesi automatici sul corpo + rigidi 100% sugli accessori (Head: hair/hair_bun/pencil/glasses; Chest: blouse_collar/pin_faro/grembiule sopra 1,0 m; Hips: cardigan_skirt/apron sotto/ledger). Clip Idle, Walk (verso giusto, verificato), Talk; `chr_nonna_ada.controller` (Speed, Talk); prefab `chr_nonna_ada.prefab` con scala 0,88 solo sul root, AlwaysAnimate, niente root motion. Da mettere in scena (Tech Lead, #58).
+
 ## 6. DA FARE
 - Resto del gioco in **3–4 giorni**: capitoli 2+ con **un sistema gestionale per capitolo** (energia/corrente, contratti, rotte, officina, OmniFreight).
 - **Post‑game** e sistemi di longevità (vedi `11_LONGEVITA.md`).
