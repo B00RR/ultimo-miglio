@@ -123,7 +123,7 @@ Stato verificato il 15/10 su `wt/vfx/Assets/_Game/VFX/README.md`, `wt_vfx_progre
 ### UI/UX
 Stato verificato il 15/10 alle 16:15 su `webgl-min` (HUD v2 del TL: `Tokens.uss`, `HudV2.uss`, font Fredoka) e `wt/ui`. Spec applicabile: `UI_SPEC_BIGLIETTI.md`. **Direttiva di Lorenzo:** niente mockup né immagini per lui; conta solo la build giocabile. Priorità: biglietti di Nonna Ada chiari e HUD senza sovrapposizioni.
 
-**HUD minimo del Cap. 1 (decisione di Lorenzo):** a schermo solo LN, giorno, riga obiettivo, joystick e pad. Niente telefono: rimandato a 'Gioco completo' (issue #64, decisione di DevOn). Combo: solo '+N' sopra Nina (clienti serviti di fila), sparisce in 1,5 s; il moltiplicatore x1,2 non si mostra. Debito: solo nella schermata di fine giornata e nel fumetto di Ada quando lo spiega. Colori dei pad: ritiro teal `#5E7F86`, consegna menta `#8FC9A8`, acquisto sole `#F4C430`, potenziamento `#F7E26B`.
+**HUD minimo del Cap. 1 (decisione di Lorenzo):** a schermo solo LN, giorno, riga obiettivo, joystick e pad. Niente telefono: rimandato a 'Gioco completo' (issue #64, decisione di DevOn). Combo: solo '+N' sopra Nina (clienti serviti di fila), sparisce in 1,5 s; il moltiplicatore x1,2 non si mostra. Debito: solo nella schermata di fine giornata e nel fumetto di Ada quando lo spiega. Pad: ritiro, consegna, acquisto, potenziamento (colori secondo GUIDA_VISIVA_CAP1 §2 e la PR #123, zona Prendi terracotta).
 
 | Voce | Stato | Criteri di accettazione | gp |
 |---|---|---|---|
@@ -131,7 +131,7 @@ Stato verificato il 15/10 alle 16:15 su `webgl-min` (HUD v2 del TL: `Tokens.uss`
 | HUD v2 (pillole compatte, pulsanti 3D, token) | 🟡 TL | Solo variabili di `Tokens.uss`; contrasto testo ≥ 4,5:1; target ≥ 48 dp | 0,5 |
 | **Biglietti di Nonna Ada** (onboarding 7 passi + fine, testi in `onboarding_testi.json`) | 🟡 logica TL fatta, layout da correggere | Una nota alla volta con coda; banda medio-alta sotto la safe area, mai negli angoli HUD né nella metà bassa (joystick); corpo ≥ 16 dp, titolo ≥ 20 dp; ≤ 90 caratteri e 2 righe; minimo 1,5 s a schermo, sticky fino al completamento; nome con `--c-terracotta-dk` (7,2:1). Componente `AdaNoteView` nella spec | 0,5 |
 | Game feel HUD: monete sull'icona LN, conteggio e pulse, clamp schede fuori dai rettangoli HUD | 🟡 base TL fatta (monete verso la pillola, clamp nel pannello) | Moneta atterra sull'icona LN; numero conta all'arrivo, non al credito; schede Cassa/pad mai sopra pillole, riga obiettivo, biglietto; combo solo '+N' sopra Nina, sparisce in 1,5 s, nessun x1,2 a schermo. `HudFeel` nella spec | 0,5 |
-| Pad in-world (ritiro, consegna, acquisto, upgrade: anello, costo, riempimento) | 🟡 | Colori: ritiro `#5E7F86`, consegna `#8FC9A8`, acquisto `#F4C430`, potenziamento `#F7E26B`; anello 0→1 morbido; prezzo pagato/totale dai dati; scheda visibile solo vicino a Nina | 0,5 |
+| Pad in-world (ritiro, consegna, acquisto, upgrade: anello, costo, riempimento) | 🟡 | Colori secondo GUIDA_VISIVA_CAP1 §2 e la PR #123 (zona Prendi terracotta); anello 0→1 morbido; prezzo pagato/totale dai dati; scheda visibile solo vicino a Nina | 0,5 |
 | Freccia obiettivo a bordo schermo | ✅ | Clamp alla safe area con margine 24 dp; diventa marker quando il bersaglio è in camera | 0 |
 | ~~Telefono di Nina (Home, Ordini, Messaggi, Flotta)~~ | ➡️ Gioco completo (#64) | Fuori dal Cap. 1: la struttura già fatta resta nel ramo ma non va nell'HUD | 0 |
 | Splash/caricamento WebGL | ⬜ | Logo + barra terracotta→sole, avvio < 5 s su laptop medio | 0,5 |
