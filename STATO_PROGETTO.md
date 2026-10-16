@@ -148,7 +148,7 @@ Voci più recenti in alto. Formato: `AAAA-MM-GG HH:MM` (Europe/Rome) — [commit
 
 ## Aggiornamento 17:45 — Impostazioni + schede pad (UI, issue #35, branch `ui/impostazioni-e-schede-pad`)
 - **Impostazioni** (ingranaggio accanto al telefono): zoom −/+ con anteprima live, slider Musica/Suoni, Salva / Indietro.
-  - PlayerPrefs: `cam_zoom`, `vol_music`, `vol_sfx` (0–1).
+  - PlayerPrefs: `cam_zoom_v3`, `vol_music`, `vol_sfx` (0–1).
   - Chiama per reflection (UI non referenzia Gameplay): `DepotCameraFit.SetOrthoSize` / `GetOrthoSize`, `AudioManager.SetMusicVolume` / `SetSfxVolume` — **Tech Lead crea i metodi e collega in scena**.
   - File: `UI/Runtime/SettingsController.cs`, `UI/UXML/Settings.uxml` (+ overlay in `Hud.uxml`), `UI/USS/Settings.uss`. Aggiungere `SettingsController` sul prefab HUD (stesso UIDocument).
 - **Schede pad** (`UpgradePadCard`): nascoste di default; `ShowOnPad(bool)` / `SetVisible(bool)` — una sola attiva (`ActiveCard`). Tech Lead: `ProximityZone` enter/exit → `ShowOnPad`. Card max 200 dp, contrasto ink su paper, Fredoka.
@@ -192,5 +192,5 @@ Voci più recenti in alto. Formato: `AAAA-MM-GG HH:MM` (Europe/Rome) — [commit
 - Merge di `origin/main` (HUD minimale #38, fix collisioni #63) in `ui/impostazioni-e-schede-pad`, senza rebase/force-push.
 - Conflitti risolti: `Hud.uxml`, `HudV2.uss`, `HudController.cs`, `UpgradePadCard.cs`, `WorldAnchoredElement.cs` → tenuta la versione main (niente telefono/card grandi), aggiunti `Settings.uss` nell'HUD e campo `settingsButton` (eventi `OnSettingsRequested` + `SettingsButtonTapped`).
 - Catture anteprima 390x844 (HTML/Playwright, non Unity): `docs/ui/catture/pr36/`.
-- Da decidere (Tech Lead): su main esiste già `Bridge/SettingsPanel` (aperto da `OnSettingsRequested`); se si aggiunge anche `SettingsController` si aprono due pannelli. `DepotCameraFit` su main usa la chiave `cam_zoom_v3`, `SettingsController` usa `cam_zoom`.
+- Deciso (Tech Lead): pannello unico `SettingsController`; `Bridge/SettingsPanel` resta (usato da `HudGameBridge`) ma senza listener `OnSettingsRequested`. Ingranaggio = toggle (QA P3, `qa/playtest_web_live_p0.md` S01). Zoom su chiave unica `cam_zoom_v3` (`DepotCameraFit.PrefZoom`).
 - Riferimento #35 (chiusa). Correlate aperte: #64, #67.
