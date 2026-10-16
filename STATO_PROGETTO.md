@@ -1,7 +1,7 @@
 # STATO PROGETTO — Ultimo Miglio
 
 > Punto di ingresso unico per chiunque (persona o agente) lavori su questo repo. Aggiornalo **nella stessa PR** in cui completi qualcosa.
-> Ultimo aggiornamento: 2026-10-16 02:15 (Europe/Rome).
+> Ultimo aggiornamento: 2026-10-16 03:01 (Europe/Rome).
 
 ## 1. Il gioco
 - **Ultimo Miglio**: gioco mobile **Android**, **Unity 6 (6000.3) URP**.
@@ -34,6 +34,9 @@
 - Documentazione di design: bibbia, core loop, tech, UI, retention, sprint 1, gestionale, longevità, cap. 1 completo, protocollo Unity.
 
 ## 5. IN CORSO (oggi 16/10)
+- **fix-qa P0 NONNO (QA live v3)**: state machine Transform-only con timeout carico 6s → scaffale → scarico → loop. PlayMode `HireNonno_RestocksShelfWithin20Seconds` verde (~9.5s). WebGL su `build/WebGL` :8777.
+- B2 costo LN sul pad acquisto; B3 clamp Nina + TopHud; B5 collider mesh scaffale/bancone rimossi; B4 testi Ada nel fumetto HUD. Tutorial: NONNO **prima** dello Zaino (invariato).
+- **night-art in pausa** (WIP commit `9fd9664`, #52 già merge; #47 non ancora).
 - **Consegna cap. 1 giocabile in WebGL entro le 17:45–18:00.**
 - Rifinitura tutorial Nonna Ada (7 passi) e game feel.
 - **Merge del ramo `animator`** (fix camminata): conflitto su `chr_nina_vela.fbx` e `bot_nonno.fbx`.

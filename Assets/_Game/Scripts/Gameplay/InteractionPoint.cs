@@ -74,7 +74,8 @@ namespace UltimoMiglio.Gameplay
         {
             if (_chip != null) return;
             var hideTag = GetComponent<UltimoMiglio.UI.World.PadTag>(); if (hideTag) hideTag.enabled = false;
-            return; // demo: niente chip flottanti, solo pad a terra
+            // B2 P2: solo pad acquisto mostrano il costo in LN (chip); zone Prendi/Consegna restano senza chip
+            if (Kind != PoiKind.Acquisto || !Pad) return;
             if (!_hud) _hud = FindFirstObjectByType<UltimoMiglio.UI.HudController>();
             if (!_hud || _hud.Root == null) return;
             _cam = Camera.main;
@@ -88,13 +89,13 @@ namespace UltimoMiglio.Gameplay
             s.borderLeftWidth = s.borderRightWidth = s.borderTopWidth = s.borderBottomWidth = 6;
             s.borderLeftColor = s.borderRightColor = s.borderTopColor = s.borderBottomColor = Ink;
             var ic = new VisualElement { pickingMode = PickingMode.Ignore };
-            var i = ic.style; i.width = 72; i.height = 72; i.borderTopLeftRadius = i.borderTopRightRadius = i.borderBottomLeftRadius = i.borderBottomRightRadius = 36;
+            var i = ic.style; i.width = 40; i.height = 40; i.borderTopLeftRadius = i.borderTopRightRadius = i.borderBottomLeftRadius = i.borderBottomRightRadius = 36;
             i.backgroundColor = Kind == PoiKind.Acquisto ? Ink : _col; i.alignItems = Align.Center; i.justifyContent = Justify.Center; i.marginRight = 12;
-            var img = new VisualElement { pickingMode = PickingMode.Ignore }; img.style.width = 48; img.style.height = 48;
+            var img = new VisualElement { pickingMode = PickingMode.Ignore }; img.style.width = 28; img.style.height = 28;
             if (Icon) { img.style.backgroundImage = Icon; img.style.unityBackgroundImageTintColor = new Color(1f, 0.976f, 0.933f); }
             ic.Add(img);
             _text = new Label(Label) { pickingMode = PickingMode.Ignore };
-            var t = _text.style; t.fontSize = Kind == PoiKind.Acquisto ? 56 : 46; t.color = Ink; t.unityFontStyleAndWeight = FontStyle.Bold; t.whiteSpace = WhiteSpace.NoWrap;
+            var t = _text.style; t.fontSize = Kind == PoiKind.Acquisto ? 28 : 22; t.color = Ink; t.unityFontStyleAndWeight = FontStyle.Bold; t.whiteSpace = WhiteSpace.NoWrap;
             if (LabelFont) t.unityFontDefinition = FontDefinition.FromFont(LabelFont);
             _chip.Add(ic); _chip.Add(_text); layer.Add(_chip);
             var arrow = _hud.Root.Q("edge-arrow"); arrow?.BringToFront(); // the off-screen arrow is never under a chip/card
@@ -118,7 +119,7 @@ namespace UltimoMiglio.Gameplay
 
             EnsureChip();
             if (_chip == null || !_cam) return;
-            if (Pad && GameRoot.Ready && Kind == PoiKind.Acquisto) { var eco = GameRoot.I.Eco; double left = eco.Cost(Pad.Kind) - eco.S.PadPaid[(int)Pad.Kind]; if (!double.IsInfinity(left)) _text.text = Mathf.CeilToInt((float)left).ToString(); }
+            if (Pad && GameRoot.Ready && Kind == PoiKind.Acquisto && _text != null) { var eco = GameRoot.I.Eco; double left = eco.Cost(Pad.Kind) - eco.S.PadPaid[(int)Pad.Kind]; if (!double.IsInfinity(left)) _text.text = Mathf.CeilToInt((float)Mathf.Max(0, (float)left)) + " LN"; }
             var nina = GameRoot.I ? GameRoot.I.Nina : null;
             bool near = nina && (nina.transform.position - transform.position).sqrMagnitude < 9f;
             if (Ring && !Pad) Ring.SetProgress(near ? 1f : 0f);
