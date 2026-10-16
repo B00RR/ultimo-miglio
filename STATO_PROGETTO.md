@@ -1,7 +1,7 @@
 # STATO PROGETTO — Ultimo Miglio
 
 > Punto di ingresso unico per chiunque (persona o agente) lavori su questo repo. Aggiornalo **nella stessa PR** in cui completi qualcosa.
-> Ultimo aggiornamento: 2026-10-16 13:56 (Europe/Rome).
+> Ultimo aggiornamento: 2026-10-16 14:23 (Europe/Rome).
 
 ## 1. Il gioco
 - **Ultimo Miglio**: gioco mobile **Android**, **Unity 6 (6000.3) URP**.
@@ -144,6 +144,7 @@ Ogni ruolo lavora solo sulle issue con la propria etichetta `ruolo:*`, sempre co
 
 Voci più recenti in alto. Formato: `AAAA-MM-GG HH:MM` (Europe/Rome) — [commit] — descrizione.
 
+- 2026-10-16 14:23 — UI/UX — catture Unity 390×844 e 360×800 in `docs/qa/hud_insegna_c/` (CI verde, run 38897133634). Responsabile del via: UI/UX Designer, scadenza 17/10/2026 10:00 (Europe/Rome).
 - 2026-10-16 13:56 — UI/UX — [fea37a1](https://github.com/B00RR/ultimo-miglio/commit/fea37a10208476a591e4d105de9060ae45976519) — cattura HUD: /root scrivibile così la licenza Unity resta nel container (il job precedente usciva 198). Main allineato dopo #162, senza force-push.
 - 2026-10-16 13:32 — UI/UX — [05c97af](https://github.com/B00RR/ultimo-miglio/commit/05c97afc8cc50a6a84284fce4316c22de8145855) — HUD direzione C (issue #172): insegna di noce appesa, cartellino GIORNO, ordine che si ritrae a icona dopo 3 s, pad PRENDI e joystick a 24 dp. Combo solo +N sopra Kaia. Font Baloo 2 (OFL). Non tocca il telefono di capitolo 1 né i nomi Bokobay.
 - 2026-10-16 13:28 — Regole di lavoro approvate da Lorenzo: etichette e milestone obbligatorie, niente segreti nel repo, PR piccole, test veloci prima della CI, responsabile e scadenza per ogni via, meno messaggi, pausa per chi non ha issue.
