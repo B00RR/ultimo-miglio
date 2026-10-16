@@ -25,12 +25,12 @@ Material:
     m_TexEnvs: []
     m_Ints: []
     m_Floats:
-    - _Fill: 0
+    - _Fill: 0.5
     - _Pulse: 0
-    - _Radius: 0.42
-    - _Thickness: 0.06
+    - _Radius: 0.12
+    - _Thickness: 0.045
     m_Colors:
-    - _Color: {r: 0.957, g: 0.769, b: 0.188, a: 1}
-    - _TrackColor: {r: 0.231, g: 0.165, b: 0.125, a: 0.45}
+    - _Color: {r: 0.957, g: 0.769, b: 0.188, a: 0.72}
+    - _TrackColor: {r: 0.231, g: 0.165, b: 0.125, a: 0.85}
   m_BuildTextureStacks: []
   m_AllowLocking: 1
