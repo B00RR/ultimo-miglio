@@ -5,16 +5,19 @@ using UltimoMiglio.VFX;
 
 namespace UltimoMiglio.Gameplay
 {
-    /// <summary>Iso camera: soft-follows Nina. Portrait default ~6.5 ortho so Nina ≈100 px su 844 (Concept PR #55).</summary>
+    /// <summary>Iso camera: soft-follows Nina con dead-zone centrata (QA v5 P2). Portrait default ortho 4.5.</summary>
     public sealed class DepotCameraFit : MonoBehaviour
     {
-        public const string PrefZoom = "cam_zoom_v3"; // nuovo key: ignora zoom stale da build lontane
+        public const string PrefZoom = "cam_zoom_v3";
         public CinemachineCamera Cm; public Transform Nina;
         public float Margin = 1.0f, TopHud = 0.20f, BottomHud = 0.08f, MinOrtho = 4.2f, MaxOrtho = 18f;
-        public float FollowSmooth = 6f, DefaultPortraitOrtho = 4.5f, DefaultLandscapeOrtho = 4.8f;
-        public float CameraDistance = UM_QualityTier.CameraDistance; // 20 m — ombre dense
+        /// <summary>FollowSmooth alto = meno ritardo. DeadZone = frazione di half-size: dentro la zona la camera sta ferma.</summary>
+        public float FollowSmooth = 14f, DeadZone = 0.16f, CatchUpAt = 0.78f;
+        public float DefaultPortraitOrtho = 4.5f, DefaultLandscapeOrtho = 4.8f;
+        public float CameraDistance = UM_QualityTier.CameraDistance;
         readonly List<Vector3> _pts = new();
         int _w, _h; float _ortho, _fullOrtho; Vector3 _centreWorld; Quaternion _rot; Vector2 _mn, _mx;
+        float _aimX, _aimY; bool _aimInit;
 
         public float OrthoSize { get => _ortho; set { _ortho = Mathf.Clamp(value, MinOrtho, MaxOrtho); Apply(); } }
         public float FullOrtho => _fullOrtho;
@@ -23,10 +26,11 @@ namespace UltimoMiglio.Gameplay
         {
             Collect(); _rot = Cm ? Cm.transform.rotation : Quaternion.identity;
             if (Cm) Cm.Follow = null;
+            // QA v5 P2: forza follow reattivo + dead-zone (ignora valori serializzati lenti da scene vecchie)
+            FollowSmooth = 14f; DeadZone = 0.16f; CatchUpAt = 0.78f;
             RecomputeBounds();
             float saved = PlayerPrefs.GetFloat(PrefZoom, 0f);
             bool portrait = Screen.height > Screen.width;
-            // Accetta solo zoom nel range stretto del nuovo default (5.5–9); altrimenti default Concept
             if (portrait) _ortho = (saved >= 4.2f && saved <= 6.5f) ? saved : DefaultPortraitOrtho;
             else _ortho = (saved >= 5f && saved <= 10f) ? saved : DefaultLandscapeOrtho;
             _ortho = Mathf.Clamp(_ortho, MinOrtho, MaxOrtho);
@@ -75,12 +79,27 @@ namespace UltimoMiglio.Gameplay
             Vector3 target = Nina ? Nina.position : _centreWorld;
             var local = inv * target;
             float halfH = _ortho * (1f - TopHud - BottomHud), halfW = _ortho * aspect;
-            float cx = Mathf.Clamp(local.x, _mn.x + halfW, _mx.x - halfW);
-            float cy = Mathf.Clamp(local.y, _mn.y + halfH, _mx.y - halfH);
-            cy += _ortho * (TopHud - BottomHud) * 0.5f;
+            if (!_aimInit || snap) { _aimX = local.x; _aimY = local.y; _aimInit = true; }
+
+            // Dead-zone centrata: la camera si muove solo quando Nina esce dalla zona intorno all'aim corrente.
+            float dzX = halfW * Mathf.Clamp01(DeadZone);
+            float dzY = halfH * Mathf.Clamp01(DeadZone);
+            float dx = local.x - _aimX, dy = local.y - _aimY;
+            if (Mathf.Abs(dx) > dzX) _aimX = local.x - Mathf.Sign(dx) * dzX;
+            if (Mathf.Abs(dy) > dzY) _aimY = local.y - Mathf.Sign(dy) * dzY;
+
+            float cx = Mathf.Clamp(_aimX, _mn.x + halfW, _mx.x - halfW);
+            float cy = Mathf.Clamp(_aimY, _mn.y + halfH, _mx.y - halfH);
+            cy += _ortho * (TopHud - BottomHud) * 0.5f; // sposta il centro utile sotto la TopHud
+            _aimX = cx; _aimY = cy - _ortho * (TopHud - BottomHud) * 0.5f;
+
             float dist = CameraDistance > 1f ? CameraDistance : UM_QualityTier.CameraDistance;
             var want = _rot * new Vector3(cx, cy, 0) - Cm.transform.forward * dist;
-            Cm.transform.position = snap ? want : Vector3.Lerp(Cm.transform.position, want, 1f - Mathf.Exp(-FollowSmooth * Time.unscaledDeltaTime));
+            float t = snap ? 1f : (1f - Mathf.Exp(-FollowSmooth * Time.unscaledDeltaTime));
+            // Catch-up se Nina sta uscendo dal quadro (ortho stretto 4.5)
+            float outFrac = Mathf.Max(Mathf.Abs(dx) / Mathf.Max(0.01f, halfW), Mathf.Abs(dy) / Mathf.Max(0.01f, halfH));
+            if (!snap && outFrac > CatchUpAt) t = Mathf.Max(t, 0.55f);
+            Cm.transform.position = Vector3.Lerp(Cm.transform.position, want, t);
             var lens = Cm.Lens; lens.OrthographicSize = _ortho; Cm.Lens = lens;
             var pc = Cm.GetComponent<CinemachinePositionComposer>(); if (pc) pc.CameraDistance = dist;
             var cam = Camera.main; if (cam) cam.orthographicSize = _ortho;
