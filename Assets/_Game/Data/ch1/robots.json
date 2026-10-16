@@ -2,9 +2,9 @@
   "source": "01_CORE_LOOP v3.3",
   "chapter": 1,
   "nonno": {
-    "unlockAtOnboardingSec": 130,
-    "hireCostLn": 15,
-    "padLabel": "ASSUMI NONNO · 15 LN",
+    "unlockAtOnboardingSec": 0,
+    "hireCostLn": 10,
+    "padLabel": "ASSUMI NONNO \u00b7 10 LN",
     "restockPpmBase": 6.0,
     "restockPpmPerLevel": 1.5,
     "selfServicePpmBase": 0.5,
