@@ -104,7 +104,7 @@ namespace UltimoMiglio.Gameplay
                         Log($"versamento debito +{E.S.DebtPaid - d0:0.##}");
                         continue;
                     }
- { var cz = FindAnyObjectByType<CassaZone>(); if (cz) { yield return Go(cz.transform.position, "Cassa"); yield return Wait(1.5f); continue; } }
+                    if (st == TutorialManager.Step.CassaPass) { var cz = FindAnyObjectByType<CassaZone>(); if (cz) { yield return Go(cz.transform.position, "Cassa"); yield return Wait(1.5f); continue; } }
                     yield return null;
                 }
             }
