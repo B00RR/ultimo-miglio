@@ -12,7 +12,9 @@ Principi: si impara camminando; una riga per passo; nessun pulsante, a parte il 
 | 6 | 1:15 ±15 | "Cammina sulle monete" | primo servizio | monete raccolte | |
 | 7 | 1:23 ±20 | Pad **ZAINO LV 1 · 40 LN** nel Magazzino (opzionale) | portafoglio ≥40 LN | Zaino 1 | nessuna pausa del flusso |
 | 8 | 1:40 ±15 | Combo: 2 clienti normali ravvicinati | t ≥ 100 s | combo ≥ x1,2 | passo +0,1 → x1,1 → x1,2 |
-| 9 | **2:10 ±5** | Pad **ASSUMI NONNO · 50 LN** vicino agli Arrivi | t ≥ 130 s | NONNO attivo (restock 6/min) | si sblocca Flotta (sola lettura) |
+| 9a | 2:07 ±5 | **Presenta NONNO**: camera su NONNO addormentato e sul pad (2,5 s), freccia | t ≥ 127 s | fine camera | joystick sempre attivo |
+| 9b | **2:10 ±5** | Pad **ASSUMI NONNO · 50 LN** vicino agli Arrivi, barra LN sul pad | dopo 9a | NONNO assunto (restock 6/min) | si sblocca Flotta (sola lettura) |
+| 9c | 2:11 ±5 | **Conferma**: camera su NONNO che porta il primo pacco allo scaffale (3 s) | NONNO assunto | primo restock di NONNO | badge "6 pacchi/min" |
 | 10 | 2:45 ±10 | Telefono: messaggio della Civetta (teaser) | NONNO + 35 s | messaggio letto | si sblocca Messaggi |
 | 11 | 3:30 ±10 | App Ordini: ordine speciale di Mamma Rosa, "Mostra la strada" | t ≥ 210 s | tap | suggerimento Flotta |
 | 12 | 3:55 ±10 | Passaggio sulla Cassa | verso la Cassaforte | passaggio | +30 LN una tantum, "mancia di Nonna Ada" (16/10) |
@@ -36,7 +38,9 @@ Principi: si impara camminando; una riga per passo; nessun pulsante, a parte il 
 | 6 | Monete a terra, pillola LN in alto | raccogliere le monete | biglietto `coins`, `onb.coins.walk` | alone sulle monete |
 | 7 | Pad ZAINO LV 1 · 40 LN illuminato in Magazzino | (facoltativo) Zaino 1 | biglietto `upgrade_zaino`, `onb.zaino.hint` | nessuno: non blocca |
 | 8 | Due clienti in coda, numero combo sopra il Bancone | combo ≥ x1,2 | `onb.combo` | nessuno |
-| 9 | Pad ASSUMI NONNO · 50 LN accanto agli Arrivi, NONNO che dorme | assumere NONNO | biglietto `unlock_nonno`, `onb.nonno.bark` | freccia sul pad |
+| 9a | Camera su NONNO che dorme e sul pad, freccia | capire chi è NONNO | `onb.nonno.intro`, `onb.nonno.what` | — |
+| 9b | Pad con barra "LN in tasca / 50" | assumere NONNO | `onb.nonno.cost`, biglietto `unlock_nonno`; se mancano LN `onb.nonno.notEnough`, poi `onb.nonno.ready` | a 20 s: `onb.nonno.reminder` + camera che pulsa sul pad, freccia, pad che rimbalza (ogni 20 s) |
+| 9c | NONNO sveglio che porta pacchi, "+1" sullo scaffale | vedere NONNO al lavoro | `onb.nonno.hired`, `onb.nonno.working` | — |
 | 10 | Telefono che vibra | leggere il messaggio | `onb.civetta.msg1/reply/msg2` | nuova vibrazione |
 | 11 | Notifica app Ordini | tap su "Mostra la strada" | `onb.orders.special`, `onb.flotta.hint` | badge rosso fisso |
 | 12 | Cassa sul percorso verso la Cassaforte | passarci sopra | moneta +30 LN | — |
@@ -59,3 +63,23 @@ I biglietti di Nonna Ada sono in `onboarding_testi.json` (7, in ordine: move, pi
 | 1,00 | 1:23 | 2:10 | 34:00 | 33,5 min | ok (golden path) |
 | 1,20 | <1:23 | 2:10 | 32:00 | 31,3 min | ok |
 Al golden path il portafoglio vale 41 LN a 1:23 e 211 LN cumulati a 2:10: tutti i 15 acquisti del cap 1 (fino a Zaino 7 a 28:47) sono pagabili in tempo con la quota del 40%.
+
+## Assunzione di NONNO: passo dedicato (rev. 16/10, richiesta DevOn)
+Problema: NONNO non era chiaro (Lorenzo non aveva capito come assumerlo). Il passo 9 diventa 3 sotto-passi (`nonnoIntro`, `hireNonno`, `nonnoConfirm` in `onboarding.json`). Il tempo del golden path non cambia (assunzione a 2:10).
+- **Cosa fa NONNO:** porta i pacchi dagli Arrivi agli scaffali al posto di Nina, 6 al minuto. Lo si dice in una riga, mentre la camera lo inquadra.
+- **Costo e progresso:** 50 LN; il pad mostra una barra di riempimento "32/50 LN" e si compra restando sopra 1,5 s.
+- **LN insufficienti:** il pad resta acceso con la barra, la freccia porta al Bancone; a 50 LN la freccia torna al pad con `onb.nonno.ready`.
+- **Conferma:** camera su NONNO che porta il primo pacco, "+1" sullo scaffale, badge "6 pacchi/min" per 4 s.
+- **Fallback:** dopo 20 s senza andare sul pad, promemoria + camera che pulsa sul pad + freccia; si ripete ogni 20 s.
+
+**Nuove chiavi di testo: proposte per il Narrative** (non sono in `onboarding_testi.json`; max 70 caratteri):
+| Chiave | Proposta |
+|---|---|
+| `onb.nonno.intro` | Quello che dorme è NONNO, il robot di casa. |
+| `onb.nonno.what` | NONNO porta i pacchi dagli Arrivi agli scaffali al posto tuo. |
+| `onb.nonno.cost` | Stai sul pad: con 50 LN NONNO torna al lavoro. |
+| `onb.nonno.notEnough` | Ti mancano LN: servi qualche cliente al Bancone. |
+| `onb.nonno.ready` | Hai 50 LN! Torna sul pad di NONNO. |
+| `onb.nonno.reminder` | NONNO aspetta te: sali sul pad vicino agli Arrivi. |
+| `onb.nonno.hired` | NONNO è sveglio! |
+| `onb.nonno.working` | Guarda: i pacchi agli scaffali li porta lui. Tu servi i clienti. |
