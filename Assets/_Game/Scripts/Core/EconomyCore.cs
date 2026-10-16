@@ -179,7 +179,7 @@ namespace UltimoMiglio.Core
         {
             switch (k)
             {
-                case UpgradeKind.Zaino: return S.Zaino + 1 < Cfg.ZainoCost.Length ? Cfg.ZainoCost[S.Zaino + 1] : double.PositiveInfinity;
+                case UpgradeKind.Zaino: return S.Zaino < Cfg.ZainoMaxLevel && S.Zaino + 1 < Cfg.ZainoCost.Length ? Cfg.ZainoCost[S.Zaino + 1] : double.PositiveInfinity;
                 case UpgradeKind.Scarpe: return S.Scarpe + 1 < Cfg.ScarpeCost.Length ? Cfg.ScarpeCost[S.Scarpe + 1] : double.PositiveInfinity;
                 case UpgradeKind.Insegna: return S.Insegna + 1 < Cfg.InsegnaCost.Length ? Cfg.InsegnaCost[S.Insegna + 1] : double.PositiveInfinity;
                 case UpgradeKind.NonnoHire: return S.NonnoLevel >= 0 ? double.PositiveInfinity : Cfg.NonnoHireCost;

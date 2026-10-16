@@ -1,5 +1,5 @@
 {
-  "_nota": "Testi definitivi onboarding cap.1 (Narrative). Voce: Oma Tilde, dai biglietti lasciati nel deposito, parla a Kaia. Max 70 caratteri. SliceSceneBuilder legge speaker, steps[].text IN ORDINE (7 passi, ordine del codice: ... monete, OLDO, Zaino) e fine: non cambiare ordine né chiavi. Le chiavi in rinviati_cap2 (telefono) entrano nel cap. 2.",
+  "_nota": "Testi definitivi onboarding cap.1 (Narrative). Voce: Oma Tilde, dai biglietti lasciati nel deposito, parla a Kaia. Max 70 caratteri. SliceSceneBuilder legge speaker, steps[] PER ID (mappati sui 16 passi di onboarding.json, #101) e fine: non cambiare le chiavi. Le chiavi in rinviati_cap2 (telefono) entrano nel cap. 2.",
   "speaker": "Oma Tilde",
   "steps": [
     {

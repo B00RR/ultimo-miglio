@@ -30,6 +30,14 @@ public class EconomyCoreTests
         Assert.IsTrue(done); Assert.AreEqual(6, e.StackCapacity); Assert.AreEqual(60, e.S.Wallet, 1e-9);
         Assert.LessOrEqual(ticks, 31, "pad must fill in ≤3 s");
     }
+    [Test] public void Zaino_Cap1_SiFermaAlLivello7()
+    {
+        var e = New(); Assert.AreEqual(7, e.Cfg.ZainoMaxLevel);
+        e.S.Zaino = 6; Assert.IsFalse(double.IsInfinity(e.Cost(UpgradeKind.Zaino)), "il livello 7 deve essere acquistabile");
+        e.S.Zaino = 7; Assert.IsTrue(double.IsInfinity(e.Cost(UpgradeKind.Zaino)), "nel cap. 1 il livello 8 non si compra");
+        e.S.Wallet = 1e6; Assert.IsFalse(e.PadTick(UpgradeKind.Zaino, 5), "il pad non deve completare oltre il livello 7");
+        Assert.AreEqual(7, e.S.Zaino); Assert.AreEqual(1.0, e.PadFill(UpgradeKind.Zaino), 1e-9);
+    }
     [Test] public void PadInstallmentPersistsWhenWalletEmpty()
     {
         var e = New(); e.S.Wallet = 20;
