@@ -134,33 +134,44 @@ jobs:
           serial = base64.b64decode(lic[i:j]).decode("latin1")[4:]
           pathlib.Path("/tmp/unity-serial").write_text(serial)
           PY
-          UNITY_SERIAL="$(cat /tmp/unity-serial)"
+          UNITY_SERIAL="$(tr -d '\r\n' < /tmp/unity-serial)"
           rm -f /tmp/unity-serial
           echo "::add-mask::$UNITY_SERIAL"
-          mkdir -p Logs Captures/hud
+          echo "Lunghezza seriale: ${#UNITY_SERIAL}"
+          if [ "${#UNITY_SERIAL}" -ne 27 ]; then
+            echo "::error::Seriale Unity inatteso: attesi 27 caratteri."
+            exit 1
+          fi
+          mkdir -p Logs Captures/hud "$RUNNER_TEMP/unity-home"
+          # Come game-ci: /root deve essere scrivibile, altrimenti la licenza non viene salvata
+          # (run 38894532033: «preferences folder could not be created», poi exit 198).
           docker run --rm \
-            -e UNITY_SERIAL -e UNITY_EMAIL -e UNITY_PASSWORD \
+            --user root \
+            -e UNITY_SERIAL -e UNITY_EMAIL -e UNITY_PASSWORD -e HOME=/root \
+            -v "$RUNNER_TEMP/unity-home:/root" \
             -v "$PWD:/project" -w /project \
             --shm-size=1025m \
             --entrypoint /bin/bash \
             unityci/editor:ubuntu-6000.3.26f1-webgl-3 \
             -lc '
               set -e
+              mkdir -p /root/.local/share/unity3d /root/.cache/unity3d /root/.config /BlankProject/Assets /project/Logs
               if [[ "$UNITY_SERIAL" == F* ]]; then
                 dbus-uuidgen > /etc/machine-id
                 mkdir -p /var/lib/dbus
                 ln -sf /etc/machine-id /var/lib/dbus/machine-id
               fi
-              mkdir -p /BlankProject/Assets /project/Logs
-              unity-editor -quit -serial "$UNITY_SERIAL" -username "$UNITY_EMAIL" -password "$UNITY_PASSWORD" \
-                -projectPath /BlankProject -logFile /project/Logs/insegna-activate.log
+              unity-editor -logFile /project/Logs/insegna-activate.log -quit \
+                -serial "$UNITY_SERIAL" -username "$UNITY_EMAIL" -password "$UNITY_PASSWORD" \
+                -projectPath /BlankProject
               set +e
               unity-editor -projectPath /project \
                 -executeMethod UltimoMiglio.UI.EditorTools.InsegnaCapture.Run \
                 -logFile /project/Logs/insegna-capture.log
               code=$?
-              unity-editor -quit -returnlicense -username "$UNITY_EMAIL" -password "$UNITY_PASSWORD" \
-                -projectPath /BlankProject -logFile /project/Logs/insegna-return.log || true
+              unity-editor -logFile /project/Logs/insegna-return.log -quit -returnlicense \
+                -username "$UNITY_EMAIL" -password "$UNITY_PASSWORD" \
+                -projectPath /BlankProject || true
               exit $code
             '
       - name: Log cattura se fallisce
