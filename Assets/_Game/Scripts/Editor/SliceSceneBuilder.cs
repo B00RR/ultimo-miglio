@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using Unity.AI.Navigation;
@@ -71,26 +72,33 @@ namespace UltimoMiglio.EditorTools
             var coinGo = coinMesh ? (GameObject)PrefabUtility.InstantiatePrefab(coinMesh) : Prim(PrimitiveType.Cylinder, "Coin", null, Vector3.zero, new Vector3(0.25f, 0.02f, 0.25f), props, UM_Palette.GialloSole);
             coinGo.name = "Coin"; foreach (var c in coinGo.GetComponentsInChildren<Collider>()) Object.DestroyImmediate(c);
             var coin = SavePrefab(coinGo, "Coin");
-            GameObject custGo = null;
+            // #2: i 6 clienti riggati (Humanoid di Nina, controller chr_cliente) al posto delle capsule; un prefab per variante.
+            var custVariants = new List<Customer>();
             {
                 const string cd = "Assets/_Game/Art/Characters/Clienti/";
                 var cctl = AssetDatabase.LoadAssetAtPath<RuntimeAnimatorController>(cd + "chr_cliente.controller");
-                var cfbx = AssetDatabase.LoadAssetAtPath<GameObject>(cd + "chr_cliente_base.fbx");
-                if (cctl && cfbx)
+                var cmat = AssetDatabase.LoadAssetAtPath<Material>("Assets/_Game/VFX/Materials/M_Char_Atlas.mat");
+                foreach (var v in new[] { "base", "anziana", "residente", "rider", "turista", "vip" })
                 {
-                    custGo = new GameObject("Customer");
-                    var m = (GameObject)PrefabUtility.InstantiatePrefab(cfbx, custGo.transform); m.transform.localPosition = Vector3.zero;
-                    var cmat = AssetDatabase.LoadAssetAtPath<Material>("Assets/_Game/VFX/Materials/M_Char_Atlas.mat");
+                    var path = $"{cd}chr_cliente_{v}.fbx"; var cfbx = AssetDatabase.LoadAssetAtPath<GameObject>(path);
+                    if (!cctl || !cfbx) { Debug.LogWarning($"[Scene] cliente riggato mancante: {v}"); continue; }
+                    var go = new GameObject("Customer");
+                    var m = (GameObject)PrefabUtility.InstantiatePrefab(cfbx, go.transform); m.transform.localPosition = Vector3.zero; m.transform.localRotation = Quaternion.identity; // fronte +Z come Nina
                     if (cmat) foreach (var r in m.GetComponentsInChildren<Renderer>()) r.sharedMaterials = System.Array.ConvertAll(r.sharedMaterials, _ => cmat);
                     var ca = m.GetComponent<Animator>() ?? m.AddComponent<Animator>();
-                    var av = AssetDatabase.LoadAllAssetsAtPath(cd + "chr_cliente_base.fbx").OfType<Avatar>().FirstOrDefault(); if (av) ca.avatar = av;
+                    var av = AssetDatabase.LoadAllAssetsAtPath(path).OfType<Avatar>().FirstOrDefault(); if (av) ca.avatar = av;
                     ca.runtimeAnimatorController = cctl; ca.applyRootMotion = false; ca.cullingMode = AnimatorCullingMode.AlwaysAnimate;
+                    var pc = SavePrefab(go, v == "base" ? "Customer" : $"Customer_{v}").AddComponentPrefab<Customer>();
+                    NonnoRobot.StripNavMeshAgents(pc.gameObject); custVariants.Add(pc);
                 }
-                else Debug.LogWarning("[Scene] clienti riggati mancanti: capsula");
             }
-            if (!custGo) { custGo = Prim(PrimitiveType.Capsule, "Customer", null, Vector3.zero, new Vector3(0.5f, 0.8f, 0.5f), chars, UM_Palette.Menta); Object.DestroyImmediate(custGo.GetComponent<Collider>()); }
-            var cust = SavePrefab(custGo, "Customer").AddComponentPrefab<Customer>();
-            NonnoRobot.StripNavMeshAgents(cust.gameObject);
+            if (custVariants.Count == 0)
+            {
+                Debug.LogWarning("[Scene] clienti riggati mancanti: capsula");
+                var capGo = Prim(PrimitiveType.Capsule, "Customer", null, Vector3.zero, new Vector3(0.5f, 0.8f, 0.5f), chars, UM_Palette.Menta); Object.DestroyImmediate(capGo.GetComponent<Collider>());
+                custVariants.Add(SavePrefab(capGo, "Customer").AddComponentPrefab<Customer>());
+            }
+            var cust = custVariants[0];
 
             // --- Nina
             var nina = new GameObject("Nina"); nina.transform.position = new Vector3(0, 0, -1f); // #60: spawn sicuro nell'area giocabile
@@ -140,7 +148,7 @@ namespace UltimoMiglio.EditorTools
             if (kitOk && DepotKit.Place("Kit/prop_counter_2m", null, banPos + new Vector3(0, 0, -0.9f), 0, false)) { banMesh.GetComponent<Renderer>().enabled = false; DepotKit.Place("Kit/prop_register", null, banPos + new Vector3(0.6f, 1.0f, -0.9f), 0, false, true); DepotKit.Place("Kit/prop_carico0", null, banPos + new Vector3(-0.15f, 1.0f, -0.9f), 8, false, true); DepotKit.Place("ThirdParty/Props/prop_tp_lemon", null, banPos + new Vector3(-0.8f, 1.0f, -0.9f), 0, false, true); DepotKit.Place("Kit/prop_rug_bancone", null, banPos + new Vector3(0, 0.005f, 0.2f), 0, false); }
             var bancone = Zone<Bancone>("Zona_Bancone", banPos, new Vector3(2.4f, 1, 1.2f), UM_Palette.Terracotta, props);
             var coins = new GameObject("Coins").AddComponent<CoinSpawner>(); coins.CoinPrefab = coin; bancone.Coins = coins;
-            var queue = new GameObject("CustomerQueue").AddComponent<CustomerQueue>(); queue.Prefab = cust;
+            var queue = new GameObject("CustomerQueue").AddComponent<CustomerQueue>(); queue.Prefab = cust; queue.Variants = custVariants.ToArray();
             queue.CounterSlot = new GameObject("CounterSlot").transform; queue.CounterSlot.position = banPos + new Vector3(0, 0, -1.8f);
             queue.Door = new GameObject("Door").transform; queue.Door.position = new Vector3(8.5f, 0, -10.5f); queue.LineStep = new Vector3(0.7f, 0, -0.7f);
             bancone.Queue = queue;

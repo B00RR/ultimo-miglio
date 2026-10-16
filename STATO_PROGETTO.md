@@ -1,7 +1,7 @@
 # STATO PROGETTO — Ultimo Miglio
 
 > Punto di ingresso unico per chiunque (persona o agente) lavori su questo repo. Aggiornalo **nella stessa PR** in cui completi qualcosa.
-> Ultimo aggiornamento: 2026-10-16 11:53 (Europe/Rome).
+> Ultimo aggiornamento: 2026-10-16 12:12 (Europe/Rome).
 
 ## 1. Il gioco
 - **Ultimo Miglio**: gioco mobile **Android**, **Unity 6 (6000.3) URP**.
@@ -23,6 +23,7 @@
 - **In pausa**: Game Designer, QA, Sound Designer, Narrative, LiveOps, Concept Artist (i loro documenti restano validi).
 
 ## 4. FATTO
+- **UI #110 pad Zaino (PR ui/110-pad-zaino, in revisione)**: dopo un acquisto il pad non paga il livello successivo finché Nina non esce e rientra (niente più portafoglio prosciugato); la pillola col prezzo resta visibile anche con Nina sul pad. Costi Zaino invariati, già allineati a #75 (40, 80, 160…; `upgrades.json` non toccato). Da verificare in Unity.
 - **UI #142 anteprime `tutorial_hud_77` (PR ui/142-anteprime-nonno, in revisione)**: anteprime 360/390/412 rigenerate con il costo reale del pad NONNO (50 LN, non 10) e LN in tasca reali; solo documentazione QA, nessun C#.
 - **UI #77 + #5 (PR ui/77-tutorial-hud, in revisione)**: fumetto di Nonna Ada compatto (ritratto 36 dp + testo 14 dp, 1–2 righe senza ellissi per testi fino a 70 caratteri, sotto la riga LN/obiettivo); obiettivo spostato a destra della pillola LN nella stessa riga; suggerimenti `onb.*` come pillola terracotta sopra il joystick; freccia ▼ sopra la pillola prezzo dei pad di acquisto (colonna 3D rimossa, ribaltamento se il pad è in alto). Nuovo `UI/USS/TutorialHud.uss` (HudV2.uss non toccato). Testi passi letti per id dalla PR #62. QA anteprima 360/390/412 in `docs/qa/tutorial_hud_77/`. Da verificare in Unity.
 - Scheletro progetto Unity 6 + vertical slice cap. 1 (EconomyCore con test EditMode, gameplay, audio, import dati, script build/cattura).
@@ -39,7 +40,7 @@
 - **main @ 7dd1767** — QA live **v5 VIA** (PR #55: #47 deposito + #48 luce/camera). Build QA su `build/WebGL` :8777; art night su `build/WebGL_next` :8778 (non toccare).
 - P2 aperti da QA v5: camera follow (Nina esce/coperta), pillola prezzo LN sotto riga obiettivo.
 - **Merge del ramo `animator`** (fix camminata): conflitto su `chr_nina_vela.fbx` e `bot_nonno.fbx`.
-- I **clienti sono ancora capsule** → sostituire con i personaggi del ramo animator.
+- **#2 clienti veri (PR anim-2-clienti, dopo #87)**: 6 prefab `Customer*` (base, anziana, residente, rider, turista, VIP) con rig Humanoid 0c05198, `chr_cliente.controller`, AlwaysAnimate, niente root motion; `CustomerQueue.Variants` sceglie a caso. UV nuove del 3D Artist (art/2-personaggi) trasferite per indice su residente/rider/turista/VIP (`um_uv_transfer_clienti.py`), bind invariato.
 - Rifinitura tutorial Nonna Ada e game feel; resto cap. 1.
 
 - **#59 NONNO all'indietro (Animator, PR anim-59-nonno-verso)**: causa doppia. (1) `Rig(nonno,"bot_nonno")` usava yaw 180° ma il modello ha le forche su +Z come Nina → forche dietro rispetto alla marcia (misurato in Play Mode: dot(forche, velocità) = -0,97, ora +0,97). (2) Ruote di Drive in retromarcia (`um_bind_bot.py` x=-a) e Drive mai in riproduzione: Lift (bool tenuto per tutto il trasporto) e Happy sostituivano la Locomotion → NONNO scivolava a ruote ferme. Nuovo `bot_nonno.controller` a 2 layer (Base Idle/Drive + Happy interrompibile; layer «Forche» con maschera mast+forks per Lift/Drop). Scena rigenerata: il riferimento `CustomerQueue.Prefab` era rotto nella scena di main (0 clienti in gioco). Test PlayMode `AnimFacingTest` (Nina 4 direzioni, clienti, NONNO: forward, posa visiva, piede d'appoggio, verso ruote). Checklist A01/A03/A05: VIA in Play Mode.
@@ -132,6 +133,12 @@ Ogni ruolo lavora solo sulle issue con la propria etichetta `ruolo:*`, sempre co
 Voci più recenti in alto. Formato: `AAAA-MM-GG HH:MM` (Europe/Rome) — [commit] — descrizione.
 
 - 2026-10-16 11:58 — Tech Lead — [fb5c2e5](https://github.com/B00RR/ultimo-miglio/commit/fb5c2e51a8b17df9817af833e6cff704eddd9529) — PR #101: TutorialManager a 16 passi da onboarding.json (spec GD #121), una riga [ONB] per passo (OnbLog), test EditMode OnboardingLogTests; dipende dalla PR #100.
+- 2026-10-16 12:12 — Code Reviewer — [4a1b26b](https://github.com/B00RR/ultimo-miglio/commit/4a1b26b6256d5f16153e713698f1ac4d3cfd5b72) — unita in squash la [PR #153](https://github.com/B00RR/ultimo-miglio/pull/153) (Audio: sfx combo +N e timbro del debito per la #137). Job `test` verde, asset OGG + README/licenze. Refs #136.
+- 2026-10-16 12:11 — Code Reviewer — [4e49b30](https://github.com/B00RR/ultimo-miglio/commit/4e49b30c6d5d867a12130ac42ff75c2ebf3d97eb) — unita in squash la [PR #88](https://github.com/B00RR/ultimo-miglio/pull/88) (feat(#2): clienti veri al posto delle capsule, 6 varianti riggate). Job `test` verde, diff rivisto (CustomerQueue.Variants, SliceSceneBuilder, ClientiRigTest). Closes #2.
+- 2026-10-16 12:04 — Code Reviewer — [2efd867](https://github.com/B00RR/ultimo-miglio/commit/2efd867a340f353a69f59d20b3f8094b6c6919df) — unita in squash la [PR #122](https://github.com/B00RR/ultimo-miglio/pull/122) (UI #110: il pad Zaino non prosciuga più gli LN sul livello successivo e la pillola prezzo resta visibile). Job `test` verde, diff rivisto (solo `UpgradePad.cs`). Closes #110.
+- 2026-10-16 11:58 — Code Reviewer — [e26ff47](https://github.com/B00RR/ultimo-miglio/commit/e26ff47c0d834131b83893fde30a4ae8ac3b9bca) — unita in squash la [PR #151](https://github.com/B00RR/ultimo-miglio/pull/151) (Docs UI: colori pad rimandati a GUIDA_VISIVA_CAP1 §2). Solo `.md`. Closes #150.
+- 2026-10-16 11:56 — Code Reviewer — [f89351c](https://github.com/B00RR/ultimo-miglio/commit/f89351c724caf40832299e49a1635fedc980c727) — unita in squash la [PR #126](https://github.com/B00RR/ultimo-miglio/pull/126) (VFX #81: build riallineata alla guida visiva — vince la guida). Job `test` verde. VIA Concept Artist + Producer. Closes #81.
+- 2026-10-16 11:55 — UI/UX — [faf9f88](https://github.com/B00RR/ultimo-miglio/commit/faf9f88) — PR #139 (Closes #138): `11_CAP1_COMPLETO` allineato all'HUD minimo (LN, giorno, riga obiettivo, joystick, pad; telefono → Gioco completo #64; combo "+N" 1,5 s; debito a fine giornata; SFX telefono segnati Gioco completo, da rivedere col Sound Designer). Seguito review: colori dei pad rimandati a GUIDA_VISIVA_CAP1 §2 e PR #123.
 - 2026-10-16 11:53 — Code Reviewer — [faf9f88](https://github.com/B00RR/ultimo-miglio/commit/faf9f88c0912ad5994c7473289f92ba847321853) — unita in squash la [PR #139](https://github.com/B00RR/ultimo-miglio/pull/139) (Docs UI: 11_CAP1_COMPLETO allineato all'HUD minimo del Cap. 1). Solo `.md`. Closes #138.
 - 2026-10-16 11:50 — Code Reviewer — [4caa545](https://github.com/B00RR/ultimo-miglio/commit/4caa5452fa083d9ecafb1c591a4257d8d979fbd5) — unita in squash la [PR #147](https://github.com/B00RR/ultimo-miglio/pull/147) (docs: sezione *Regole del computer*, repo docs archiviato). Solo `.md`; conflitto su STATO_PROGETTO.md risolto con merge di main nel branch.
 - 2026-10-16 11:50 — Code Reviewer — [8a2268e](https://github.com/B00RR/ultimo-miglio/commit/8a2268e61628a9ca3e14b79914948723b96c894c) — unita in squash la [PR #145](https://github.com/B00RR/ultimo-miglio/pull/145) (regola 1 solo Unity sul box, `flock /tmp/unity-box.lock`). Solo `.md`.
@@ -252,8 +259,3 @@ Voci più recenti in alto. Formato: `AAAA-MM-GG HH:MM` (Europe/Rome) — [commit
 - Deciso (Tech Lead): pannello unico `SettingsController`; `Bridge/SettingsPanel` resta (usato da `HudGameBridge`) ma senza listener `OnSettingsRequested`. Ingranaggio = toggle (QA P3, `qa/playtest_web_live_p0.md` S01). Zoom su chiave unica `cam_zoom_v3` (`DepotCameraFit.PrefZoom`).
 - Riferimento #35 (chiusa). Correlate aperte: #64, #67.
 - 2026-10-16 — PR #85 (3D Artist, Refs #2): solo clienti v03-uv in `3d/export/chr/` (rider cappello limone, 3 toni pelle; residente/rider/turista/vip, vertici invariati) + review docs/review/2. Nonna Ada tolta: la consegna l'Animator (#93).
-
-## Aggiornamento 16/10 11:15 — 11_CAP1_COMPLETO allineato all'HUD minimo (UI, issue #138, branch ui/138-cap1-hud-minimo)
-- Copia di riferimento: `docs/design/11_CAP1_COMPLETO.md` (decisione del Producer); quella in `ultimo-miglio-docs` diventa un rimando (docs#2/#3).
-- UI/UX: HUD Cap. 1 solo LN, giorno, riga obiettivo, joystick e pad; telefono di Nina rimandato a Gioco completo (#64); combo solo "+N" sopra Nina per 1,5 s, x1,2 non mostrato; debito solo a fine giornata e nel fumetto di Ada; colori pad ritiro `#5E7F86`, consegna `#8FC9A8`, acquisto `#F4C430`, potenziamento `#F7E26B`. UI/UX 5 → 4 gp.
-- Sound: SFX UI telefono (swipe, notifica) segnati Gioco completo; "test speaker telefono" → test su speaker di smartphone. Nessun nuovo asset: **da rivedere col Sound Designer**.
