@@ -73,6 +73,21 @@ public class TutorialToNonnoTest
             Assert.GreaterOrEqual(eco.S.CustomersServed, servesNeeded, "could not serve customers");
             Assert.GreaterOrEqual(eco.S.Wallet, hire - 0.01, $"wallet {eco.S.Wallet} after {eco.S.CustomersServed} serves — need ≥{hire} LN");
 
+            // #101: tutorial a 16 passi — lo Zaino viene prima di NONNO; il pad di NONNO compare solo al passo hireNonno (dopo combo/softgate)
+            var padZ = Object.FindObjectsByType<UpgradePad>(FindObjectsSortMode.None).First(p => p.Kind == UpgradeKind.Zaino);
+            float tz = Time.time;
+            while (eco.S.Zaino < 1 && Time.time - tz < 120f)
+            {
+                if (padZ.gameObject.activeInHierarchy) { if (!padZ.Occupied) yield return EnterPad(n, padZ); else n.ScriptedInput = Vector3.zero; yield return null; }
+                else yield return ServeCycle(n, arr, shelves, ban);
+            }
+            Assert.GreaterOrEqual(eco.S.Zaino, 1, "Zaino non comprato (passo zainoPad)");
+            float tn = Time.time;
+            while (!padN.gameObject.activeInHierarchy && Time.time - tn < 150f) yield return ServeCycle(n, arr, shelves, ban);
+            Assert.IsTrue(padN.gameObject.activeInHierarchy, $"pad NONNO mai rivelato, passo={TutorialManager.I.Current}");
+            Assert.AreEqual(TutorialManager.Step.HireNonno, TutorialManager.I.Current);
+            if (eco.S.Wallet < hire) eco.S.Wallet = hire; // l'assist del passo lo garantisce già
+
             // Hire NONNO: cammina sul pad e resta in trigger (teleport CC non genera OnTriggerEnter)
             yield return EnterPad(n, padN);
             float h = Time.time;
@@ -120,7 +135,8 @@ public class TutorialToNonnoTest
         Time.timeScale = 3f;
         try
         {
-            while (!GameRoot.Ready || !GameRoot.I.Nina) yield return null;
+            while (!GameRoot.Ready || !GameRoot.I.Nina || TutorialManager.I == null) yield return null;
+            yield return null; TutorialManager.I.Skip(); // test del soft-lock, non del tutorial: tutti i pad visibili
             var n = GameRoot.I.Nina; var eco = GameRoot.I.Eco;
             var arr = Object.FindAnyObjectByType<ArrivalsZone>();
             var shelves = Object.FindObjectsByType<Shelf>(FindObjectsSortMode.None);
@@ -150,6 +166,15 @@ public class TutorialToNonnoTest
             Assert.Greater(eco.S.CustomersServed, before, "il Bancone non serve dopo l'assunzione di NONNO");
         }
         finally { Time.timeScale = 1f; }
+    }
+
+    static IEnumerator ServeCycle(NinaController n, ArrivalsZone arr, Shelf[] shelves, Bancone ban)
+    {
+        yield return Go(n, arr.transform.position);
+        float a = Time.time; while (n.Stack.Count < Mathf.Min(2, n.Stack.Capacity) && Time.time - a < 8f) yield return null;
+        if (shelves.Length > 0) { yield return Go(n, shelves[0].transform.position); yield return Wait(n, 1.2f); }
+        yield return Go(n, ban.transform.position);
+        float b = Time.time; while (n.Stack.Count > 0 && Time.time - b < 12f) yield return null;
     }
 
     static IEnumerator Wait(NinaController n, float s)

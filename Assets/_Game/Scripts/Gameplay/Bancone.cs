@@ -33,10 +33,14 @@ namespace UltimoMiglio.Gameplay
             }
         }
 
+        bool _comboNotified;
         public void Serve(Customer c)
         {
             if (!GameRoot.Ready || c == null) return;
             double ln = GameRoot.I.Eco.Serve(GameRoot.I.ActiveTime);
+            // #101: moltiplicatore combo applicato a questo cliente; al primo x1,2 (comboReached) avvisa il tutorial
+            double mult = GameRoot.I.Eco.CustomerValue > 0 ? ln / GameRoot.I.Eco.CustomerValue : 1;
+            if (!_comboNotified && mult >= 1.2 - 1e-6 && TutorialManager.I) { _comboNotified = true; TutorialManager.I.NotifyCombo((float)mult); }
             // Credit wallet immediately (40% spend share). Coins are visual-only so magnet/HUD fly can't soft-lock LN at 0.
             GameRoot.I.Eco.CollectActive(ln, transform.position.ToWP());
             UM_FxPlayer.Play(UM_FxPlayer.Fx.PackageDeliver, c.transform.position + Vector3.up);

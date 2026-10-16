@@ -4,18 +4,26 @@ using UltimoMiglio.Core;
 
 namespace UltimoMiglio.Gameplay
 {
-    /// <summary>Onboarding cap.1: one step at a time (Nonna Ada banner in the HUD + animated ground marker + edge arrow).
-    /// Steps complete from game state (EconomyState / stack / shelves). Progress saved in PlayerPrefs "um_tut_step".</summary>
+    /// <summary>Onboarding cap.1 a 16 passi (#101, onboarding.json della PR #106): un passo alla volta, Zaino prima di NONNO, passo combo.
+    /// L'ordine e gli id arrivano da onboarding.json (Ch1Data.asset); i gate si valutano dallo stato di gioco. Progresso in PlayerPrefs "um_tut_step".
+    /// Ogni passo scrive le righe [ONB] di docs/design/13_CAP1_EVENTI_ONBOARDING.md (#91).</summary>
     public sealed class TutorialManager : MonoBehaviour
     {
-        public enum Step { Muoviti, Arrivi, Scaffali, Bancone, Monete, Nonno, Zaino, Fine, Chiuso }
+        public enum Step { ColdOpen, Move, PickUp, Shelve, Serve, Coins, ZainoPad, Combo, NonnoIntro, HireNonno, NonnoConfirm, PadNuovi, CassaPass, DebtCard, WallPad, FreePlay, Chiuso,
+            Fine = FreePlay }
+        /// <summary>id dei passi in onboarding.json (PR #106), nello stesso ordine di <see cref="Step"/>.</summary>
+        public static readonly string[] StepIds = { "coldOpen", "move", "pickUp", "shelve", "serve", "coins", "zainoPad", "combo", "nonnoIntro", "hireNonno", "nonnoConfirm", "padNuovi", "cassaPass", "debtCard", "wallPad", "freePlay" };
+        public const int StepCount = 16;
+        /// <summary>Passi senza escalation di aiuti (spec #91 §2).</summary>
+        public static bool HasHints(Step s) => !(s == Step.ColdOpen || s == Step.NonnoIntro || s == Step.NonnoConfirm || s == Step.WallPad || s >= Step.FreePlay);
         public const string PrefKey = "um_tut_step";
         public static TutorialManager I { get; private set; }
         public static System.Action<Step> StepChanged;
 
         public string Speaker = "Nonna Ada";
-        [TextArea] public string[] Texts = new string[7]; [TextArea] public string EndText;
+        [TextArea] public string[] Texts = new string[StepCount]; [TextArea] public string EndText;
         public Transform Arrivi, Scaffale, Bancone, Monete, PadZaino, PadNonno;
+        [Tooltip("Durate dei passi 'solo guardare' (coldOpen, nonnoIntro, wallPad), s")] public float ColdOpenSec = 2f, NonnoIntroSec = 2.5f, WallPadSec = 3f, NonnoConfirmMaxSec = 20f, ComboSoftGateSec = 40f;
         public float EndSeconds = 6f;
         [Tooltip("onboarding_testi.json (PR #62): passi per id + suggerimenti onb.*. Facoltativo: senza, valgono Texts/EndText.")]
         public TextAsset TestiJson;
@@ -26,13 +34,33 @@ namespace UltimoMiglio.Gameplay
         [Tooltip("Aiuti a 10/20/40 s di inattività (OnboardingHints). La freccia a bordo schermo parte solo al livello 2.")]
         public bool AiutiProgressivi = true;
         [Tooltip("'Salta tutorial' compare dopo questo passo o alla prima combo (NotifyCombo)")]
-        public Step SaltaDopo = Step.Monete;
+        public Step SaltaDopo = Step.Combo;
 
         public Step Current { get; private set; }
         public string CurrentObjectiveText => Current < Step.Fine && (int)Current < Objectives.Length ? Objectives[(int)Current] : (Current == Step.Fine ? "Deposito aperto!" : "");
-        Vector3 _startPos; int _shelfBase, _servedBase; double _walletBase; float _endT;
+        Vector3 _startPos; int _shelfBase, _servedBase, _padBase; double _walletBase, _debtBase; float _endT, _stepStart; bool _cassaSeen;
+        int _hints, _lvl3; float _nolnpAt = -99f;
+        /// <summary>Passi letti da onboarding.json (null = asset non importato: valgono <see cref="StepIds"/>).</summary>
+        public UltimoMiglio.Core.Data.OnboardingStep[] Steps { get; private set; }
+        /// <summary>Tempo di gioco attivo (s) usato nelle righe [ONB]: non scorre in pausa/menu.</summary>
+        public static double OnbTime => GameRoot.I && GameRoot.Ready ? GameRoot.I.ActiveTime : Time.timeSinceLevelLoad;
+        public static string IdOf(Step s) => (int)s < StepIds.Length ? StepIds[(int)s] : "freePlay";
+        /// <summary>#91: una riga [ONB] in console (formato OnbLog).</summary>
+        public static void Onb(string type, Step s, params object[] extras)
+        {
+            int n = Mathf.Min((int)s, StepCount - 1);
+            Debug.Log(OnbLog.Line(type, IdOf((Step)n), n, OnbTime, extras));
+        }
+        /// <summary>Chiamato da OnboardingHints a ogni livello di aiuto (1/2/3 = 10/20/40 s).</summary>
+        public void NotifyHint(int lvl, float idle, string kind)
+        {
+            if (Current >= Step.Fine || !HasHints(Current)) return;
+            _hints++; if (lvl >= 3) _lvl3++;
+            Onb("hint", Current, "lvl", lvl, "idle", (double)idle, "kind", kind);
+        }
         Transform _marker, _markerArrow; VisualElement _banner; Label _bannerText, _objective;
-        static readonly string[] Objectives = { "Muoviti", "Vai agli Arrivi", "Metti sullo scaffale", "Porta al Bancone", "Raccogli le monete", "Assumi NONNO", "Compra lo Zaino" };
+        static readonly string[] Objectives = { "Benvenuta al Deposito", "Muoviti", "Vai agli Arrivi", "Metti sullo scaffale", "Porta al Bancone", "Raccogli le monete", "Compra lo Zaino",
+            "Servi di fila", "Ecco NONNO", "Assumi NONNO", "NONNO lavora", "Nuovi pad", "Passa dalla Cassa", "Versa il debito", "Prossimo obiettivo" };
         UltimoMiglio.UI.EdgeArrow _edge; UltimoMiglio.UI.HudController _hud;
 
         void Awake() { I = this; }
@@ -40,6 +68,7 @@ namespace UltimoMiglio.Gameplay
         void Start()
         {
             LoadTesti();
+            LoadSteps();
             Current = (Step)Mathf.Clamp(PlayerPrefs.GetInt(PrefKey, 0), 0, (int)Step.Chiuso);
             _hud = FindAnyObjectByType<UltimoMiglio.UI.HudController>();
             _edge = FindAnyObjectByType<UltimoMiglio.UI.EdgeArrow>(FindObjectsInactive.Include);
@@ -49,10 +78,11 @@ namespace UltimoMiglio.Gameplay
             RegisterWorldReveals();
             // Graduale solo per una partita NUOVA (nessun passo salvato) o iniziata già in graduale; salvataggi precedenti = tutto visibile
             bool nuova = !PlayerPrefs.HasKey(PrefKey);
-            if (RivelaGraduale && nuova) { PlayerPrefs.SetInt(PrefGraduale, 1); PlayerPrefs.Save(); }
-            bool graduale = RivelaGraduale && Current < Step.Fine && (nuova || PlayerPrefs.GetInt(PrefGraduale, 0) == 1);
+            // #101: nelle nuove partite RivelaGraduale è sempre acceso (anche se la scena serializzava false); i salvataggi esistenti restano come sono
+            if (nuova) { RivelaGraduale = true; PlayerPrefs.SetInt(PrefGraduale, 1); PlayerPrefs.Save(); }
+            bool graduale = Current < Step.Fine && (nuova ? RivelaGraduale : PlayerPrefs.GetInt(PrefGraduale, 0) == 1);
             if (graduale) UltimoMiglio.UI.HudReveal.HideAll(LockedAtStart);
-            for (var k = Step.Muoviti; k < Current; k++) RevealFor(k); // ripresa da PlayerPrefs: ciò che è già stato rivelato resta visibile
+            for (var k = Step.ColdOpen; k < Current; k++) RevealFor(k); // ripresa da PlayerPrefs: ciò che è già stato rivelato resta visibile
             Enter(Current);
         }
 
@@ -118,17 +148,31 @@ namespace UltimoMiglio.Gameplay
 
         const bool UseAdaNote = true;
         static readonly System.Collections.Generic.Dictionary<string, Step> IdToStep = new()
-        {   // id PR #62 (move…) + id storici (muoviti…): l'ordine nel JSON non conta più
-            { "move", Step.Muoviti }, { "pickup", Step.Arrivi }, { "shelve", Step.Scaffali }, { "serve", Step.Bancone }, { "coins", Step.Monete },
-            { "unlock_nonno", Step.Nonno }, { "upgrade_zaino", Step.Zaino },
-            { "muoviti", Step.Muoviti }, { "arrivi", Step.Arrivi }, { "scaffali", Step.Scaffali }, { "bancone", Step.Bancone }, { "monete", Step.Monete },
-            { "nonno", Step.Nonno }, { "zaino", Step.Zaino }
+        {   // id dei testi (onboarding_testi.json "step:<id>") → passo
+            { "move", Step.Move }, { "pickup", Step.PickUp }, { "shelve", Step.Shelve }, { "serve", Step.Serve }, { "coins", Step.Coins },
+            { "unlock_nonno", Step.HireNonno }, { "upgrade_zaino", Step.ZainoPad }
         };
+        /// <summary>Testi serializzati nella scena col vecchio ordine a 7 passi (Muoviti, Arrivi, Scaffali, Bancone, Monete, Nonno, Zaino) → nuovi indici.</summary>
+        static void MigrateTexts(string[] old, string[] nu)
+        {
+            var map = new[] { Step.Move, Step.PickUp, Step.Shelve, Step.Serve, Step.Coins, Step.HireNonno, Step.ZainoPad };
+            for (int i = 0; i < old.Length && i < map.Length; i++) nu[(int)map[i]] = old[i];
+        }
+        void LoadSteps()
+        {
+            var d = DataLoader.LoadOnboarding();
+            if (d?.steps == null || d.steps.Length == 0) { Debug.LogWarning("[Onb] onboarding.json non importato in Ch1Data.asset: uso l'ordine predefinito a 16 passi"); return; }
+            if (d.steps.Length != StepCount) Debug.LogError($"[Onb] onboarding.json ha {d.steps.Length} passi, attesi {StepCount}");
+            for (int i = 0; i < Mathf.Min(d.steps.Length, StepCount); i++)
+                if (d.steps[i].id != StepIds[i]) Debug.LogError($"[Onb] passo {i}: id '{d.steps[i].id}' in onboarding.json, atteso '{StepIds[i]}'");
+            Steps = d.steps;
+        }
         readonly System.Collections.Generic.Dictionary<string, string> _hints = new();
         VisualElement _hint; Label _hintText; Step _adaShown = (Step)(-1);
 
         void LoadTesti()
         {
+            if (Texts == null || Texts.Length < StepCount) { var t = new string[StepCount]; if (Texts != null) MigrateTexts(Texts, t); Texts = t; }
             if (!TestiJson) return;
             string j = TestiJson.text;
             foreach (System.Text.RegularExpressions.Match m in System.Text.RegularExpressions.Regex.Matches(j, "\\{\\s*\"id\"\\s*:\\s*\"([^\"]+)\"\\s*,\\s*\"text\"\\s*:\\s*\"((?:[^\"\\\\]|\\\\.)*)\""))
@@ -142,10 +186,12 @@ namespace UltimoMiglio.Gameplay
         {
             string k = Current switch
             {
-                Step.Muoviti => "onb.move.card",
-                Step.Arrivi => GameRoot.I && GameRoot.I.Nina && GameRoot.I.Nina.Stack.Count >= GameRoot.I.Nina.Stack.Capacity ? "onb.pick.max" : null,
-                Step.Scaffali => "onb.deposit.hint", Step.Bancone => "onb.cust.first", Step.Monete => "onb.coins.walk",
-                Step.Zaino => "onb.zaino.hint", _ => null
+                Step.Move => "onb.move.card",
+                Step.PickUp => GameRoot.I && GameRoot.I.Nina && GameRoot.I.Nina.Stack.Count >= GameRoot.I.Nina.Stack.Capacity ? "onb.pick.max" : null,
+                Step.Shelve => "onb.deposit.hint", Step.Serve => "onb.cust.first", Step.Coins => "onb.coins.walk",
+                Step.ZainoPad => "onb.zaino.hint", Step.Combo => "onb.combo", Step.NonnoIntro => "onb.nonno.intro", Step.HireNonno => "onb.nonno.cost",
+                Step.NonnoConfirm => "onb.nonno.working", Step.PadNuovi => "onb.pads.new", Step.CassaPass => "onb.cassa.tip", Step.DebtCard => "onb.debt.adaExplain",
+                Step.WallPad => "onb.wall.goal", _ => null
             };
             return k != null && _hints.TryGetValue(k, out var v) ? v : null;
         }
@@ -167,13 +213,18 @@ namespace UltimoMiglio.Gameplay
         public static readonly string[] LockedAtStart = { "hud.pillolaValute", "zona.arrivi", "zona.scaffaleTerracotta", "zona.bancone", "pad.zaino", "pad.assumiNonno", "robot.nonno.attivo" };
         bool _uiRegistered, _comboSeen; VisualElement _skip;
 
-        static string[] RevealsOf(Step s) => s switch
+        /// <summary>Reveal del passo: da onboarding.json (steps[].reveals) se importato, altrimenti la mappa predefinita. Gli id non presenti nella slice vengono ignorati da HudReveal.</summary>
+        string[] RevealsOf(Step s)
         {
-            Step.Arrivi => new[] { "zona.arrivi" }, Step.Scaffali => new[] { "zona.scaffaleTerracotta" }, Step.Bancone => new[] { "zona.bancone" },
-            Step.Monete => new[] { "hud.pillolaValute" }, Step.Nonno => new[] { "pad.assumiNonno", "robot.nonno.attivo" }, Step.Zaino => new[] { "pad.zaino" },
-            _ => System.Array.Empty<string>()
-        };
-        static void RevealFor(Step s) { if (s >= Step.Fine) UltimoMiglio.UI.HudReveal.ShowAll(); else foreach (var id in RevealsOf(s)) UltimoMiglio.UI.HudReveal.Show(id); }
+            if (Steps != null && (int)s < Steps.Length && Steps[(int)s].reveals != null) return Steps[(int)s].reveals;
+            return s switch
+            {
+                Step.PickUp => new[] { "zona.arrivi" }, Step.Shelve => new[] { "zona.scaffaleTerracotta" }, Step.Serve => new[] { "zona.bancone" },
+                Step.Coins => new[] { "hud.pillolaValute" }, Step.ZainoPad => new[] { "pad.zaino" }, Step.HireNonno => new[] { "pad.assumiNonno" },
+                Step.NonnoConfirm => new[] { "robot.nonno.attivo" }, _ => System.Array.Empty<string>()
+            };
+        }
+        void RevealFor(Step s) { if (s >= Step.Fine) UltimoMiglio.UI.HudReveal.ShowAll(); else foreach (var id in RevealsOf(s)) UltimoMiglio.UI.HudReveal.Show(id); }
 
         void RegisterWorldReveals()
         {
@@ -196,7 +247,7 @@ namespace UltimoMiglio.Gameplay
         public void NotifyCombo(float multiplier)
         {
             ComboPopup.Show(multiplier > 0f ? "x" + multiplier.ToString("0.0", System.Globalization.CultureInfo.GetCultureInfo("it-IT")) : "Combo!");
-            if (!_comboSeen) { _comboSeen = true; Debug.Log("[Onb] gate comboReached"); }
+            if (!_comboSeen) { _comboSeen = true; Debug.Log($"[Onb] comboReached x{multiplier:0.0}"); }
         }
 
         void EnsureSkip()
@@ -209,29 +260,34 @@ namespace UltimoMiglio.Gameplay
         /// <summary>Salta il tutorial: rivela tutto ciò che i passi saltati avrebbero rivelato e chiude il tutorial.</summary>
         public void Skip()
         {
-            Debug.Log($"[Onb] skip at step={Current}");
+            if (Current >= Step.Fine) return;
+            Onb("skip", Current, "from", IdOf(Current));
+            Onb("end", Step.FreePlay, "total", OnbTime, "hints", _hints, "lvl3", _lvl3);
             UltimoMiglio.UI.HudReveal.ShowAll(); CameraPeek.Cancel();
             if (_hud) _hud.CompleteAdaNote();
             Enter(Step.Chiuso);
         }
 
-        public string CurrentText => Current < Step.Fine ? Texts[(int)Current] : Current == Step.Fine ? EndText : null;
+        public string CurrentText => Current < Step.Fine ? (Texts != null && (int)Current < Texts.Length ? Texts[(int)Current] : CurrentHintText()) : Current == Step.Fine ? EndText : null;
+        string CurrentHintText() { var h = CurrentHint(); return string.IsNullOrEmpty(h) ? null : h; }
 
         void Enter(Step s)
         {
             Current = s; PlayerPrefs.SetInt(PrefKey, (int)s); PlayerPrefs.Save();
             var eco = GameRoot.Ready ? GameRoot.I.Eco : null;
             if (GameRoot.I && GameRoot.I.Nina) _startPos = GameRoot.I.Nina.transform.position;
-            _shelfBase = ShelfTotal(); _servedBase = eco?.S.CustomersServed ?? 0; _walletBase = eco?.S.Wallet ?? 0; _endT = 0;
-            // QA #42: after Arrivi/Bancone path, enough LN to hire NONNO within ~90s tutorial
-            if (s == Step.Nonno && eco != null && eco.S.NonnoLevel < 0)
+            _shelfBase = ShelfTotal(); _servedBase = eco?.S.CustomersServed ?? 0; _walletBase = eco?.S.Wallet ?? 0; _endT = 0; _stepStart = Time.time;
+            _debtBase = eco?.S.DebtPaid ?? 0; _padBase = eco == null ? 0 : eco.S.Scarpe + eco.S.Insegna; _cassaSeen = false;
+            // QA #42: LN sufficienti per i pad del tutorial (Zaino prima, poi NONNO) senza farm
+            if (eco != null && (s == Step.ZainoPad || s == Step.HireNonno))
             {
-                double need = eco.Cost(UpgradeKind.NonnoHire);
-                if (!double.IsInfinity(need) && eco.S.Wallet < need)
-                    eco.S.Wallet = need;
+                double need = eco.Cost(s == Step.ZainoPad ? UpgradeKind.Zaino : UpgradeKind.NonnoHire);
+                if (!double.IsInfinity(need) && eco.S.Wallet < need) eco.S.Wallet = need;
             }
-            if (s == Step.Monete && eco != null && eco.S.Wallet < 4)
+            if (s == Step.Coins && eco != null && eco.S.Wallet < 4)
                 eco.S.Wallet = System.Math.Max(eco.S.Wallet, 4);
+            if (s < Step.Chiuso) Onb("start", s, "reveals", RevealsOf(s).Length);
+            if (s == Step.FreePlay) Onb("end", s, "total", OnbTime, "hints", _hints, "lvl3", _lvl3);
             Debug.Log($"[Tutorial] step {(int)s} {s}: {CurrentText}");
             StepChanged?.Invoke(s);
             RevealFor(s);
@@ -246,8 +302,8 @@ namespace UltimoMiglio.Gameplay
         public Transform CurrentTarget => Target();
         Transform Target() => Current switch
         {
-            Step.Arrivi => Arrivi, Step.Scaffali => Scaffale, Step.Bancone => Bancone, Step.Monete => Monete,
-            Step.Zaino => PadZaino, Step.Nonno => PadNonno, _ => null
+            Step.PickUp => Arrivi, Step.Shelve => Scaffale, Step.Serve => Bancone, Step.Coins => Monete, Step.Combo => Bancone,
+            Step.ZainoPad => PadZaino, Step.NonnoIntro => PadNonno, Step.HireNonno => PadNonno, Step.PadNuovi => CheapestNewPad(), Step.CassaPass => Cassa(), _ => null
         };
 
         void Update()
@@ -286,20 +342,58 @@ namespace UltimoMiglio.Gameplay
             var t = Target();
             if (_marker) _marker.gameObject.SetActive(false);
             var eco = GameRoot.I.Eco; var nina = GameRoot.I.Nina;
-            bool done = Current switch
+            float inStep = Time.time - _stepStart;
+            if (Current == Step.CassaPass) { var cz = FindAnyObjectByType<CassaZone>(); if (cz && cz.Occupied) _cassaSeen = true; }
+            string ev = Current switch
             {
-                Step.Muoviti => nina && (nina.transform.position - _startPos).sqrMagnitude > 1.5f * 1.5f,
-                Step.Arrivi => nina && nina.Stack.Count >= Mathf.Min(3, nina.Stack.Capacity),
-                Step.Scaffali => ShelfTotal() > _shelfBase,
-                Step.Bancone => eco.S.CustomersServed > _servedBase,
+                Step.ColdOpen => inStep >= ColdOpenSec ? "coldOpenEnd" : null,
+                Step.Move => nina && (nina.transform.position - _startPos).sqrMagnitude > 1.5f * 1.5f ? "playerMoved" : null,
+                Step.PickUp => nina && nina.Stack.Count >= 1 ? "parcelPicked" : null,
+                Step.Shelve => ShelfTotal() > _shelfBase ? "shelfDeposit" : null,
+                Step.Serve => eco.S.CustomersServed > _servedBase ? "customerServed" : null,
                 // LN già accreditati su Bancone.Serve (CollectActive); monete a terra = Burst VFX
-                Step.Monete => eco.S.Wallet > 0.01,
-                Step.Zaino => eco.S.Zaino >= 1,
-                Step.Nonno => eco.S.NonnoLevel >= 0,
-                Step.Fine => (_endT += Time.deltaTime) > EndSeconds,
-                _ => false
+                Step.Coins => eco.S.Wallet > 0.01 ? "coinsCollected" : null,
+                Step.ZainoPad => eco.S.Zaino >= 1 ? "padPurchased" : null,
+                Step.Combo => _comboSeen ? "comboReached" : null,
+                Step.NonnoIntro => inStep >= NonnoIntroSec ? "cameraDone" : null,
+                Step.HireNonno => eco.S.NonnoLevel >= 0 ? "nonnoHired" : null,
+                Step.NonnoConfirm => NonnoWorking() || inStep >= NonnoConfirmMaxSec ? "nonnoFirstRestock" : null,
+                Step.PadNuovi => eco.S.Scarpe + eco.S.Insegna > _padBase || (double.IsInfinity(eco.Cost(UpgradeKind.Scarpe)) && double.IsInfinity(eco.Cost(UpgradeKind.Insegna))) ? "padPurchasedAny" : null,
+                Step.CassaPass => _cassaSeen || !Cassa() ? "cassaPassed" : null,
+                Step.DebtCard => eco.S.DebtPaid > _debtBase || eco.S.DebtPaid > 0 ? "firstDebtDeposit" : null,
+                Step.WallPad => inStep >= WallPadSec ? "goalSeen" : null,
+                Step.FreePlay => (_endT += Time.deltaTime) > EndSeconds ? "freePlayShown" : null,
+                _ => null
             };
-            if (done) { if (_hud && Current < Step.Fine) _hud.PulseCurrency(); Enter(Current + 1); }
+            // #91 softgate: il passo combo avanza dopo 40 s senza x1,2
+            if (ev == null && Current == Step.Combo && inStep >= ComboSoftGateSec) { Onb("softgate", Current, "idle", (double)inStep); Enter(Current + 1); return; }
+            if (ev == null) { CheckNoLn(eco); return; }
+            if (Current < Step.FreePlay) Onb("gate", Current, "event", ev, "dur", (double)inStep);
+            if (_hud && Current < Step.Fine) _hud.PulseCurrency();
+            Enter(Current + 1);
+        }
+
+        void CheckNoLn(EconomyCore eco)
+        {
+            var k = Current == Step.ZainoPad ? UpgradeKind.Zaino : Current == Step.HireNonno ? UpgradeKind.NonnoHire : (UpgradeKind?)null;
+            if (k == null || Time.time - _nolnpAt < 5f) return;
+            var pad = (Current == Step.ZainoPad ? PadZaino : PadNonno)?.GetComponent<UpgradePad>();
+            double cost = eco.Cost(k.Value);
+            if (pad && pad.Occupied && eco.S.Wallet <= 0 && !double.IsInfinity(cost))
+            { _nolnpAt = Time.time; Onb("nolnp", Current, "pad", Current == Step.ZainoPad ? "zaino" : "assumiNonno", "wallet", (int)eco.S.Wallet, "cost", (int)cost); }
+        }
+        static bool NonnoWorking()
+        {
+            foreach (var b in FindObjectsByType<NonnoRobot>(FindObjectsSortMode.None)) if (b.State != NonnoRobot.WorkState.Idle || b.CarryCount > 0) return true;
+            return false;
+        }
+        Transform Cassa() { var c = FindAnyObjectByType<CassaZone>(); return c ? c.transform : null; }
+        Transform CheapestNewPad()
+        {
+            Transform best = null; double bc = double.PositiveInfinity; var eco = GameRoot.I.Eco;
+            foreach (var p in FindObjectsByType<UpgradePad>(FindObjectsSortMode.None))
+                if ((p.Kind == UpgradeKind.Scarpe || p.Kind == UpgradeKind.Insegna) && eco.Cost(p.Kind) < bc) { bc = eco.Cost(p.Kind); best = p.transform; }
+            return best;
         }
     }
 }

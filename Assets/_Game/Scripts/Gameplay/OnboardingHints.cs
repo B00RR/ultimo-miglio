@@ -47,7 +47,7 @@ namespace UltimoMiglio.Gameplay
             if (!_tut) _tut = TutorialManager.I; if (!_tut) return;
             if (!_hud) _hud = FindAnyObjectByType<HudController>();
             if (!_edge) _edge = FindAnyObjectByType<EdgeArrow>(FindObjectsInactive.Include);
-            if (_tut.Current >= TutorialManager.Step.Fine) { if (_level > 0) Clear(); return; }
+            if (_tut.Current >= TutorialManager.Step.Fine || !TutorialManager.HasHints(_tut.Current)) { if (_level > 0) Clear(); return; }
 
             var nina = GameRoot.I.Nina; if (!nina) return;
             var target = _tut.CurrentTarget; var np = nina.transform.position;
@@ -64,19 +64,19 @@ namespace UltimoMiglio.Gameplay
 
             if (_level < 1 && _idle >= Level1Sec)
             {
-                _level = 1; Log();
+                _level = 1; Log(); _tut.NotifyHint(1, _idle, "ripeti");
                 var txt = _tut.CurrentText; if (_hud && !string.IsNullOrEmpty(txt)) _hud.ShowAdaNote(txt); // testo ripetuto (ricompare con animazione)
                 _ip = target ? target.GetComponentInChildren<InteractionPoint>() : null; if (_ip) _ip.HintPulse = true;
             }
             if (_level < 2 && _idle >= Level2Sec)
             {
                 _level = 2;
-                if (target && !OnScreen(target.position)) { if (_edge) _edge.SetTarget(target, _tut.CurrentObjectiveText); Log("freccia"); }
-                else { EnsureHand(); _handOn = _hand != null; if (_handOn && _hud) _hud.Root.AddToClassList("onb-hand"); Log("mano"); }
+                if (target && !OnScreen(target.position)) { if (_edge) _edge.SetTarget(target, _tut.CurrentObjectiveText); Log("freccia"); _tut.NotifyHint(2, _idle, "freccia"); }
+                else { EnsureHand(); _handOn = _hand != null; if (_handOn && _hud) _hud.Root.AddToClassList("onb-hand"); Log("mano"); _tut.NotifyHint(2, _idle, "manoFantasma"); }
             }
             if (_level < 3 && _idle >= Level3Sec)
             {
-                _level = 3;
+                _level = 3; _tut.NotifyHint(3, _idle, "camera");
                 if (target && !_peekDone) { _peekDone = true; CameraPeek.Request(target.position, HintPeekSec); Log("camera"); } else Log("camera già usata");
             }
             if (_handOn) AnimateHand(target, np);

@@ -1,4 +1,5 @@
 using System.Collections;
+using System.Linq;
 using NUnit.Framework;
 using UnityEngine;
 using UnityEngine.SceneManagement;
@@ -18,7 +19,8 @@ public class Ch1LoopTest
         float t = 0; while (LoopAutoTest.Result == null && t < 900) { t += Time.unscaledDeltaTime; yield return null; }
         Time.timeScale = 1f;
         Assert.AreEqual("PASS", LoopAutoTest.Result);
-        CollectionAssert.AreEqual(new[] { 0, 1, 2, 3, 4, 5, 6, 7, 8 }, LoopAutoTest.TutSteps, "tutorial steps out of order: " + string.Join(",", LoopAutoTest.TutSteps));
+        CollectionAssert.AreEqual(System.Linq.Enumerable.Range(0, TutorialManager.StepCount + 1).ToArray(), LoopAutoTest.TutSteps, // #101: 16 passi + Chiuso
+             "tutorial steps out of order: " + string.Join(",", LoopAutoTest.TutSteps));
         Assert.AreEqual(1, PlayerPrefs.GetInt(TutorialManager.PrefKey) == (int)TutorialManager.Step.Chiuso ? 1 : 0, "tutorial state not saved");
     }
 
