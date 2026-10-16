@@ -1,7 +1,7 @@
 # STATO PROGETTO — Ultimo Miglio
 
 > Punto di ingresso unico per chiunque (persona o agente) lavori su questo repo. Aggiornalo **nella stessa PR** in cui completi qualcosa.
-> Ultimo aggiornamento: 2026-10-16 11:18 (Europe/Rome).
+> Ultimo aggiornamento: 2026-10-16 11:47 (Europe/Rome).
 
 ## 1. Il gioco
 - **Ultimo Miglio**: gioco mobile **Android**, **Unity 6 (6000.3) URP**.
@@ -82,13 +82,14 @@ $UNITY -batchmode -projectPath "$PWD" -runTests -testPlatform PlayMode \
 
 
 ## Regole del computer
-- Massimo **1 processo Unity** alla volta sul box, sempre con `flock /tmp/unity-box.lock`; la coda la gestisce il Tech Lead.
-- **Build e test solo su GitHub Actions**; in locale è permessa solo la build per il QA.
+- Massimo **1 processo Unity** alla volta sul box (anche batchmode), sempre con `flock /tmp/unity-box.lock`; la coda la gestisce il Tech Lead.
+- **Build e test solo su GitHub Actions**; in locale è permessa solo la build per il QA. Il **runner self-hosted resta spento** finché non usa lo stesso lock con un job alla volta.
 - Massimo **1 server http di test** alla volta, sempre chiuso a fine lavoro.
 - Nessun processo in background dimenticato: lo chiude chi lo apre.
 - Prima di qualsiasi lavoro pesante si controlla `uptime`: se il load supera **16** si aspetta.
 - Niente clone o build duplicati: ognuno lavora solo nella propria cartella in `/tmp`.
 - I ruoli senza una issue attiva restano fermi finché il Producer non li riattiva.
+- Quando un ruolo si ferma, ferma solo i propri processi e subagenti e non manda **MAI** stop agli altri agenti: gli stop agli altri li danno solo DevOn o il Producer.
 
 ## Ruoli e responsabilità
 Ogni ruolo lavora solo sulle issue con la propria etichetta `ruolo:*`, sempre con **ramo + PR + `Closes #N`** (o `Refs #N` se parziale). Nessuno pusha su `main`.
@@ -107,7 +108,7 @@ Ogni ruolo lavora solo sulle issue con la propria etichetta `ruolo:*`, sempre co
 | **Game Designer** (`ruolo:design`) | Regole, economia, onboarding, dati di design | Lavoro fuori dalle issue `ruolo:design` |
 
 ## 10. Da dove iniziare (nuovo agente)
-1. Leggi questo file, poi `00_BIBBIA.md` e `11_CAP1_COMPLETO.md` in questo repo (B00RR/ultimo-miglio; il repo docs è archiviato, sola lettura).
+1. Leggi questo file, poi `docs/design/11_CAP1_COMPLETO.md` in questo repo. `00_BIBBIA.md` è ancora da migrare dal repo archiviato B00RR/ultimo-miglio-docs (sola lettura).
 2. Guarda le issue aperte: `gh issue list -R B00RR/ultimo-miglio` e scegli quelle del tuo ruolo con `priorita:alta`.
 3. Clona in una cartella tua, crea il ramo, lavora, lancia i test, apri la PR.
 4. Rispetta i vincoli della sezione 2 (italiano, WebGL, niente video, asset liberi adattati).
@@ -128,7 +129,9 @@ Ogni ruolo lavora solo sulle issue con la propria etichetta `ruolo:*`, sempre co
 
 Voci più recenti in alto. Formato: `AAAA-MM-GG HH:MM` (Europe/Rome) — [commit] — descrizione.
 
+- 2026-10-16 11:50 — Producer — aggiornate *Regole del computer*: stop solo ai propri processi/subagenti (mai agli altri; stop agli altri solo DevOn/Producer); da PR #145 portati runner self-hosted spento, soglia load 16 e Unity anche in batchmode; corretto §10.1 (`docs/design/11_CAP1_COMPLETO.md`; `00_BIBBIA.md` ancora da migrare).
 - 2026-10-16 11:48 — Regole del computer decise da DevOn su richiesta di Lorenzo (carico box 158/8 core); repo docs archiviato.
+- 2026-10-16 11:47 — Code Reviewer — [d039bd8](https://github.com/B00RR/ultimo-miglio/commit/d039bd8aaa9dfe52606eca05ccaae874dace65ea) — unita in squash la [PR #87](https://github.com/B00RR/ultimo-miglio/pull/87) (fix(#59): NONNO non va più in retromarcia + test PlayMode verso di marcia). Job `test` verde. Refs #59.
 - 2026-10-16 11:29 — Code Reviewer — [2f2f61f](https://github.com/B00RR/ultimo-miglio/commit/2f2f61f2d5d4946d01c8b7f65fc192d715cc0e51) — unita in squash la [PR #85](https://github.com/B00RR/ultimo-miglio/pull/85) (clienti v03-uv: rider cappello limone, 3 toni pelle; Ada già su main via #93). Job `test` verde. Refs #2.
 - 2026-10-16 11:29 — Code Reviewer — [8ed4422](https://github.com/B00RR/ultimo-miglio/commit/8ed4422972dd7c6d3a80a45769034ec6b6c3d270) — unita in squash la [PR #135](https://github.com/B00RR/ultimo-miglio/pull/135) (Zaino 8 = 3.000 LN; combo HUD solo +N). Job `test` verde. Closes #134.
 - 2026-10-16 11:29 — Code Reviewer — [3a3864c](https://github.com/B00RR/ultimo-miglio/commit/3a3864c134075e713eef85346639d11b7b581e12) — unita in squash la [PR #113](https://github.com/B00RR/ultimo-miglio/pull/113) (testi HUD minimo cap. 1 / rinviati_cap2). Job `test` verde. Closes #105.
