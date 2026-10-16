@@ -40,15 +40,15 @@ Principi: si impara camminando; una riga per passo; nessun pulsante, a parte il 
 | 8 | Due clienti in coda, numero combo sopra il Bancone | combo ≥ x1,2 | `onb.combo` | nessuno |
 | 9a | Camera su NONNO che dorme e sul pad, freccia | capire chi è NONNO | `onb.nonno.intro`, `onb.nonno.what` | — |
 | 9b | Pad con barra "LN in tasca / 50" | assumere NONNO | `onb.nonno.cost`, biglietto `unlock_nonno`; se mancano LN `onb.nonno.notEnough`, poi `onb.nonno.ready` | a 20 s: `onb.nonno.reminder` + camera che pulsa sul pad, freccia, pad che rimbalza (ogni 20 s) |
-| 9c | NONNO sveglio che porta pacchi, "+1" sullo scaffale | vedere NONNO al lavoro | `onb.nonno.hired`, `onb.nonno.working` | — |
-| 10 | Telefono che vibra | leggere il messaggio | `onb.civetta.msg1/reply/msg2` | nuova vibrazione |
+| 9c | NONNO sveglio che porta pacchi, "+1" sullo scaffale | vedere NONNO al lavoro | `onb.nonno.hired`, `onb.nonno.working`; poi `onb.nonno.bark` solo come bark ricorrente | — |
+| 10 | Telefono che vibra | leggere il messaggio | `onb.civetta.msg1`, `onb.civetta.reply`, `onb.civetta.msg2` | nuova vibrazione |
 | 11 | Notifica app Ordini | tap su "Mostra la strada" | `onb.orders.special`, `onb.flotta.hint` | badge rosso fisso |
 | 12 | Cassa sul percorso verso la Cassaforte | passarci sopra | moneta +30 LN | — |
-| 13 | Chiamata di Viktor, scheda debito | primo versamento | `onb.viktor.call1/2`, `onb.debt.pedaggioHint` | freccia sulla Cassaforte |
+| 13 | Chiamata di Viktor, scheda debito | primo versamento | `onb.viktor.call1`, `onb.viktor.call2`, `onb.debt.pedaggioHint` | freccia sulla Cassaforte |
 | 14 | Pad APRI MURO tratteggiato | nessuno (obiettivo mostrato) | `onb.wall.goal` | — |
 | 15 | HUD completo | gioco libero | biglietto `fine` | — |
 
-I biglietti di Nonna Ada sono in `onboarding_testi.json` (7, in ordine: move, pickup, shelve, serve, coins, upgrade_zaino, unlock_nonno); le chiavi `onb.*` stanno nello stesso file (`lettere`, `suggerimenti`).
+I biglietti di Nonna Ada sono in `onboarding_testi.json` (7, in ordine: move, pickup, shelve, serve, coins, upgrade_zaino, unlock_nonno); le chiavi `onb.*` stanno nello stesso file (`lettere`, `suggerimenti`). Testi definitivi in `onboarding_testi.json` (PR #62).
 
 ## Ricompense dopo l'onboarding (rev. 16/10, `economy.json` → `rewards`)
 - Traguardi consegne: 100 / 250 / 450 pacchi = +60 / +120 / +200 LN (golden path: 6:03, 12:25, 20:11).
@@ -72,14 +72,6 @@ Problema: NONNO non era chiaro (Lorenzo non aveva capito come assumerlo). Il pas
 - **Conferma:** camera su NONNO che porta il primo pacco, "+1" sullo scaffale, badge "6 pacchi/min" per 4 s.
 - **Fallback:** dopo 20 s senza andare sul pad, promemoria + camera che pulsa sul pad + freccia; si ripete ogni 20 s.
 
-**Nuove chiavi di testo: proposte per il Narrative** (non sono in `onboarding_testi.json`; max 70 caratteri):
-| Chiave | Proposta |
-|---|---|
-| `onb.nonno.intro` | Quello che dorme è NONNO, il robot di casa. |
-| `onb.nonno.what` | NONNO porta i pacchi dagli Arrivi agli scaffali al posto tuo. |
-| `onb.nonno.cost` | Stai sul pad: con 50 LN NONNO torna al lavoro. |
-| `onb.nonno.notEnough` | Ti mancano LN: servi qualche cliente al Bancone. |
-| `onb.nonno.ready` | Hai 50 LN! Torna sul pad di NONNO. |
-| `onb.nonno.reminder` | NONNO aspetta te: sali sul pad vicino agli Arrivi. |
-| `onb.nonno.hired` | NONNO è sveglio! |
-| `onb.nonno.working` | Guarda: i pacchi agli scaffali li porta lui. Tu servi i clienti. |
+**Chiavi di testo NONNO:** `onb.nonno.intro`, `onb.nonno.what`, `onb.nonno.cost`, `onb.nonno.notEnough`, `onb.nonno.ready`, `onb.nonno.reminder`, `onb.nonno.hired`, `onb.nonno.working`, `onb.nonno.bark`. `onb.nonno.hired` si mostra solo alla conferma dell'assunzione (9c); `onb.nonno.bark` è solo il bark ricorrente di NONNO dopo la conferma, mai sovrapposto.
+
+**Testi definitivi in `onboarding_testi.json` (PR #62).** Questo documento riporta solo le chiavi: unica fonte dei testi è quel file.
