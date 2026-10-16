@@ -1,5 +1,6 @@
 <ui:UXML xmlns:ui="UnityEngine.UIElements" editor-extension-mode="False">
     <Style src="project://database/Assets/_Game/UI/USS/DioramaSolare.uss" /><Style src="project://database/Assets/_Game/UI/Tokens.uss" /><Style src="project://database/Assets/_Game/UI/USS/HudV2.uss" />
+    <Style src="project://database/Assets/_Game/UI/USS/LegnoCartone.uss" />
     <ui:VisualElement name="hud-root" class="fill hud--minimal" picking-mode="Ignore">
         <ui:VisualElement name="world-layer" class="layer" picking-mode="Ignore" />
         <ui:VisualElement name="popup-layer" class="layer" picking-mode="Ignore" />
