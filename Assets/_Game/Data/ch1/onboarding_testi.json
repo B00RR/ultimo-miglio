@@ -2,13 +2,34 @@
   "_nota": "Testi definitivi onboarding cap.1. Voce: Nonna Ada, dai suoi biglietti lasciati nel deposito, parla a Nina. Max 70 caratteri.",
   "speaker": "Nonna Ada",
   "steps": [
-    { "id": "muoviti",   "text": "Nina, tesoro, sgranchisci le gambe: joystick o WASD." },
-    { "id": "arrivi",    "text": "Il furgone ha scaricato! Prendi i pacchi agli Arrivi." },
-    { "id": "scaffali",  "text": "Ogni pacco al suo scaffale, per colore. Ordine, sempre!" },
-    { "id": "bancone",   "text": "C'è gente al Bancone. Servila col sorriso, come facevo io." },
-    { "id": "monete",    "text": "Cammina sulle monete: ogni lira conta, credimi." },
-    { "id": "zaino",     "text": "Fermati sul pad ZAINO: porterai più pacchi in un giro." },
-    { "id": "nonno",     "text": "Il vecchio NONNO dorme in magazzino. Sveglialo dal pad!" }
+    {
+      "id": "muoviti",
+      "text": "Nina, tesoro, sgranchisci le gambe: joystick o WASD."
+    },
+    {
+      "id": "arrivi",
+      "text": "Il furgone ha scaricato! Prendi i pacchi agli Arrivi."
+    },
+    {
+      "id": "scaffali",
+      "text": "Ogni pacco al suo scaffale, per colore. Ordine, sempre!"
+    },
+    {
+      "id": "bancone",
+      "text": "C'è gente al Bancone. Servila col sorriso, come facevo io."
+    },
+    {
+      "id": "monete",
+      "text": "Cammina sulle monete: ogni lira conta, credimi."
+    },
+    {
+      "id": "nonno",
+      "text": "Assumi NONNO (10 LN): lui porta i pacchi al posto tuo."
+    },
+    {
+      "id": "zaino",
+      "text": "Poi lo Zaino: più pacchi in un viaggio. Vale ogni lira."
+    }
   ],
   "fine": "Brava la mia Nina. Vela & Figli è in buone mani adesso."
 }

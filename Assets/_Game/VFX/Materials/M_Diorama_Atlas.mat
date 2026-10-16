@@ -31,28 +31,34 @@ Material:
     m_Ints: []
     m_Floats:
     - _Bands: 3
+    - _FloorBaseMix: 1
+    - _GroutDark: 0.1
     - _HeightDark: 0.18
     - _HeightRange: 2.5
-    - _NoiseScale: 0.35
-    - _NoiseStrength: 0.06
+    - _NoiseScale: 0.22
+    - _NoiseStrength: 0.02
     - _OutlineOn: 0
     - _OutlineWidth: 0.012
     - _RampOffset: 0
     - _RampSoftness: 0.06
     - _RimPower: 3.5
     - _RimStrength: 0.2
-    - _ShadowStrength: 0.6
-    - _TileSize: 1
-    - _TileVar: 0.08
+    - _ShadowCool: 0.2
+    - _ShadowSoft: 0.35
+    - _ShadowStrength: 0.72
+    - _TileSize: 3.5
+    - _TileVar: 0.015
     - _TopLight: 0.1
     - _WallAO: 0.3
     - _WallAOHeight: 0.5
     m_Colors:
-    - _BaseColor: {r: 1, g: 1, b: 1, a: 1}
+    - _BaseColor: {r: 0.9529412, g: 0.8901961, b: 0.7647059, a: 1}
     - _EmissionColor: {r: 0, g: 0, b: 0, a: 1}
-    - _FloorTint: {r: 1, g: 0.95, b: 0.9, a: 1}
+    - _FloorTint: {r: 0.9529412, g: 0.8901961, b: 0.7647059, a: 1}
+    - _FloorTintB: {r: 0.9098039, g: 0.827451, b: 0.6745098, a: 1}
+    - _FloorTintC: {r: 0.9137255, g: 0.8235294, b: 0.65882355, a: 1}
     - _OutlineColor: {r: 0.231, g: 0.184, b: 0.165, a: 1}
     - _RimColor: {r: 1, g: 0.957, b: 0.839, a: 1}
-    - _ShadowTint: {r: 0.55, g: 0.5, b: 0.72, a: 1}
+    - _ShadowTint: {r: 0.56078434, g: 0.47843137, b: 0.4627451, a: 1}
   m_BuildTextureStacks: []
   m_AllowLocking: 1
