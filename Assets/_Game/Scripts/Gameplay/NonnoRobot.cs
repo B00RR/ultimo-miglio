@@ -104,7 +104,11 @@ namespace UltimoMiglio.Gameplay
                 var tn = c.GetType().Name;
                 if (tn != "NavMeshAgent") continue;
                 if (c is Behaviour b) b.enabled = false;
-                Destroy(c);
+                #if UNITY_EDITOR
+                Object.DestroyImmediate(c);
+                #else
+                Object.Destroy(c);
+                #endif
             }
         }
         public static void StripAllNavMeshAgentsInScene()
@@ -115,7 +119,11 @@ namespace UltimoMiglio.Gameplay
                 if (c == null) continue;
                 if (c.GetType().Name != "NavMeshAgent") continue;
                 if (c is Behaviour b) b.enabled = false;
+                #if UNITY_EDITOR
+                Object.DestroyImmediate(c);
+                #else
                 Object.Destroy(c);
+                #endif
             }
         }
 
