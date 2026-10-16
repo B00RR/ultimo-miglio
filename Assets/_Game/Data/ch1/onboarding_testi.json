@@ -61,6 +61,9 @@
     "onb.viktor.call1": "Signora Vela. Viktor Sale, OmniFreight.",
     "onb.viktor.call2": "La prima rata scade il Giorno 24. Non ci deluda.",
     "onb.debt.pedaggioHint": "Salti la scadenza? OmniFreight prende il 15% di ogni moneta",
-    "onb.wall.goal": "Prossimo obiettivo: abbatti il muro"
+    "onb.wall.goal": "Prossimo obiettivo: abbatti il muro",
+    "onb.zaino.notEnough": "Per lo Zaino servono 40 LN. Ancora qualche cliente!",
+    "onb.pads.new": "Pad nuovi! Scarpe per correre, Insegna per clienti più ricchi.",
+    "onb.cassa.tip": "Sulla Cassa c'è una mancia di Nonna Ada: 30 LN. Prendila."
   }
 }
