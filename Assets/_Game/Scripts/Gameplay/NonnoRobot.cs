@@ -55,8 +55,14 @@ namespace UltimoMiglio.Gameplay
             if (!hired) { State = WorkState.Idle; return; }
             if (!_announced) { _announced = true; Happy(); AudioManager.I?.Play(AudioManager.Sfx.NonnoStart); State = WorkState.Idle; }
 
-            _selfServeAcc += (float)(eco.NonnoSelfServicePpm / 60.0) * Time.deltaTime;
-            if (_selfServeAcc >= 1f && Queue.Waiting > 1) { _selfServeAcc -= 1f; var c = Queue.Head; if (Bancone.InAttesa(c)) Bancone.Serve(c); }
+            // #188: banco self-service = 1 pacco venduto per cliente. Prima: (1) l'accumulatore cresceva senza limite a coda vuota e,
+            // al ritorno dei clienti, NONNO ne serviva uno per frame; (2) la vendita non consumava nessun pacco (monete senza consegna).
+            _selfServeAcc = Mathf.Min(1f, _selfServeAcc + (float)(eco.NonnoSelfServicePpm / 60.0) * Time.deltaTime);
+            if (_selfServeAcc >= 1f && Queue.Waiting > 1)
+            {
+                var c = Queue.Head;
+                if (Bancone.InAttesa(c) && TakeFromShelf()) { _selfServeAcc = 0f; Bancone.Serve(c); }
+            }
 
             float perParcel = 60f / Mathf.Max(0.1f, (float)eco.NonnoRestockPpm);
             // Cap per-parcel so a full CarryMax never exceeds LoadTimeout under normal ppm
@@ -123,6 +129,14 @@ namespace UltimoMiglio.Gameplay
                     if (_carry <= 0) State = WorkState.Idle;
                     break;
             }
+        }
+
+        /// <summary>#188: il pacco venduto da NONNO esce da uno scaffale (quello più pieno); niente pacco = niente vendita.</summary>
+        bool TakeFromShelf()
+        {
+            Shelf best = null;
+            foreach (var s in Shelves) if (s && s.Count > 0 && (best == null || s.Count > best.Count)) best = s;
+            return best != null && best.Take();
         }
 
         Shelf Pick()
