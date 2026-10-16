@@ -1,15 +1,22 @@
-/* Cartellino pad compatto (issue #38). Max ~140 dp. Visibile solo sul pad. */
-.pad-tag { align-items: center; padding: 3px 8px; border-radius: 10px; border-width: 2px; translate: -50% -100%; position: absolute; max-width: 140px; max-height: 56px; overflow: hidden; }
+/* Cartellino pad (#186): insegna di noce, testo Fredoka, prezzo Baloo 2. Max ~140 dp. */
+.pad-tag { align-items: center; padding: 3px 8px 5px; border-radius: 8px; border-width: 2px; border-bottom-width: 3px; border-color: #3B2A20;
+    background-color: #7A4A2E; background-image: url("project://database/Assets/_Game/UI/Textures/tex_insegna_noce.png");
+    -unity-background-scale-mode: stretch-to-fill;
+    translate: -50% -100%; position: absolute; max-width: 140px; max-height: 56px; overflow: hidden; }
 .pad-tag__row { flex-direction: row; align-items: center; }
 .pad-tag__icon { width: 16px; height: 16px; margin-right: 4px; -unity-background-scale-mode: scale-to-fit; }
-.pad-tag__label { font-size: 12px; -unity-font-definition: url("project://database/Assets/_Game/UI/Fonts/Fredoka-SemiBold.ttf"); -unity-font-style: normal; margin: 0; padding: 0; white-space: nowrap; text-overflow: ellipsis; overflow: hidden; max-width: 100px; }
-.pad-tag__price { font-size: 14px; -unity-font-definition: url("project://database/Assets/_Game/UI/Fonts/Fredoka-Bold.ttf"); -unity-font-style: normal; margin: 0; padding: 0; white-space: nowrap; }
-.pad-tag--pacco { background-color: #3E5A61; border-color: #5E7F86; }
-.pad-tag--pacco .pad-tag__label, .pad-tag--pacco .pad-tag__price { color: #FFFFFF; }
+.pad-tag__label { font-size: 12px; color: #F3E3C3; -unity-font-definition: url("project://database/Assets/_Game/UI/Fonts/Fredoka-Medium_SDF.asset"); -unity-font-style: normal;
+    -unity-text-outline-width: 1px; -unity-text-outline-color: #3B2A20; text-shadow: 0 1px 0 #9E7873;
+    margin: 0; padding: 0; white-space: nowrap; text-overflow: ellipsis; overflow: hidden; max-width: 100px; }
+.pad-tag__price { font-size: 16px; color: #F3E3C3; -unity-font-definition: url("project://database/Assets/_Game/UI/Fonts/Baloo2-Bold_SDF.asset"); -unity-font-style: normal;
+    -unity-text-outline-width: 1px; -unity-text-outline-color: #3B2A20; text-shadow: 0 1px 0 #9E7873;
+    margin: 0; padding: 0; white-space: nowrap; }
+.pad-tag--pacco { background-color: #7A4A2E; border-color: #3B2A20; }
+.pad-tag--pacco .pad-tag__label, .pad-tag--pacco .pad-tag__price { color: #F3E3C3; }
 .pad-tag--pacco .pad-tag__icon { background-image: url("project://database/Assets/_Game/UI/Icons/ic_box_cream.png"); }
-.pad-tag--moneta { background-color: #F4C430; border-color: #3B2A20; }
-.pad-tag--moneta .pad-tag__label, .pad-tag--moneta .pad-tag__price { color: #3B2A20; }
-.pad-tag--moneta .pad-tag__icon { background-image: url("project://database/Assets/_Game/UI/Icons/ic_coin.png"); -unity-background-image-tint-color: #3B2A20; }
-.pad-tag--cliente { background-color: #8FC9A8; border-color: #3B2A20; }
-.pad-tag--cliente .pad-tag__label, .pad-tag--cliente .pad-tag__price { color: #3B2A20; }
+.pad-tag--moneta { background-color: #7A4A2E; border-color: #3B2A20; }
+.pad-tag--moneta .pad-tag__label, .pad-tag--moneta .pad-tag__price { color: #F3E3C3; }
+.pad-tag--moneta .pad-tag__icon { background-image: url("project://database/Assets/_Game/UI/Icons/ic_coin.png"); -unity-background-image-tint-color: #F2B53A; }
+.pad-tag--cliente { background-color: #7A4A2E; border-color: #3B2A20; }
+.pad-tag--cliente .pad-tag__label, .pad-tag--cliente .pad-tag__price { color: #F3E3C3; }
 .pad-tag--cliente .pad-tag__icon { background-image: url("project://database/Assets/_Game/UI/Icons/ic_customer_cream.png"); }

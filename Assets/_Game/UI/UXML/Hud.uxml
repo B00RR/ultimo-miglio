@@ -3,6 +3,7 @@
     <Style src="project://database/Assets/_Game/UI/USS/LegnoCartone.uss" />
     <Style src="project://database/Assets/_Game/UI/USS/TutorialHud.uss" />
     <Style src="project://database/Assets/_Game/UI/USS/Onboarding.uss" />
+    <Style src="project://database/Assets/_Game/UI/USS/Etichette.uss" />
     <ui:VisualElement name="hud-root" class="fill hud--minimal" picking-mode="Ignore">
         <ui:VisualElement name="world-layer" class="layer" picking-mode="Ignore" />
         <ui:VisualElement name="popup-layer" class="layer" picking-mode="Ignore" />

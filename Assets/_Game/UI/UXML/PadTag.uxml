@@ -1,4 +1,4 @@
-<ui:UXML xmlns:ui="UnityEngine.UIElements"><Style src="project://database/Assets/_Game/UI/Tokens.uss" /><Style src="project://database/Assets/_Game/UI/USS/PadTag.uss" />
+<ui:UXML xmlns:ui="UnityEngine.UIElements"><Style src="project://database/Assets/_Game/UI/Tokens.uss" /><Style src="project://database/Assets/_Game/UI/USS/PadTag.uss" /><Style src="project://database/Assets/_Game/UI/USS/Etichette.uss" />
     <ui:VisualElement class="pad-tag pad-tag--pacco" picking-mode="Ignore">
         <ui:VisualElement class="pad-tag__row" picking-mode="Ignore">
             <ui:VisualElement name="tag-icon" class="pad-tag__icon" picking-mode="Ignore" />

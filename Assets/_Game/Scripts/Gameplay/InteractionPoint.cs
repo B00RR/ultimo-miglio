@@ -6,13 +6,14 @@ namespace UltimoMiglio.Gameplay
 {
     public enum PoiKind { Prendi, Consegna, Acquisto }
 
-    /// <summary>My Little Universe-style interaction point: raised rounded ground pad with a thick ink rim that pulses
-    /// (scale + emission), coloured by kind (prendi = blu, consegna = verde, acquisto = giallo), plus a floating billboard
-    /// chip (icon + max 2 words, Fredoka) drawn in the HUD world layer. The current tutorial target gets a bigger,
-    /// brighter pad and a vertical beacon; the others stay calm. Purely visual: gameplay stays in ProximityZone.</summary>
+    /// <summary>Punto di interazione: disco a terra (prendi terracotta, consegna menta, acquisto sole) e, sul pad
+    /// di acquisto, cartellino a insegna di noce. Il prezzo («60 LN») usa il Font Asset TextCore Baloo 2
+    /// (Etichette.uss): niente pillola gialla piatta e niente font dinamico. Solo visuale: il gioco resta in ProximityZone.</summary>
     public sealed class InteractionPoint : MonoBehaviour
     {
-        public PoiKind Kind; public string Label; public Texture2D Icon; public Font LabelFont;
+        public PoiKind Kind; public string Label; public Texture2D Icon;
+        /// <summary>Non disegna più il cartellino (#186): il Font Asset è in Etichette.uss. Il campo resta per le scene già salvate.</summary>
+        public Font LabelFont;
         public float Radius = 1.1f; public bool HasCard; public UpgradePad Pad; public UltimoMiglio.VFX.UM_PadFillRing Ring; public UltimoMiglio.VFX.UM_PadIcon PadIcon;
         // #69 (guida §2: niente blu/grigi freddi): Prendi = terracotta #C8633B, Consegna = menta #8FC9A8, Acquisto/upgrade = giallo sole #F4C430 (Concept, #69); bordo outline #3B2F2A.
         // Il nome "Blu" resta per compatibilità API, ma ora vale terracotta.
@@ -101,25 +102,20 @@ namespace UltimoMiglio.Gameplay
             _cam = Camera.main;
             var layer = _hud.Root.Q("world-layer") ?? _hud.Root;
             _chip = new VisualElement { name = "poi-chip", pickingMode = PickingMode.Ignore };
-            // Colonna: freccia ▼ terracotta SOPRA la pillola (mai sovrapposta al prezzo), centrata sullo stesso asse; ancora = fondo pillola
+            _chip.AddToClassList("poi-chip"); _chip.AddToClassList("insegna-noce");
+            // Colonna: freccia ▼ terracotta SOPRA l'insegna (mai sul prezzo), stesso asse; ancora = fondo insegna
             _chipCol = new VisualElement { name = "poi-chip-col", pickingMode = PickingMode.Ignore }; _chipCol.AddToClassList("poi-chip-col");
             _chevron = new VisualElement { name = "poi-chevron", pickingMode = PickingMode.Ignore }; _chevron.AddToClassList("poi-chevron");
-            var s = _chip.style; s.flexDirection = FlexDirection.Row; s.alignItems = Align.Center; s.alignSelf = Align.Center;
-            s.paddingLeft = 8; s.paddingRight = 12; s.paddingTop = 4; s.paddingBottom = 4;
-            s.backgroundColor = Kind == PoiKind.Acquisto ? Giallo : new Color(1f, 0.976f, 0.933f);
-            s.borderTopLeftRadius = s.borderTopRightRadius = s.borderBottomLeftRadius = s.borderBottomRightRadius = 999;
-            s.borderLeftWidth = s.borderRightWidth = s.borderTopWidth = s.borderBottomWidth = 3; // bordo 3–4 px (GUIDA §10)
-            s.borderLeftColor = s.borderRightColor = s.borderTopColor = s.borderBottomColor = Ink;
-            var ic = new VisualElement { pickingMode = PickingMode.Ignore };
-            var i = ic.style; i.width = 28; i.height = 28; i.borderTopLeftRadius = i.borderTopRightRadius = i.borderBottomLeftRadius = i.borderBottomRightRadius = 36;
-            i.backgroundColor = Kind == PoiKind.Acquisto ? Ink : _col; i.alignItems = Align.Center; i.justifyContent = Justify.Center; i.marginRight = 12;
-            var img = new VisualElement { pickingMode = PickingMode.Ignore }; img.style.width = 18; img.style.height = 18;
-            if (Icon) { img.style.backgroundImage = Icon; img.style.unityBackgroundImageTintColor = new Color(1f, 0.976f, 0.933f); }
-            ic.Add(img);
+            if (Icon)
+            {
+                var img = new VisualElement { pickingMode = PickingMode.Ignore };
+                img.AddToClassList("poi-chip__icon");
+                img.style.backgroundImage = Icon;
+                _chip.Add(img);
+            }
             _text = new Label(Label) { pickingMode = PickingMode.Ignore };
-            var t = _text.style; t.fontSize = Kind == PoiKind.Acquisto ? 18 : 16; t.color = Ink; t.unityFontStyleAndWeight = FontStyle.Bold; t.whiteSpace = WhiteSpace.NoWrap;
-            if (LabelFont) t.unityFontDefinition = FontDefinition.FromFont(LabelFont);
-            _chip.Add(ic); _chip.Add(_text);
+            _text.AddToClassList("poi-chip__valore");
+            _chip.Add(_text);
             // #94: barra LN "32/50" fra la freccia e la pillola: freccia ▼ → barra → pillola, stesso asse
             _bar = new VisualElement { name = "poi-bar", pickingMode = PickingMode.Ignore }; _bar.AddToClassList("poi-bar");
             var track = new VisualElement { pickingMode = PickingMode.Ignore }; track.AddToClassList("poi-bar__track");
@@ -158,7 +154,7 @@ namespace UltimoMiglio.Gameplay
                 var eco = GameRoot.I.Eco; double cost = eco.Cost(Pad.Kind), paid = eco.S.PadPaid[(int)Pad.Kind];
                 if (!double.IsInfinity(cost))
                 {
-                    _text.text = Mathf.CeilToInt((float)Mathf.Max(0, (float)(cost - paid))) + " LN"; // pillola = quanto manca
+                    _text.text = Mathf.CeilToInt((float)Mathf.Max(0, (float)(cost - paid))) + " LN"; // insegna = quanto manca
                     int pd = Mathf.FloorToInt((float)paid), c = Mathf.CeilToInt((float)cost);
                     _barLabel.text = pd + "/" + c; _barFill.style.width = Length.Percent(c > 0 ? Mathf.Clamp01((float)(paid / cost)) * 100f : 0f);
                     var n = GameRoot.I.Nina; bool close = n && (n.transform.position - transform.position).sqrMagnitude < 9f;
@@ -193,7 +189,7 @@ namespace UltimoMiglio.Gameplay
             _chipCol.EnableInClassList("poi-chip-col--flip", flip);
             float panelW = _chip.panel.visualTree.worldBound.width;
             if (panelW < 1f) panelW = Screen.width;
-            float halfChip = 70f; // pillola ~140px, anchor al centro (translate -50%)
+            float halfChip = 70f; // insegna ~140 px, ancora al centro (translate -50%)
             const float edgePad = 10f;
             if (p.x < halfChip + edgePad) p.x = halfChip + edgePad;
             if (p.x > panelW - halfChip - edgePad) p.x = panelW - halfChip - edgePad;

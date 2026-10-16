@@ -211,11 +211,11 @@ namespace UltimoMiglio.EditorTools
             // --- punti di interazione stile My Little Universe (pad a terra + chip billboard)
             {
                 Texture2D I(string n) => AssetDatabase.LoadAssetAtPath<Texture2D>($"Assets/_Game/UI/Icons/{n}.png");
-                var font = AssetDatabase.LoadAssetAtPath<Font>("Assets/_Game/UI/Fonts/Fredoka-Bold.ttf");
                 var ringPf = AssetDatabase.LoadAssetAtPath<GameObject>("Assets/_Game/VFX/Prefabs/fx_pad_fill_ring.prefab");
                 foreach (var z in Object.FindObjectsByType<ProximityZone>(FindObjectsSortMode.None))
                 {
-                    var ip = z.gameObject.AddComponent<InteractionPoint>(); ip.LabelFont = font;
+                    // #186: il prezzo sta sull'insegna (Font Asset in Etichette.uss), non su un Font dinamico.
+                    var ip = z.gameObject.AddComponent<InteractionPoint>();
                     var bc = z.GetComponent<BoxCollider>(); ip.Radius = bc ? Mathf.Clamp(Mathf.Min(bc.size.x, bc.size.z) * 0.5f, 0.45f, 1.2f) : 0.9f;
                     switch (z)
                     {

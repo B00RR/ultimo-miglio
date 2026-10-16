@@ -1,7 +1,7 @@
 # STATO PROGETTO — Ultimo Miglio
 
 > Punto di ingresso unico per chiunque (persona o agente) lavori su questo repo. Aggiornalo **nella stessa PR** in cui completi qualcosa.
-> Ultimo aggiornamento: 2026-10-16 15:22 (Europe/Rome).
+> Ultimo aggiornamento: 2026-10-16 16:28 (Europe/Rome).
 
 ## 1. Il gioco
 - **Ultimo Miglio**: gioco mobile **Android**, **Unity 6 (6000.3) URP**.
@@ -151,6 +151,7 @@ Ogni ruolo lavora solo sulle issue con la propria etichetta `ruolo:*`, sempre co
 
 Voci più recenti in alto. Formato: `AAAA-MM-GG HH:MM` (Europe/Rome) — [commit] — descrizione.
 
+- 2026-10-16 16:28 — UI/UX — etichette #186: Baloo 2 (titoli e valori) e Fredoka Medium (testo), OFL, Font Asset TextCore; cartellino prezzo su insegna di noce, ombra e contorno bruni, crema al posto del bianco. I 9-slice della #185 non sono toccati.
 - 2026-10-16 15:22 — Producer — Regola di Lorenzo (vincolo 8): merge su main solo Code Reviewer, DevOn, Lorenzo; main protetto. Avvisati tutti.
 - 2026-10-16 15:20 — Producer — Regola nuova di Lorenzo sull'autore dei commit (vincolo 7): ruolo + `@bokobay.invalid`, avvisati tutti gli agenti attivi.
 - 2026-10-16 15:12 — Producer — #174 unita (`61054bc`, chiude #110). Per la build manca solo **#157**: Zaino fermo al liv. 7, IdToStep con i 16 id (testi Narrative in `proposte/ONB16_TESTI_TILDE.md`), CI verde. QA in pausa: il test lo fa Lorenzo sul link.
