@@ -12,6 +12,10 @@ namespace UltimoMiglio.Gameplay
     {
         public static string Result; public static readonly System.Collections.Generic.List<int> TutSteps = new(); public float TimeoutSec = 900f; public int Teleports;
         NinaController N; EconomyCore E;
+        static System.Action<TutorialManager.Step> _onStep;
+        /// <summary>Scollega il contatore dei passi da TutorialManager.StepChanged (TearDown dei test, OnDestroy).</summary>
+        public static void Stacca() { if (_onStep != null) TutorialManager.StepChanged -= _onStep; _onStep = null; }
+        void OnDestroy() => Stacca();
 
 #if !UNITY_EDITOR
         [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.AfterSceneLoad)]
@@ -37,7 +41,7 @@ namespace UltimoMiglio.Gameplay
             N = GameRoot.I.Nina; E = GameRoot.I.Eco;
             if (E.S.Zaino > 0) { Log("save already has Zaino>0: resetting test target to next level"); }
             int zainoStart = E.S.Zaino;
-            TutSteps.Clear(); if (TutorialManager.I) TutSteps.Add((int)TutorialManager.I.Current); TutorialManager.StepChanged += s => { TutSteps.Add((int)s); Log("TUTORIAL -> " + s); };
+            TutSteps.Clear(); if (TutorialManager.I) TutSteps.Add((int)TutorialManager.I.Current); _onStep = s => { TutSteps.Add((int)s); Log("TUTORIAL -> " + s); }; TutorialManager.StepChanged += _onStep;
             Log("START");
             var arr = FindAnyObjectByType<ArrivalsZone>(); var shelves = FindObjectsByType<Shelf>(FindObjectsSortMode.None).OrderBy(s => s.Color).ToArray();
             var picks = FindObjectsByType<ShelfPickup>(FindObjectsSortMode.None); var ban = FindAnyObjectByType<Bancone>();
@@ -79,7 +83,8 @@ namespace UltimoMiglio.Gameplay
                     var st = TutorialManager.I.Current;
                     if (st == TutorialManager.Step.PadNuovi)
                     {
-                        var np = pads.Where(p => (p.Kind == UpgradeKind.Scarpe || p.Kind == UpgradeKind.Insegna) && p.gameObject.activeInHierarchy && !double.IsInfinity(E.Cost(p.Kind)))
+                        // pad cercati di nuovo: con il tutorial graduale Scarpe/Insegna compaiono solo qui (FindObjectsByType salta gli inattivi)
+                        var np = FindObjectsByType<UpgradePad>(FindObjectsSortMode.None).Where(p => (p.Kind == UpgradeKind.Scarpe || p.Kind == UpgradeKind.Insegna) && p.gameObject.activeInHierarchy && !double.IsInfinity(E.Cost(p.Kind)))
                                      .OrderBy(p => E.Cost(p.Kind)).FirstOrDefault();
                         if (np) { if (E.S.Wallet < E.Cost(np.Kind)) { E.S.Wallet = E.Cost(np.Kind); Log("test: LN per " + np.Kind); } yield return Go(np.transform.position, np.Kind + " pad"); yield return Wait(8f); continue; }
                     }

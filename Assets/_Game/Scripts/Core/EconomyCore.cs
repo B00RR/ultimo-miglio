@@ -16,6 +16,7 @@ namespace UltimoMiglio.Core
         public double DebtPaid;          // LN versed on current tranche (60%)
         public double ChapterEarnedActive, ChapterEarnedOffline;
         public int Zaino, Scarpe, Insegna, NonnoLevel = -1; // -1 = not hired
+        public double SpentLn;           // #121: LN spese in totale nei pad (esclusi i versamenti alla Cassaforte)
         public double[] PadPaid = new double[5]; // installment progress per UpgradeKind (saved)
         public double Combo = 1.0; public double LastServeTime = -999;
         public double ActiveSec;         // active (foreground) seconds this chapter
@@ -197,7 +198,7 @@ namespace UltimoMiglio.Core
             double T = Cfg.PadFillMaxSec, dt = Cfg.ZoneTickSec;
             double frac = Math.Max(dt / T, (2 * dwellSec * dt) / (T * T));
             double pay = Math.Min(Math.Min(remaining, S.Wallet), Math.Max(1, Math.Ceiling(cost * frac)));
-            S.Wallet -= pay; S.PadPaid[i] += pay;
+            S.Wallet -= pay; S.PadPaid[i] += pay; S.SpentLn += pay; // #121: LN spese in pad/assunzioni (log [ONB] spent)
             Emit("pad_progress", $"\"id\":\"{k}\",\"ln\":{F(pay)},\"paid\":{F(S.PadPaid[i])},\"cost\":{F(cost)}");
             if (S.PadPaid[i] + 1e-9 < cost) return false;
             S.PadPaid[i] = 0; Apply(k);

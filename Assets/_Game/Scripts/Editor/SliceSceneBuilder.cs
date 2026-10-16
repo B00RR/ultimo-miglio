@@ -157,6 +157,9 @@ namespace UltimoMiglio.EditorTools
             // --- pads (near the Cassa, 01 §3)
             var padRow = banPos + new Vector3(-1.5f, 0, 4.5f);
             Pad("Pad_Zaino", UpgradeKind.Zaino, padRow, 0, props);
+            // #101: passo padNuovi (onboarding.json: gate padPurchasedAny su scarpe/insegna). Senza questi pad il tutorial si bloccava al passo 11.
+            Pad("Pad_Scarpe", UpgradeKind.Scarpe, padRow + new Vector3(1.8f, 0, 0), 0, props);
+            Pad("Pad_Insegna", UpgradeKind.Insegna, padRow + new Vector3(3.6f, 0, 0), 0, props);
             Pad("Pad_AssumiNonno", UpgradeKind.NonnoHire, arrPos + new Vector3(3.2f, 0, 0.5f), 0, props); // onboarding: last step
 
             // --- NONNO
