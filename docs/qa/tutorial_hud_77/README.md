@@ -7,23 +7,23 @@ Linee fucsia = fasce libere della GUIDA §10 (350 px alto / 500 px basso su 1170
 
 Script: `anteprima/shoot.js` (Playwright, viewport 360×800, 390×844, 412×915, DPR 2). Misure in `anteprima/risultati.json`.
 
-Prima (build web pubblicata, 360×800): `prima_build_web_360.jpg` — nessun fumetto di Ada a schermo, obiettivo a tutta larghezza.
+Prima (build web pubblicata, 360×800): `prima_build_web_360.jpg` — nessun fumetto di Tilde a schermo, obiettivo a tutta larghezza.
 
 ## Casi
 | caso | contenuto |
 |---|---|
-| move | passo 1, testo Ada + suggerimento `onb.move.card` |
+| move | passo 1, testo Tilde + suggerimento `onb.move.card` |
 | shelve | passo 3, suggerimento più lungo `onb.deposit.hint` (50 caratteri) |
-| nonno | pad acquisto obiettivo: freccia ▼ sopra la pillola "50 LN" (costo reale NONNO, `robots.json` `hireCostLn`; LN in tasca 50, come nel golden path all'assunzione a 2:10) |
+| nonno | pad acquisto obiettivo: freccia ▼ sopra la pillola "50 LN" (costo reale OLDO, `robots.json` `hireCostLn`; LN in tasca 50, come nel golden path all'assunzione a 2:10) |
 | nonno_alto | pad in alto sullo schermo: colonna ribaltata sotto il pad, freccia ▲ |
 | fine70 | testo più lungo (`fine`, 62 caratteri) |
 
 ## Checklist sovrapposizioni (esito anteprima)
 | controllo | 360×800 | 390×844 | 412×915 |
 |---|---|---|---|
-| HUD alto (LN/giorno, obiettivo, ingranaggio, Ada) dentro la fascia alta | 103 ≤ 111 dp ✅ | 103 ≤ 117 dp ✅ | 103 ≤ 126 dp ✅ |
-| Fumetto Ada: righe / ellissi | 2 righe, nessun taglio ✅ | 2 righe ✅ | 1–2 righe ✅ |
-| Ada × obiettivo × pillola LN × ingranaggio | nessuna ✅ | nessuna ✅ | nessuna ✅ |
+| HUD alto (LN/giorno, obiettivo, ingranaggio, Tilde) dentro la fascia alta | 103 ≤ 111 dp ✅ | 103 ≤ 117 dp ✅ | 103 ≤ 126 dp ✅ |
+| Fumetto Tilde: righe / ellissi | 2 righe, nessun taglio ✅ | 2 righe ✅ | 1–2 righe ✅ |
+| Tilde × obiettivo × pillola LN × ingranaggio | nessuna ✅ | nessuna ✅ | nessuna ✅ |
 | Suggerimento/CTA dentro la fascia bassa | inizia a 642 = 642 ✅ | 686 ≥ 677 ✅ | 757 ≥ 734 ✅ |
 | Suggerimento × joystick (a riposo, 12–124 dp dal fondo) | nessuna ✅ | nessuna ✅ | nessuna ✅ |
 | Suggerimento senza ellissi | ✅ (13 dp) | ✅ | ✅ |
@@ -32,4 +32,4 @@ Prima (build web pubblicata, 360×800): `prima_build_web_360.jpg` — nessun fum
 | Joystick flottante sopra il suggerimento | il suggerimento si nasconde (codice) — da verificare in Unity | | |
 
 
-**Numeri reali (#142):** pad NONNO 50 LN (#75 ha tolto i 15 LN temporanei); LN in tasca 0 nei passi iniziali (nessun portafoglio di partenza), 50 nei casi `nonno`; giorno G1. Anteprime rigenerate il 16/10/2026.
+**Numeri reali (#142):** pad OLDO 50 LN (#75 ha tolto i 15 LN temporanei); LN in tasca 0 nei passi iniziali (nessun portafoglio di partenza), 50 nei casi `nonno`; giorno G1. Anteprime rigenerate il 16/10/2026.

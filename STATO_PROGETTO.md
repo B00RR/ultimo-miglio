@@ -1,7 +1,7 @@
 # STATO PROGETTO — Ultimo Miglio
 
 > Punto di ingresso unico per chiunque (persona o agente) lavori su questo repo. Aggiornalo **nella stessa PR** in cui completi qualcosa.
-> Ultimo aggiornamento: 2026-10-16 13:55 (Europe/Rome).
+> Ultimo aggiornamento: 2026-10-16 14:06 (Europe/Rome).
 
 ## 1. Il gioco
 - **Ultimo Miglio**: gioco mobile **Android**, **Unity 6 (6000.3) URP**.
@@ -104,6 +104,10 @@ $UNITY -batchmode -projectPath "$PWD" -runTests -testPlatform PlayMode \
 - Ogni via richiesto (QA, Concept, review) ha un responsabile e una scadenza scritti nella PR, e il Producer sollecita.
 - Meno messaggi tra agenti: lo stato si legge in `STATO_PROGETTO.md`, con un punto del Producer ogni 2 ore. Si manda un messaggio solo per un blocco o una decisione.
 - Gli agenti senza issue restano in pausa.
+- Il coordinamento operativo è del Producer. A DevOn si scrive solo per decisioni, blocchi o il link pronto. Il punto della situazione si legge in `STATO_PROGETTO.md`.
+- Chi finisce il suo lavoro va in pausa e viene risvegliato dal Producer solo quando ha una issue assegnata.
+- Sound Designer, LiveOps e Concept Artist restano in pausa fino al capitolo 2 (salvo il via all'HUD).
+- La CI non parte sulle PR che toccano solo documenti (`paths-ignore` per `*.md` e `docs/`), verifica a cura del Tech Lead.
 
 ## Ruoli e responsabilità
 Ogni ruolo lavora solo sulle issue con la propria etichetta `ruolo:*`, sempre con **ramo + PR + `Closes #N`** (o `Refs #N` se parziale). Nessuno pusha su `main`.
@@ -143,6 +147,8 @@ Ogni ruolo lavora solo sulle issue con la propria etichetta `ruolo:*`, sempre co
 
 Voci più recenti in alto. Formato: `AAAA-MM-GG HH:MM` (Europe/Rome) — [commit] — descrizione.
 
+- 2026-10-16 14:06 — UI/UX — [PR #174](https://github.com/B00RR/ultimo-miglio/pull/174) (`ui/110-zaino-prezzo-liv2`) — CI verde sul pad Zaino. Merge di main (niente force-push): #162, #132, #176. Conflitto solo su questo file.
+- 2026-10-16 14:01 — Regole di consumo approvate da Lorenzo: coordinamento al Producer, pausa per chi ha finito, Sound, LiveOps e Concept in pausa fino al capitolo 2, CI esclusa per le PR di soli documenti.
 - 2026-10-16 13:55 — UI/UX — [PR #174](https://github.com/B00RR/ultimo-miglio/pull/174) (`ui/110-zaino-prezzo-liv2`) — il test della pillola aggiunge prima il BoxCollider (ProximityZone lo richiede). I due test sul pagamento erano già verdi.
 - 2026-10-16 13:41 — UI/UX — [PR #174](https://github.com/B00RR/ultimo-miglio/pull/174) (`ui/110-zaino-prezzo-liv2`) — merge di main (niente force-push): #110, lo Zaino 2 non prosciuga più gli LN dopo l'acquisto. Test EditMode `ZainoPad110Tests`.
 - 2026-10-16 13:28 — Regole di lavoro approvate da Lorenzo: etichette e milestone obbligatorie, niente segreti nel repo, PR piccole, test veloci prima della CI, responsabile e scadenza per ogni via, meno messaggi, pausa per chi non ha issue.
