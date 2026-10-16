@@ -9,6 +9,9 @@ namespace UltimoMiglio.Gameplay
         public int Priority; public float DwellSec = 0.5f, TickSec = 0.1f;
         public UltimoMiglio.UI.ZoneFillRing Ring;
         static ProximityZone _active;
+        /// <summary>#243 diagnosi: eventi enter/exit/rifiuto delle zone (null = spento, nessuna allocazione).</summary>
+        public static System.Action<string> Trace;
+        static string N(ProximityZone z) => z ? z.name : "null";
         public static ProximityZone Active => _active;
         public bool Occupied => Nina;
         protected NinaController Nina { get; private set; }
@@ -16,13 +19,13 @@ namespace UltimoMiglio.Gameplay
         float _acc; bool _started;
 
         protected virtual void Reset() { GetComponent<Collider>().isTrigger = true; }
-        void OnTriggerEnter(Collider o) { var n = o.GetComponent<NinaController>(); if (n) { Nina = n; Dwell = 0; _acc = 0; _started = false; if (!_active || _active.Priority < Priority) _active = this; } }
-        void OnTriggerExit(Collider o) { if (o.GetComponent<NinaController>()) { Nina = null; if (_active == this) _active = null; OnZoneExit(); } }
+        void OnTriggerEnter(Collider o) { var n = o.GetComponent<NinaController>(); if (n) { Nina = n; Dwell = 0; _acc = 0; _started = false; if (!_active || _active.Priority < Priority) _active = this; Trace?.Invoke($"enter {name} active={N(_active)}"); } }
+        void OnTriggerExit(Collider o) { if (o.GetComponent<NinaController>()) { Nina = null; if (_active == this) _active = null; Trace?.Invoke($"exit {name} active={N(_active)}"); OnZoneExit(); } }
         /// <summary>#104: un collider disattivato (o la zona disabilitata) non manda OnTriggerExit. Senza questo Nina restava
         /// "dentro" il pad di NONNO appena assunto e la _active statica bloccava Arrivi, Scaffali e Bancone fino al reload.</summary>
         protected void ReleaseNina()
         {
-            if (Nina) { Nina = null; OnZoneExit(); }
+            if (Nina) { Nina = null; Trace?.Invoke($"release {name}"); OnZoneExit(); }
             if (_active == this) _active = null;
         }
         protected virtual void OnDisable() { ReleaseNina(); }
@@ -32,7 +35,7 @@ namespace UltimoMiglio.Gameplay
             if (!GameRoot.Ready) return;
             OnIdleUpdate();
             if (!Nina) return;
-            if (_active && _active != this && _active.Nina) return;
+            if (_active && _active != this && _active.Nina) { Trace?.Invoke($"rifiuto {name}: active={N(_active)}"); return; }
             _active = this;
             Dwell += Time.deltaTime;
             if (Dwell < DwellSec) { if (Ring) Ring.SetFill(Dwell / DwellSec); return; }

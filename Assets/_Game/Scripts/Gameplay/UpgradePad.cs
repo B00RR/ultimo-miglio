@@ -48,11 +48,11 @@ namespace UltimoMiglio.Gameplay
         protected override void OnZoneTick(float t)
         {
             var eco = GameRoot.I.Eco;
-            if (_waitExit) return; // #110: livello successivo solo dopo essere usciti e rientrati
-            if (eco.S.Wallet <= 0) { StopLoop(); return; }
+            if (_waitExit) { Trace?.Invoke($"rifiuto {name}: waitExit"); return; } // #110: livello successivo solo dopo essere usciti e rientrati
+            if (eco.S.Wallet <= 0) { Trace?.Invoke($"rifiuto {name}: wallet=0"); StopLoop(); return; }
             double prima = eco.S.Wallet;
             bool done = eco.PadTick(Kind, t);
-            if (!done && eco.S.Wallet == prima) { StopLoop(); return; } // #110: sosta chiusa, non scalare il livello successivo
+            if (!done && eco.S.Wallet == prima) { Trace?.Invoke($"rifiuto {name}: PadTick non paga (cost={eco.Cost(Kind)} paid={eco.S.PadPaid[(int)Kind]})"); StopLoop(); return; } // #110: sosta chiusa, non scalare il livello successivo
             if (!_paying) { _paying = true; AudioManager.I?.StartUpgradeLoop(); }
             if (!_padVis) _padVis = transform.Find("Pad"); if (_padVis) { _pulse = 1f; }
             if (Ring) Ring.SetFill((float)eco.PadFill(Kind));
