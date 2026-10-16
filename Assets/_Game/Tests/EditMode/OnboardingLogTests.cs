@@ -8,14 +8,14 @@ public class OnboardingLogTests
 {
     [Test] public void SpecExamples_MatchRegex()
     {
-        Assert.AreEqual("[ONB] start id=hireNonno n=9 t=130.0 reveals=1", OnbLog.Line("start", "hireNonno", 9, 130, "reveals", 1));
-        Assert.AreEqual("[ONB] gate id=hireNonno n=9 t=131.2 event=nonnoHired dur=1.2", OnbLog.Line("gate", "hireNonno", 9, 131.2, "event", "nonnoHired", "dur", 1.2));
+        Assert.AreEqual("[ONB] start id=hireNonno n=9 t=130.0 reveals=1 ln=211", OnbLog.Line("start", "hireNonno", 9, 130, "reveals", 1, "ln", 211));
+        Assert.AreEqual("[ONB] gate id=hireNonno n=9 t=131.2 event=nonnoHired dur=1.2 ln=121 spent=90", OnbLog.Line("gate", "hireNonno", 9, 131.2, "event", "nonnoHired", "dur", 1.2, "ln", 121, "spent", 90));
         Assert.AreEqual("[ONB] hint id=move n=1 t=36.0 lvl=2 idle=20.0 kind=manoFantasma", OnbLog.Line("hint", "move", 1, 36, "lvl", 2, "idle", 20.0, "kind", "manoFantasma"));
         foreach (var l in new[] {
             OnbLog.Line("softgate", "combo", 7, 140, "idle", 40.0),
-            OnbLog.Line("nolnp", "hireNonno", 9, 129.5, "pad", "assumiNonno", "wallet", 32, "cost", 50),
+            OnbLog.Line("nolnp", "hireNonno", 9, 129.5, "pad", "assumiNonno", "need", 50, "have", 32),
             OnbLog.Line("skip", "nonnoIntro", 8, 120.4, "from", "nonnoIntro"),
-            OnbLog.Line("end", "freePlay", 15, 301, "total", 301.0, "hints", 2, "lvl3", 0) })
+            OnbLog.Line("end", "freePlay", 15, 301, "total", 301.0, "hints", 2, "lvl3", 0, "ln", 40, "spent", 260) })
             Assert.IsTrue(OnbLog.IsValid(l), l);
     }
     [Test] public void DecimalPointAndSpaces_AreSafe()

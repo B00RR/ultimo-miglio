@@ -125,7 +125,7 @@ MonoBehaviour:
           costLn: 1700
         - level: 8
           stackCapacity: 16
-          costLn: 5120
+          costLn: 3000
         - level: 9
           stackCapacity: 18
           costLn: 10240
@@ -146,7 +146,9 @@ MonoBehaviour:
           costLn: 327680
         costNote: '16/10 GD: livelli 5-7 a x1,7 (560/960/1700) invece di x2 per spezzare
           la pianura 8-20 min (proposta LiveOps 1). Dal livello 8 resta la serie
-          x2 originale.'
+          x2 originale. 16/10 GD (issue Zaino 8): livello 8 = 3.000 LN (x1,76, stessa
+          pendenza dei livelli 4-7) invece di 5.120; livello 9+ invariato (10.240).
+          Verificato con econ_sim_v3/long_check.'
       scarpe:
         levels:
         - level: 0
@@ -359,3 +361,252 @@ MonoBehaviour:
       dayDurationSecFromCh6: 300
       calendarDaysPerCycle: 4.2583
       timeAdvancesOnlyWhileActive: 1
+    onboarding:
+      chapter: 1
+      lockedAtStart:
+      - hud.pillolaValute
+      - zona.arrivi
+      - zona.scaffaleTerracotta
+      - zona.altriScaffali
+      - zona.bancone
+      - zona.cassa
+      - zona.cassaforte
+      - pad.zaino
+      - pad.assumiNonno
+      - pad.scarpe
+      - pad.insegna
+      - pad.nonnoUpgrade
+      - pad.apriMuro
+      - robot.nonno.attivo
+      - clienti.normali
+      - clienti.anziano
+      - clienti.frettoloso
+      steps:
+      - id: coldOpen
+        tSec: 0
+        maxSec: 15
+        reveals: []
+        gate:
+          event: coldOpenEnd
+          value: 0
+          pad: 
+          level: 0
+          pads: []
+        textKeys:
+        - onb.cold.letterAda
+        - onb.cold.letterOmni
+      - id: move
+        tSec: 15
+        maxSec: 30
+        reveals:
+        - input.joystick
+        gate:
+          event: playerMoved
+          value: 1.5
+          pad: 
+          level: 0
+          pads: []
+        textKeys:
+        - onb.move.card
+        - step:move
+      - id: pickUp
+        tSec: 30
+        maxSec: 45
+        reveals:
+        - zona.arrivi
+        gate:
+          event: parcelPicked
+          value: 1
+          pad: 
+          level: 0
+          pads: []
+        textKeys:
+        - step:pickup
+        - onb.pick.max
+      - id: shelve
+        tSec: 50
+        maxSec: 60
+        reveals:
+        - zona.scaffaleTerracotta
+        gate:
+          event: shelfDeposit
+          value: 1
+          pad: 
+          level: 0
+          pads: []
+        textKeys:
+        - step:shelve
+        - onb.deposit.hint
+      - id: serve
+        tSec: 70
+        maxSec: 90
+        reveals:
+        - zona.bancone
+        - cliente.mammaRosa
+        gate:
+          event: customerServed
+          value: 1
+          pad: 
+          level: 0
+          pads: []
+        textKeys:
+        - step:serve
+        - onb.cust.first
+      - id: coins
+        tSec: 75
+        maxSec: 95
+        reveals:
+        - hud.pillolaValute
+        - monete
+        gate:
+          event: coinsCollected
+          value: 1
+          pad: 
+          level: 0
+          pads: []
+        textKeys:
+        - step:coins
+        - onb.coins.walk
+      - id: zainoPad
+        tSec: 83
+        maxSec: 120
+        reveals:
+        - pad.zaino
+        gate:
+          event: padPurchased
+          value: 0
+          pad: zaino
+          level: 1
+          pads: []
+        textKeys:
+        - step:upgrade_zaino
+        - onb.zaino.hint
+      - id: combo
+        tSec: 100
+        maxSec: 125
+        reveals:
+        - clienti.normali
+        - feedback.comboPlusN
+        gate:
+          event: comboReached
+          value: 1.2
+          pad: 
+          level: 0
+          pads: []
+        textKeys:
+        - onb.combo
+      - id: nonnoIntro
+        tSec: 127
+        maxSec: 132
+        reveals:
+        - robot.nonno.dorme
+        gate:
+          event: cameraDone
+          value: 0
+          pad: 
+          level: 0
+          pads: []
+        textKeys:
+        - onb.nonno.intro
+        - onb.nonno.what
+      - id: hireNonno
+        tSec: 130
+        maxSec: 160
+        reveals:
+        - pad.assumiNonno
+        gate:
+          event: nonnoHired
+          value: 0
+          pad: 
+          level: 0
+          pads: []
+        textKeys:
+        - onb.nonno.cost
+        - step:unlock_nonno
+      - id: nonnoConfirm
+        tSec: 131
+        maxSec: 150
+        reveals:
+        - robot.nonno.attivo
+        gate:
+          event: nonnoFirstRestock
+          value: 0
+          pad: 
+          level: 0
+          pads: []
+        textKeys:
+        - onb.nonno.hired
+        - onb.nonno.working
+      - id: padNuovi
+        tSec: 170
+        maxSec: 230
+        reveals:
+        - pad.scarpe
+        - pad.insegna
+        - pad.zaino.livelliSuccessivi
+        gate:
+          event: padPurchasedAny
+          value: 0
+          pad: 
+          level: 0
+          pads:
+          - scarpe
+          - insegna
+        textKeys:
+        - onb.pads.new
+      - id: cassaPass
+        tSec: 235
+        maxSec: 255
+        reveals:
+        - zona.cassa
+        gate:
+          event: cassaPassed
+          value: 0
+          pad: 
+          level: 0
+          pads: []
+        textKeys:
+        - onb.cassa.tip
+      - id: debtCard
+        tSec: 240
+        maxSec: 280
+        reveals:
+        - zona.cassaforte
+        gate:
+          event: firstDebtDeposit
+          value: 0
+          pad: 
+          level: 0
+          pads: []
+        textKeys:
+        - onb.debt.adaExplain
+        - onb.viktor.call1
+        - onb.viktor.call2
+        - onb.debt.pedaggioHint
+      - id: wallPad
+        tSec: 270
+        maxSec: 300
+        reveals:
+        - pad.apriMuro
+        gate:
+          event: goalSeen
+          value: 3
+          pad: 
+          level: 0
+          pads: []
+        textKeys:
+        - onb.wall.goal
+      - id: freePlay
+        tSec: 300
+        maxSec: 0
+        reveals:
+        - pad.nonnoUpgrade
+        - tutto il resto del cap 1
+        gate:
+          event: none
+          value: 0
+          pad: 
+          level: 0
+          pads: []
+        textKeys:
+        - fine

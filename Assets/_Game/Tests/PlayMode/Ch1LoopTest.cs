@@ -8,10 +8,18 @@ using UltimoMiglio.Gameplay;
 
 public class Ch1LoopTest
 {
+    [TearDown]
+    public void TearDown()
+    {
+        // #101: niente stato statico tra un test e l'altro
+        TutorialManager.TestSenzaComparse = false; TutorialManager.TestAccelera = false;
+        LoopAutoTest.Stacca(); Time.timeScale = 1f;
+    }
+
     [UnityTest, Timeout(1000000)]
     public IEnumerator Chapter1Loop_PickStackDeliverServeBuyZaino()
     {
-        PlayerPrefs.DeleteAll(); UltimoMiglio.Gameplay.TutorialManager.TestSenzaComparse = true; /* #101: niente comparse graduali */
+        PlayerPrefs.DeleteAll(); UltimoMiglio.Gameplay.TutorialManager.TestSenzaComparse = true; UltimoMiglio.Gameplay.TutorialManager.TestAccelera = true; /* #101: niente comparse graduali, tempi corti */
         var save = System.IO.Path.Combine(Application.persistentDataPath, "save_v1.json"); if (System.IO.File.Exists(save)) System.IO.File.Delete(save);
         PlayerPrefs.SetInt(UltimoMiglio.Gameplay.TutorialManager.PrefGraduale, 0); // #94: test non di onboarding → niente rivelazione graduale
         yield return SceneManager.LoadSceneAsync("Ch1_Deposito");

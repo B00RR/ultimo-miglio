@@ -13,7 +13,7 @@ public class TutorialToNonnoTest
     [UnityTest, Timeout(480000)]
     public IEnumerator Path_ArriviShelfBancone_EarnsLn_HiresNonno_Works()
     {
-        PlayerPrefs.DeleteAll(); UltimoMiglio.Gameplay.TutorialManager.TestSenzaComparse = true; /* #101: niente comparse graduali */
+        PlayerPrefs.DeleteAll(); UltimoMiglio.Gameplay.TutorialManager.TestSenzaComparse = true; UltimoMiglio.Gameplay.TutorialManager.TestAccelera = true; /* #101: niente comparse graduali, tempi corti */
         var save = System.IO.Path.Combine(Application.persistentDataPath, "save_v1.json");
         if (System.IO.File.Exists(save)) System.IO.File.Delete(save);
 
@@ -84,9 +84,15 @@ public class TutorialToNonnoTest
             }
             Assert.GreaterOrEqual(eco.S.Zaino, 1, "Zaino non comprato (passo zainoPad)");
             float tn = Time.time;
-            while (!padN.gameObject.activeInHierarchy && Time.time - tn < 150f) yield return ServeCycle(n, arr, shelves, ban);
-            Assert.IsTrue(padN.gameObject.activeInHierarchy, $"pad NONNO mai rivelato, passo={TutorialManager.I.Current}");
-            Assert.AreEqual(TutorialManager.Step.HireNonno, TutorialManager.I.Current);
+            // dopo lo Zaino: combo (comboReached o softgate 40 s) → nonnoIntro (camera) → hireNonno. Con TestSenzaComparse il pad è già attivo:
+            // conta il passo del tutorial, non la visibilità del pad.
+            while (TutorialManager.I.Current < TutorialManager.Step.HireNonno && Time.time - tn < 150f)
+            {
+                if (TutorialManager.I.Current == TutorialManager.Step.NonnoIntro) { n.ScriptedInput = Vector3.zero; yield return null; }
+                else yield return ServeCycle(n, arr, shelves, ban);
+            }
+            Assert.AreEqual(TutorialManager.Step.HireNonno, TutorialManager.I.Current, "passo hireNonno non raggiunto dopo lo Zaino");
+            Assert.IsTrue(padN.gameObject.activeInHierarchy, $"pad NONNO non visibile al passo {TutorialManager.I.Current}");
             if (eco.S.Wallet < hire) eco.S.Wallet = hire; // l'assist del passo lo garantisce già
 
             // Hire NONNO: cammina sul pad e resta in trigger (teleport CC non genera OnTriggerEnter)
@@ -129,7 +135,7 @@ public class TutorialToNonnoTest
     [UnityTest, Timeout(240000)]
     public IEnumerator HireNonnoStandingOnPad_ThenArriviAndBanconeStillWork()
     {
-        PlayerPrefs.DeleteAll(); UltimoMiglio.Gameplay.TutorialManager.TestSenzaComparse = true; /* #101: niente comparse graduali */
+        PlayerPrefs.DeleteAll(); UltimoMiglio.Gameplay.TutorialManager.TestSenzaComparse = true; UltimoMiglio.Gameplay.TutorialManager.TestAccelera = true; /* #101: niente comparse graduali, tempi corti */
         var save = System.IO.Path.Combine(Application.persistentDataPath, "save_v1.json");
         if (System.IO.File.Exists(save)) System.IO.File.Delete(save);
         PlayerPrefs.SetInt(UltimoMiglio.Gameplay.TutorialManager.PrefGraduale, 0); // #94: test non di onboarding → niente rivelazione graduale

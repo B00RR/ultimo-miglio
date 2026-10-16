@@ -23,7 +23,13 @@ namespace UltimoMiglio.Gameplay
         public string Speaker = "Nonna Ada";
         [TextArea] public string[] Texts = new string[StepCount]; [TextArea] public string EndText;
         public Transform Arrivi, Scaffale, Bancone, Monete, PadZaino, PadNonno;
-        [Tooltip("Durate dei passi 'solo guardare' (coldOpen, nonnoIntro, wallPad), s")] public float ColdOpenSec = 2f, NonnoIntroSec = 2.5f, WallPadSec = 3f, NonnoConfirmMaxSec = 20f, ComboSoftGateSec = 40f;
+        [Tooltip("Durate dei passi 'solo guardare' (coldOpen, nonnoIntro, wallPad), s")] public float ColdOpenSec = 15f, NonnoIntroSec = 2.5f, WallPadSec = 3f, NonnoConfirmMaxSec = 20f, ComboSoftGateSec = 40f;
+        [Tooltip("onboarding.json revealWhen: nonnoIntro da t>=127 s, padNuovi da t>=170 s (tempo attivo); nonnoConfirm tiene la camera su NONNO 3 s")]
+        public float NonnoIntroMinT = 127f, PadNuoviMinT = 170f, NonnoConfirmCamSec = 3f;
+        /// <summary>Solo test PlayMode: tempi corti (coldOpen 2 s, niente attese t>=127/170 s) e LN garantiti ai pad del tutorial (Zaino, NONNO) e alle monete.
+        /// Il design di default (onboarding.json) non cambia: nel gioco vero le LN si guadagnano.</summary>
+        public static bool TestAccelera;
+        float ColdOpenEff => TestAccelera ? Mathf.Min(ColdOpenSec, 2f) : ColdOpenSec;
         public float EndSeconds = 6f;
         [Tooltip("onboarding_testi.json (PR #62): passi per id + suggerimenti onb.*. Facoltativo: senza, valgono Texts/EndText.")]
         public TextAsset TestiJson;
@@ -40,7 +46,7 @@ namespace UltimoMiglio.Gameplay
 
         public Step Current { get; private set; }
         public string CurrentObjectiveText => Current < Step.Fine && (int)Current < Objectives.Length ? Objectives[(int)Current] : (Current == Step.Fine ? "Deposito aperto!" : "");
-        Vector3 _startPos; int _shelfBase, _servedBase, _padBase; double _walletBase, _debtBase; float _endT, _stepStart; bool _cassaSeen;
+        Vector3 _startPos; int _shelfBase, _servedBase, _padBase, _coinBase; double _walletBase, _debtBase; float _endT, _stepStart; bool _cassaSeen;
         int _hintCount, _lvl3; float _nolnpAt = -99f;
         /// <summary>Passi letti da onboarding.json (null = asset non importato: valgono <see cref="StepIds"/>).</summary>
         public UltimoMiglio.Core.Data.OnboardingStep[] Steps { get; private set; }
@@ -215,7 +221,7 @@ namespace UltimoMiglio.Gameplay
         // ---------------- #94: comparse graduali + Salta tutorial ----------------
         /// <summary>Sottoinsieme di onboarding.json → lockedAtStart presente nella slice. Per decisione di DevOn (#64/#94) niente telefono,
         /// niente barra debito (il debito si vede solo a fine giornata e nel fumetto di Ada), combo = ComboPopup nel mondo: nessun id HUD per questi.</summary>
-        public static readonly string[] LockedAtStart = { "hud.pillolaValute", "zona.arrivi", "zona.scaffaleTerracotta", "zona.bancone", "pad.zaino", "pad.assumiNonno", "robot.nonno.attivo" };
+        public static readonly string[] LockedAtStart = { "hud.pillolaValute", "zona.arrivi", "zona.scaffaleTerracotta", "zona.bancone", "pad.zaino", "pad.assumiNonno", "robot.nonno.attivo", "pad.scarpe", "pad.insegna" };
         bool _uiRegistered, _comboSeen; VisualElement _skip;
 
         /// <summary>Reveal del passo: da onboarding.json (steps[].reveals) se importato, altrimenti la mappa predefinita. Gli id non presenti nella slice vengono ignorati da HudReveal.</summary>
@@ -226,7 +232,7 @@ namespace UltimoMiglio.Gameplay
             {
                 Step.PickUp => new[] { "zona.arrivi" }, Step.Shelve => new[] { "zona.scaffaleTerracotta" }, Step.Serve => new[] { "zona.bancone" },
                 Step.Coins => new[] { "hud.pillolaValute" }, Step.ZainoPad => new[] { "pad.zaino" }, Step.HireNonno => new[] { "pad.assumiNonno" },
-                Step.NonnoConfirm => new[] { "robot.nonno.attivo" }, _ => System.Array.Empty<string>()
+                Step.NonnoConfirm => new[] { "robot.nonno.attivo" }, Step.PadNuovi => new[] { "pad.scarpe", "pad.insegna" }, _ => System.Array.Empty<string>()
             };
         }
         void RevealFor(Step s) { if (s >= Step.Fine) UltimoMiglio.UI.HudReveal.ShowAll(); else foreach (var id in RevealsOf(s)) UltimoMiglio.UI.HudReveal.Show(id); }
@@ -236,6 +242,9 @@ namespace UltimoMiglio.Gameplay
             void W(string id, Transform t) { if (t) UltimoMiglio.UI.HudReveal.RegisterWorld(id, t.gameObject); }
             W("zona.arrivi", Arrivi); W("zona.scaffaleTerracotta", Scaffale); W("zona.bancone", Bancone); W("pad.zaino", PadZaino); W("pad.assumiNonno", PadNonno);
             var nr = FindAnyObjectByType<NonnoRobot>(); if (nr) UltimoMiglio.UI.HudReveal.RegisterWorld("robot.nonno.attivo", nr.gameObject);
+            // #101: pad del passo padNuovi (GATE-07: invisibili finché padNuovi non parte)
+            foreach (var p in FindObjectsByType<UpgradePad>(FindObjectsSortMode.None))
+            { if (p.Kind == UpgradeKind.Scarpe) W("pad.scarpe", p.transform); else if (p.Kind == UpgradeKind.Insegna) W("pad.insegna", p.transform); }
         }
 
         void EnsureUiReveals()
@@ -253,7 +262,8 @@ namespace UltimoMiglio.Gameplay
         public void NotifyCombo(int clientiDiFila, float moltiplicatore)
         {
             if (clientiDiFila >= 2) ComboPopup.Show(clientiDiFila); // il primo cliente non è ancora una combo
-            if (!_comboSeen && moltiplicatore >= ComboGate - 1e-4f) { _comboSeen = true; UltimoMiglio.UI.OnbLog.Write("gate comboReached"); }
+            if (!_comboSeen && Current == Step.Combo && moltiplicatore >= ComboGate - 1e-4f) // GD: conta solo con il passo combo attivo
+                { _comboSeen = true; UltimoMiglio.UI.OnbLog.Write("gate comboReached"); }
         }
 
         void EnsureSkip()
@@ -268,7 +278,7 @@ namespace UltimoMiglio.Gameplay
         {
             if (Current >= Step.Fine) return;
             Onb("skip", Current, "from", IdOf(Current));
-            Onb("end", Step.FreePlay, "total", OnbTime, "hints", _hintCount, "lvl3", _lvl3);
+            var ecoS = GameRoot.Ready ? GameRoot.I.Eco : null; Onb("end", Step.FreePlay, "total", OnbTime, "hints", _hintCount, "lvl3", _lvl3, "ln", Ln(ecoS), "spent", Spent(ecoS));
             UltimoMiglio.UI.HudReveal.ShowAll(); CameraPeek.Cancel();
             if (_hud) _hud.CompleteAdaNote();
             Enter(Step.Chiuso);
@@ -283,17 +293,19 @@ namespace UltimoMiglio.Gameplay
             var eco = GameRoot.Ready ? GameRoot.I.Eco : null;
             if (GameRoot.I && GameRoot.I.Nina) _startPos = GameRoot.I.Nina.transform.position;
             _shelfBase = ShelfTotal(); _servedBase = eco?.S.CustomersServed ?? 0; _walletBase = eco?.S.Wallet ?? 0; _endT = 0; _stepStart = Time.time;
-            _debtBase = eco?.S.DebtPaid ?? 0; _padBase = eco == null ? 0 : eco.S.Scarpe + eco.S.Insegna; _cassaSeen = false;
-            // QA #42: LN sufficienti per i pad del tutorial (Zaino prima, poi NONNO) senza farm
-            if (eco != null && (s == Step.ZainoPad || s == Step.HireNonno))
+            _debtBase = eco?.S.DebtPaid ?? 0; _padBase = eco == null ? 0 : eco.S.Scarpe + eco.S.Insegna; _cassaSeen = false; _coinBase = CoinSpawner.Raccolte;
+            // QA #42 → GD 16/10: niente LN regalate nel gioco vero; restano solo dietro il flag dei test (TestAccelera)
+            if (TestAccelera && eco != null && (s == Step.ZainoPad || s == Step.HireNonno))
             {
                 double need = eco.Cost(s == Step.ZainoPad ? UpgradeKind.Zaino : UpgradeKind.NonnoHire);
                 if (!double.IsInfinity(need) && eco.S.Wallet < need) eco.S.Wallet = need;
             }
-            if (s == Step.Coins && eco != null && eco.S.Wallet < 4)
+            if (TestAccelera && s == Step.Coins && eco != null && eco.S.Wallet < 4)
                 eco.S.Wallet = System.Math.Max(eco.S.Wallet, 4);
-            if (s < Step.Chiuso) Onb("start", s, "reveals", RevealsOf(s).Length);
-            if (s == Step.FreePlay) Onb("end", s, "total", OnbTime, "hints", _hintCount, "lvl3", _lvl3);
+            if (s < Step.Chiuso) Onb("start", s, "reveals", RevealsOf(s).Length, "ln", Ln(eco));
+            // onboarding.json nonnoConfirm.camera: 3 s su NONNO (input libero)
+            if (s == Step.NonnoConfirm) { var nr = FindAnyObjectByType<NonnoRobot>(); if (nr) CameraPeek.Request(nr.transform.position, NonnoConfirmCamSec); }
+            if (s == Step.FreePlay) Onb("end", s, "total", OnbTime, "hints", _hintCount, "lvl3", _lvl3, "ln", Ln(eco), "spent", Spent(eco));
             Debug.Log($"[Tutorial] step {(int)s} {s}: {CurrentText}");
             StepChanged?.Invoke(s);
             RevealFor(s);
@@ -354,18 +366,18 @@ namespace UltimoMiglio.Gameplay
             if (Current == Step.CassaPass) { var cz = FindAnyObjectByType<CassaZone>(); if (cz && cz.Occupied) _cassaSeen = true; }
             string ev = Current switch
             {
-                Step.ColdOpen => inStep >= ColdOpenSec ? "coldOpenEnd" : null,
+                Step.ColdOpen => inStep >= ColdOpenEff ? "coldOpenEnd" : null,
                 Step.Move => nina && (nina.transform.position - _startPos).sqrMagnitude > 1.5f * 1.5f ? "playerMoved" : null,
                 Step.PickUp => nina && nina.Stack.Count >= 1 ? "parcelPicked" : null,
                 Step.Shelve => ShelfTotal() > _shelfBase ? "shelfDeposit" : null,
                 Step.Serve => eco.S.CustomersServed > _servedBase ? "customerServed" : null,
-                // LN già accreditati su Bancone.Serve (CollectActive); monete a terra = Burst VFX
-                Step.Coins => eco.S.Wallet > 0.01 ? "coinsCollected" : null,
+                // GD 16/10: il passo chiude alla raccolta di una moneta (arriva a Nina/HUD), non con il portafoglio > 0
+                Step.Coins => CoinSpawner.Raccolte > _coinBase ? "coinsCollected" : null,
                 Step.ZainoPad => eco.S.Zaino >= 1 ? "padPurchased" : null,
                 Step.Combo => _comboSeen ? "comboReached" : null,
                 Step.NonnoIntro => inStep >= NonnoIntroSec ? "cameraDone" : null,
                 Step.HireNonno => eco.S.NonnoLevel >= 0 ? "nonnoHired" : null,
-                Step.NonnoConfirm => NonnoWorking() || inStep >= NonnoConfirmMaxSec ? "nonnoFirstRestock" : null,
+                Step.NonnoConfirm => (NonnoWorking() && inStep >= NonnoConfirmCamSec) || inStep >= NonnoConfirmMaxSec ? "nonnoFirstRestock" : null,
                 Step.PadNuovi => eco.S.Scarpe + eco.S.Insegna > _padBase || (double.IsInfinity(eco.Cost(UpgradeKind.Scarpe)) && double.IsInfinity(eco.Cost(UpgradeKind.Insegna))) ? "padPurchasedAny" : null,
                 Step.CassaPass => _cassaSeen || !Cassa() ? "cassaPassed" : null,
                 Step.DebtCard => eco.S.DebtPaid > _debtBase || eco.S.DebtPaid > 0 ? "firstDebtDeposit" : null,
@@ -373,10 +385,13 @@ namespace UltimoMiglio.Gameplay
                 Step.FreePlay => (_endT += Time.deltaTime) > EndSeconds ? "freePlayShown" : null,
                 _ => null
             };
+            // onboarding.json revealWhen: nonnoIntro solo con t>=127 s, padNuovi solo con t>=170 s. Il gate resta in attesa (start del passo dopo entro 1 s dal gate).
+            bool attesaT = !TestAccelera && ((Current == Step.Combo && OnbTime < NonnoIntroMinT) || (Current == Step.NonnoConfirm && OnbTime < PadNuoviMinT));
+            if (attesaT && (ev != null || (Current == Step.Combo && inStep >= ComboSoftGateSec))) return;
             // #91 softgate: il passo combo avanza dopo 40 s senza x1,2
             if (ev == null && Current == Step.Combo && inStep >= ComboSoftGateSec) { Onb("softgate", Current, "idle", (double)inStep); Enter(Current + 1); return; }
             if (ev == null) { CheckNoLn(eco); return; }
-            if (Current < Step.FreePlay) Onb("gate", Current, "event", ev, "dur", (double)inStep);
+            if (Current < Step.FreePlay) Onb("gate", Current, "event", ev, "dur", (double)inStep, "ln", Ln(eco), "spent", Spent(eco));
             if (_hud && Current < Step.Fine) _hud.PulseCurrency();
             Enter(Current + 1);
         }
@@ -387,9 +402,12 @@ namespace UltimoMiglio.Gameplay
             if (k == null || Time.time - _nolnpAt < 5f) return;
             var pad = (Current == Step.ZainoPad ? PadZaino : PadNonno)?.GetComponent<UpgradePad>();
             double cost = eco.Cost(k.Value);
-            if (pad && pad.Occupied && eco.S.Wallet <= 0 && !double.IsInfinity(cost))
-            { _nolnpAt = Time.time; Onb("nolnp", Current, "pad", Current == Step.ZainoPad ? "zaino" : "assumiNonno", "wallet", (int)eco.S.Wallet, "cost", (int)cost); }
+            // spec #121: scatta quando le LN in tasca non bastano a finire il pad (sotto il costo residuo), non solo a 0
+            if (pad && pad.Occupied && !double.IsInfinity(cost) && eco.S.Wallet + 1e-6 < cost - eco.S.PadPaid[(int)k.Value])
+            { _nolnpAt = Time.time; Onb("nolnp", Current, "pad", Current == Step.ZainoPad ? "zaino" : "assumiNonno", "need", (int)cost, "have", Ln(eco)); }
         }
+        static int Ln(EconomyCore eco) => eco == null ? 0 : (int)System.Math.Floor(System.Math.Max(0, eco.S.Wallet));
+        static int Spent(EconomyCore eco) => eco == null ? 0 : (int)System.Math.Floor(System.Math.Max(0, eco.S.SpentLn));
         static bool NonnoWorking()
         {
             foreach (var b in FindObjectsByType<NonnoRobot>(FindObjectsSortMode.None)) if (b.State != NonnoRobot.WorkState.Idle || b.CarryCount > 0) return true;
