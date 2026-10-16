@@ -158,6 +158,7 @@ Ogni ruolo lavora solo sulle issue con la propria etichetta `ruolo:*`, sempre co
 
 Voci più recenti in alto. Formato: `AAAA-MM-GG HH:MM` (Europe/Rome) — [commit] — descrizione.
 
+- 2026-10-16 19:32 — Code Reviewer — [a91d6d3](https://github.com/B00RR/ultimo-miglio/commit/a91d6d3e02d68960b79abd2e295e6a69e06d21f1) — unita #217 (chiude #205, Tech Lead): telecamera regolabile con zoom, rotazione e inclinazione (pinch, slider, reset, salvataggio). Milestone «Gioco completo», entra nella prossima build.
 - 2026-10-16 19:18 — Code Reviewer — [3e810ea](https://github.com/B00RR/ultimo-miglio/commit/3e810ea) — unita #219 (chiude #136 e #203, Animator): tappe del debito 25/50/75% con frase di Oma Tilde, sfx e ricompensa; la bitmask delle tappe sta nel salvataggio.
 - 2026-10-16 18:46 — Code Reviewer — [31c33cb](https://github.com/B00RR/ultimo-miglio/commit/31c33cb) — unita #214 (chiude #171): il trigger dei pad d'acquisto è tondo e coincide con il cerchio visibile (raggio del cerchio meno quello di Kaia); test PlayMode in 8 direzioni.
 - 2026-10-16 18:27 — Code Reviewer — [5b07b83](https://github.com/B00RR/ultimo-miglio/commit/5b07b83e2a1cab85941a77e0b0a4028d929fc598) — unita #211 (chiude #210): la guida del tutorial usa una cache di scaffali, pad e personaggi invece di FindObjectsByType a ogni frame. Su main ci sono #207 e #211: dato il via a Build & Release. Unite anche #125, #209, #207, #208, #213 e #215.
