@@ -286,7 +286,7 @@ namespace UltimoMiglio.VFX
             var fl = Make("flash", mat, 1, out var fr); fl.transform.SetParent(ps.transform, false); Tile(fl, TileDot);
             fr.renderMode = ParticleSystemRenderMode.HorizontalBillboard; fr.maxParticleSize = 3f;
             var fm = fl.main; fm.duration = 0.3f; fm.startLifetime = 0.3f; fm.startSpeed = 0; fm.startSize = 2.4f;
-            var fc = UM_Palette.UiSole; fc.a = 0.8f; // #69: flash a terra giallo sole fm.startColor = fc;
+            var fc = UM_Palette.UiSole; fc.a = 0.8f; fm.startColor = fc; // #69: flash a terra giallo sole
             var fe = fl.emission; fe.SetBursts(new[] { new ParticleSystem.Burst(0, 1) });
             FadeOut(fl, fc, 0.1f);
             return ps.gameObject;
