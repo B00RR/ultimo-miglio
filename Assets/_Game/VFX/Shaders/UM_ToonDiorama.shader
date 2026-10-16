@@ -166,9 +166,14 @@ Shader "UltimoMiglio/ToonDiorama"
                     half3 slab = h < 0.5h ? lerp(_FloorTint.rgb, _FloorTintB.rgb, h * 2.0h) : lerp(_FloorTintB.rgb, _FloorTintC.rgb, h * 2.0h - 1.0h);
                     albedo.rgb = lerp(albedo.rgb * _FloorTint.rgb, slab, _FloorBaseMix);
                     albedo.rgb *= 1.0h + ((half)Hash21(cell + 7.1) - 0.5h) * 2.0h * _TileVar;
-                    half2 e = (half2)abs(frac(tuv) - 0.5);                       // 0 al centro, 0.5 sul bordo
-                    half grout = max(smoothstep(0.5h - fw.x, 0.5h, e.x), smoothstep(0.5h - fw.y, 0.5h, e.y));
-                    albedo.rgb *= 1.0h - grout * _GroutDark;
+                    // Concept: togli 1 fuga ogni 2 + fuga #E8D3AC ~30% (fw clampato: niente rete densa in camera)
+                    float2 tuv2 = tuv * 0.5;
+                    half2 fw2 = min(fw * 0.5h, half2(0.045h, 0.045h));
+                    half2 e = (half2)abs(frac(tuv2) - 0.5);
+                    half grout = max(smoothstep(0.5h - fw2.x, 0.5h, e.x), smoothstep(0.5h - fw2.y, 0.5h, e.y));
+                    half3 groutCol = half3(0.910h, 0.827h, 0.675h); // #E8D3AC
+                    half ga = grout * 0.30h; // opacita ~30% come da Concept
+                    albedo.rgb = lerp(albedo.rgb, groutCol, ga);
                 }
                 float4 sc = TransformWorldToShadowCoord(i.positionWS);
                 Light L = GetMainLight(sc);

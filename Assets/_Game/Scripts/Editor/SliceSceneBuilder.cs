@@ -259,7 +259,7 @@ namespace UltimoMiglio.EditorTools
                 quad.name = "Ring"; quad.transform.SetParent(z.transform, false); quad.transform.localPosition = new Vector3(0, 0.03f, 0);
                 quad.transform.localRotation = Quaternion.Euler(90, 0, 0); var bc = z.GetComponent<BoxCollider>(); quad.transform.localScale = new Vector3(bc.size.x, bc.size.z, 1);
                 quad.GetComponent<Renderer>().sharedMaterial = ringMat;
-                var ring = quad.AddComponent<UltimoMiglio.UI.ZoneFillRing>(); Set(ring, "ringRenderer", quad.GetComponent<Renderer>()); z.Ring = ring;
+                var ring = quad.AddComponent<UltimoMiglio.UI.ZoneFillRing>(); Set(ring, "ringRenderer", quad.GetComponent<Renderer>()); ring.SetFill(0.35f); z.Ring = ring;
                 // demo: niente UpgradePadCard
             }
             var bridge = hudGo.AddComponent<UltimoMiglio.UI.Bridge.HudGameBridge>();
