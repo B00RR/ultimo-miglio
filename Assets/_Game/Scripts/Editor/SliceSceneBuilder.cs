@@ -103,7 +103,7 @@ namespace UltimoMiglio.EditorTools
 
             // --- Nina
             var nina = new GameObject("Nina"); nina.transform.position = new Vector3(0, 0, -1f); // #60: spawn sicuro nell'area giocabile
-            var cc = nina.AddComponent<CharacterController>(); cc.center = new Vector3(0, 0.8f, 0); cc.height = 1.6f; cc.radius = 0.3f;
+            var cc = nina.AddComponent<CharacterController>(); cc.center = new Vector3(0, 0.8f, 0); cc.height = 1.6f; cc.radius = NinaRadius;
             var ninaAnim = Rig(nina.transform, "chr_nina_vela", 0f);
             if (!ninaAnim)
             {
@@ -228,14 +228,15 @@ namespace UltimoMiglio.EditorTools
                         case CassaZone _: ip.Kind = PoiKind.Prendi; ip.Label = "Monete"; ip.Icon = I("ic_coin"); ip.HasCard = true; break;
                         case UpgradePad up:
                             ip.Kind = PoiKind.Acquisto; ip.Label = "0"; ip.Icon = I("ic_coin"); ip.HasCard = true; ip.Pad = up; ip.Radius = bc ? Mathf.Min(bc.size.x, bc.size.z) * 0.5f : 0.7f; // #187: anello = trigger 1,4 m (era 0,95 → cerchi da 2 m che si toccavano)
-                            if (ringPf) { var rg = (GameObject)PrefabUtility.InstantiatePrefab(ringPf); rg.transform.SetParent(up.transform, false); rg.transform.localPosition = new Vector3(0, 0.1f, 0); up.FillRing = rg.GetComponent<UltimoMiglio.VFX.UM_PadFillRing>(); }
+                            if (ringPf) { var rg = (GameObject)PrefabUtility.InstantiatePrefab(ringPf); rg.transform.SetParent(up.transform, false); rg.transform.localPosition = new Vector3(0, 0.1f, 0); rg.transform.localScale = Vector3.one * (ip.Radius / FillRingRadius); up.FillRing = rg.GetComponent<UltimoMiglio.VFX.UM_PadFillRing>(); } // #171: anello di riempimento = cerchio (era a scala 1, Ø ~1,9 m)
+                            PadTriggerTondo(up, ip.Radius * InteractionPoint.VisualScale);
                             break;
                         default: ip.Kind = PoiKind.Prendi; ip.Label = z.name.Replace("Zona_", ""); break;
                     }
                     if (ringPf && !(z is UpgradePad))
                     {
                         var rg = (GameObject)PrefabUtility.InstantiatePrefab(ringPf); rg.transform.SetParent(z.transform, false); rg.transform.localPosition = new Vector3(0, 0.1f, 0);
-                        rg.transform.localScale = Vector3.one * (ip.Radius / 0.95f);
+                        rg.transform.localScale = Vector3.one * (ip.Radius / FillRingRadius);
                         var fr = rg.GetComponent<UltimoMiglio.VFX.UM_PadFillRing>(); if (fr) { fr.playCompleteBurst = false; fr.kind = ip.Kind == PoiKind.Consegna ? UltimoMiglio.VFX.UM_PadFillRing.Kind.Delivery : UltimoMiglio.VFX.UM_PadFillRing.Kind.Pickup; ip.Ring = fr; }
                     }
                     BuildZoneVisual(ip, ringModel, atlasMat); // #187: anello in edit time, salvato in scena
@@ -317,6 +318,21 @@ namespace UltimoMiglio.EditorTools
         static void Pad(string name, UpgradeKind k, Vector3 pos, float unlock, Material m)
         {
             var pad = Zone<UpgradePad>(name, pos, new Vector3(1.4f, 1, 1.4f), UM_Palette.Crema, m); pad.Kind = k; pad.UnlockAtActiveSec = unlock; pad.Priority = 1;
+        }
+        /// <summary>Raggio del CharacterController di Kaia (Nina), usato anche per i trigger dei pad.</summary>
+        public const float NinaRadius = 0.3f;
+        /// <summary>Raggio nativo (m, a scala 1) dell'anello fx_pad_fill_ring.</summary>
+        const float FillRingRadius = 0.95f;
+        /// <summary>#171 + #187 («anello = trigger»): il BoxCollider quadrato del pad rispondeva anche fuori dal cerchio sulle diagonali.
+        /// Ora è un cilindro centrato sul cerchio con raggio = raggio del cerchio - raggio di Kaia: il pad si attiva quando il centro di Kaia entra nel cerchio.</summary>
+        static void PadTriggerTondo(UpgradePad up, float raggioCerchio)
+        {
+            var box = up.GetComponent<BoxCollider>();
+            var cap = up.GetComponent<CapsuleCollider>(); if (!cap) cap = up.gameObject.AddComponent<CapsuleCollider>(); // prima il nuovo: ProximityZone richiede un Collider
+            float h = box ? box.size.y : 1f, y = box ? box.center.y : 0.5f;
+            if (box) Object.DestroyImmediate(box);
+            float rt = Mathf.Max(0.1f, raggioCerchio - NinaRadius);
+            cap.isTrigger = true; cap.direction = 1; cap.radius = rt; cap.height = Mathf.Max(h, 2f * rt); cap.center = new Vector3(0, Mathf.Max(y, cap.height * 0.5f), 0);
         }
         static T Zone<T>(string name, Vector3 pos, Vector3 size, Color c, Material m) where T : ProximityZone
         {
