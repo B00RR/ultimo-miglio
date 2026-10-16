@@ -1,7 +1,7 @@
 # STATO PROGETTO — Ultimo Miglio
 
 > Punto di ingresso unico per chiunque (persona o agente) lavori su questo repo. Aggiornalo **nella stessa PR** in cui completi qualcosa.
-> Ultimo aggiornamento: 2026-10-16 11:47 (Europe/Rome).
+> Ultimo aggiornamento: 2026-10-16 11:53 (Europe/Rome).
 
 ## 1. Il gioco
 - **Ultimo Miglio**: gioco mobile **Android**, **Unity 6 (6000.3) URP**.
@@ -132,6 +132,7 @@ Ogni ruolo lavora solo sulle issue con la propria etichetta `ruolo:*`, sempre co
 Voci più recenti in alto. Formato: `AAAA-MM-GG HH:MM` (Europe/Rome) — [commit] — descrizione.
 
 - 2026-10-16 11:55 — UI/UX — [faf9f88](https://github.com/B00RR/ultimo-miglio/commit/faf9f88) — PR #139 (Closes #138): `11_CAP1_COMPLETO` allineato all'HUD minimo (LN, giorno, riga obiettivo, joystick, pad; telefono → Gioco completo #64; combo "+N" 1,5 s; debito a fine giornata; SFX telefono segnati Gioco completo, da rivedere col Sound Designer). Seguito review: colori dei pad rimandati a GUIDA_VISIVA_CAP1 §2 e PR #123.
+- 2026-10-16 11:53 — Code Reviewer — [faf9f88](https://github.com/B00RR/ultimo-miglio/commit/faf9f88c0912ad5994c7473289f92ba847321853) — unita in squash la [PR #139](https://github.com/B00RR/ultimo-miglio/pull/139) (Docs UI: 11_CAP1_COMPLETO allineato all'HUD minimo del Cap. 1). Solo `.md`. Closes #138.
 - 2026-10-16 11:50 — Code Reviewer — [4caa545](https://github.com/B00RR/ultimo-miglio/commit/4caa5452fa083d9ecafb1c591a4257d8d979fbd5) — unita in squash la [PR #147](https://github.com/B00RR/ultimo-miglio/pull/147) (docs: sezione *Regole del computer*, repo docs archiviato). Solo `.md`; conflitto su STATO_PROGETTO.md risolto con merge di main nel branch.
 - 2026-10-16 11:50 — Code Reviewer — [8a2268e](https://github.com/B00RR/ultimo-miglio/commit/8a2268e61628a9ca3e14b79914948723b96c894c) — unita in squash la [PR #145](https://github.com/B00RR/ultimo-miglio/pull/145) (regola 1 solo Unity sul box, `flock /tmp/unity-box.lock`). Solo `.md`.
 - 2026-10-16 11:49 — Code Reviewer — [b5f6ba5](https://github.com/B00RR/ultimo-miglio/commit/b5f6ba5864023f012c1f592163100e7931789a76) — unita in squash la [PR #143](https://github.com/B00RR/ultimo-miglio/pull/143) (anteprime QA `tutorial_hud_77` con pad NONNO a 50 LN). Solo documentazione QA, nessun C#. Closes #142.
