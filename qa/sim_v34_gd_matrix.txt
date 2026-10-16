@@ -1,0 +1,8 @@
+1|8400|38.9|7|2|3|2|0|1.5|0|39|40|ok
+Totale 559 min (9.3 h); range 36.1-38.9 min; more 0; proroghe usate 0
+1|8400|35.7|7|2|3|2|0|1.49|0|36|40|ok
+Totale 537 min (8.9 h); range 34.1-36.5 min; more 0; proroghe usate 0
+1|8400|33.5|7|2|3|2|0|1.49|0|33|40|ok
+Totale 521 min (8.7 h); range 32.5-35.7 min; more 0; proroghe usate 0
+1|8400|31.3|7|2|3|2|0|1.49|0|31|40|ok
+Totale 507 min (8.4 h); range 30.9-35.0 min; more 0; proroghe usate 0

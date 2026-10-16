@@ -16,6 +16,11 @@ namespace UltimoMiglio.VFX
         /// Web: outline/shadows cheap variants allowed (desktop-class GPUs via WebGL2), DPR capped in the WebGL template.
         /// Post-process: OFF di default su Web (in WebGL ha dato schermo magenta). Abilitarlo solo dopo verifica in build.
         public static bool AllowPostOnWeb = false;
+        /// Perf: percorso shader economico (_UM_LITE: niente rumore mondo, fughe pavimento, rim, vignetta a terra).
+        /// Attivo su Base/Standard; su Web solo se WebLite = true (es. telefono low-end, oppure URL ?lite=1 letto dal bootstrap).
+        public static bool WebLite = false;
+        public static bool LiteShading { get; private set; }
+        const string LiteKeyword = "_UM_LITE";
         public static bool PostProcessingEnabled { get; private set; }
         /// v2.1 (#48) anti-scalettatura: camera ortho a 20 m (DepotCameraFit.CameraDistance) invece di 40.
         /// La shadow map copre [near, shadowDistance]: con 40 m metà texel finivano nel vuoto davanti alla scena.
@@ -26,9 +31,22 @@ namespace UltimoMiglio.VFX
         public const float ShadowDepthBias = 0.6f, ShadowNormalBias = 0.7f;
         static bool OutlineTier(UMTier t) => t == UMTier.Alto || t == UMTier.Web;
 
+        /// Perf WebGL: solo il keyword shader, senza toccare l'URP asset. "?lite=1" nell'URL attiva il percorso economico
+        /// (per test A/B su telefono reale e per i device lenti), "?lite=0" lo forza spento.
+        [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.BeforeSceneLoad)]
+        static void BootLite()
+        {
+            Shader.DisableKeyword(LiteKeyword);
+            if (Application.platform != RuntimePlatform.WebGLPlayer) return;
+            var url = Application.absoluteURL ?? "";
+            if (url.Contains("lite=1")) { WebLite = true; LiteShading = true; Shader.EnableKeyword(LiteKeyword); }
+        }
+
         public static void Apply(UMTier tier, Material[] toonMaterials = null)
         {
             Current = tier;
+            LiteShading = tier == UMTier.Base || tier == UMTier.Standard || (tier == UMTier.Web && WebLite);
+            if (LiteShading) Shader.EnableKeyword(LiteKeyword); else Shader.DisableKeyword(LiteKeyword);
             var urp = GraphicsSettings.currentRenderPipeline as UniversalRenderPipelineAsset;
             if (urp != null)
             {
