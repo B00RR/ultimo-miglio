@@ -133,6 +133,9 @@ jobs:
           customImage: unityci/editor:ubuntu-6000.3.26f1-webgl-3
           # Metodo ufficiale del Tech Lead (shader, Look48, HUD, scena): output in Builds/WebGL_min
           buildMethod: UltimoMiglio.EditorTools.WebGLMinBuild.Build
+          # .lfs-assets-id (cache LFS) rende il working tree "sporco": niente versioning semantico da git
+          versioning: None
+          allowDirtyBuild: true
       - name: Controllo build non compressa
         run: |
           test -f Builds/WebGL_min/index.html
