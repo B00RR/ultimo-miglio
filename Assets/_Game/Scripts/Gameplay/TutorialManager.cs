@@ -47,7 +47,7 @@ namespace UltimoMiglio.Gameplay
         public Step SaltaDopo = Step.Combo;
 
         public Step Current { get; private set; }
-        CassaZone _cassaZone; string _hintSrc; // #191 cache
+        string _hintSrc; // #191 cache (CassaZone in AggiornaCache, #210)
         public string CurrentObjectiveText => Current < Step.Fine && (int)Current < Objectives.Length ? Objectives[(int)Current] : (Current == Step.Fine ? "Deposito aperto!" : "");
         Vector3 _startPos; int _shelfBase, _servedBase, _padBase, _coinBase; double _walletBase, _debtBase; float _endT, _stepStart; bool _cassaSeen;
         int _hintCount, _lvl3; float _nolnpAt = -99f;
@@ -300,7 +300,7 @@ namespace UltimoMiglio.Gameplay
             Current = s; PlayerPrefs.SetInt(PrefKey, (int)s); PlayerPrefs.SetInt(PrefVer, Versione); PlayerPrefs.Save();
             var eco = GameRoot.Ready ? GameRoot.I.Eco : null;
             if (GameRoot.I && GameRoot.I.Nina) _startPos = GameRoot.I.Nina.transform.position;
-            _shelfBase = ShelfTotal(); _servedBase = eco?.S.CustomersServed ?? 0; _walletBase = eco?.S.Wallet ?? 0; _endT = 0; _stepStart = Time.time;
+            AggiornaCache(true); _shelfBase = ShelfTotal(); _servedBase = eco?.S.CustomersServed ?? 0; _walletBase = eco?.S.Wallet ?? 0; _endT = 0; _stepStart = Time.time;
             _debtBase = eco?.S.DebtPaid ?? 0; _padBase = eco == null ? 0 : eco.S.Scarpe + eco.S.Insegna; _cassaSeen = false; _coinBase = CoinSpawner.Raccolte;
             // QA #42 → GD 16/10: niente LN regalate nel gioco vero; restano solo dietro il flag dei test (TestAccelera)
             if (TestAccelera && eco != null && (s == Step.ZainoPad || s == Step.HireNonno))
@@ -317,11 +317,29 @@ namespace UltimoMiglio.Gameplay
             Debug.Log($"[Tutorial] step {(int)s} {s}: {CurrentText}");
             StepChanged?.Invoke(s);
             RevealFor(s);
+            AggiornaCache(true); // i pad appena rivelati entrano subito nella guida
             AggiornaGuida(true);
             if (_marker) _marker.gameObject.SetActive(false); // QA v2: no world waypoint if edge arrow exists
         }
 
-        static int ShelfTotal() { int n = 0; foreach (var sh in FindObjectsByType<Shelf>(FindObjectsSortMode.None)) n += sh.Count; return n; }
+        int ShelfTotal() { AggiornaCache(false); int n = 0; for (int i = 0; i < _shelves.Count; i++) { var sh = _shelves[i]; if (sh) n += sh.Count; } return n; }
+
+        // #191: cache di scaffali, pad, NONNO, Ada e Cassa. Niente FindObjectsByType a ogni frame (un array nuovo ogni volta = GC e scatti su WebGL):
+        // ricerca al massimo ogni CacheSec (pad che compaiono/si sbloccano entrano entro 0,2 s) e forzata a ogni cambio di passo; liste riusate.
+        const float CacheSec = 0.2f;
+        readonly System.Collections.Generic.List<Shelf> _shelves = new System.Collections.Generic.List<Shelf>(16);
+        readonly System.Collections.Generic.List<UpgradePad> _pads = new System.Collections.Generic.List<UpgradePad>(16);
+        readonly System.Collections.Generic.List<NonnoRobot> _nonni = new System.Collections.Generic.List<NonnoRobot>(4);
+        CassaZone _cassa; AdaPresence _ada; float _cacheT = float.NegativeInfinity;
+        void AggiornaCache(bool forza)
+        {
+            if (!forza && Time.unscaledTime - _cacheT < CacheSec) return;
+            _cacheT = Time.unscaledTime;
+            _shelves.Clear(); _shelves.AddRange(FindObjectsByType<Shelf>(FindObjectsSortMode.None));
+            _pads.Clear(); _pads.AddRange(FindObjectsByType<UpgradePad>(FindObjectsSortMode.None));
+            _nonni.Clear(); _nonni.AddRange(FindObjectsByType<NonnoRobot>(FindObjectsSortMode.None));
+            _cassa = FindAnyObjectByType<CassaZone>(); _ada = FindAnyObjectByType<AdaPresence>();
+        }
 
         public Transform CurrentTarget => Target();
         Transform Target() => TargetOf(Current);
@@ -364,9 +382,10 @@ namespace UltimoMiglio.Gameplay
 
         Transform NearestFreeShelf()
         {
-            var n = GameRoot.I ? GameRoot.I.Nina : null; Transform best = null; float bd = float.MaxValue;
-            foreach (var sh in FindObjectsByType<Shelf>(FindObjectsSortMode.None))
+            AggiornaCache(false); var n = GameRoot.I ? GameRoot.I.Nina : null; Transform best = null; float bd = float.MaxValue;
+            for (int i = 0; i < _shelves.Count; i++)
             {
+                var sh = _shelves[i]; if (!sh || !sh.isActiveAndEnabled) continue;
                 if (sh.Count >= sh.Capacity) continue;
                 float d = n ? (sh.transform.position - n.transform.position).sqrMagnitude : 0; if (d < bd) { bd = d; best = sh.transform; }
             }
@@ -375,15 +394,18 @@ namespace UltimoMiglio.Gameplay
         Transform NearestNewPad()
         {
             var n = GameRoot.I ? GameRoot.I.Nina : null; var eco = GameRoot.I ? GameRoot.I.Eco : null; Transform best = null; float bd = float.MaxValue;
-            foreach (var p in FindObjectsByType<UpgradePad>(FindObjectsSortMode.None))
+            AggiornaCache(false);
+            for (int i = 0; i < _pads.Count; i++)
             {
+                var p = _pads[i]; if (!p || !p.isActiveAndEnabled) continue;
                 if ((p.Kind != UpgradeKind.Scarpe && p.Kind != UpgradeKind.Insegna) || (eco != null && double.IsInfinity(eco.Cost(p.Kind)))) continue;
                 float d = n ? (p.transform.position - n.transform.position).sqrMagnitude : 0; if (d < bd) { bd = d; best = p.transform; }
             }
             return best;
         }
-        static Transform Nonno() { var b = FindAnyObjectByType<NonnoRobot>(); return b ? b.transform : null; }
-        static Transform Ada() { var a = FindAnyObjectByType<AdaPresence>(); return a ? a.transform : null; }
+        Transform Nonno() { AggiornaCache(false); for (int i = 0; i < _nonni.Count; i++) if (_nonni[i] && _nonni[i].isActiveAndEnabled) return _nonni[i].transform; return null; }
+        Transform Ada() { AggiornaCache(false); return _ada && _ada.isActiveAndEnabled ? _ada.transform : null; }
+        VisualElement _joy;
 
         void Update()
         {
@@ -407,7 +429,7 @@ namespace UltimoMiglio.Gameplay
                 _hud.Root.EnableInClassList("hud--skip", skipOn); // stringe la riga obiettivo (Onboarding.uss)
             }
             EnsureHint();
-            if (_hint != null) { var h = Current < Step.Fine ? CurrentHint() : null; var joy = _hud.Root.Q("joystick-base"); bool joyOver = joy != null && joy.resolvedStyle.display == DisplayStyle.Flex && joy.resolvedStyle.opacity > 0.05f && joy.worldBound.Overlaps(_hint.worldBound);
+            if (_hint != null) { var h = Current < Step.Fine ? CurrentHint() : null; if (_joy == null || _joy.panel == null) _joy = _hud.Root.Q("joystick-base"); var joy = _joy; bool joyOver = joy != null && joy.resolvedStyle.display == DisplayStyle.Flex && joy.resolvedStyle.opacity > 0.05f && joy.worldBound.Overlaps(_hint.worldBound);
                 _hint.EnableInClassList("tut-hint--on", !string.IsNullOrEmpty(h) && !joyOver); // mai sotto il pollice/joystick flottante
                 if (_hintText != null && h != null && !string.Equals(h, _hintSrc)) { _hintSrc = h; _hintText.text = DisplayNames.Apply(h); } } // #191: Replace solo quando cambia il suggerimento
             // B4 P2: testi Ada nel fumetto HUD (non solo console)
@@ -423,7 +445,7 @@ namespace UltimoMiglio.Gameplay
             if (TestBloccaPassi) return;
             var eco = GameRoot.I.Eco; var nina = GameRoot.I.Nina;
             float inStep = Time.time - _stepStart;
-            if (Current == Step.CassaPass) { if (!_cassaZone) _cassaZone = FindAnyObjectByType<CassaZone>(); var cz = _cassaZone; /* #191: niente ricerca scena a ogni frame */ if (cz && cz.Occupied) _cassaSeen = true; }
+            if (Current == Step.CassaPass) { AggiornaCache(false); if (_cassa && _cassa.Occupied) _cassaSeen = true; }
             string ev = Current switch
             {
                 Step.ColdOpen => inStep >= ColdOpenEff ? "coldOpenEnd" : null,
@@ -468,17 +490,22 @@ namespace UltimoMiglio.Gameplay
         }
         static int Ln(EconomyCore eco) => eco == null ? 0 : (int)System.Math.Floor(System.Math.Max(0, eco.S.Wallet));
         static int Spent(EconomyCore eco) => eco == null ? 0 : (int)System.Math.Floor(System.Math.Max(0, eco.S.SpentLn));
-        static bool NonnoWorking()
+        bool NonnoWorking()
         {
-            foreach (var b in FindObjectsByType<NonnoRobot>(FindObjectsSortMode.None)) if (b.State != NonnoRobot.WorkState.Idle || b.CarryCount > 0) return true;
+            AggiornaCache(false);
+            for (int i = 0; i < _nonni.Count; i++) { var b = _nonni[i]; if (b && (b.State != NonnoRobot.WorkState.Idle || b.CarryCount > 0)) return true; }
             return false;
         }
-        Transform Cassa() { var c = FindAnyObjectByType<CassaZone>(); return c ? c.transform : null; }
+        Transform Cassa() { AggiornaCache(false); return _cassa && _cassa.isActiveAndEnabled ? _cassa.transform : null; }
         Transform CheapestNewPad()
         {
             Transform best = null; double bc = double.PositiveInfinity; var eco = GameRoot.I.Eco;
-            foreach (var p in FindObjectsByType<UpgradePad>(FindObjectsSortMode.None))
+            AggiornaCache(false);
+            for (int i = 0; i < _pads.Count; i++)
+            {
+                var p = _pads[i]; if (!p || !p.isActiveAndEnabled) continue;
                 if ((p.Kind == UpgradeKind.Scarpe || p.Kind == UpgradeKind.Insegna) && eco.Cost(p.Kind) < bc) { bc = eco.Cost(p.Kind); best = p.transform; }
+            }
             return best;
         }
     }

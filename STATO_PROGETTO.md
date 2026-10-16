@@ -1,7 +1,7 @@
 # STATO PROGETTO — Ultimo Miglio
 
 > Punto di ingresso unico per chiunque (persona o agente) lavori su questo repo. Aggiornalo **nella stessa PR** in cui completi qualcosa.
-> Ultimo aggiornamento: 2026-10-16 19:10 (Europe/Rome).
+> Ultimo aggiornamento: 2026-10-16 19:12 (Europe/Rome).
 
 ## 1. Il gioco
 - **Ultimo Miglio**: gioco mobile **Android**, **Unity 6 (6000.3) URP**.
@@ -158,7 +158,10 @@ Ogni ruolo lavora solo sulle issue con la propria etichetta `ruolo:*`, sempre co
 
 Voci più recenti in alto. Formato: `AAAA-MM-GG HH:MM` (Europe/Rome) — [commit] — descrizione.
 
+- 2026-10-16 19:12 — UI/UX — merge di `origin/main` (`c96cbc0`) nel ramo etichette (#186), niente rebase: restano il trigger tondo dei pad (#214) e la cache della guida (#211). L'ombra cotta nello sprite resta.
 - 2026-10-16 19:10 — UI/UX — #186 sulla cattura di `2457adf` (390×844): la seconda riga resta intera. L'ombra figlia copriva il crema (un figlio si disegna sopra il fondo) e in basso restava una fascia squadrata. L'ombra #9E7873 al 60% è ora dentro lo sprite 9-slice del fumetto e delle pillole (4 px, angoli alpha 0, slice basso che la include, padding sotto compensato). Rimossi gli elementi ombra da UXML e dal codice. Il fumetto torna crema pieno #F3E3C3 e opaco. Unity non rieseguito: non è la via finché una cattura nuova non mostra il crema e l'ombra stondata.
+- 2026-10-16 18:46 — Code Reviewer — [31c33cb](https://github.com/B00RR/ultimo-miglio/commit/31c33cb) — unita #214 (chiude #171): il trigger dei pad d'acquisto è tondo e coincide con il cerchio visibile (raggio del cerchio meno quello di Kaia); test PlayMode in 8 direzioni.
+- 2026-10-16 18:27 — Code Reviewer — [5b07b83](https://github.com/B00RR/ultimo-miglio/commit/5b07b83e2a1cab85941a77e0b0a4028d929fc598) — unita #211 (chiude #210): la guida del tutorial usa una cache di scaffali, pad e personaggi invece di FindObjectsByType a ogni frame. Su main ci sono #207 e #211: dato il via a Build & Release. Unite anche #125, #209, #207, #208, #213 e #215.
 - 2026-10-16 18:20 — UI/UX — merge di `origin/main` (`9f6553c`) nel ramo etichette (#186), niente rebase: restano l'anello = trigger (#187), la cache #191 e il punto Cap. 1 delle 18:10. Il prezzo resta sull'insegna (#186).
 - 2026-10-16 18:18 — UI/UX — #186 sulla cattura di `9063e83` (390×844): l'ombra del fumetto è figlia del fumetto (`left`/`right` 0, `top` 4 px, `bottom` -4 px, #9E7873 al 60%), così non sporge più a destra; stessa misura per «Muoviti». Il testo non ha più un tetto: `max-height: none`, overflow visibile, `text-overflow: clip`, padding sotto 16 dp. USS non ha `line-height`: l'interlinea resta quella di Fredoka. Unity non rieseguito.
 - 2026-10-16 18:10 — Producer — **punto Cap. 1 (18:10 Europe/Rome)**, main a [ee59380](https://github.com/B00RR/ultimo-miglio/commit/ee59380fdab2bb148e8515eeff2d2aa2c51ecc84):
