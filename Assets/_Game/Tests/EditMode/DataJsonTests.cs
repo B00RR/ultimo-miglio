@@ -57,7 +57,21 @@ public class DataJsonTests
     [Test] public void Ch1ValuesDriveConfig()
     {
         var c = UltimoMiglio.Core.EconomyConfig.From(TestData.Ch1());
-        Assert.AreEqual(8400, c.TrancheLn); Assert.AreEqual(5, c.ZainoCapacity[0]); Assert.AreEqual(10, c.NonnoHireCost);
+        Assert.AreEqual(8400, c.TrancheLn); Assert.AreEqual(5, c.ZainoCapacity[0]); Assert.AreEqual(50, c.NonnoHireCost); Assert.AreEqual(130, c.NonnoUnlockSec, 1e-9);
         Assert.AreEqual(336, c.CassaCapacity, 1e-6); Assert.AreEqual(10, c.ParcelValueLn, 1e-9);
+    }
+
+    /// <summary>#104: la sezione rewards di economy.json (#75) arriva fino a EconomyConfig.</summary>
+    [Test] public void Ch1RewardsDriveConfig()
+    {
+        var d = TestData.Ch1(); Assert.IsNotNull(d.economy.rewards, "economy.json: rewards non letto");
+        var c = UltimoMiglio.Core.EconomyConfig.From(d);
+        CollectionAssert.AreEqual(new[] { 100, 250, 450 }, c.ParcelMilestones);
+        CollectionAssert.AreEqual(new[] { 60.0, 120.0, 200.0 }, c.ParcelMilestoneBonusLn);
+        CollectionAssert.AreEqual(new[] { 0.25, 0.5, 0.75 }, c.DebtMilestoneShares);
+        Assert.AreEqual(30, c.CassaFirstVisitTipLn, 1e-9); Assert.AreEqual(480, c.NextPadArrowFromSec, 1e-9);
+        CollectionAssert.AreEqual(new[] { "scarpe:2", "nonno:2" }, c.NextPadArrowCandidates);
+        Assert.AreEqual("decor_foto_nonna_ada", d.economy.rewards.debtMilestones[2].itemId);
+        CollectionAssert.AreEqual(new[] { 560.0, 960.0, 1700.0 }, c.ZainoCost.Skip(5).Take(3).ToArray());
     }
 }

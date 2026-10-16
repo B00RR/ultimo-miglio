@@ -83,13 +83,13 @@ MonoBehaviour:
           costLn: 320
         - level: 5
           stackCapacity: 10
-          costLn: 640
+          costLn: 560
         - level: 6
           stackCapacity: 12
-          costLn: 1280
+          costLn: 960
         - level: 7
           stackCapacity: 14
-          costLn: 2560
+          costLn: 1700
         - level: 8
           stackCapacity: 16
           costLn: 5120
@@ -183,9 +183,9 @@ MonoBehaviour:
           costLn: 686304
     robots:
       nonno:
-        unlockAtOnboardingSec: 0
-        hireCostLn: 10
-        padLabel: "ASSUMI NONNO \xB7 10 LN"
+        unlockAtOnboardingSec: 130
+        hireCostLn: 50
+        padLabel: "ASSUMI NONNO \xB7 50 LN"
         restockPpmBase: 6
         restockPpmPerLevel: 1.5
         selfServicePpmBase: 0.5
