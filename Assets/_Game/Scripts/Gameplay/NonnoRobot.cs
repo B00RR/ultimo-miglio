@@ -56,7 +56,7 @@ namespace UltimoMiglio.Gameplay
             if (!_announced) { _announced = true; Happy(); AudioManager.I?.Play(AudioManager.Sfx.NonnoStart); State = WorkState.Idle; }
 
             _selfServeAcc += (float)(eco.NonnoSelfServicePpm / 60.0) * Time.deltaTime;
-            if (_selfServeAcc >= 1f && Queue.Waiting > 1) { _selfServeAcc -= 1f; var c = Queue.Head; if (c != null && c.AtCounter) Bancone.Serve(c); }
+            if (_selfServeAcc >= 1f && Queue.Waiting > 1) { _selfServeAcc -= 1f; var c = Queue.Head; if (Bancone.InAttesa(c)) Bancone.Serve(c); }
 
             float perParcel = 60f / Mathf.Max(0.1f, (float)eco.NonnoRestockPpm);
             // Cap per-parcel so a full CarryMax never exceeds LoadTimeout under normal ppm
