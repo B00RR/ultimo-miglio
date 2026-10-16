@@ -131,6 +131,7 @@ Ogni ruolo lavora solo sulle issue con la propria etichetta `ruolo:*`, sempre co
 
 Voci più recenti in alto. Formato: `AAAA-MM-GG HH:MM` (Europe/Rome) — [commit] — descrizione.
 
+- 2026-10-16 11:56 — Tech Lead — [65559fe](https://github.com/B00RR/ultimo-miglio/commit/65559fe79f32f1312019f4975cf616e26cdf2294) — PR #97: merge di main (lampione #124 tenuto), arco del Bancone a +3.2 (i clienti si incastravano nella fessura muro/arco: 4 PlayMode rossi), secondo collider di Bancone e scaffali ripristinato (#58), test senza PlayerPrefs.DeleteAll, scena rigenerata.
 - 2026-10-16 11:53 — Code Reviewer — [faf9f88](https://github.com/B00RR/ultimo-miglio/commit/faf9f88c0912ad5994c7473289f92ba847321853) — unita in squash la [PR #139](https://github.com/B00RR/ultimo-miglio/pull/139) (Docs UI: 11_CAP1_COMPLETO allineato all'HUD minimo del Cap. 1). Solo `.md`. Closes #138.
 - 2026-10-16 11:50 — Code Reviewer — [4caa545](https://github.com/B00RR/ultimo-miglio/commit/4caa5452fa083d9ecafb1c591a4257d8d979fbd5) — unita in squash la [PR #147](https://github.com/B00RR/ultimo-miglio/pull/147) (docs: sezione *Regole del computer*, repo docs archiviato). Solo `.md`; conflitto su STATO_PROGETTO.md risolto con merge di main nel branch.
 - 2026-10-16 11:50 — Code Reviewer — [8a2268e](https://github.com/B00RR/ultimo-miglio/commit/8a2268e61628a9ca3e14b79914948723b96c894c) — unita in squash la [PR #145](https://github.com/B00RR/ultimo-miglio/pull/145) (regola 1 solo Unity sul box, `flock /tmp/unity-box.lock`). Solo `.md`.
