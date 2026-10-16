@@ -10,7 +10,7 @@ using UltimoMiglio.Gameplay;
 /// <summary>Real gameplay path (not wallet cheat): Arrivi → shelf → Bancone serves → LN → hire NONNO → working.</summary>
 public class TutorialToNonnoTest
 {
-    [UnityTest, Timeout(300000)]
+    [UnityTest, Timeout(480000)]
     public IEnumerator Path_ArriviShelfBancone_EarnsLn_HiresNonno_Works()
     {
         PlayerPrefs.DeleteAll();
@@ -49,8 +49,9 @@ public class TutorialToNonnoTest
             Assert.IsFalse(string.IsNullOrEmpty(TutorialManager.I.CurrentObjectiveText), "objective text empty");
 
             int servesNeeded = 3;
+            double hire = eco.Cost(UpgradeKind.NonnoHire); // dai dati (#75: 50 LN), non più 10 fisso
             float t0 = Time.time;
-            while (eco.S.CustomersServed < servesNeeded && Time.time - t0 < 180f)
+            while ((eco.S.CustomersServed < servesNeeded || eco.S.Wallet < hire) && Time.time - t0 < 360f)
             {
                 yield return Go(n, arr.transform.position);
                 float a = Time.time;
@@ -70,7 +71,7 @@ public class TutorialToNonnoTest
             }
 
             Assert.GreaterOrEqual(eco.S.CustomersServed, servesNeeded, "could not serve customers");
-            Assert.GreaterOrEqual(eco.S.Wallet, 10.0 - 0.01, $"wallet {eco.S.Wallet} after {eco.S.CustomersServed} serves — need ≥10 LN");
+            Assert.GreaterOrEqual(eco.S.Wallet, hire - 0.01, $"wallet {eco.S.Wallet} after {eco.S.CustomersServed} serves — need ≥{hire} LN");
 
             // Hire NONNO: cammina sul pad e resta in trigger (teleport CC non genera OnTriggerEnter)
             yield return EnterPad(n, padN);
@@ -105,6 +106,50 @@ public class TutorialToNonnoTest
             Application.logMessageReceived -= onLog;
             Time.timeScale = 1f;
         }
+    }
+
+    /// <summary>#104 (QA LIVE v9 P0): assunto NONNO restando sul pad, il collider del pad si spegne senza OnTriggerExit;
+    /// la zona attiva statica restava sul pad e Arrivi/Bancone non rispondevano più fino al reload.</summary>
+    [UnityTest, Timeout(240000)]
+    public IEnumerator HireNonnoStandingOnPad_ThenArriviAndBanconeStillWork()
+    {
+        PlayerPrefs.DeleteAll();
+        var save = System.IO.Path.Combine(Application.persistentDataPath, "save_v1.json");
+        if (System.IO.File.Exists(save)) System.IO.File.Delete(save);
+        yield return SceneManager.LoadSceneAsync("Ch1_Deposito");
+        Time.timeScale = 3f;
+        try
+        {
+            while (!GameRoot.Ready || !GameRoot.I.Nina) yield return null;
+            var n = GameRoot.I.Nina; var eco = GameRoot.I.Eco;
+            var arr = Object.FindAnyObjectByType<ArrivalsZone>();
+            var shelves = Object.FindObjectsByType<Shelf>(FindObjectsSortMode.None);
+            var ban = Object.FindAnyObjectByType<Bancone>();
+            var padN = Object.FindObjectsByType<UpgradePad>(FindObjectsSortMode.None).First(p => p.Kind == UpgradeKind.NonnoHire);
+            eco.S.Wallet = eco.Cost(UpgradeKind.NonnoHire) + 20;
+
+            yield return EnterPad(n, padN);
+            float h = Time.time;
+            while (eco.S.NonnoLevel < 0 && Time.time - h < 60f) { if (!padN.Occupied) yield return EnterPad(n, padN); else n.ScriptedInput = Vector3.zero; yield return null; }
+            Assert.GreaterOrEqual(eco.S.NonnoLevel, 0, "NONNO non assunto");
+            yield return Wait(n, 0.5f);
+            Assert.IsFalse(padN.Occupied, "il pad di NONNO (spento) tiene ancora Nina");
+            Assert.AreNotEqual(padN, ProximityZone.Active, "la zona attiva è rimasta bloccata sul pad di NONNO");
+
+            if (arr.Stock < 5) arr.Stock = 20;
+            yield return Go(n, arr.transform.position);
+            float a = Time.time;
+            while (n.Stack.Count < 1 && Time.time - a < 15f) yield return null;
+            Assert.Greater(n.Stack.Count, 0, "Arrivi non dà pacchi dopo l'assunzione di NONNO");
+
+            if (shelves.Length > 0) { yield return Go(n, shelves[0].transform.position); yield return Wait(n, 1.2f); }
+            int before = eco.S.CustomersServed;
+            yield return Go(n, ban.transform.position);
+            float b = Time.time;
+            while (eco.S.CustomersServed <= before && Time.time - b < 40f) yield return null;
+            Assert.Greater(eco.S.CustomersServed, before, "il Bancone non serve dopo l'assunzione di NONNO");
+        }
+        finally { Time.timeScale = 1f; }
     }
 
     static IEnumerator Wait(NinaController n, float s)
