@@ -16,8 +16,14 @@ namespace UltimoMiglio.Gameplay
         float _acc; bool _started;
 
         protected virtual void Reset() { GetComponent<Collider>().isTrigger = true; }
-        void OnTriggerEnter(Collider o) { var n = o.GetComponent<NinaController>(); if (n) { Nina = n; Dwell = 0; _acc = 0; _started = false; if (!_active || _active.Priority < Priority) _active = this; } }
-        void OnTriggerExit(Collider o) { if (o.GetComponent<NinaController>()) { Nina = null; if (_active == this) _active = null; OnZoneExit(); } }
+        void OnTriggerEnter(Collider o) { if (PerDistanza) return; var n = o.GetComponent<NinaController>(); if (n) Entra(n); }
+        void OnTriggerExit(Collider o) { if (PerDistanza) return; if (o.GetComponent<NinaController>()) Esci(); }
+        void Entra(NinaController n) { Nina = n; Dwell = 0; _acc = 0; _started = false; if (!_active || _active.Priority < Priority) _active = this; }
+        void Esci() { Nina = null; if (_active == this) _active = null; OnZoneExit(); }
+        /// <summary>#171: true = la zona decide "dentro/fuori" con <see cref="DentroPerDistanza"/> a ogni frame invece che con OnTriggerEnter/Exit
+        /// (il contatto trigger↔CharacterController scattava a 0,60-0,65 m su un disco di 0,70, e un collider riacceso con Kaia già dentro non manda Enter).</summary>
+        protected virtual bool PerDistanza => false;
+        protected virtual bool DentroPerDistanza(NinaController n) => false;
         /// <summary>#104: un collider disattivato (o la zona disabilitata) non manda OnTriggerExit. Senza questo Nina restava
         /// "dentro" il pad di NONNO appena assunto e la _active statica bloccava Arrivi, Scaffali e Bancone fino al reload.</summary>
         protected void ReleaseNina()
@@ -31,6 +37,11 @@ namespace UltimoMiglio.Gameplay
         {
             if (!GameRoot.Ready) return;
             OnIdleUpdate();
+            if (PerDistanza)
+            {
+                var n = GameRoot.I.Nina; bool dentro = n && DentroPerDistanza(n);
+                if (dentro && !Nina) Entra(n); else if (!dentro && Nina) Esci();
+            }
             if (!Nina) return;
             if (_active && _active != this && _active.Nina) return;
             _active = this;

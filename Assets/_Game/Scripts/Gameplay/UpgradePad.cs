@@ -35,6 +35,30 @@ namespace UltimoMiglio.Gameplay
                 if (ip.Pad == this) ip.HasCard = false;
             }
         }
+        /// <summary>#171: il pad si attiva quando i piedi (pivot) di Kaia sono entro il raggio del disco visibile, distanza orizzontale dal centro.
+        /// Il raggio è letto dal disco: scala reale dell'anello dell'InteractionPoint (mesh Ø 1 m), altrimenti Radius × VisualScale o il figlio "Pad".</summary>
+        protected override bool PerDistanza => true;
+        protected override bool DentroPerDistanza(NinaController n)
+        {
+            if (!_col || !_col.enabled) return false; // pad non disponibile (costo infinito / non sbloccato): mai dentro
+            var c = DiscCenter; var p = n.transform.position; float dx = p.x - c.x, dz = p.z - c.z;
+            float r = DiscRadius; return dx * dx + dz * dz <= r * r;
+        }
+        InteractionPoint _ip; bool _ipCercato; Transform _disc;
+        InteractionPoint Ip { get { if (!_ipCercato) { _ipCercato = true; _ip = GetComponent<InteractionPoint>(); } return _ip; } }
+        /// <summary>#171: centro del disco visibile (anello dell'InteractionPoint, o il pad stesso).</summary>
+        public Vector3 DiscCenter => Ip && Ip.RingVisual ? Ip.RingVisual.position : transform.position;
+        /// <summary>#171: raggio del disco visibile, in metri (scala del mondo inclusa).</summary>
+        public float DiscRadius
+        {
+            get
+            {
+                if (Ip && Ip.RingVisual) { var sc = Ip.RingVisual.lossyScale; return 0.5f * Mathf.Min(sc.x, sc.z); } // mesh dell'anello Ø 1 m a scala 1
+                if (Ip) return Ip.Radius * InteractionPoint.VisualScale;
+                if (!_disc) _disc = transform.Find("Pad");
+                return _disc ? 0.5f * Mathf.Min(_disc.lossyScale.x, _disc.lossyScale.z) : 0.7f;
+            }
+        }
         protected override void OnZoneStart() { base.OnZoneStart(); if (GameRoot.Ready) GameRoot.I.Eco.BeginPadStay(Kind); }
         protected override void OnIdleUpdate()
         {
