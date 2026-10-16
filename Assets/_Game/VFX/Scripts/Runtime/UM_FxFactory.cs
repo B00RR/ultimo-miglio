@@ -195,7 +195,7 @@ namespace UltimoMiglio.VFX
             m.duration = 0.25f; m.startLifetime = new ParticleSystem.MinMaxCurve(0.25f, 0.4f);
             m.startSpeed = new ParticleSystem.MinMaxCurve(1.8f, 3.2f);
             m.startSize = new ParticleSystem.MinMaxCurve(0.07f, 0.13f);
-            m.startColor = Grad(UM_Palette.UiPacco, Color.Lerp(UM_Palette.UiPacco, UM_Palette.Crema, 0.35f)); // UI: teal pacco
+            m.startColor = Grad(UM_Palette.Terracotta, Color.Lerp(UM_Palette.Terracotta, UM_Palette.Crema, 0.35f)); // #69: terracotta pacco (niente teal)
             m.gravityModifier = 0.6f;
             var e = ps.emission; e.SetBursts(new[] { new ParticleSystem.Burst(0, (short)N(9)) });
             var sh = ps.shape; sh.shapeType = ParticleSystemShapeType.Cone; sh.angle = 25f; sh.radius = 0.15f; sh.rotation = new Vector3(-90, 0, 0);
@@ -208,10 +208,10 @@ namespace UltimoMiglio.VFX
             ShrinkOut(st);
             var pr = Make("ring", mat, 1, out var prr); pr.transform.SetParent(ps.transform, false); Tile(pr, TileRing);
             prr.renderMode = ParticleSystemRenderMode.HorizontalBillboard; prr.maxParticleSize = 3f;
-            var prm = pr.main; prm.duration = 0.35f; prm.startLifetime = 0.35f; prm.startSpeed = 0; prm.startSize = 1.4f; prm.startColor = UM_Palette.UiPacco;
+            var prm = pr.main; prm.duration = 0.35f; prm.startLifetime = 0.35f; prm.startSpeed = 0; prm.startSize = 1.4f; prm.startColor = UM_Palette.Terracotta;
             var pre = pr.emission; pre.SetBursts(new[] { new ParticleSystem.Burst(0, 1) });
             var prs = pr.sizeOverLifetime; prs.enabled = true; prs.size = new ParticleSystem.MinMaxCurve(1f, AnimationCurve.EaseInOut(0, 0.3f, 1, 1f));
-            FadeOut(pr, UM_Palette.UiPacco, 0.3f);
+            FadeOut(pr, UM_Palette.Terracotta, 0.3f);
             return ps.gameObject;
         }
 

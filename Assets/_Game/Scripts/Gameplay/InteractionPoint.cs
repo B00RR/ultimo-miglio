@@ -14,8 +14,10 @@ namespace UltimoMiglio.Gameplay
     {
         public PoiKind Kind; public string Label; public Texture2D Icon; public Font LabelFont;
         public float Radius = 1.1f; public bool HasCard; public UpgradePad Pad; public UltimoMiglio.VFX.UM_PadFillRing Ring; public UltimoMiglio.VFX.UM_PadIcon PadIcon;
-        // Concept: Purchase = #F4C430, Pickup = teal, Delivery = menta; bordo bruno #3B2A20
-        public static readonly Color Blu = new(0.369f, 0.498f, 0.525f), Verde = new(0.561f, 0.788f, 0.659f), Giallo = new(0.957f, 0.769f, 0.188f), Ink = new(0.231f, 0.165f, 0.125f);
+        // #69 (guida §2: niente blu/grigi freddi): Prendi = terracotta #C8633B, Consegna = menta #8FC9A8, Acquisto = limone #F7E26B; bordo outline #3B2F2A.
+        // Il nome "Blu" resta per compatibilità API, ma ora vale terracotta.
+        public static readonly Color Blu = new(0.784f, 0.388f, 0.231f), Verde = new(0.561f, 0.788f, 0.659f), Giallo = new(0.969f, 0.886f, 0.420f), Ink = new(0.231f, 0.184f, 0.165f);
+        static readonly Color Crema = new(0.953f, 0.890f, 0.765f); // #F3E3C3: schiarimenti caldi (mai verso il bianco/grigio freddo)
 
         Transform _rim, _fill, _beacon; Material _fillMat, _beaconMat; Color _col;
         VisualElement _chip; Label _text; UltimoMiglio.UI.HudController _hud; Camera _cam; TutorialManager _tut;
@@ -35,11 +37,21 @@ namespace UltimoMiglio.Gameplay
             }
         }
 
+        /// #69: il quadrato giallo arrotondato (UI ZoneRing) sotto il disco si leggeva come griglia di debug.
+        /// Il disco del POI già mostra la zona: nascondo il quad del ProximityZone e quelli figli (la logica di Fill resta, solo invisibile).
+        void HideLegacyZoneSquare()
+        {
+            var zone = GetComponent<ProximityZone>();
+            if (zone && zone.Ring) { var r = zone.Ring.GetComponent<Renderer>(); if (r) r.enabled = false; }
+            foreach (var zr in GetComponentsInChildren<UltimoMiglio.UI.ZoneFillRing>(true)) { var r = zr.GetComponent<Renderer>(); if (r) r.enabled = false; }
+        }
+
         public Color KindColor => Kind == PoiKind.Prendi ? Blu : Kind == PoiKind.Consegna ? Verde : Giallo;
 
         void Start()
         {
             HideFloatingChips();
+            HideLegacyZoneSquare();
             _col = KindColor; _phase = Random.value * 6f;
             var sh = Shader.Find("Universal Render Pipeline/Unlit");
             Material M(Color c) { var m = new Material(sh); m.SetColor("_BaseColor", c); if (m.HasProperty("_Color")) m.SetColor("_Color", c); return m; }
@@ -50,7 +62,7 @@ namespace UltimoMiglio.Gameplay
             float fillA = Kind == PoiKind.Acquisto ? 0.92f : 0.78f;
             _fillMat.color = new Color(_col.r, _col.g, _col.b, fillA);
             _fill = Disc("POI_Fill", _fillMat, new Vector3(Radius * 1.95f, 0.08f, Radius * 1.95f), 0.05f);
-            _beaconMat = M(Color.Lerp(_col, Color.white, 0.35f));
+            _beaconMat = M(Color.Lerp(_col, Crema, 0.35f));
             _beacon = Disc("POI_Beacon", _beaconMat, new Vector3(0.14f, 1.6f, 0.14f), 1.6f);
             _beacon.gameObject.SetActive(false);
             _tut = FindAnyObjectByType<TutorialManager>();
@@ -119,10 +131,10 @@ namespace UltimoMiglio.Gameplay
             _rim.localScale = new Vector3(Radius * 2.15f * sc, 0.06f, Radius * 2.15f * sc);
             _fill.localScale = new Vector3(Radius * 1.95f * sc, 0.08f, Radius * 1.95f * sc);
             float baseA = Kind == PoiKind.Acquisto ? 0.92f : 0.78f;
-            var fill = Color.Lerp(_col, Color.white, (_active ? 0.22f : 0.08f) * k);
+            var fill = Color.Lerp(_col, Crema, (_active ? 0.22f : 0.08f) * k);
             fill.a = baseA * (0.88f + 0.12f * k); // pulse leggibile
             _fillMat.SetColor("_BaseColor", fill); if (_fillMat.HasProperty("_Color")) _fillMat.SetColor("_Color", fill);
-            if (_active) { _beacon.localScale = new Vector3(0.18f, 2.2f + 0.3f * k, 0.18f); _beaconMat.SetColor("_BaseColor", Color.Lerp(_col, Color.white, 0.3f + 0.4f * k)); }
+            if (_active) { _beacon.localScale = new Vector3(0.18f, 2.2f + 0.3f * k, 0.18f); _beaconMat.SetColor("_BaseColor", Color.Lerp(_col, Crema, 0.3f + 0.4f * k)); }
 
             EnsureChip();
             if (_chip == null || !_cam) return;
