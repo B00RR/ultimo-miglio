@@ -48,7 +48,10 @@ Formato Given/When/Then; ogni criterio è misurabile dal bot di playtest (`botSt
 | ECO-05 | eff 0,7 | rata 1 saldata | entro 40:00 (finestra) senza usare la Proroga |
 | ECO-06 | qualsiasi eff | prima della spiegazione del debito (4:00) | il 100% delle LN resta nel portafoglio; dopo, 40% portafoglio / 60% debito ±1% |
 | ECO-07 | 100 / 250 / 450 pacchi consegnati | — | +60 / +120 / +200 LN una sola volta, coriandoli e riga di Mamma Rosa; eff 1,0: 6:03 / 12:25 / 20:11 ±15% |
-| ECO-08 | versato 25% / 50% / 75% della rata | — | timbro / +1 Reputazione / arredo `decor_foto_nonna_ada`, annunciati nel fumetto di Ada e riportati nella schermata di fine giornata; nessuna valuta assegnata |
+| ECO-08 | versato 25% / 50% / 75% della rata | il versamento supera la soglia | timbro / +1 Reputazione / arredo "foto di Oma Tilde" (id `decor_foto_nonna_ada` in economy.json, invariato); nessuna valuta assegnata; entro 1 s: timbro sulla Cassaforte, riga di Oma Tilde `onb.debt.milestone1/2/3` (una sola volta per tappa) e `sfx_debt_stamp_01/02/03` (uno per tappa) |
+| ECO-08b | tappa N raggiunta nel ciclo | compare la schermata di fine giornata | mostra "tappa N/3" (1/3, 2/3, 3/3) coerente coi log; mai una barra o un contatore delle tappe nell'HUD durante il gioco |
+| SFX-01 | passo `combo` | 2° cliente di fila ("+2", moltiplicatore interno x1,2) | suona `sfx_combo_plus_02` insieme al "+2" (±0,1 s) e scatta il gate; `sfx_combo_x1_5` non suona prima di "+5" |
+| SFX-02 | tutto il cap 1 | — | nessun sfx di telefono (squillo, notifica, vibrazione) in nessun passo |
 | ECO-09 | t ≥ 8:00, Scarpe 2 o NONNO 2 pagabili | — | freccia sul più economico dei due; sparisce all'acquisto o dopo 20 s |
 | ECO-10 | costi | si apre ogni pad | prezzi = `upgrades.json` (Zaino 5/6/7 = 560/960/1.700 LN) |
 | ECO-11 | cap 1 | — | nessun sistema gestionale di 10 attivo; tranche 8.400 LN invariata |
@@ -109,7 +112,7 @@ Valgono per **tutti** i passi: GATE-02, GATE-03, ONB-10, ONB-11, ONB-16, PT-01�
 | 5 | `serve` | ONB-05, CLI-01, CLI-05 |
 | 6 | `coins` | ONB-06 |
 | 7 | `zainoPad` | ONB-07, GATE-06, ECO-10 |
-| 8 | `combo` | ONB-08, ONB-15, CLI-02 (anziano da 1:40), GATE-05 |
+| 8 | `combo` | SFX-01, ONB-08, ONB-15, CLI-02 (anziano da 1:40), GATE-05 |
 | 9 | `nonnoIntro` | ONB-09a |
 | 10 | `hireNonno` | ONB-09, ONB-09b, ONB-09c, GATE-06 |
 | 11 | `nonnoConfirm` | ONB-09d |
@@ -118,4 +121,4 @@ Valgono per **tutti** i passi: GATE-02, GATE-03, ONB-10, ONB-11, ONB-16, PT-01�
 | 14 | `debtCard` | ONB-13, ONB-13b, ECO-06, GATE-06 |
 | 15 | `wallPad` | ONB-14 |
 | 16 | `freePlay` | PT-07, fine run (maxSec 0 = terminale) |
-Criteri a livello di sessione (non legati a un passo): CLI-03, CLI-04, CLI-06, CLI-07, ECO-01…ECO-05, ECO-07…ECO-09, ECO-11, DAT-01…03.
+Criteri a livello di sessione (non legati a un passo): ECO-08b, SFX-02, CLI-03, CLI-04, CLI-06, CLI-07, ECO-01…ECO-05, ECO-07…ECO-09, ECO-11, DAT-01…03.
