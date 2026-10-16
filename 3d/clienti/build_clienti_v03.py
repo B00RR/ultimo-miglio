@@ -127,26 +127,36 @@ def vip(P):
     acc(P,cube(HR+Vector((0,-0.07,0.06)),(0.07,0.01,0.12),"glow"),"phone")
     for sx in (1,-1): acc(P,ico((sx*0.18,-0.03,1.47),0.015,"sole",1),"earrings")
 
+def shell_front(o,ymax):
+    # tiene solo le facce laterali frontali (centro y<ymax): guscio aperto aderente alla curva del cappotto
+    import bmesh
+    o.data.transform(o.matrix_world); o.matrix_world=Matrix()
+    bm=bmesh.new(); bm.from_mesh(o.data)
+    bmesh.ops.delete(bm,geom=[f for f in bm.faces if f.calc_center_median().y>ymax or abs(f.normal.z)>0.7],context='FACES')
+    bm.to_mesh(o.data); bm.free(); return o
+def front_y(o,z0,z1,xmax=0.09):
+    vs=[(o.matrix_world@v.co) for v in o.data.vertices]; vs=[v.y for v in vs if z0<v.z<z1 and abs(v.x)<xmax]
+    return min(vs)
 def ada(P):
-    # Nonna Ada: chignon bianco + matita, occhiali tondi ottone con catenella, cardigan terracotta su camicetta menta,
-    # grembiule noce (bruno_m) con tasche/attrezzi e libro mastro, spilla faro, scarponi.
+    # Nonna Ada v02 (review Concept Artist PR #85): grembiule aderente (guscio sulla curva del cardigan + pettorina dentro il colletto),
+    # niente catenella occhiali, niente fiocco/asta sul fianco. Statura 0.88 di Nina: SOLO scala nel prefab (rig condiviso).
     acc(P,uvs((0,0.02,1.6),0.192,"crema",10,5,(1.03,1.0,0.8)),"hair")
     acc(P,ico((0,0.07,1.79),0.095,"crema",1,(1,1,0.9)),"hair_bun")
     acc(P,cyl((0.05,0.07,1.84),0.012,0.26,"sole",6,(0.3,1.2,0)),"pencil")
     for sx in (1,-1): acc(P,cyl((sx*0.068,-0.19,1.54),0.048,0.012,"sole_d",8,(math.pi/2,0,0)),"glasses")
     acc(P,cube((0,-0.19,1.545),(0.05,0.012,0.012),"sole_d"),"glasses")
-    for sx in (1,-1): acc(P,cube((sx*0.165,-0.14,1.41),(0.01,0.01,0.24),"sole_d",rot=(0,math.radians(sx*-8),0)),"glasses")   # catenella
-    acc(P,cyl((0,-0.02,1.32),0.13,0.06,"menta",10),"blouse_collar")                     # colletto camicetta menta
-    acc(P,cube((0,-0.16,1.2),(0.11,0.02,0.14),"menta"),"blouse_collar")                  # scollo a V menta
-    acc(P,cyl((0,0,0.68),0.255,0.5,"terracotta",12,r2=0.215),"cardigan_skirt")         # cardigan lungo al ginocchio
-    acc(P,cube((0,-0.215,0.78),(0.36,0.03,0.6),"bruno_m"),"apron")                      # grembiule noce
-    acc(P,cube((0,-0.2,1.13),(0.24,0.03,0.2),"bruno_m"),"apron")
-    acc(P,cube((0,-0.236,0.72),(0.32,0.02,0.16),"stivali"),"apron")                     # tasche
-    for k,(x,c) in enumerate(((-0.11,"sole"),(-0.085,"bruno"),(-0.06,"legno_l"))): acc(P,cube((x,-0.24,0.84),(0.015,0.015,0.1),c),"apron")   # attrezzi
-    acc(P,cube((0.07,-0.25,0.82),(0.11,0.02,0.08),"tufo"),"ledger")                     # libro mastro in tasca
-    acc(P,cube((0.11,-0.2,1.24),(0.03,0.02,0.05),"sole"),"pin_faro")                    # spilla faro
-    acc(P,cube((0.11,-0.205,1.28),(0.035,0.02,0.015),"terracotta_d"),"pin_faro")
-    for sx in (1,-1): acc(P,cube((sx*0.15,0.2,0.92),(0.12,0.02,0.04),"bruno_m"),"apron")   # fiocco dietro
+    by=front_y(P[0],1.05,1.25)                                                        # fronte del torso
+    acc(P,cube((0,by+0.006,1.2),(0.11,0.012,0.14),"menta"),"blouse_collar")           # scollo a V menta
+    acc(P,cyl((0,-0.02,1.32),0.13,0.06,"menta",10),"blouse_collar")                    # colletto (copre la cima della pettorina)
+    acc(P,cyl((0,0,0.68),0.255,0.5,"terracotta",12,r2=0.215),"cardigan_skirt")
+    acc(P,shell_front(cyl((0,0,0.69),0.263,0.46,"bruno_m",12,r2=0.223),-0.1),"apron")  # telo grembiule sulla curva della gonna
+    acc(P,cube((0,by-0.012,1.1),(0.22,0.01,0.38),"bruno_m"),"apron")                  # pettorina piatta sul petto, sale fin dentro il colletto (z 1.29)
+    sy=-0.262*0.8                                                                       # fronte della gonna a z~0.72
+    acc(P,cube((0,sy-0.012,0.72),(0.30,0.008,0.15),"stivali"),"apron")                 # tasche
+    for x,c in ((-0.11,"sole"),(-0.085,"bruno"),(-0.06,"legno_l")): acc(P,cube((x,sy-0.02,0.82),(0.015,0.012,0.09),c),"apron")
+    acc(P,cube((0.07,sy-0.022,0.8),(0.1,0.012,0.07),"tufo"),"ledger")
+    acc(P,cube((0.11,by-0.01,1.24),(0.03,0.012,0.05),"sole"),"pin_faro")
+    acc(P,cube((0.11,by-0.012,1.28),(0.035,0.012,0.015),"terracotta_d"),"pin_faro")
 CFG={"base":dict(top="tufo_b",legs="bruno_m",shoes="stivali"),
  "residente":dict(top="terracotta",legs="bruno_m",shoes="stivali",sleeve="short",fn=residente,hat=True),
  "rider":dict(top="menta",legs="menta",shoes="bruno_m",fn=rider,hat=True),

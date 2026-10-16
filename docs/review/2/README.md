@@ -18,3 +18,15 @@ Chignon bianco (crema) con matita gialla, occhiali tondi ottone + catenella, cam
 ## Render
 fronte/3-4/retro/iso 3-4: `ada_*.png`; lineup con i 6 clienti v02: `lineup_iso34.png`, `lineup_fronte.png`.
 Generatori: `3d/clienti/build_clienti_v03.py`, `3d/clienti/render_review_2.py` (Blender 4.2.3, headless).
+
+## v02 — fix dalla review del Concept Artist (PR #85)
+**Nonna Ada** (1.466 tri, stessi giunti):
+1. Grembiule: telo = guscio aperto sulla curva della gonna del cardigan (spessore minimo, nessun blocco staccato); pettorina appoggiata sul petto, con la cima dentro il colletto menta.
+2. Catenella occhiali rimossa.
+3. Asta/fiocco marrone sul fianco rimossi.
+4. **Statura: scala uniforme 0.88 rispetto a Nina SOLO nel prefab** (Transform del root del personaggio). Non è nella mesh, perché il rig Humanoid è condiviso con Nina/clienti. Per l'Animator e il Tech Lead: la mesh resta a 1:1 sui giunti di Nina; la scala 0.88 va messa nel prefab/scena.
+
+**Clienti v03-uv**: SOLO remap UV su celle calde esistenti di T_Palette_Atlas (nessuna cella nuova). **Numero e ordine dei vertici e posizioni INVARIATI** (verificato via assert nello script `3d/clienti/clienti_v03_uv.py`); triangoli invariati.
+- rider: cappello limone #F7E26B (prima era terracotta come il residente).
+- Pelle: tono A pelle/pelle_d (base, anziana, invariati), tono B pelle_d/legno (residente, vip), tono C intonaco_terra/pelle (rider, turista).
+- File cambiati: `3d/export/chr/chr_cliente_{residente,rider,turista,vip}.{fbx,glb,blend}`. base e anziana: nessun cambio. I FBX riggati in `Assets/_Game/Art/Characters/Clienti/` NON sono toccati: l'Animator deve trasferire le UV (o rifare il bind con gli stessi pesi, perché la topologia è identica).
