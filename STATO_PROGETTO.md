@@ -132,6 +132,7 @@ Ogni ruolo lavora solo sulle issue con la propria etichetta `ruolo:*`, sempre co
 Voci più recenti in alto. Formato: `AAAA-MM-GG HH:MM` (Europe/Rome) — [commit] — descrizione.
 
 - 2026-10-16 11:50 — Producer — aggiornate *Regole del computer*: stop solo ai propri processi/subagenti (mai agli altri; stop agli altri solo DevOn/Producer); da PR #145 portati runner self-hosted spento, soglia load 16 e Unity anche in batchmode; corretto §10.1 (`docs/design/11_CAP1_COMPLETO.md`; `00_BIBBIA.md` ancora da migrare).
+- 2026-10-16 11:50 — Producer — aggiornate *Regole del computer*: stop solo ai propri processi/subagenti (mai agli altri; stop agli altri solo DevOn/Producer); da PR #145 portati runner self-hosted spento, soglia load 16 e Unity anche in batchmode; corretto §10.1 (`docs/design/11_CAP1_COMPLETO.md`; `00_BIBBIA.md` ancora da migrare).
 - 2026-10-16 11:50 — Tech Lead — regola §10.11 "1 solo Unity sul box" con `flock /tmp/unity-box.lock` e soglia di load 16, dopo il blocco del box (load 200) delle 11:45. Il runner self-hosted è spento per oggi.
 - 2026-10-16 11:48 — Regole del computer decise da DevOn su richiesta di Lorenzo (carico box 158/8 core); repo docs archiviato.
 - 2026-10-16 11:47 — Code Reviewer — [d039bd8](https://github.com/B00RR/ultimo-miglio/commit/d039bd8aaa9dfe52606eca05ccaae874dace65ea) — unita in squash la [PR #87](https://github.com/B00RR/ultimo-miglio/pull/87) (fix(#59): NONNO non va più in retromarcia + test PlayMode verso di marcia). Job `test` verde. Refs #59.
