@@ -54,9 +54,9 @@ Altre: `cfr3_02_movimento`, `cfr3_03_arrivi`, `cfr3_05_bancone`.
 ### Scostamenti ancora presenti
 | # | Area | Cosa si vede | Guida | Owner | Issue |
 |---|---|---|---|---|---|
-| C1 | Zone/pad a terra | Dischi blu-grigio scuro, pali grigio freddo, riquadri gialli tipo griglia di debug sotto i pad | Niente grigi/blu freddi; zone in menta/limone/terracotta, nessuna griglia | VFX & Technical Artist | vedi issue [Arte] zone |
-| C2 | Insegna | Pannello bianco piatto, nessun faro | Insegna in legno/terracotta con faro (§3) | 3D Artist | vedi issue [Arte] insegna |
-| C3 | Pad telefono | Ora «08:00» bianca su crema illeggibile, due barre vuote | Testo bruno #3B2A20, niente campi vuoti (§10) | UI/UX Designer | vedi issue [Arte] pad |
+| C1 | Zone/pad a terra | Dischi blu-grigio scuro, pali grigio freddo, riquadri gialli tipo griglia di debug sotto i pad | Niente grigi/blu freddi; zone in menta/limone/terracotta, nessuna griglia | VFX & Technical Artist | #69 |
+| C2 | Insegna | Pannello bianco piatto, nessun faro | Insegna in legno/terracotta con faro (§3) | 3D Artist | #70 |
+| C3 | Pad telefono | Ora «08:00» bianca su crema illeggibile, due barre vuote | Testo bruno #3B2A20, niente campi vuoti (§10) | UI/UX Designer | #71 |
 
 ### Non verificato
 Notte/lanterne, FX, animazioni di NONNO/TICO (non inquadrati).
