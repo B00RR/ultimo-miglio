@@ -90,19 +90,10 @@ namespace UltimoMiglio.Gameplay
                     }
                     if (st == TutorialManager.Step.DebtCard)
                     {
-                        // #223: il passo si chiude solo con un versamento fatto DOPO il suo inizio. Il versamento è la quota al debito
-                        // delle monete raccolte, quindi il test fa come un giocatore: un giro di consegna completo e raccoglie le monete.
-                        double d0 = E.S.DebtPaid;
-                        yield return Go(arr.transform.position, "Arrivals (debito)");
-                        float a2 = Time.time; while (!N.Stack.Full && Time.time - a2 < 8) yield return null;
-                        foreach (var s2 in shelves) { yield return Go(s2.transform.position, "Shelf " + s2.Color); yield return Wait(1.5f); }
-                        var pk2 = picks.OrderBy(p => (p.transform.position - N.transform.position).sqrMagnitude).First();
-                        yield return Go(pk2.transform.position, "Pickup " + pk2.Shelf.Color); yield return Wait(2f);
-                        yield return Go(ban.transform.position, "Bancone (debito)");
-                        float b2 = Time.time; while (N.Stack.Count > 0 && Time.time - b2 < 25) yield return null;
-                        yield return Go(ban.transform.position + Vector3.right * 0.8f, "Coins (debito)"); yield return Wait(2.5f);
-                        Log($"versamento debito +{E.S.DebtPaid - d0:0.##}");
-                        continue;
+                        // #223 (regole GD): il passo si chiude solo con il primo versamento alla Cassaforte, fatto DOPO il suo inizio:
+                        // il test fa come un giocatore e porta Nina sul bersaglio del passo (la Cassaforte).
+                        var safe = TutorialManager.I.CurrentTarget; double d0 = E.S.DebtPaid;
+                        if (safe) { yield return Go(safe.position, "Cassaforte"); yield return Wait(1.5f); Log($"versamento debito +{E.S.DebtPaid - d0:0.##}"); continue; }
                     }
                     if (st == TutorialManager.Step.CassaPass) { var cz = FindAnyObjectByType<CassaZone>(); if (cz) { yield return Go(cz.transform.position, "Cassa"); yield return Wait(1.5f); continue; } }
                     yield return null;
