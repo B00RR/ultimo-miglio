@@ -232,6 +232,11 @@
         "format": "+{n}",
         "durationSec": 1.5,
         "persistentHud": false
+      },
+      "sfx": {
+        "onPlusN": "sfx_combo_plus_{N:02d} (N = 1..8, tono che sale; da N>8 si ripete sfx_combo_plus_08)",
+        "onGate": "sfx_combo_plus_02: il gate x1,2 coincide con il 2° cliente di fila ('+2')",
+        "note": "sfx_combo_x1_5 (+5) e sfx_combo_x2 (+10) restano per i traguardi di combo successivi, non per il gate"
       }
     },
     {
@@ -466,6 +471,39 @@
           "onb.orders.special",
           "onb.flotta.hint"
         ]
+      }
+    ]
+  },
+  "sfxPolicy": "Cap 1: nessun sfx di telefono (squillo, notifica, vibrazione): il telefono non c'è. Gli aiuti usano solo sfx di freccia/pulsazione (UI onboarding).",
+  "debtMilestoneFeedback": {
+    "note": "HUD minimo: timbro sulla Cassaforte al versamento che supera la soglia, una riga di Oma Tilde nel fumetto, e 'tappa N/3' nella schermata di fine giornata. Nessuna barra persistente. Premi e soglie in economy.json → rewards.debtMilestones (qui solo il feedback, per non toccare EconomyData).",
+    "milestones": [
+      {
+        "share": 0.25,
+        "reward": "stampSoloVisivo",
+        "cassaforteStamp": "stamp_tappa1",
+        "lineKey": "onb.debt.milestone1",
+        "endOfDayLabel": "tappa 1/3",
+        "sfx": "sfx_debt_stamp_01",
+        "persistentHud": false
+      },
+      {
+        "share": 0.5,
+        "reward": "reputation",
+        "cassaforteStamp": "stamp_tappa2",
+        "lineKey": "onb.debt.milestone2",
+        "endOfDayLabel": "tappa 2/3",
+        "sfx": "sfx_debt_stamp_02",
+        "persistentHud": false
+      },
+      {
+        "share": 0.75,
+        "reward": "decor",
+        "cassaforteStamp": "stamp_tappa3",
+        "lineKey": "onb.debt.milestone3",
+        "endOfDayLabel": "tappa 3/3",
+        "sfx": "sfx_debt_stamp_03",
+        "persistentHud": false
       }
     ]
   }

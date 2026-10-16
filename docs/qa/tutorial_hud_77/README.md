@@ -14,7 +14,7 @@ Prima (build web pubblicata, 360×800): `prima_build_web_360.jpg` — nessun fum
 |---|---|
 | move | passo 1, testo Tilde + suggerimento `onb.move.card` |
 | shelve | passo 3, suggerimento più lungo `onb.deposit.hint` (50 caratteri) |
-| nonno | pad acquisto obiettivo: freccia ▼ sopra la pillola "50 LN" (costo reale NONNO, `robots.json` `hireCostLn`; LN in tasca 50, come nel golden path all'assunzione a 2:10) |
+| nonno | pad acquisto obiettivo: freccia ▼ sopra la pillola "50 LN" (costo reale OLDO, `robots.json` `hireCostLn`; LN in tasca 50, come nel golden path all'assunzione a 2:10) |
 | nonno_alto | pad in alto sullo schermo: colonna ribaltata sotto il pad, freccia ▲ |
 | fine70 | testo più lungo (`fine`, 62 caratteri) |
 
@@ -32,4 +32,4 @@ Prima (build web pubblicata, 360×800): `prima_build_web_360.jpg` — nessun fum
 | Joystick flottante sopra il suggerimento | il suggerimento si nasconde (codice) — da verificare in Unity | | |
 
 
-**Numeri reali (#142):** pad NONNO 50 LN (#75 ha tolto i 15 LN temporanei); LN in tasca 0 nei passi iniziali (nessun portafoglio di partenza), 50 nei casi `nonno`; giorno G1. Anteprime rigenerate il 16/10/2026.
+**Numeri reali (#142):** pad OLDO 50 LN (#75 ha tolto i 15 LN temporanei); LN in tasca 0 nei passi iniziali (nessun portafoglio di partenza), 50 nei casi `nonno`; giorno G1. Anteprime rigenerate il 16/10/2026.
