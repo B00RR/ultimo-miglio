@@ -6,6 +6,8 @@ namespace UltimoMiglio.Gameplay
     /// <summary>Customer walking to a queue slot; leaves after patience (20 s) at the counter.</summary>
     public sealed class Customer : MonoBehaviour
     {
+        /// <summary>#111: raggio del corpo (CapsuleCollider del prefab e sweep).</summary>
+        public const float BodyRadius = 0.3f;
         public ParcelColor Wants; public float Speed = 2.2f;
         public Vector3 Target; public bool Leaving; public float Waited;
         public bool AtCounter => !Leaving && (transform.position - Target).sqrMagnitude < 0.36f; // 0.6m — WebGL was stuck at Bancone with 0.2m
@@ -21,7 +23,16 @@ namespace UltimoMiglio.Gameplay
             var d = Target - transform.position; d.y = 0;
             bool moving = d.sqrMagnitude > 0.0025f;
             float cur = 0f;
-            if (moving) { var ap = AgentMove.Slide(transform, Vector3.ClampMagnitude(d.normalized * Speed * Time.deltaTime, d.magnitude), 0.3f); if (ap.sqrMagnitude < 1e-10f) { _stuck += Time.deltaTime; if (_stuck > 1.5f) { transform.position = new Vector3(Target.x, transform.position.y, Target.z); _stuck = 0; } } else _stuck = 0; AgentMove.Face(transform, ap.sqrMagnitude > 1e-8f ? ap : d, Time.deltaTime); cur = Time.deltaTime > 0 ? ap.magnitude / Time.deltaTime : 0f; }
+            if (moving)
+            {
+                var step = Vector3.ClampMagnitude(d.normalized * Speed * Time.deltaTime, d.magnitude);
+                var ap = AgentMove.Slide(transform, step, BodyRadius, Leaving); // #111: in uscita attraversa solo i personaggi (collider spento), mai i solidi
+                // #111: niente più teletrasporto al Target. Fermo davanti a un personaggio: si aspetta in fila.
+                // Incastrato su un solido statico da più di 1,5 s: prova ad aggirarlo di lato, sempre con collisioni (mai attraverso muri/scaffali).
+                if (ap.sqrMagnitude < 1e-10f && !AgentMove.LastBlockedByAgent) { _stuck += Time.deltaTime; if (_stuck > 1.5f) ap = AgentMove.Sidestep(transform, step, BodyRadius); }
+                else if (ap.sqrMagnitude > 1e-10f) _stuck = 0;
+                AgentMove.Face(transform, ap.sqrMagnitude > 1e-8f ? ap : d, Time.deltaTime); cur = Time.deltaTime > 0 ? ap.magnitude / Time.deltaTime : 0f;
+            }
             else if (Leaving) Owner.Recycle(this);
             var an = Anim();
             if (an && an.runtimeAnimatorController) { an.SetFloat(SpeedId, moving ? Mathf.Max(cur, 0.5f) : 0f); an.SetFloat(PatienceId, Leaving ? 1f : Mathf.Clamp01(1f - Waited / (float)GameRoot.I.Eco.Cfg.CustomerPatienceSec)); }
