@@ -57,7 +57,7 @@ Esistenti (PR #62): tutte le `onb.*` e i biglietti `step:<id>` citati sopra.
 - Traguardi consegne: 100 / 250 / 450 pacchi = +60 / +120 / +200 LN (golden path: 6:03, 12:25, 20:11).
 - Tappe del debito (25 / 50 / 75% della rata), coerenti con l'HUD minimo (premi in `economy.json` → `rewards.debtMilestones`, feedback in `onboarding.json` → `debtMilestoneFeedback`):
   - **premi invariati:** 25% timbro visivo; 50% +1 Reputazione; 75% arredo "foto di Nonna Ada";
-  - **feedback:** al versamento che supera la soglia compare un **timbro sulla Cassaforte** (3 timbri diversi, restano visibili sulla Cassaforte), **una riga di Nonna Ada** nel fumetto (`onb.debt.milestone1/2/3`) e sfx `sfx_debt_stamp`; nella **schermata di fine giornata** compare "tappa 1/3", "2/3", "3/3";
+  - **feedback:** al versamento che supera la soglia compare un **timbro sulla Cassaforte** (3 timbri diversi, restano visibili sulla Cassaforte), **una riga di Nonna Ada** nel fumetto (`onb.debt.milestone1/2/3`) e sfx `sfx_debt_stamp_01/02/03` (uno per tappa); nella **schermata di fine giornata** compare "tappa 1/3", "2/3", "3/3";
   - nessuna barra o contatore nell'HUD.
 - Freccia "prossimo pad" da 8:00 sul più economico tra Scarpe 2 e NONNO 2, solo se pagabile.
 
@@ -85,7 +85,7 @@ Al golden path il portafoglio vale 41 LN a 1:23 e 211 LN cumulati a 2:10: tutti 
 - `onb.debt.milestone3`: tre quarti, arriva la foto di Nonna Ada per il deposito.
 
 **Sound, hook:**
-- `sfx_debt_stamp`: timbro sulla Cassaforte a ogni tappa (nuovo asset, ~0,4 s; varianti 1/2/3 facoltative);
-- `sfx_combo_plus`: tick breve a ogni "+N" della combo, tono che sale con N (nuovo asset o derivato da `sfx_combo_x1_5`); a N=2 coincide col gate dell'onboarding;
+- `sfx_debt_stamp_01`, `_02`, `_03`: timbro sulla Cassaforte, uno per tappa (25/50/75%), ~0,4 s;
+- `sfx_combo_plus_01` … `sfx_combo_plus_08`: tick breve a ogni "+N" della combo, tono che sale con N (oltre 8 si ripete `_08`); `sfx_combo_plus_02` coincide col gate dell'onboarding;
 - `sfx_combo_x1_5` (+5) e `sfx_combo_x2` (+10): invariati;
 - nessun sfx di telefono (squillo, notifica, vibrazione) nel cap 1.

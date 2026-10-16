@@ -234,8 +234,8 @@
         "persistentHud": false
       },
       "sfx": {
-        "onPlusN": "sfx_combo_plus (tick breve, tono che sale con N)",
-        "onGate": "sfx_combo_plus con N=2: il gate x1,2 coincide con il 2° cliente di fila ('+2')",
+        "onPlusN": "sfx_combo_plus_{N:02d} (N = 1..8, tono che sale; da N>8 si ripete sfx_combo_plus_08)",
+        "onGate": "sfx_combo_plus_02: il gate x1,2 coincide con il 2° cliente di fila ('+2')",
         "note": "sfx_combo_x1_5 (+5) e sfx_combo_x2 (+10) restano per i traguardi di combo successivi, non per il gate"
       }
     },
@@ -484,7 +484,7 @@
         "cassaforteStamp": "stamp_tappa1",
         "adaLineKey": "onb.debt.milestone1",
         "endOfDayLabel": "tappa 1/3",
-        "sfx": "sfx_debt_stamp",
+        "sfx": "sfx_debt_stamp_01",
         "persistentHud": false
       },
       {
@@ -493,7 +493,7 @@
         "cassaforteStamp": "stamp_tappa2",
         "adaLineKey": "onb.debt.milestone2",
         "endOfDayLabel": "tappa 2/3",
-        "sfx": "sfx_debt_stamp",
+        "sfx": "sfx_debt_stamp_02",
         "persistentHud": false
       },
       {
@@ -502,7 +502,7 @@
         "cassaforteStamp": "stamp_tappa3",
         "adaLineKey": "onb.debt.milestone3",
         "endOfDayLabel": "tappa 3/3",
-        "sfx": "sfx_debt_stamp",
+        "sfx": "sfx_debt_stamp_03",
         "persistentHud": false
       }
     ]
