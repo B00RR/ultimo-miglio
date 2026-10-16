@@ -116,6 +116,8 @@ namespace UltimoMiglio.Gameplay
             StepChanged?.Invoke(s);
             var t = Target();
             if (_edge) { if (t) _edge.SetTarget(t, s.ToString().ToUpper()); else _edge.Clear(); }
+            // #4 (VFX): anello pulsante a terra sul bersaglio + freccia a terra davanti a Nina (niente waypoint fluttuante, QA #44)
+            if (t) UltimoMiglio.VFX.UM_TutorialMarker.Show(t, GameRoot.I && GameRoot.I.Nina ? GameRoot.I.Nina.transform : null); else UltimoMiglio.VFX.UM_TutorialMarker.Hide();
             if (_marker) _marker.gameObject.SetActive(false); // QA v2: no world waypoint if edge arrow exists
         }
 
