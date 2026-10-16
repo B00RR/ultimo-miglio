@@ -16,7 +16,7 @@ public class AgentSpaceTest
     static float Flat(Vector3 a, Vector3 b) { a.y = b.y = 0; return Vector3.Distance(a, b); }
     static IEnumerator Load()
     {
-        PlayerPrefs.DeleteAll(); Time.timeScale = 1f;
+        PlayerPrefs.DeleteKey("um_save_v1" /* GameRoot.SaveKey */); PlayerPrefs.DeleteKey(TutorialManager.PrefKey); Time.timeScale = 1f; // solo chiavi di gioco, non i volumi (#36)
         yield return SceneManager.LoadSceneAsync("Ch1_Deposito");
         for (int i = 0; i < 60 && !GameRoot.Ready; i++) yield return null;
         Assert.IsTrue(GameRoot.Ready);
@@ -53,7 +53,7 @@ public class AgentSpaceTest
         // Nina sul percorso della coda, tra la porta e il bancone (passo QA v9: lungo la coda all'angolo SE)
         var spot = q.CounterSlot.position + q.LineStep * 2f; // dentro la fila
         float minN = float.MaxValue, minC = float.MaxValue, t = 0, maxJump = 0; int seen = 0;
-        var prev = new System.Collections.Generic.Dictionary<Customer, Vector3>();
+        var prev = new System.Collections.Generic.Dictionary<Customer, Vector3>(); var prevW = new System.Collections.Generic.Dictionary<Customer, float>();
         while (t < 20f)
         {
             Place(n, spot);
@@ -61,9 +61,9 @@ public class AgentSpaceTest
             var cs = Object.FindObjectsByType<Customer>(FindObjectsSortMode.None).Where(c => c.isActiveAndEnabled).ToArray(); seen = Mathf.Max(seen, cs.Length);
             foreach (var c in cs) minN = Mathf.Min(minN, Flat(c.transform.position, n.transform.position));
             // niente teletrasporti: spostamento per frame entro la velocità massima (+ separazione 3 cm); i clienti appena (ri)spawnati alla porta esclusi
-            var next = new System.Collections.Generic.Dictionary<Customer, Vector3>();
-            foreach (var c in cs) { if (prev.TryGetValue(c, out var p0)) maxJump = Mathf.Max(maxJump, Flat(c.transform.position, p0) - (c.Speed * Time.deltaTime + 0.03f)); next[c] = c.transform.position; }
-            prev = next;
+            var next = new System.Collections.Generic.Dictionary<Customer, Vector3>(); var nextW = new System.Collections.Generic.Dictionary<Customer, float>();
+            foreach (var c in cs) { nextW[c] = c.Waited; if (prev.TryGetValue(c, out var p0) && prevW.TryGetValue(c, out var w0) && c.Waited >= w0) maxJump = Mathf.Max(maxJump, Flat(c.transform.position, p0) - (c.Speed * Time.deltaTime + 0.03f)); next[c] = c.transform.position; }
+            prev = next; prevW = nextW;
             for (int i = 0; i < cs.Length; i++) for (int j = i + 1; j < cs.Length; j++) minC = Mathf.Min(minC, Flat(cs[i].transform.position, cs[j].transform.position));
         }
         Debug.Log($"[AgentSpace] salto oltre velocità max={maxJump:F3} m");
