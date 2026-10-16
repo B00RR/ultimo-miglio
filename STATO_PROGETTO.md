@@ -1,7 +1,7 @@
 # STATO PROGETTO — Ultimo Miglio
 
 > Punto di ingresso unico per chiunque (persona o agente) lavori su questo repo. Aggiornalo **nella stessa PR** in cui completi qualcosa.
-> Ultimo aggiornamento: 2026-10-16 03:01 (Europe/Rome).
+> Ultimo aggiornamento: 2026-10-16 04:11 (Europe/Rome).
 
 ## 1. Il gioco
 - **Ultimo Miglio**: gioco mobile **Android**, **Unity 6 (6000.3) URP**.
@@ -34,13 +34,11 @@
 - Documentazione di design: bibbia, core loop, tech, UI, retention, sprint 1, gestionale, longevità, cap. 1 completo, protocollo Unity.
 
 ## 5. IN CORSO (oggi 16/10)
-- **fix-qa P0 NONNO (QA live v3)**: state machine Transform-only con timeout carico 6s → scaffale → scarico → loop. PlayMode `HireNonno_RestocksShelfWithin20Seconds` verde (~9.5s). WebGL su `build/WebGL` :8777.
-- B2 costo LN sul pad acquisto; B3 clamp Nina + TopHud; B5 collider mesh scaffale/bancone rimossi; B4 testi Ada nel fumetto HUD. Tutorial: NONNO **prima** dello Zaino (invariato).
-- **night-art in pausa** (WIP commit `9fd9664`, #52 già merge; #47 non ancora).
-- **Consegna cap. 1 giocabile in WebGL entro le 17:45–18:00.**
-- Rifinitura tutorial Nonna Ada (7 passi) e game feel.
+- **main @ 7dd1767** — QA live **v5 VIA** (PR #55: #47 deposito + #48 luce/camera). Build QA su `build/WebGL` :8777; art night su `build/WebGL_next` :8778 (non toccare).
+- P2 aperti da QA v5: camera follow (Nina esce/coperta), pillola prezzo LN sotto riga obiettivo.
 - **Merge del ramo `animator`** (fix camminata): conflitto su `chr_nina_vela.fbx` e `bot_nonno.fbx`.
 - I **clienti sono ancora capsule** → sostituire con i personaggi del ramo animator.
+- Rifinitura tutorial Nonna Ada e game feel; resto cap. 1.
 
 ## 6. DA FARE
 - Resto del gioco in **3–4 giorni**: capitoli 2+ con **un sistema gestionale per capitolo** (energia/corrente, contratti, rotte, officina, OmniFreight).
@@ -99,6 +97,11 @@ $UNITY -batchmode -projectPath "$PWD" -runTests -testPlatform PlayMode \
 
 ## 11. Cronologia
 Voci più recenti in alto. Formato: `AAAA-MM-GG HH:MM` (Europe/Rome) — [commit] — descrizione.
+
+- 2026-10-16 04:11 — [7dd1767](https://github.com/B00RR/ultimo-miglio/commit/7dd1767) — merge [PR #55](https://github.com/B00RR/ultimo-miglio/pull/55): deposito #47 + luce/camera #48; Concept VIA; **QA live v5 VIA**.
+- 2026-10-16 03:18 — [1b5b7be](https://github.com/B00RR/ultimo-miglio/commit/1b5b7be) — merge [PR #45](https://github.com/B00RR/ultimo-miglio/pull/45): fix QA v1–v3 (#41–#44, #49); **QA live v4 VIA**.
+- 2026-10-16 01:51 — [ba25f62](https://github.com/B00RR/ultimo-miglio/commit/ba25f62) — merge [PR #51](https://github.com/B00RR/ultimo-miglio/pull/51): guida visiva — tavola Nonna Ada v01 e decisione ombre/saturazione.
+- 2026-10-16 01:49 — [29534d3](https://github.com/B00RR/ultimo-miglio/commit/29534d3) — merge [PR #50](https://github.com/B00RR/ultimo-miglio/pull/50): guida visiva capitolo 1 + confronto build (Concept Artist).
 
 - 2026-10-16 03:05 — ramo `night-art` — Tech Lead: merge #52 (vfx/48-luce) + #47 (art/47-deposito) + fix NONNO timeout; build WebGL_next :8778.
 - 2026-10-16 04:00 — branch art/47-deposito — 3D Artist: deposito fedele alla guida (#47): lastre 0,25 m, archi in tufo, parapetti in tufo e legno, insegna col faro, banco in noce con Carico 0 emissivo, kit premium, DressGameplay, Borgo Gradoni su gradoni.
