@@ -30,7 +30,7 @@ public class NonnoWorkTest
             var eco = GameRoot.I.Eco;
             eco.S.Wallet = 100;
             Assert.AreEqual(-1, eco.S.NonnoLevel);
-            Assert.LessOrEqual(eco.Cost(UpgradeKind.NonnoHire), 10.01, "NONNO hire should be ≤10 LN");
+            Assert.LessOrEqual(eco.Cost(UpgradeKind.NonnoHire), 50.01, "NONNO hire should be ≤50 LN (#75)");
             bool done = false;
             for (int i = 0; i < 500 && !done; i++)
                 done = eco.PadTick(UpgradeKind.NonnoHire, i * 0.1);

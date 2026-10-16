@@ -9,6 +9,8 @@ Fonte: `01_CORE_LOOP.md` v3.3; verifica in `qa/econ_sim_v3.py`. Validazione: `py
 | debt.json | `DebtConfig` | tranche, finestra, Proroga, mora/Pedaggio, Assist |
 | upgrades.json | `UpgradeTrackConfig` ×3 | Zaino, Scarpe, Insegna (livelli, costi, effetti) |
 | robots.json | `RobotConfig` | NONNO: pad 50 LN a 130 s, restock e banco, livelli |
+| customers.json | `CustomerTypesConfig` | 4 tipi di cliente |
+| onboarding.json | `OnboardingConfig` | 15 passi dell'onboarding |
 | zones.json | `ZoneConfig` | distanze, tempi per zona, pad |
 | offline.json | `OfflineConfig` | Cassa, tetti, x2, Turno di notte, totem |
 | daycycle.json | `DayCycleConfig` | durate del ciclo e calendario |
@@ -104,3 +106,8 @@ Generato da `qa/playthrough_ch1.py`, che usa la stessa logica di `qa/econ_sim_v3
 ## Clienti e onboarding (aggiunti il 15/10)
 - `customers.json` → `CustomerTypesConfig`: 4 tipi (normale, frettoloso, anziano, vipMammaRosa), ciascuno con `valueMultiplier`, `patienceSec`, `spawnWeight`, `unlockAtSec`, `visualCue`, `barkKeys`. Il valore medio pesato vale 1,00, quindi l'economia e il golden path restano invariati.
 - `onboarding.json` → `OnboardingConfig`: `steps[]` con `id`, `tSec`, `toleranceSec`, `trigger`, `completeWhen`, `target` (zoneId), `textKeys` (segnaposto `onb.*`), `unlocks`. Specifica leggibile: `onboarding.md`.
+
+## Revisione 16/10 (Game Designer)
+- `upgrades.json`: Zaino 5/6/7 costano 560/960/1.700 LN (×1,7); dal livello 8 resta la serie ×2.
+- `economy.json` → `rewards`: traguardi pacchi (100/250/450 = +60/+120/+200 LN), tappe del debito (25/50/75%), mancia di 30 LN al primo passaggio sulla Cassa, freccia "prossimo pad" da 480 s.
+- Golden path rigenerato: rata 1 saldata a 34:00 (eff 1,2: 32:00; eff 0,85: 36:00). Valutazione delle varianti: `qa/eval_liveops_ch1.py`.

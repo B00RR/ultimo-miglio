@@ -26,6 +26,7 @@ namespace UltimoMiglio.Gameplay
         static readonly int SpeedId = Animator.StringToHash("Speed"), LiftId = Animator.StringToHash("Lift"), DropId = Animator.StringToHash("Drop"), HappyId = Animator.StringToHash("Happy");
         Renderer[] _renderers; bool _shown = true;
         const float WalkSpeed = 2.6f;
+        float _curSpeed; // #59: velocità reale -> Animator Speed
         /// <summary>Max seconds loading at Arrivi before departing with whatever is carried (forces progress).</summary>
         const float LoadTimeout = 6f;
 
@@ -38,7 +39,7 @@ namespace UltimoMiglio.Gameplay
         void LateUpdate()
         {
             if (!Animator || !Animator.isActiveAndEnabled) return;
-            float spd = (_dest - transform.position).sqrMagnitude > 0.08f && State is WorkState.ToArrivals or WorkState.ToShelf ? WalkSpeed : 0f;
+            float spd = (_dest - transform.position).sqrMagnitude > 0.08f && State is WorkState.ToArrivals or WorkState.ToShelf ? Mathf.Max(_curSpeed, 0.5f) : 0f;
             Animator.SetFloat(SpeedId, spd); Animator.SetBool(LiftId, _carry > 0);
         }
         public void Happy() { if (Animator) Animator.SetTrigger(HappyId); }
@@ -135,9 +136,9 @@ namespace UltimoMiglio.Gameplay
         {
             var d = _dest - transform.position; d.y = 0;
             if (d.sqrMagnitude < 0.35f) { _stuckT = 0; return true; }
-            transform.position += Vector3.ClampMagnitude(d.normalized * WalkSpeed * Time.deltaTime, d.magnitude);
-            if (d.sqrMagnitude > 0.001f)
-                transform.rotation = Quaternion.Slerp(transform.rotation, Quaternion.LookRotation(d), 12f * Time.deltaTime);
+            var applied = AgentMove.Slide(transform, Vector3.ClampMagnitude(d.normalized * WalkSpeed * Time.deltaTime, d.magnitude), 0.4f);
+            AgentMove.Face(transform, applied.sqrMagnitude > 1e-8f ? applied : d, Time.deltaTime); // #59
+            _curSpeed = Time.deltaTime > 0 ? applied.magnitude / Time.deltaTime : 0f;
             // Anti-stuck: if Transform barely moved for 2s (edge case), snap to dest
             if ((transform.position - _lastPos).sqrMagnitude < 1e-5f) _stuckT += Time.deltaTime;
             else _stuckT = 0;
