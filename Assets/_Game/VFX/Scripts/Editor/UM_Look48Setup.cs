@@ -52,9 +52,9 @@ namespace UltimoMiglio.VFX.EditorTools
                     m.SetColor("_FloorTint", UM_Palette.Pavimento);  // #F3E3C3
                     m.SetColor("_FloorTintB", UM_Palette.CremaVarA); // #E8D3AC
                     m.SetColor("_FloorTintC", UM_Palette.CremaVarB); // #E9D2A8
-                    m.SetFloat("_TileSize", 1.1f);                   // lastre grandi in camera
-                    m.SetFloat("_TileVar", 0.025f);
-                    m.SetFloat("_GroutDark", 0.035f);
+                    m.SetFloat("_TileSize", 3.5f);                   // lastre grandi in camera (×0.5 in shader)
+                    m.SetFloat("_TileVar", 0.015f);
+                    m.SetFloat("_GroutDark", 0.10f); // shader: mix fisso ~30% verso #E8D3AC
                     m.SetFloat("_NoiseStrength", 0.02f); m.SetFloat("_NoiseScale", 0.22f);
                 }
                 else m.SetFloat("_FloorBaseMix", 0f);
