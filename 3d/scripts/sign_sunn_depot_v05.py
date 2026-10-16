@@ -1,11 +1,12 @@
-# Insegna «Vela & Figli» v04 (#70): legno noce con cornice terracotta, scritta crema in rilievo (Fredoka Bold, OFL, già nel repo),
+# Insegna «Sunn Depot» v05 (#130 + #70; deriva dalla v04 «Vela & Figli»). Il file resta prop_sign_vela_figli.fbx per tenere GUID e riferimenti di DepotKit.
+# v04 (#70): legno noce con cornice terracotta, scritta crema in rilievo (Fredoka Bold, OFL, già nel repo),
 # faro (emblema Faro Spento) in rilievo con lanterna emissiva. Profondità reale: niente più decal piatta (DepotKit.DressSignFace non nasconde più la mesh).
-# blender -b -P 3d/scripts/sign_vela_figli_v04.py   (riusa helper/atlas/export di kit_deposito_v03.py)
+# blender -b -P 3d/scripts/sign_sunn_depot_v05.py   (riusa helper/atlas/export di kit_deposito_v03.py)
 import pathlib
 _S=open(str(pathlib.Path(__file__).resolve().parent/'kit_deposito_v03.py')).read()
 exec(_S[:_S.index('# ---------- MURI')])
 FONT=R+'/Assets/_Game/UI/Fonts/Fredoka-Bold.ttf'
-def sign_faro_v04():
+def sign_sunn_v05():
     p=P()
     p.box((-1.22,-0.06,-0.40),(1.22,0.05,0.40),'terracotta',0.03,2)                 # cornice terracotta (spessore 11 cm)
     p.box((-1.12,-0.10,-0.31),(1.12,0.0,0.31),'bruno_m',0.02,1)                      # tavola noce, sporge 4 cm dalla cornice
@@ -20,12 +21,24 @@ def sign_faro_v04():
     p.cyl(fx,fy,0.125,0.205,0.058,'EMI:glow',10,0.0)                                  # lanterna
     p.cyl(fx,fy,0.205,0.29,0.075,'terracotta_d',10,0.0,r2=0.01)                       # cupola
     for s in (-1,1): p.box((fx+s*0.07,fy-0.03,0.15),(fx+s*0.28,fy-0.025,0.18),'EMI:glow',0.0)   # raggi corti
-    bpy.ops.object.text_add(location=(0,0,0)); t=bpy.context.object; t.data.body='Vela & Figli'
-    t.data.font=bpy.data.fonts.load(FONT); t.data.extrude=0.018; t.data.size=0.30; t.data.resolution_u=1
-    t.data.align_x='CENTER'; t.data.align_y='CENTER'; t.rotation_euler=(math.pi/2,0,0); t.location=(0.17,-0.12,-0.01)
+    # sole in rilievo a destra (motivo del nome): disco giallo 'sole' con anello 'sole_d' e 8 raggi corti
+    sx,sz=0.93,0.0
+    rx=Matrix.Rotation(math.pi/2,4,'X')
+    t0=bmesh.new(); bmesh.ops.create_cone(t0,cap_ends=True,segments=14,radius1=0.12,radius2=0.12,depth=0.02)
+    bmesh.ops.transform(t0,matrix=Matrix.Translation((sx,-0.11,sz))@rx,verts=t0.verts); p._add(t0,'sole_d')
+    t1=bmesh.new(); bmesh.ops.create_cone(t1,cap_ends=True,segments=14,radius1=0.095,radius2=0.095,depth=0.02)
+    bmesh.ops.transform(t1,matrix=Matrix.Translation((sx,-0.125,sz))@rx,verts=t1.verts); p._add(t1,'sole')
+    for i in range(8):
+        a=i*math.pi/4; t2=bmesh.new(); bmesh.ops.create_cube(t2,size=1.0)
+        bmesh.ops.transform(t2,matrix=Matrix.Translation((sx+math.cos(a)*0.165,-0.11,sz+math.sin(a)*0.165))@Matrix.Rotation(-a,4,'Y')@Matrix.Diagonal((0.07,0.02,0.025,1)),verts=t2.verts); p._add(t2,'sole')
+    bpy.ops.object.text_add(location=(0,0,0)); t=bpy.context.object; t.data.body='SUNN DEPOT'
+    t.data.font=bpy.data.fonts.load(FONT); t.data.extrude=0.018; t.data.size=0.27; t.data.resolution_u=1
+    t.data.align_x='CENTER'; t.data.align_y='CENTER'; t.rotation_euler=(math.pi/2,0,0); t.location=(0.0,-0.12,-0.01)
+    bpy.context.view_layer.update(); w=t.dimensions.x; k=min(1.0,1.42/w); t.scale=(k,k,1.0)   # adatta la larghezza tra faro e sole
+    t.location=(0.06,-0.12,-0.01)
     bpy.ops.object.convert(target='MESH'); bpy.ops.object.transform_apply(location=True,rotation=True,scale=True)
     bpy.ops.object.mode_set(mode='EDIT'); bpy.ops.mesh.select_all(action='SELECT'); bpy.ops.mesh.dissolve_limited(angle_limit=0.05); bpy.ops.object.mode_set(mode='OBJECT')
     tb=bmesh.new(); tb.from_mesh(t.data); bmesh.ops.triangulate(tb,faces=tb.faces[:]); bpy.data.objects.remove(t)
     p._add(tb,'crema')
     export(p,'prop_sign_vela_figli')
-sign_faro_v04(); print(''.join(REP))
+sign_sunn_v05(); print(''.join(REP))

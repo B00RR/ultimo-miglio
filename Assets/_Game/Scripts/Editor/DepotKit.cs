@@ -152,7 +152,7 @@ namespace UltimoMiglio.EditorTools
             col.AddComponent<BoxCollider>().size = new Vector3(0.36f, 2.6f, 0.36f);
         }
 
-        // #70: l'insegna è la mesh 3D prop_sign_vela_figli v04 (cornice terracotta, tavola noce, faro in rilievo con lanterna emissiva,
+        // #70: l'insegna è la mesh 3D prop_sign_vela_figli v05 «Sunn Depot» (#130, nome file invariato per GUID) (cornice terracotta, tavola noce, faro in rilievo con lanterna emissiva,
         // scritta crema in rilievo in Fredoka). Prima qui si spegnevano i renderer della mesh e si metteva un quad Unlit piatto
         // (tex_sign_vela_figli.png, fondo crema): era il «pannello bianco piatto senza faro». Ora si tiene la mesh e si toglie l'eventuale decal.
         static void DressSignFace()
