@@ -158,16 +158,17 @@ namespace UltimoMiglio.Gameplay
         }
 
         const bool UseAdaNote = true;
-        static readonly System.Collections.Generic.Dictionary<string, Step> IdToStep = new()
+        internal static readonly System.Collections.Generic.Dictionary<string, Step> IdToStep = new()
         {   // id dei testi (onboarding_testi.json "step:<id>") → passo
             { "move", Step.Move }, { "pickup", Step.PickUp }, { "shelve", Step.Shelve }, { "serve", Step.Serve }, { "coins", Step.Coins },
             { "unlock_nonno", Step.HireNonno }, { "upgrade_zaino", Step.ZainoPad }
         };
-        /// <summary>Testi serializzati nella scena col vecchio ordine a 7 passi (Muoviti, Arrivi, Scaffali, Bancone, Monete, Nonno, Zaino) → nuovi indici.</summary>
-        static void MigrateTexts(string[] old, string[] nu)
+        /// <summary>#101: testi per id (onboarding_testi.json) → array a 16 passi. Sostituisce il vecchio array a 7 passi (#4).</summary>
+        public static string[] TextsById(System.Collections.Generic.IEnumerable<(string id, string text)> steps)
         {
-            var map = new[] { Step.Move, Step.PickUp, Step.Shelve, Step.Serve, Step.Coins, Step.HireNonno, Step.ZainoPad };
-            for (int i = 0; i < old.Length && i < map.Length; i++) nu[(int)map[i]] = old[i];
+            var t = new string[StepCount];
+            foreach (var (id, text) in steps) if (id != null && IdToStep.TryGetValue(id, out var st)) t[(int)st] = text;
+            return t;
         }
         void LoadSteps()
         {
@@ -183,7 +184,7 @@ namespace UltimoMiglio.Gameplay
 
         void LoadTesti()
         {
-            if (Texts == null || Texts.Length < StepCount) { var t = new string[StepCount]; if (Texts != null) MigrateTexts(Texts, t); Texts = t; }
+            if (Texts == null || Texts.Length != StepCount) Texts = new string[StepCount]; // #101: niente più migrazione dal tutorial lineare a 7 passi (#4)
             if (!TestiJson) return;
             string j = TestiJson.text;
             foreach (System.Text.RegularExpressions.Match m in System.Text.RegularExpressions.Regex.Matches(j, "\\{\\s*\"id\"\\s*:\\s*\"([^\"]+)\"\\s*,\\s*\"text\"\\s*:\\s*\"((?:[^\"\\\\]|\\\\.)*)\""))

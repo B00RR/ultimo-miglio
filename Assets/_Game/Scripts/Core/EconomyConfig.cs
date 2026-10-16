@@ -13,6 +13,8 @@ namespace UltimoMiglio.Core
         public double ComboStep, ComboMax, ComboResetGapSec;
         public double InsegnaBonusPerLevel, PlayerSpendShare, TrancheLn;
         public double NinaBaseSpeed, FullStackSlowdown;
+        /// <summary>Cap. 1: lo Zaino si ferma al livello 7 (decisione Lorenzo/Producer 16/10). I livelli 8+ nei dati restano per i capitoli successivi.</summary>
+        public int ZainoMaxLevel = 7;
         public int[] ZainoCapacity; public double[] ZainoCost, ScarpeBonus, ScarpeCost, InsegnaBonus, InsegnaCost;
         public double NonnoHireCost, NonnoUnlockSec;
         // Ricompense intermedie (economy.json → rewards)
