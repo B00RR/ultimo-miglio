@@ -96,7 +96,10 @@ $UNITY -batchmode -projectPath "$PWD" -runTests -testPlatform PlayMode \
 - **Tech Lead verifica** a 1170×2532 / 1080×2400; **Unity non avviato** in questa PR.
 
 ## 11. Cronologia
+
 Voci più recenti in alto. Formato: `AAAA-MM-GG HH:MM` (Europe/Rome) — [commit] — descrizione.
+
+- **2026-10-16 09:35 (Europe/Rome)** — Fix P0 #58 #59 #60 (ramo fix-p0-lorenzo, [a87edf0](https://github.com/B00RR/ultimo-miglio/commit/a87edf0)): BoxCollider su muri/archi/scaffali/bancone/props, Nina clamp x −8.6..7.0, NONNO yaw 0° + sweep AgentMove, spawn sicuro. EditMode 35/35, PlayMode 11/11. LIVE P0 su 8780: `qa/playtest_web_live_p0.md`.
 
 - 2026-10-16 04:11 — [7dd1767](https://github.com/B00RR/ultimo-miglio/commit/7dd1767) — merge [PR #55](https://github.com/B00RR/ultimo-miglio/pull/55): deposito #47 + luce/camera #48; Concept VIA; **QA live v5 VIA**.
 - 2026-10-16 03:18 — [1b5b7be](https://github.com/B00RR/ultimo-miglio/commit/1b5b7be) — merge [PR #45](https://github.com/B00RR/ultimo-miglio/pull/45): fix QA v1–v3 (#41–#44, #49); **QA live v4 VIA**.
