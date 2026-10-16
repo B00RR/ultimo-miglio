@@ -12,8 +12,14 @@ namespace UltimoMiglio.Gameplay
         public UltimoMiglio.UI.World.UpgradePadCard Card; public UM_PadFillRing FillRing;
         Transform _padVis; float _pulse; Vector3 _padBase = Vector3.zero;
         void LateUpdate() { if (!_padVis) return; if (_padBase == Vector3.zero) _padBase = _padVis.localScale; _pulse = Mathf.MoveTowards(_pulse, 0, Time.deltaTime * 6f); _padVis.localScale = _padBase * (1f + 0.08f * Mathf.Sin(_pulse * Mathf.PI)); }
-        bool _paying; Renderer[] _renderers; Collider _col; int _avail = -1;
-        void Awake() { _renderers = GetComponentsInChildren<Renderer>(true); _col = GetComponent<Collider>(); }
+        // #110: dopo un acquisto il pad aspetta che Nina esca prima di pagare il livello successivo (_waitExit)
+        bool _paying, _waitExit; Renderer[] _renderers; Collider _col; int _avail = -1;
+        void Awake()
+        {
+            _renderers = GetComponentsInChildren<Renderer>(true); _col = GetComponent<Collider>();
+            // #110: la scheda pad è nascosta dall'HUD minimo (QA #41), quindi la pillola prezzo NON deve sparire con Nina sopra
+            foreach (var ip in GetComponentsInChildren<InteractionPoint>(true)) if (ip.Pad == this) ip.HasCard = false;
+        }
         protected override void OnIdleUpdate()
         {
             var eco = GameRoot.I.Eco; bool avail = !double.IsInfinity(eco.Cost(Kind)) && GameRoot.I.ActiveTime >= UnlockAtActiveSec;
@@ -27,14 +33,15 @@ namespace UltimoMiglio.Gameplay
         protected override void OnZoneTick(float t)
         {
             var eco = GameRoot.I.Eco;
+            if (_waitExit) return; // #110: livello successivo solo dopo essere usciti e rientrati
             if (eco.S.Wallet <= 0) { StopLoop(); return; }
             if (!_paying) { _paying = true; AudioManager.I?.StartUpgradeLoop(); }
             bool done = eco.PadTick(Kind, t);
             if (!_padVis) _padVis = transform.Find("Pad"); if (_padVis) { _pulse = 1f; }
             if (Ring) Ring.SetFill((float)eco.PadFill(Kind));
-            if (done) { StopLoop(); AudioManager.I?.Play(AudioManager.Sfx.UpgradeComplete); UM_FxPlayer.Play(UM_FxPlayer.Fx.Upgrade, transform.position); UM_FxPlayer.Play(UM_FxPlayer.Fx.UpgradeComplete, transform.position); UM_FxPlayer.Play(UM_FxPlayer.Fx.Purchase, transform.position); Completed?.Invoke(Kind); Nina.Cheer(); }
+            if (done) { _waitExit = true; StopLoop(); AudioManager.I?.Play(AudioManager.Sfx.UpgradeComplete); UM_FxPlayer.Play(UM_FxPlayer.Fx.Upgrade, transform.position); UM_FxPlayer.Play(UM_FxPlayer.Fx.UpgradeComplete, transform.position); UM_FxPlayer.Play(UM_FxPlayer.Fx.Purchase, transform.position); Completed?.Invoke(Kind); Nina.Cheer(); }
         }
-        protected override void OnZoneExit() { base.OnZoneExit(); StopLoop(); }
+        protected override void OnZoneExit() { base.OnZoneExit(); StopLoop(); _waitExit = false; }
         void StopLoop() { if (_paying) { _paying = false; AudioManager.I?.StopUpgradeLoop(); } }
     }
 }
