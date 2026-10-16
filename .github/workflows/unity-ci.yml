@@ -1,6 +1,7 @@
 # Pipeline Ultimo Miglio (issue #12)
 # - Ogni PR verso main: test EditMode + PlayMode (game-ci) e commento con l'esito sulla PR.
-# - PR verso main e push su main: test EditMode + PlayMode e build WebGL (verifica, artifact).
+# - PR verso main: SOLO test EditMode + PlayMode (una sola invocazione game-ci, testMode: all) + commento.
+# - Push su main e avvio manuale: test + build WebGL (verifica, artifact). Le modifiche solo .md/docs non avviano la CI.
 # - Deploy su B00RR/ultimo-miglio-web (GitHub Pages) SOLO con avvio manuale (workflow_dispatch): niente deploy automatico al merge.
 # game-ci v4 con licenza Personal vuole UNITY_LICENSE (.ulf) + UNITY_EMAIL/UNITY_PASSWORD: senza .ulf la build si ferma con
 # "Missing Unity License File and no Serial was found" (run 38865014865). Con la .ulf i test erano verdi (run 38757501264).
@@ -9,16 +10,19 @@ name: Unity CI (WebGL)
 on:
   pull_request:
     branches: [main]
+    paths-ignore: ['**/*.md', 'docs/**']
   push:
     branches: [main]
+    paths-ignore: ['**/*.md', 'docs/**']
   workflow_dispatch:
 permissions:
   contents: read
   pull-requests: write
   checks: write
+# Una run per workflow+ref; si annullano solo le run vecchie delle PR, mai i push su main o gli avvii manuali.
 concurrency:
-  group: unity-ci-${{ github.ref }}
-  cancel-in-progress: true
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
 env:
   UNITY_VERSION: 6000.3.26f1
   TZ: Europe/Rome
@@ -47,9 +51,9 @@ jobs:
     if: needs.licenza.outputs.ok == 'true'
     runs-on: ubuntu-24.04
     steps:
-      # L'immagine unityci/editor è molto grande: liberare spazio sul runner
+      # L'immagine unityci/editor (~15 GB) non entra senza spazio: pulizia limitata alle cartelle più grandi e veloci da togliere
       - uses: jlumbroso/free-disk-space@v1.3.1
-        with: { tool-cache: true, android: true, dotnet: true, haskell: true, large-packages: false, docker-images: true, swap-storage: false }
+        with: { tool-cache: false, android: true, dotnet: true, haskell: true, large-packages: false, docker-images: false, swap-storage: false }
       - uses: actions/checkout@v4
       # LFS con cache: si scaricano solo gli oggetti nuovi (risparmio banda LFS)
       - name: Elenco oggetti LFS
@@ -63,8 +67,10 @@ jobs:
       - uses: actions/cache@v4
         with:
           path: Library
-          key: Library-test-${{ hashFiles('Assets/**/*.asmdef', 'Packages/packages-lock.json', 'ProjectSettings/ProjectVersion.txt') }}
-          restore-keys: Library-test-
+          # Chiave stabile (progetto nella radice del repo): cambia solo con pacchetti/impostazioni
+          key: Library-${{ runner.os }}-test-${{ hashFiles('Packages/packages-lock.json', 'Packages/manifest.json', 'ProjectSettings/**') }}
+          restore-keys: |
+            Library-${{ runner.os }}-test-
       - uses: game-ci/unity-test-runner@v4
         env:
           UNITY_LICENSE: ${{ secrets.UNITY_LICENSE }}
@@ -107,12 +113,13 @@ jobs:
 
   build:
     needs: licenza
-    if: needs.licenza.outputs.ok == 'true'
+    # Sulle PR niente build WebGL (solo test): build su push a main e avvio manuale
+    if: needs.licenza.outputs.ok == 'true' && github.event_name != 'pull_request'
     runs-on: ubuntu-24.04
     steps:
-      # L'immagine unityci/editor è molto grande: liberare spazio sul runner
+      # L'immagine unityci/editor (~15 GB) non entra senza spazio: pulizia limitata alle cartelle più grandi e veloci da togliere
       - uses: jlumbroso/free-disk-space@v1.3.1
-        with: { tool-cache: true, android: true, dotnet: true, haskell: true, large-packages: false, docker-images: true, swap-storage: false }
+        with: { tool-cache: false, android: true, dotnet: true, haskell: true, large-packages: false, docker-images: false, swap-storage: false }
       - uses: actions/checkout@v4
       - run: git lfs ls-files -l | cut -d' ' -f1 | sort > .lfs-assets-id
       - uses: actions/cache@v4
@@ -124,8 +131,9 @@ jobs:
       - uses: actions/cache@v4
         with:
           path: Library
-          key: Library-WebGL-${{ hashFiles('Assets/**/*.asmdef', 'Packages/packages-lock.json', 'ProjectSettings/ProjectVersion.txt') }}
-          restore-keys: Library-WebGL-
+          key: Library-${{ runner.os }}-WebGL-${{ hashFiles('Packages/packages-lock.json', 'Packages/manifest.json', 'ProjectSettings/**') }}
+          restore-keys: |
+            Library-${{ runner.os }}-WebGL-
       - uses: game-ci/unity-builder@v4
         env:
           UNITY_LICENSE: ${{ secrets.UNITY_LICENSE }}
