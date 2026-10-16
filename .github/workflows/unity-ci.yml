@@ -2,7 +2,8 @@
 # - Ogni PR verso main: test EditMode + PlayMode (game-ci) e commento con l'esito sulla PR.
 # - PR verso main: EditMode sempre, PlayMode solo se cambiano gameplay/scene/prefab/pacchetti/impostazioni (una sola invocazione game-ci) + commento.
 # - Push su main e avvio manuale: test + build WebGL (verifica, artifact). Le modifiche solo .md/docs non avviano la CI.
-# - Deploy su B00RR/ultimo-miglio-web (GitHub Pages) SOLO con avvio manuale (workflow_dispatch): niente deploy automatico al merge.
+# - Deploy su B00RR/ultimo-miglio-web (GitHub Pages) in radice SOLO con avvio manuale (workflow_dispatch).
+# - Preview /dev/ (issue #179): a ogni push su main il job deploy-dev pubblica la build SOLO in dev/ (mai radice o prova/).
 # game-ci v4 con licenza Personal vuole UNITY_LICENSE (.ulf) + UNITY_EMAIL/UNITY_PASSWORD: senza .ulf la build si ferma con
 # "Missing Unity License File and no Serial was found" (run 38865014865). Con la .ulf i test erano verdi (run 38757501264).
 # Secret richiesti: UNITY_LICENSE, UNITY_EMAIL, UNITY_PASSWORD; PAGES_DEPLOY_KEY (deploy key con scrittura sul repo web).
@@ -198,3 +199,40 @@ jobs:
           commit_message: "Build WebGL da ultimo-miglio@${{ github.sha }}"
       - uses: actions/upload-artifact@v4
         with: { name: webgl, path: Builds/WebGL_min, retention-days: 3 }
+
+  # Preview automatica su /dev/ (issue #179): solo push su main, copia mirata in dev/ del repo del sito
+  deploy-dev:
+    needs: build
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    runs-on: ubuntu-24.04
+    permissions: { contents: read }
+    # Due deploy dev non si sovrappongono: si accodano (nessuno viene annullato a meta')
+    concurrency:
+      group: deploy-dev-ultimo-miglio-web
+      cancel-in-progress: false
+    steps:
+      - uses: actions/checkout@v4
+        with: { sparse-checkout: tools }
+      - uses: actions/download-artifact@v4
+        with: { name: webgl, path: build-webgl }
+      - name: Clona il repo del sito
+        uses: actions/checkout@v4
+        with:
+          repository: B00RR/ultimo-miglio-web
+          ref: main
+          ssh-key: ${{ secrets.PAGES_DEPLOY_KEY }}
+          path: sito
+      - name: Prepara dev/ (patch mobile, cap DPR 1.25, etichetta SHA e ora Europe/Rome)
+        run: tools/deploy_dev.sh build-webgl sito "$GITHUB_SHA"
+      - name: Commit e push solo di dev/
+        working-directory: sito
+        run: |
+          git config user.name "Build & Release"
+          git config user.email "build-release@bokobay.invalid"
+          git add -A dev
+          fuori=$(git status --porcelain | grep -v ' dev/' || true)
+          if [ -n "$fuori" ]; then echo "::error::Modifiche fuori da dev/:"; echo "$fuori"; exit 1; fi
+          if git diff --cached --quiet; then echo "Nessuna modifica in dev/"; exit 0; fi
+          git commit -qm "Preview dev da ultimo-miglio@${GITHUB_SHA::7} ($GITHUB_SHA) - $(TZ=Europe/Rome date '+%d/%m %H:%M')"
+          git push -q origin HEAD:main
+          echo "Preview: https://b00rr.github.io/ultimo-miglio-web/dev/"
