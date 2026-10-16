@@ -29,7 +29,7 @@
  {
   "w": 360,
   "h": 800,
-  "caso": "04_aiuto20_freccia",
+  "caso": "04_aiuto20_freccia_fuori_camera",
   "ov": [],
   "objCut": false,
   "top": 103,
@@ -38,7 +38,7 @@
  {
   "w": 360,
   "h": 800,
-  "caso": "05_aiuto40_mano",
+  "caso": "05_aiuto20_mano_bersaglio_a_schermo",
   "ov": [],
   "objCut": false,
   "top": 103,
@@ -48,6 +48,15 @@
   "w": 360,
   "h": 800,
   "caso": "06_badge_nonno",
+  "ov": [],
+  "objCut": false,
+  "top": 103,
+  "fT": 111
+ },
+ {
+  "w": 360,
+  "h": 800,
+  "caso": "08_combo_popup",
   "ov": [],
   "objCut": false,
   "top": 103,
@@ -92,7 +101,7 @@
  {
   "w": 390,
   "h": 844,
-  "caso": "04_aiuto20_freccia",
+  "caso": "04_aiuto20_freccia_fuori_camera",
   "ov": [],
   "objCut": false,
   "top": 103,
@@ -101,7 +110,7 @@
  {
   "w": 390,
   "h": 844,
-  "caso": "05_aiuto40_mano",
+  "caso": "05_aiuto20_mano_bersaglio_a_schermo",
   "ov": [],
   "objCut": false,
   "top": 103,
@@ -111,6 +120,15 @@
   "w": 390,
   "h": 844,
   "caso": "06_badge_nonno",
+  "ov": [],
+  "objCut": false,
+  "top": 103,
+  "fT": 117
+ },
+ {
+  "w": 390,
+  "h": 844,
+  "caso": "08_combo_popup",
   "ov": [],
   "objCut": false,
   "top": 103,
@@ -155,7 +173,7 @@
  {
   "w": 412,
   "h": 915,
-  "caso": "04_aiuto20_freccia",
+  "caso": "04_aiuto20_freccia_fuori_camera",
   "ov": [],
   "objCut": false,
   "top": 103,
@@ -164,7 +182,7 @@
  {
   "w": 412,
   "h": 915,
-  "caso": "05_aiuto40_mano",
+  "caso": "05_aiuto20_mano_bersaglio_a_schermo",
   "ov": [],
   "objCut": false,
   "top": 103,
@@ -174,6 +192,15 @@
   "w": 412,
   "h": 915,
   "caso": "06_badge_nonno",
+  "ov": [],
+  "objCut": false,
+  "top": 103,
+  "fT": 126
+ },
+ {
+  "w": 412,
+  "h": 915,
+  "caso": "08_combo_popup",
   "ov": [],
   "objCut": false,
   "top": 103,

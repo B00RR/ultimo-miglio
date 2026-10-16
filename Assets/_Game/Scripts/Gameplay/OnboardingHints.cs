@@ -4,25 +4,26 @@ using UltimoMiglio.UI;
 
 namespace UltimoMiglio.Gameplay
 {
-    /// <summary>Aiuti progressivi dell'onboarding (#94). Il timer conta l'INATTIVITÀ sul passo corrente:
-    /// Nina ferma, oppure nessun avvicinamento di almeno 1 m al bersaglio. Si azzera a ogni cambio passo e a ogni avvicinamento.
-    ///   10 s → livello 1: il bersaglio pulsa (InteractionPoint.HintPulse);
-    ///   20 s → livello 2: freccia a bordo schermo (EdgeArrow, visibile solo col bersaglio fuori camera);
-    ///   40 s → livello 3: mano fantasma che mostra il trascinamento verso il bersaglio (zona joystick, sparisce al tocco).
+    /// <summary>Aiuti progressivi dell'onboarding (#94, ordine della PR #90). Il timer conta il tempo SENZA PROGRESSO verso il gate:
+    /// progresso = avvicinarsi di almeno 1 m al bersaglio (senza bersaglio: muoversi) oppure completare l'azione (cambio passo).
+    /// Si azzera a ogni progresso e a ogni cambio passo.
+    ///   10 s → livello 1: ripete il biglietto di Ada + il bersaglio pulsa (InteractionPoint.HintPulse);
+    ///   20 s → livello 2: freccia a bordo schermo se il bersaglio è fuori camera, altrimenti mano fantasma (zona joystick, sparisce al tocco);
+    ///   40 s → livello 3: camera breve ≤ 1,5 s sul bersaglio (andata e ritorno incluse), joystick libero, UNA sola volta per passo.
     /// Ogni livello scrive un log "[Onb] hint step=… level=…". Le comparse (HudReveal.Revealed) chiedono la camera breve.</summary>
     public sealed class OnboardingHints : MonoBehaviour
     {
         public static bool Active { get; private set; }
-        public float Level1Sec = 10f, Level2Sec = 20f, Level3Sec = 40f, ProgressMeters = 1f;
+        public float Level1Sec = 10f, Level2Sec = 20f, Level3Sec = 40f, ProgressMeters = 1f, HintPeekSec = 1.5f;
         [Tooltip("Camera breve sugli elementi rivelati (s, 2,5–3)")] public float RevealPeekSec = 2.75f;
 
         TutorialManager _tut; EdgeArrow _edge; HudController _hud; InteractionPoint _ip;
-        VisualElement _hand; float _idle, _best = float.MaxValue; int _level; Vector3 _lastNina; bool _hasLast;
+        VisualElement _hand; float _idle, _best = float.MaxValue; int _level; bool _handOn, _peekDone; Vector3 _lastNina; bool _hasLast;
 
         void OnEnable() { Active = true; TutorialManager.StepChanged += OnStep; HudReveal.Revealed += OnRevealed; }
         void OnDisable() { Active = false; TutorialManager.StepChanged -= OnStep; HudReveal.Revealed -= OnRevealed; Clear(); }
 
-        void OnStep(TutorialManager.Step s) { _idle = 0; _best = float.MaxValue; Clear(); }
+        void OnStep(TutorialManager.Step s) { _idle = 0; _best = float.MaxValue; _peekDone = false; Clear(); }
 
         void OnRevealed(string id, Vector3? at)
         {
@@ -35,6 +36,7 @@ namespace UltimoMiglio.Gameplay
             _level = 0;
             if (_ip) { _ip.HintPulse = false; _ip = null; }
             if (_edge) _edge.Clear();
+            _handOn = false;
             if (_hand != null) _hand.RemoveFromClassList("ghost-hand--on");
             if (_hud && _hud.Root != null) _hud.Root.RemoveFromClassList("onb-hand");
         }
@@ -60,13 +62,34 @@ namespace UltimoMiglio.Gameplay
             if (progress) { _idle = 0; if (_level > 0) Clear(); return; }
             _idle += Time.deltaTime;
 
-            if (_level < 1 && _idle >= Level1Sec) { _level = 1; Log(); _ip = target ? target.GetComponentInChildren<InteractionPoint>() : null; if (_ip) _ip.HintPulse = true; }
-            if (_level < 2 && _idle >= Level2Sec) { _level = 2; Log(); if (_edge && target) _edge.SetTarget(target, _tut.CurrentObjectiveText); }
-            if (_level < 3 && _idle >= Level3Sec) { _level = 3; Log(); EnsureHand(); if (_hand != null) _hand.AddToClassList("ghost-hand--on"); _hud.Root.AddToClassList("onb-hand"); }
-            if (_level >= 3) AnimateHand(target, np);
+            if (_level < 1 && _idle >= Level1Sec)
+            {
+                _level = 1; Log();
+                var txt = _tut.CurrentText; if (_hud && !string.IsNullOrEmpty(txt)) _hud.ShowAdaNote(txt); // testo ripetuto (ricompare con animazione)
+                _ip = target ? target.GetComponentInChildren<InteractionPoint>() : null; if (_ip) _ip.HintPulse = true;
+            }
+            if (_level < 2 && _idle >= Level2Sec)
+            {
+                _level = 2;
+                if (target && !OnScreen(target.position)) { if (_edge) _edge.SetTarget(target, _tut.CurrentObjectiveText); Log("freccia"); }
+                else { EnsureHand(); _handOn = _hand != null; if (_handOn && _hud) _hud.Root.AddToClassList("onb-hand"); Log("mano"); }
+            }
+            if (_level < 3 && _idle >= Level3Sec)
+            {
+                _level = 3;
+                if (target && !_peekDone) { _peekDone = true; CameraPeek.Request(target.position, HintPeekSec); Log("camera"); } else Log("camera già usata");
+            }
+            if (_handOn) AnimateHand(target, np);
         }
 
-        void Log() => Debug.Log($"[Onb] hint step={_tut.Current} level={_level} idle={_idle:0.0}s");
+        void Log(string what = null) => Debug.Log($"[Onb] hint step={_tut.Current} level={_level}{(what != null ? " " + what : "")} idle={_idle:0.0}s");
+
+        static bool OnScreen(Vector3 w)
+        {
+            var cam = Camera.main; if (!cam) return false;
+            var v = cam.WorldToViewportPoint(w);
+            return v.z > 0 && v.x > 0.05f && v.x < 0.95f && v.y > 0.05f && v.y < 0.95f;
+        }
 
         void EnsureHand()
         {

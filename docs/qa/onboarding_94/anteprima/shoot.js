@@ -4,9 +4,10 @@ const cases=[
  {k:'01_avvio',scene:'avvio',ada:S[0].text,obj:'Muoviti',hint:G['onb.move.card']},
  {k:'02_comparsa_LN',scene:'reveal',ada:S[4].text,obj:'Raccogli le monete',hint:G['onb.coins.walk']},
  {k:'03_pad_barra',scene:'pad',ada:S[5].text,obj:'Compra lo Zaino',chev:1,price:'18 LN',py:0.45},
- {k:'04_aiuto20_freccia',scene:'aiuto20',ada:S[1].text,obj:'Vai agli Arrivi',hint:G['onb.pick.max']},
- {k:'05_aiuto40_mano',scene:'aiuto40',ada:S[0].text,obj:'Muoviti',hint:G['onb.move.card']},
+ {k:'04_aiuto20_freccia_fuori_camera',scene:'aiuto20',ada:S[1].text,obj:'Vai agli Arrivi',hint:G['onb.pick.max']},
+ {k:'05_aiuto20_mano_bersaglio_a_schermo',scene:'aiuto40',ada:S[0].text,obj:'Muoviti',hint:G['onb.move.card']},
  {k:'06_badge_nonno',scene:'nonno',ada:S[6].text,obj:'Assumi NONNO'},
+ {k:'08_combo_popup',scene:'combo',ada:S[4].text,obj:'Servi di fila'},
  {k:'07_salta',scene:'salta',ada:S[6].text,obj:'Assumi NONNO'},
 ];
 (async()=>{
@@ -18,7 +19,7 @@ const cases=[
   const r=await p.evaluate(()=>{const vis=e=>e&&getComputedStyle(e).display!='none'&&e.getClientRects().length;
    const R=id=>{const e=document.getElementById(id);if(!vis(e))return null;let n=e;while(n){if(getComputedStyle(n).display=='none')return null;n=n.parentElement;}const b=e.getBoundingClientRect();return {x:b.left,y:b.top,r:b.right,b:b.bottom}};
    const H=innerHeight,fT=H*350/2532,fB=H-H*500/2532;
-   const el={pill:R('currency-pill'),obj:R('obj'),gear:R('gear'),skip:R('skip'),ada:R('ada'),hint:R('hintpill'),joy:R('joystick-base'),hand:R('hand'),chev:R('chev'),bar:R('bar'),price:R('price'),nb:R('nb'),edge:R('edge-arrow')};
+   const el={pill:R('currency-pill'),obj:R('obj'),gear:R('gear'),skip:R('skip'),ada:R('ada'),hint:R('hintpill'),joy:R('joystick-base'),hand:R('hand'),chev:R('chev'),bar:R('bar'),price:R('price'),nb:R('nb'),combo:R('combo'),edge:R('edge-arrow')};
    const ov=[];const ks=Object.keys(el).filter(k=>el[k]);const grp=['chev','bar','price'];
    for(let i=0;i<ks.length;i++)for(let j=i+1;j<ks.length;j++){const a=el[ks[i]],c=el[ks[j]];
      if(grp.includes(ks[i])&&grp.includes(ks[j])){ if(a.x<c.r&&c.x<a.r&&a.y<c.b-1&&c.y<a.b-1) ov.push(ks[i]+'×'+ks[j]); continue;}
