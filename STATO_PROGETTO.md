@@ -187,3 +187,10 @@ Voci più recenti in alto. Formato: `AAAA-MM-GG HH:MM` (Europe/Rome) — [commit
 - Layout di riferimento: `Art/Environment/Layouts/bancone_layout.json` (+ README conversione). Licenze 3D: `docs/LICENZE_ASSET.md`.
 - Nina su main: FBX dell'Animator (1.968 facce, UV raccolte nelle celle dell'atlas), **nessuna striatura nel file**. Non toccata.
 - **Non compilato né testato in Unity** (Unity occupato): servono import, test EditMode/PlayMode e una cattura della scena rigenerata.
+
+## Aggiornamento 16/10 09:30 — PR #36 riallineata a main (UI)
+- Merge di `origin/main` (HUD minimale #38, fix collisioni #63) in `ui/impostazioni-e-schede-pad`, senza rebase/force-push.
+- Conflitti risolti: `Hud.uxml`, `HudV2.uss`, `HudController.cs`, `UpgradePadCard.cs`, `WorldAnchoredElement.cs` → tenuta la versione main (niente telefono/card grandi), aggiunti `Settings.uss` nell'HUD e campo `settingsButton` (eventi `OnSettingsRequested` + `SettingsButtonTapped`).
+- Catture anteprima 390x844 (HTML/Playwright, non Unity): `docs/ui/catture/pr36/`.
+- Da decidere (Tech Lead): su main esiste già `Bridge/SettingsPanel` (aperto da `OnSettingsRequested`); se si aggiunge anche `SettingsController` si aprono due pannelli. `DepotCameraFit` su main usa la chiave `cam_zoom_v3`, `SettingsController` usa `cam_zoom`.
+- Riferimento #35 (chiusa). Correlate aperte: #64, #67.
