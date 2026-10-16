@@ -55,7 +55,7 @@ Esistenti (PR #62): tutte le `onb.*` e i biglietti `step:<id>` citati sopra.
 
 ## Ricompense dopo l'onboarding (rev. 16/10, `economy.json` → `rewards`)
 - Traguardi consegne: 100 / 250 / 450 pacchi = +60 / +120 / +200 LN (golden path: 6:03, 12:25, 20:11).
-- Tappe del debito (25 / 50 / 75% della rata), coerenti con l'HUD minimo:
+- Tappe del debito (25 / 50 / 75% della rata), coerenti con l'HUD minimo (premi in `economy.json` → `rewards.debtMilestones`, feedback in `onboarding.json` → `debtMilestoneFeedback`):
   - **premi invariati:** 25% timbro visivo; 50% +1 Reputazione; 75% arredo "foto di Nonna Ada";
   - **feedback:** al versamento che supera la soglia compare un **timbro sulla Cassaforte** (3 timbri diversi, restano visibili sulla Cassaforte), **una riga di Nonna Ada** nel fumetto (`onb.debt.milestone1/2/3`) e sfx `sfx_debt_stamp`; nella **schermata di fine giornata** compare "tappa 1/3", "2/3", "3/3";
   - nessuna barra o contatore nell'HUD.

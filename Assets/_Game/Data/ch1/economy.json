@@ -40,38 +40,17 @@
     "debtMilestones": [
       {
         "share": 0.25,
-        "reward": "stampSoloVisivo",
-        "feedback": {
-          "cassaforteStamp": "stamp_tappa1",
-          "adaLineKey": "onb.debt.milestone1",
-          "endOfDayLabel": "tappa 1/3",
-          "sfx": "sfx_debt_stamp",
-          "persistentHud": false
-        }
+        "reward": "stampSoloVisivo"
       },
       {
         "share": 0.5,
         "reward": "reputation",
-        "amount": 1,
-        "feedback": {
-          "cassaforteStamp": "stamp_tappa2",
-          "adaLineKey": "onb.debt.milestone2",
-          "endOfDayLabel": "tappa 2/3",
-          "sfx": "sfx_debt_stamp",
-          "persistentHud": false
-        }
+        "amount": 1
       },
       {
         "share": 0.75,
         "reward": "decor",
-        "itemId": "decor_foto_nonna_ada",
-        "feedback": {
-          "cassaforteStamp": "stamp_tappa3",
-          "adaLineKey": "onb.debt.milestone3",
-          "endOfDayLabel": "tappa 3/3",
-          "sfx": "sfx_debt_stamp",
-          "persistentHud": false
-        }
+        "itemId": "decor_foto_nonna_ada"
       }
     ],
     "cassaFirstVisitTipLn": 30,
@@ -82,7 +61,6 @@
         "nonno:2"
       ],
       "rule": "freccia sul pad più economico tra i candidati, solo se il portafoglio ne copre il costo; sparisce all'acquisto o dopo 20 s"
-    },
-    "debtMilestonesNote": "HUD minimo: timbro sulla Cassaforte al versamento che supera la soglia, una riga di Nonna Ada nel fumetto, e 'tappa N/3' nella schermata di fine giornata. Nessuna barra persistente."
+    }
   }
 }

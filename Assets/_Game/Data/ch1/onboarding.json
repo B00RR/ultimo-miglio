@@ -474,5 +474,37 @@
       }
     ]
   },
-  "sfxPolicy": "Cap 1: nessun sfx di telefono (squillo, notifica, vibrazione): il telefono non c'è. Gli aiuti usano solo sfx di freccia/pulsazione (UI onboarding)."
+  "sfxPolicy": "Cap 1: nessun sfx di telefono (squillo, notifica, vibrazione): il telefono non c'è. Gli aiuti usano solo sfx di freccia/pulsazione (UI onboarding).",
+  "debtMilestoneFeedback": {
+    "note": "HUD minimo: timbro sulla Cassaforte al versamento che supera la soglia, una riga di Nonna Ada nel fumetto, e 'tappa N/3' nella schermata di fine giornata. Nessuna barra persistente. Premi e soglie in economy.json → rewards.debtMilestones (qui solo il feedback, per non toccare EconomyData).",
+    "milestones": [
+      {
+        "share": 0.25,
+        "reward": "stampSoloVisivo",
+        "cassaforteStamp": "stamp_tappa1",
+        "adaLineKey": "onb.debt.milestone1",
+        "endOfDayLabel": "tappa 1/3",
+        "sfx": "sfx_debt_stamp",
+        "persistentHud": false
+      },
+      {
+        "share": 0.5,
+        "reward": "reputation",
+        "cassaforteStamp": "stamp_tappa2",
+        "adaLineKey": "onb.debt.milestone2",
+        "endOfDayLabel": "tappa 2/3",
+        "sfx": "sfx_debt_stamp",
+        "persistentHud": false
+      },
+      {
+        "share": 0.75,
+        "reward": "decor",
+        "cassaforteStamp": "stamp_tappa3",
+        "adaLineKey": "onb.debt.milestone3",
+        "endOfDayLabel": "tappa 3/3",
+        "sfx": "sfx_debt_stamp",
+        "persistentHud": false
+      }
+    ]
+  }
 }
