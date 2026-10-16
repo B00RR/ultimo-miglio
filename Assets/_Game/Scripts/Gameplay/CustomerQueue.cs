@@ -6,7 +6,7 @@ namespace UltimoMiglio.Gameplay
     /// <summary>Spawns customers at CustomersPerMin (always more than Nina can serve) into a line in front of the Bancone.</summary>
     public sealed class CustomerQueue : MonoBehaviour
     {
-        public Customer Prefab; public Transform Door, CounterSlot; public Vector3 LineStep = new(0, 0, -0.9f); public int MaxLine = 8;
+        public Customer Prefab; [Tooltip("#2: varianti (6 clienti riggati); vuoto = solo Prefab")] public Customer[] Variants; public Transform Door, CounterSlot; public Vector3 LineStep = new(0, 0, -0.9f); public int MaxLine = 8;
         readonly List<Customer> _line = new(); readonly Stack<Customer> _pool = new(); float _t;
         public Customer Head => _line.Count > 0 ? _line[0] : null;
         public int Waiting => _line.Count;
@@ -19,7 +19,7 @@ namespace UltimoMiglio.Gameplay
         }
         void Spawn()
         {
-            var c = _pool.Count > 0 ? _pool.Pop() : Instantiate(Prefab, transform);
+            var c = _pool.Count > 0 ? _pool.Pop() : Instantiate(Variants != null && Variants.Length > 0 ? Variants[Random.Range(0, Variants.Length)] : Prefab, transform);
             c.Owner = this; c.transform.position = Door.position; c.Leaving = false; c.Waited = 0; c.Wants = (ParcelColor)Random.Range(0, 3);
             c.gameObject.SetActive(true); _line.Add(c);
             if (_line.Count == 1) AudioManager.I?.Play(AudioManager.Sfx.Bell);
