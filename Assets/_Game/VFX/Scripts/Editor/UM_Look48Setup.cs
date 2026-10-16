@@ -40,20 +40,22 @@ namespace UltimoMiglio.VFX.EditorTools
                 if (!m || !m.shader || m.shader.name != ToonShader) continue;
                 bool floor = System.Array.IndexOf(FloorMats, m.name) >= 0;
                 m.SetColor("_ShadowTint", UM_Palette.Ombra);       // #9E7873 (guida §9)
-                m.SetFloat("_ShadowStrength", 0.6f);
-                m.SetFloat("_ShadowCool", 0.12f);                    // lieve tinta fresca (decisione aperta DevOn: max 0.3, mai blu/viola)
+                m.SetFloat("_ShadowStrength", 0.72f); // contrasto luce/ombra
+                m.SetFloat("_ShadowCool", 0.20f); // Concept: ombre leggermente fresche                    // lieve tinta fresca (decisione aperta DevOn: max 0.3, mai blu/viola)
                 m.SetFloat("_ShadowSoft", 0.35f);                    // bordo ombra = PCF filtrato, niente scalini
                 m.SetFloat("_Bands", 3f); m.SetFloat("_RampSoftness", 0.06f);
                 if (floor)
                 {
                     m.SetFloat("_FloorBaseMix", 1f);                 // pavimento = lastre crema/tufo, non arancio saturo
+                    m.SetColor("_BaseColor", UM_Palette.Pavimento);  // albedo crema neutro (no wash arancio)
+                    if (m.HasProperty("_Color")) m.SetColor("_Color", UM_Palette.Pavimento);
                     m.SetColor("_FloorTint", UM_Palette.Pavimento);  // #F3E3C3
                     m.SetColor("_FloorTintB", UM_Palette.CremaVarA); // #E8D3AC
                     m.SetColor("_FloorTintC", UM_Palette.CremaVarB); // #E9D2A8
-                    m.SetFloat("_TileSize", 0.25f);                  // lastre ~0,25 m (guida §3)
-                    m.SetFloat("_TileVar", 0.04f);
-                    m.SetFloat("_GroutDark", 0.12f);
-                    m.SetFloat("_NoiseStrength", 0.05f); m.SetFloat("_NoiseScale", 0.35f);
+                    m.SetFloat("_TileSize", 1.1f);                   // lastre grandi in camera
+                    m.SetFloat("_TileVar", 0.025f);
+                    m.SetFloat("_GroutDark", 0.035f);
+                    m.SetFloat("_NoiseStrength", 0.02f); m.SetFloat("_NoiseScale", 0.22f);
                 }
                 else m.SetFloat("_FloorBaseMix", 0f);
                 EditorUtility.SetDirty(m); n++;
@@ -96,13 +98,13 @@ namespace UltimoMiglio.VFX.EditorTools
                 var so = new SerializedObject(mb);
                 if (tn == "DepotCameraFit")
                 {
-                    Set(so, "DefaultPortraitOrtho", 7f); Set(so, "DefaultLandscapeOrtho", 6.5f);
-                    Set(so, "MinOrtho", 5.5f); Set(so, "CameraDistance", UM_QualityTier.CameraDistance);
+                    Set(so, "DefaultPortraitOrtho", 4.5f); Set(so, "DefaultLandscapeOrtho", 4.8f);
+                    Set(so, "MinOrtho", 4.2f); Set(so, "CameraDistance", UM_QualityTier.CameraDistance);
                     so.ApplyModifiedProperties(); n++;
                 }
                 else if (tn == "CameraRigSetup")
                 {
-                    Set(so, "OrthoSize", 7f); Set(so, "Distance", UM_QualityTier.CameraDistance);
+                    Set(so, "OrthoSize", 4.5f); Set(so, "Distance", UM_QualityTier.CameraDistance);
                     so.ApplyModifiedProperties(); n++;
                 }
             }
