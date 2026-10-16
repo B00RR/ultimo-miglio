@@ -56,8 +56,8 @@ Esistenti (PR #62): tutte le `onb.*` e i biglietti `step:<id>` citati sopra.
 ## Ricompense dopo l'onboarding (rev. 16/10, `economy.json` → `rewards`)
 - Traguardi consegne: 100 / 250 / 450 pacchi = +60 / +120 / +200 LN (golden path: 6:03, 12:25, 20:11).
 - Tappe del debito (25 / 50 / 75% della rata), coerenti con l'HUD minimo (premi in `economy.json` → `rewards.debtMilestones`, feedback in `onboarding.json` → `debtMilestoneFeedback`):
-  - **premi invariati:** 25% timbro visivo; 50% +1 Reputazione; 75% arredo "foto di Nonna Ada";
-  - **feedback:** al versamento che supera la soglia compare un **timbro sulla Cassaforte** (3 timbri diversi, restano visibili sulla Cassaforte), **una riga di Nonna Ada** nel fumetto (`onb.debt.milestone1/2/3`) e sfx `sfx_debt_stamp_01/02/03` (uno per tappa); nella **schermata di fine giornata** compare "tappa 1/3", "2/3", "3/3";
+  - **premi invariati:** 25% timbro visivo; 50% +1 Reputazione; 75% arredo "foto di Oma Tilde";
+  - **feedback:** al versamento che supera la soglia compare un **timbro sulla Cassaforte** (3 timbri diversi, restano visibili sulla Cassaforte), **una riga di Oma Tilde** nel fumetto (`onb.debt.milestone1/2/3`) e sfx `sfx_debt_stamp_01/02/03` (uno per tappa); nella **schermata di fine giornata** compare "tappa 1/3", "2/3", "3/3";
   - nessuna barra o contatore nell'HUD.
 - Freccia "prossimo pad" da 8:00 sul più economico tra Scarpe 2 e NONNO 2, solo se pagabile.
 
@@ -79,10 +79,10 @@ Al golden path il portafoglio vale 41 LN a 1:23 e 211 LN cumulati a 2:10: tutti 
 - Il biglietto `step:unlock_nonno` e gli altri `step:*` restano invariati.
 
 ## Tappe del debito e audio: richieste (rev. 16/10)
-**Narrative, chiavi nuove** (voce di Nonna Ada, ≤70 caratteri):
+**Narrative, chiavi nuove** (voce di Oma Tilde, ≤70 caratteri):
 - `onb.debt.milestone1`: un quarto della rata versato (timbro);
 - `onb.debt.milestone2`: metà della rata, la gente del quartiere ci nota (+1 Reputazione);
-- `onb.debt.milestone3`: tre quarti, arriva la foto di Nonna Ada per il deposito.
+- `onb.debt.milestone3`: tre quarti, arriva la foto di Oma Tilde per il deposito.
 
 **Sound, hook:**
 - `sfx_debt_stamp_01`, `_02`, `_03`: timbro sulla Cassaforte, uno per tappa (25/50/75%), ~0,4 s;
