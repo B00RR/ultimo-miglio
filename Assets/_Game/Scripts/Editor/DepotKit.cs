@@ -22,18 +22,18 @@ namespace UltimoMiglio.EditorTools
             bool arch = AssetDatabase.LoadAssetAtPath<GameObject>(Root + "Kit/env_wall_arch_4m.fbx");
             for (int i = 0; i < 9; i++)
             {
-                if (arch && (i == 1 || i == 2 || i == 6 || i == 7)) { if (i == 1 || i == 6) Place("Kit/env_wall_arch_4m", _parent, new Vector3(-8 + i * 2 + 1, 0, 8.35f), 0, false, false, 4f, true); continue; }
-                Place(i == 4 ? "Kit/env_wall_2m_b" : "Kit/env_wall_2m_a", _parent, new Vector3(-8 + i * 2, 0, 8.35f), 0, false, false, 2f, true);
+                if (arch && (i == 1 || i == 2 || i == 6 || i == 7)) { if (i == 1 || i == 6) Place("Kit/env_wall_arch_4m", _parent, new Vector3(-8 + i * 2 + 1, 0, 8.35f), 0, false, false, true); continue; }
+                Place(i == 4 ? "Kit/env_wall_2m_b" : "Kit/env_wall_2m_a", _parent, new Vector3(-8 + i * 2, 0, 8.35f), 0, false, false, true);
             }
             for (int i = 0; i < 11; i++)
             {
                 // Concept PR#55: muro E più vicino all'area di gioco (camera ortho ~6.5)
-                if (arch && (i == 4 || i == 5)) { if (i == 4) Place("Kit/env_wall_arch_4m", _parent, new Vector3(7.6f, 0, -10 + i * 2 + 1), 90, false, false, 4f, true); continue; }
-                Place(i % 3 == 1 ? "Kit/env_wall_2m_b" : "Kit/env_wall_2m_a", _parent, new Vector3(7.6f, 0, -10 + i * 2), 90, false, false, 2f, true);
+                if (arch && (i == 4 || i == 5)) { if (i == 4) Place("Kit/env_wall_arch_4m", _parent, new Vector3(7.6f, 0, -10 + i * 2 + 1), 90, false, false, true); continue; }
+                Place(i % 3 == 1 ? "Kit/env_wall_2m_b" : "Kit/env_wall_2m_a", _parent, new Vector3(7.6f, 0, -10 + i * 2), 90, false, false, true);
             }
             Place("Kit/env_wall_corner", _parent, new Vector3(7.6f, 0, 8.35f), 0, false);
-            for (int i = 0; i < 9; i++) Place("Kit/env_plinth_edge_2m", _parent, new Vector3(-8 + i * 2, 0, -11.15f), 0, false, false, 2f, true);
-            for (int i = 0; i < 11; i++) Place("Kit/env_plinth_edge_2m", _parent, new Vector3(-9.15f, 0, -10 + i * 2), 90, false, false, 2f, true);
+            for (int i = 0; i < 9; i++) Place("Kit/env_plinth_edge_2m", _parent, new Vector3(-8 + i * 2, 0, -11.15f), 0, false, false, true);
+            for (int i = 0; i < 11; i++) Place("Kit/env_plinth_edge_2m", _parent, new Vector3(-9.15f, 0, -10 + i * 2), 90, false, false, true);
             // wall dressing (N wall), sign and lanterns
             Place("Kit/prop_sign_sunn_depot", _parent, new Vector3(0, 1.95f, 8.08f), 0, false); DressSignFace(); // faro + Vela & Figli (piu basso, in camera)
             foreach (var x in new[] { -6f, 3f, 7f }) Place("Kit/prop_lantern_wall", _parent, new Vector3(x, 1.9f, 8.1f), 0, false);
@@ -102,40 +102,66 @@ namespace UltimoMiglio.EditorTools
             Place("../Props/prop_parcel_box_cube", _parent, shelfC + new Vector3(1.2f, 0, -1.4f), -25, true);
             Place("../Props/prop_parcel_box_flat", _parent, shelfC + new Vector3(1.2f, 0, -1.4f), 30, false, true);
             // Bancone: limoni e pila ai lati, lavagna e lampione lungo la coda (lato -x, la coda va verso +x)
-            Place("Kit/prop_lemontree_pot", _parent, banPos + new Vector3(-1.75f, 0, -0.9f), 0, true);
-            Place("Kit/prop_parcel_stack_a", _parent, banPos + new Vector3(-1.8f, 0, 0.6f), 25, true);
+            Place("Kit/prop_lemontree_pot", _parent, banPos + new Vector3(-2.5f, 0, -1.6f), 0, true); // #82 (Game Designer): varco ovest riaperto, il giro da est costava fino a +6,8 m dai pad (detour_82.py)
+            Place("Kit/prop_parcel_stack_a", _parent, banPos + new Vector3(-2.2f, 0, 0.9f), 25, true); // #82: varco ovest di 1,26 m fra pila e angolo del banco
             Place("Kit/prop_sign_board_aperto", _parent, banPos + new Vector3(-1.2f, 0, -2.4f), 30, true);
             Place("Kit/prop_streetlamp", _parent, banPos + new Vector3(-1.9f, 0, -3.4f), 0, true);
             Place("Kit/prop_plant_pot_round", _parent, banPos + new Vector3(-2.4f, 0, 1.6f), 0, true); // #187: spostato a ovest, fra Bancone e Cassa non c'era spazio con anello = trigger
             // Concept: pezzo di muro/arco visibile dietro il Bancone (beauty shot)
-            Place("Kit/env_wall_2m_a", _parent, banPos + new Vector3(-0.2f, 0, 2.8f), 0, false, false, 2f, true);
-            Place("Kit/env_wall_2m_b", _parent, banPos + new Vector3(1.8f, 0, 2.8f), 0, false, false, 2f, true);
+            Place("Kit/env_wall_2m_a", _parent, banPos + new Vector3(-0.2f, 0, 1.45f), 0, false, false, true); // #82 opzione A: muro a ridosso, niente sacca
+            Place("Kit/env_wall_2m_b", _parent, banPos + new Vector3(2.0f, 0, 1.45f), 0, false, false, true);
             if (AssetDatabase.LoadAssetAtPath<GameObject>(Root + "Kit/env_wall_arch_4m.fbx"))
-                Place("Kit/env_wall_arch_4m", _parent, banPos + new Vector3(3.6f, 0, 1.2f), -90, false, false, 4f, true);
-            Place("Kit/prop_sign_sunn_depot", _parent, banPos + new Vector3(0.6f, 2.0f, 2.55f), 0, false); DressSignFace();
-            Place("Kit/prop_lantern_wall", _parent, banPos + new Vector3(-1.4f, 1.85f, 2.55f), 0, false);
+                Place("Kit/env_wall_arch_4m", _parent, banPos + new Vector3(3.2f, 0, -0.3f), -90, false, false, true); // #97: a 3.6 restava una fessura di ~0.45 m tra muro_b e arco: i clienti (r 0.3) ci si incastravano e non arrivavano al Bancone
+            Place("Kit/prop_sign_sunn_depot", _parent, banPos + new Vector3(0.6f, 2.0f, 1.2f), 0, false); DressSignFace();
+            Place("Kit/prop_lantern_wall", _parent, banPos + new Vector3(-1.4f, 1.85f, 1.2f), 0, false);
             Debug.Log("[Kit] gameplay dressing: " + _parent.childCount + " pieces");
         }
 
-        /// <summary>Instantiates Root+rel+".fbx". fitLen>0 + alongX: rotate so the long side is along X (or Z when yaw=90).</summary>
-        public static bool Place(string rel, Transform parent, Vector3 pos, float yaw, bool solid, bool onTop = false, float fitLen = 0, bool wall = false)
+        /// <summary>Instantiates Root+rel+".fbx". wall: ruota di 90 se serve perché il lato lungo segua X (o Z con yaw=90).
+        /// #82: bounds calcolati a yaw 0 (locali), yaw applicato dopo, così i collider non si gonfiano; gli archi hanno 3 collider (pilastri + architrave).</summary>
+        public static bool Place(string rel, Transform parent, Vector3 pos, float yaw, bool solid, bool onTop = false, bool wall = false)
         {
             var src = AssetDatabase.LoadAssetAtPath<GameObject>(Root + rel + ".fbx");
             if (!src) { Debug.LogWarning("[Kit] missing " + rel); return false; }
             var go = (GameObject)PrefabUtility.InstantiatePrefab(src);
             if (parent || _parent) go.transform.SetParent(parent ? parent : _parent, true);
-            go.transform.rotation = Quaternion.Euler(0, yaw, 0); go.transform.position = Vector3.zero;
+            foreach (var c in go.GetComponentsInChildren<Collider>()) Object.DestroyImmediate(c);
+            go.transform.rotation = Quaternion.identity; go.transform.position = Vector3.zero;
             var b = Bounds(go); if (b.size == Vector3.zero) { Object.DestroyImmediate(go); return false; }
-            if (wall) { bool wantX = Mathf.Abs(Mathf.DeltaAngle(yaw, 90)) > 45; bool isX = b.size.x >= b.size.z; if (wantX != isX) { go.transform.rotation = Quaternion.Euler(0, yaw + 90, 0); b = Bounds(go); } }
-            go.transform.position += new Vector3(pos.x - b.center.x, pos.y - b.min.y, pos.z - b.center.z);
+            bool localX = b.size.x >= b.size.z;
+            if (wall)
+            {
+                bool wantX = Mathf.Abs(Mathf.Sin(yaw * Mathf.Deg2Rad)) < 0.7071f; // #82: anche yaw -90 vuol dire lato lungo su Z (arco del set a fianco del Bancone)
+                bool side = Mathf.Abs(Mathf.DeltaAngle(yaw, 90)) <= 45 || Mathf.Abs(Mathf.DeltaAngle(yaw, -90)) <= 45;
+                bool worldX = localX != side;
+                if (wantX != worldX) yaw += 90;
+            }
+            var rot = Quaternion.Euler(0, yaw, 0);
+            var off = rot * new Vector3(b.center.x, 0, b.center.z);
+            go.transform.rotation = rot; go.transform.position = new Vector3(pos.x - off.x, pos.y - b.min.y, pos.z - off.z);
             go.isStatic = true;
             if (_mat) foreach (var r in go.GetComponentsInChildren<Renderer>()) r.sharedMaterials = System.Array.ConvertAll(r.sharedMaterials, m => m && m.name.Contains("Emissive") && _emi ? _emi : _mat);
-            foreach (var c in go.GetComponentsInChildren<Collider>()) Object.DestroyImmediate(c);
-            b = Bounds(go);
             // #58: muri/archi sempre solidi; prop a terra alti >25cm (vasi, casse, set) solidi; tappeti/decal no
-            if (!solid && (wall || (!onTop && b.min.y < 0.3f && b.size.y > 0.25f && Mathf.Max(b.size.x, b.size.z) < 6f))) solid = true;
-            if (solid) { var bc = go.AddComponent<BoxCollider>(); bc.center = go.transform.InverseTransformPoint(b.center); var ls = go.transform.lossyScale; var sz = Quaternion.Inverse(go.transform.rotation) * b.size; bc.size = new Vector3(Mathf.Abs(sz.x / ls.x), Mathf.Abs(sz.y / ls.y), Mathf.Abs(sz.z / ls.z)); }
+            float minY = pos.y;
+            if (!solid && (wall || (!onTop && minY < 0.3f && b.size.y > 0.25f && Mathf.Max(b.size.x, b.size.z) < 6f))) solid = true;
+            if (!solid) return true;
+            var ls = go.transform.lossyScale; var inv = new Vector3(1f / ls.x, 1f / ls.y, 1f / ls.z);
+            if (rel.Contains("wall_arch"))
+            {
+                // pilastri 0-0.2L e 0.8L-L a tutta altezza, architrave 0.2L-0.8L da 0.75H (2.4 su 3.2) in su
+                float L = localX ? b.size.x : b.size.z, H = b.size.y;
+                Vector3 ax = localX ? Vector3.right : Vector3.forward, th = localX ? new Vector3(0, 0, b.size.z) : new Vector3(b.size.x, 0, 0);
+                AddBox(go, b.center - ax * (0.4f * L), ax * (0.2f * L) + Vector3.up * H + th, inv);
+                AddBox(go, b.center + ax * (0.4f * L), ax * (0.2f * L) + Vector3.up * H + th, inv);
+                AddBox(go, new Vector3(b.center.x, b.min.y + 0.875f * H, b.center.z), ax * (0.6f * L) + Vector3.up * (0.25f * H) + th, inv);
+            }
+            else AddBox(go, b.center, b.size, inv);
             return true;
+        }
+
+        static void AddBox(GameObject go, Vector3 localCenter, Vector3 localSize, Vector3 inv)
+        {
+            var bc = go.AddComponent<BoxCollider>(); bc.center = Vector3.Scale(localCenter, inv); bc.size = Vector3.Scale(localSize, inv);
         }
 
         /// <summary>#65: lampione. Il pivot dell'FBX è alla base del palo (mesh: palo r 0.146 all'origine, braccio +X 0.62 a 2.3-2.6 m).

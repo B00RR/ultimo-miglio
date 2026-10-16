@@ -134,7 +134,7 @@ namespace UltimoMiglio.EditorTools
                 body.AddComponent<NavMeshObstacle>().carving = true;
                 // #58: BoxCollider semplice (il CharacterController scivola sui box, B5)
                 // #47: scaffale caricato se presente
-                if (kitOk && DepotKit.Place(AssetDatabase.LoadAssetAtPath<GameObject>("Assets/_Game/Art/Environment/Kit/prop_shelf_2m_loaded.fbx") ? "Kit/prop_shelf_2m_loaded" : "Kit/prop_shelf_2m", null, body.transform.position - new Vector3(0, 0.9f, 0), 0, false)) body.GetComponent<Renderer>().enabled = false;
+                if (kitOk && DepotKit.Place(AssetDatabase.LoadAssetAtPath<GameObject>("Assets/_Game/Art/Environment/Kit/prop_shelf_2m_loaded.fbx") ? "Kit/prop_shelf_2m_loaded" : "Kit/prop_shelf_2m", null, body.transform.position - new Vector3(0, 0.9f, 0), 0, false)) body.GetComponent<Renderer>().enabled = false; // #58: il BoxCollider del box resta (secondo collider voluto)
                 Box("Code", body.transform, new Vector3(0, 0.55f, 0.52f), new Vector3(0.9f, 0.08f, 0.1f), world, cols[i]);
                 shelves[i] = Zone<Shelf>($"Zona_Scaffale_{(char)('A' + i)}", p + new Vector3(0, 0, 0.65f), new Vector3(1.8f, 1, 1.2f), cols[i], props);
                 shelves[i].Color = (ParcelColor)i; shelves[i].Count = 4;
@@ -146,14 +146,14 @@ namespace UltimoMiglio.EditorTools
             var banMesh = Box("Bancone_Mesh", null, banPos + new Vector3(0, 0.5f, -0.9f), new Vector3(2.4f, 1f, 0.7f), world, UM_Palette.Terracotta); banMesh.AddComponent<NavMeshObstacle>().carving = true;
            // #58: BoxCollider solido
             // #47: counter + Carico0 + rug
-            if (kitOk && DepotKit.Place("Kit/prop_counter_2m", null, banPos + new Vector3(0, 0, -0.9f), 0, false)) { banMesh.GetComponent<Renderer>().enabled = false; DepotKit.Place("Kit/prop_register", null, banPos + new Vector3(0.6f, 1.0f, -0.9f), 0, false, true); DepotKit.Place("Kit/prop_carico0", null, banPos + new Vector3(-0.15f, 1.0f, -0.9f), 8, false, true); DepotKit.Place("ThirdParty/Props/prop_tp_lemon", null, banPos + new Vector3(-0.8f, 1.0f, -0.9f), 0, false, true); DepotKit.Place("Kit/prop_rug_bancone", null, banPos + new Vector3(0, 0.005f, 0.2f), 0, false); }
-            var bancone = Zone<Bancone>("Zona_Bancone", banPos + new Vector3(0, 0, 0.45f), new Vector3(2.4f, 1, 1.2f), UM_Palette.Terracotta, props);
+            if (kitOk && DepotKit.Place("Kit/prop_counter_2m", null, banPos + new Vector3(0, 0, -0.9f), 0, false)) { banMesh.GetComponent<Renderer>().enabled = false; /* #58: il BoxCollider di Bancone_Mesh resta */ DepotKit.Place("Kit/prop_register", null, banPos + new Vector3(0.6f, 1.0f, -0.9f), 0, false, true); DepotKit.Place("Kit/prop_carico0", null, banPos + new Vector3(-0.15f, 1.0f, -0.9f), 8, false, true); DepotKit.Place("ThirdParty/Props/prop_tp_lemon", null, banPos + new Vector3(-0.8f, 1.0f, -0.9f), 0, false, true); DepotKit.Place("Kit/prop_rug_bancone", null, banPos + new Vector3(0, 0.005f, 0.2f), 0, false); }
+            var bancone = Zone<Bancone>("Zona_Bancone", banPos + new Vector3(0, 0, 0.33f), new Vector3(2.4f, 1, 1.2f), UM_Palette.Terracotta, props); // #82+#187: centrata fra banco (faccia -0.55) e muro (faccia +1.21), 0,28 m per lato
             var coins = new GameObject("Coins").AddComponent<CoinSpawner>(); coins.CoinPrefab = coin; bancone.Coins = coins;
             var queue = new GameObject("CustomerQueue").AddComponent<CustomerQueue>(); queue.Prefab = cust; queue.Variants = custVariants.ToArray();
             queue.CounterSlot = new GameObject("CounterSlot").transform; queue.CounterSlot.position = banPos + new Vector3(0, 0, -1.8f);
             queue.Door = new GameObject("Door").transform; queue.Door.position = new Vector3(8.5f, 0, -10.5f); queue.LineStep = new Vector3(0.7f, 0, -0.7f);
             bancone.Queue = queue;
-            var cassa = Zone<CassaZone>("Zona_Cassa", banPos + new Vector3(2.35f, 0, 1.55f), new Vector3(1.2f, 1, 1.2f), UM_Palette.TealOmni, props); cassa.Coins = coins;
+            var cassa = Zone<CassaZone>("Zona_Cassa", banPos + new Vector3(2.8f, 0, 2.8f), new Vector3(1.2f, 1, 1.2f), UM_Palette.TealOmni, props); cassa.Coins = coins; // #82+#187: oltre il muro del set (z +1.45), gap ≥ 0,4 m da muro, arco, pad e vasi (layout_187.py)
 
             // --- pads (near the Cassa, 01 §3)
             var padRow = banPos + new Vector3(-0.9f, 0, 4.5f);

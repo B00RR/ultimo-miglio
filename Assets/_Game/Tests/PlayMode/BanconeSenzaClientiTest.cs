@@ -27,10 +27,17 @@ public class BanconeSenzaClientiTest
             int pacchi = n.Stack.Count; Assert.Greater(pacchi, 0);
 
             var p = ban.GetComponent<Collider>().bounds.center; p.y = n.transform.position.y;
+            // #82: il muro del set chiude il retro del Bancone: Nina entra dal lato est (come Nina_ReachesZonaBancone_NoPocketBehind)
+            var zc = ban.transform.position;
+            var cc = n.GetComponent<CharacterController>(); if (cc) cc.enabled = false; n.transform.position = zc + new Vector3(2.2f, 0.05f, -2.4f); if (cc) cc.enabled = true; yield return null;
+            var wps = new System.Collections.Generic.List<Vector3> { zc + new Vector3(2.2f, 0, -0.1f), p }; int k = 0;
             float tw = Time.time; // entra camminando (OnTriggerEnter), come nei test esistenti
-            while (!ban.Occupied && Time.time - tw < 15f)
+            while (!ban.Occupied && Time.time - tw < 20f)
             {
-                var d = p - n.transform.position; d.y = 0; n.ScriptedInput = d.sqrMagnitude > 0.01f ? d.normalized : Vector3.forward; yield return null;
+                var d = wps[k] - n.transform.position; d.y = 0;
+                if (d.sqrMagnitude < 0.04f && k < wps.Count - 1) { k++; continue; }
+                if (k == wps.Count - 1) { d = p - n.transform.position; d.y = 0; }
+                n.ScriptedInput = d.sqrMagnitude > 0.01f ? d.normalized : Vector3.forward; yield return null;
             }
             n.ScriptedInput = Vector3.zero;
             Assert.IsTrue(ban.Occupied, "Nina non è entrata nel Bancone");
