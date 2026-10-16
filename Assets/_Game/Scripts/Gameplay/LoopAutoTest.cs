@@ -46,7 +46,7 @@ namespace UltimoMiglio.Gameplay
             {
                 cycle++;
                 var kind = E.S.Zaino == zainoStart ? UpgradeKind.Zaino : UpgradeKind.NonnoHire; var pad = kind == UpgradeKind.Zaino ? padZ : padN;
-                if (E.S.Wallet + E.S.PadPaid[(int)kind] >= E.Cost(kind) || (cycle > 1 && E.S.Wallet > 0))
+                if (pad.gameObject.activeInHierarchy && (E.S.Wallet + E.S.PadPaid[(int)kind] >= E.Cost(kind) || (cycle > 1 && E.S.Wallet > 0))) // #101: pad nascosto dal tutorial graduale = non ancora comprabile
                 {
                     yield return Go(pad.transform.position, kind + " pad");
                     float w = Time.time; while (!Goal() && E.S.Wallet > 0.001 && Time.time - w < 20) { if (kind == UpgradeKind.Zaino && E.S.Zaino > zainoStart) break; yield return null; }
@@ -67,7 +67,23 @@ namespace UltimoMiglio.Gameplay
                 double w0 = E.S.Wallet; yield return Go(ban.transform.position + Vector3.right * 0.8f, "Coins"); yield return Wait(2.5f);
                 Log($"coins collected, wallet +{E.S.Wallet - w0:0.##}");
             }
-            if (TutorialManager.I) { float te = Time.time; while (TutorialManager.I.Current != TutorialManager.Step.Chiuso && Time.time - te < 15) yield return null; }
+            // #101: passi 11-15 dopo NONNO (pad nuovi, Cassa, debito, muro, gioco libero)
+            if (TutorialManager.I)
+            {
+                float te = Time.time;
+                while (TutorialManager.I.Current != TutorialManager.Step.Chiuso && Time.time - te < 120)
+                {
+                    var st = TutorialManager.I.Current;
+                    if (st == TutorialManager.Step.PadNuovi)
+                    {
+                        var np = pads.Where(p => (p.Kind == UpgradeKind.Scarpe || p.Kind == UpgradeKind.Insegna) && p.gameObject.activeInHierarchy && !double.IsInfinity(E.Cost(p.Kind)))
+                                     .OrderBy(p => E.Cost(p.Kind)).FirstOrDefault();
+                        if (np) { if (E.S.Wallet < E.Cost(np.Kind)) { E.S.Wallet = E.Cost(np.Kind); Log("test: LN per " + np.Kind); } yield return Go(np.transform.position, np.Kind + " pad"); yield return Wait(8f); continue; }
+                    }
+                    if (st == TutorialManager.Step.CassaPass) { var cz = FindAnyObjectByType<CassaZone>(); if (cz) { yield return Go(cz.transform.position, "Cassa"); yield return Wait(1.5f); continue; } }
+                    yield return null;
+                }
+            }
             Result = Goal() ? "PASS" : "FAIL";
             Log("tutorial steps: " + string.Join(",", TutSteps));
             Log($"{Result} cycles={cycle} teleports={Teleports}");
