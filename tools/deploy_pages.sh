@@ -13,6 +13,7 @@ gh repo clone "$REPO" "$TMP" -- -q --depth 1
 find "$TMP" -mindepth 1 -maxdepth 1 ! -name .git -exec rm -rf {} +
 cp -r "$SRC"/. "$TMP"/; touch "$TMP/.nojekyll"
 tools/patch_index_mobile.sh "$TMP/index.html"
+tools/cache_bust_index.sh "$TMP/index.html" "$SHA"
 echo "commit sorgente: $SHA — $(date '+%Y-%m-%d %H:%M') Europe/Rome" > "$TMP/VERSIONE.txt"
 cd "$TMP"; git add -A
 git commit -qm "Build WebGL da ultimo-miglio@$SHA" && git push -q origin HEAD:main
