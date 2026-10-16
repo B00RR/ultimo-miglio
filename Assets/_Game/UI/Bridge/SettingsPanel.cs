@@ -9,7 +9,7 @@ namespace UltimoMiglio.UI.Bridge
     /// Pausa il gioco (timeScale=0) mentre è aperto. Aperto dal bottone ingranaggio dell'HUD.</summary>
     public sealed class SettingsPanel : MonoBehaviour
     {
-        public const string PrefMusic = "vol_music", PrefSfx = "vol_sfx";
+        public const string PrefMusic = AudioManager.PrefMusic, PrefSfx = AudioManager.PrefSfx;
         VisualElement _root, _panel; Label _zoomL; Slider _music, _sfx; HudController _hud;
         float _prevScale = 1f; bool _open;
 
@@ -37,7 +37,7 @@ namespace UltimoMiglio.UI.Bridge
             _panel.Add(Lab("Musica", 18, true));
             _music = new Slider(0, 1) { value = PlayerPrefs.GetFloat(PrefMusic, 0.6f) }; StyleSlider(_music); _music.RegisterValueChangedCallback(e => SetMusic(e.newValue)); _panel.Add(_music);
             _panel.Add(Lab("Suoni", 18, true));
-            _sfx = new Slider(0, 1) { value = PlayerPrefs.GetFloat(PrefSfx, 1f) }; StyleSlider(_sfx); _sfx.RegisterValueChangedCallback(e => SetSfx(e.newValue)); _panel.Add(_sfx);
+            _sfx = new Slider(0, 1) { value = PlayerPrefs.GetFloat(PrefSfx, 1f) }; StyleSlider(_sfx); _sfx.RegisterValueChangedCallback(e => SetSfx(e.newValue)); _sfx.RegisterCallback<PointerUpEvent>(_ => AudioManager.I?.Play(AudioManager.Sfx.UiTap)); // anteprima volume Suoni _panel.Add(_sfx);
 
             var save = Btn("SALVA", SaveAndClose); save.style.marginTop = 22; save.style.alignSelf = Align.Center; save.style.minWidth = 180; _panel.Add(save);
             _root.Add(_panel); hudRoot.Add(_root);
@@ -47,7 +47,7 @@ namespace UltimoMiglio.UI.Bridge
         static Label Lab(string t, float fs, bool bold) { var l = new Label(t); l.style.fontSize = fs; l.style.color = new Color(0.23f, 0.16f, 0.125f); if (bold) l.style.unityFontStyleAndWeight = FontStyle.Bold; return l; }
         Button Btn(string t, System.Action a)
         {
-            var b = new Button(a) { text = t };
+            var b = new Button(() => { AudioManager.I?.Play(AudioManager.Sfx.UiTap); a?.Invoke(); }) { text = t };
             var s = b.style; s.height = 56; s.minWidth = 56; s.fontSize = 28; s.unityFontStyleAndWeight = FontStyle.Bold;
             s.backgroundColor = new Color(0.957f, 0.769f, 0.188f); s.color = new Color(0.23f, 0.16f, 0.125f);
             s.borderTopLeftRadius = s.borderTopRightRadius = s.borderBottomLeftRadius = s.borderBottomRightRadius = 18;
@@ -59,7 +59,7 @@ namespace UltimoMiglio.UI.Bridge
         public void Toggle() { if (_open) SaveAndClose(); else Open(); }
         public void Open()
         {
-            if (_open) return; _open = true; _prevScale = Time.timeScale; Time.timeScale = 0f;
+            if (_open) return; AudioManager.I?.Play(AudioManager.Sfx.UiTap); _open = true; _prevScale = Time.timeScale; Time.timeScale = 0f;
             _root.style.display = DisplayStyle.Flex; RefreshZoomLabel();
         }
         void SaveAndClose()

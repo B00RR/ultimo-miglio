@@ -4,9 +4,6 @@
   "principle": "una meccanica per passo; il passo successivo si sblocca solo col gate (evento osservabile) del precedente",
   "lockedAtStart": [
     "hud.pillolaValute",
-    "hud.telefono",
-    "hud.barraDebito",
-    "hud.combo",
     "zona.arrivi",
     "zona.scaffaleTerracotta",
     "zona.altriScaffali",
@@ -22,10 +19,7 @@
     "robot.nonno.attivo",
     "clienti.normali",
     "clienti.anziano",
-    "clienti.frettoloso",
-    "app.flotta",
-    "app.messaggi",
-    "app.ordini"
+    "clienti.frettoloso"
   ],
   "hintEscalationDefault": {
     "10s": "ripete il suggerimento e fa pulsare il bersaglio",
@@ -212,10 +206,10 @@
       "tSec": 100,
       "toleranceSec": 15,
       "maxSec": 125,
-      "mechanic": "combo: servire clienti di fila",
+      "mechanic": "combo: servire clienti di fila (feedback '+N' sopra Kaia)",
       "reveals": [
         "clienti.normali",
-        "hud.combo"
+        "feedback.comboPlusN"
       ],
       "gate": {
         "event": "comboReached",
@@ -225,13 +219,20 @@
         "onb.combo"
       ],
       "hintEscalation": {
-        "10s": "numero combo pulsa",
+        "10s": "il '+N' sopra Kaia diventa più grande per un istante",
         "20s": "freccia sul Bancone quando c'è coda",
         "40s": "ripete onb.combo; dopo 40 s il gate si considera passato (combo non bloccante)"
       },
       "revealWhen": "zainoPad completato",
       "softGateSec": 40,
-      "note": "anziano compare da 1:40"
+      "note": "anziano compare da 1:40",
+      "comboFeedback": {
+        "type": "floatingText",
+        "anchor": "nina.head",
+        "format": "+{n}",
+        "durationSec": 1.5,
+        "persistentHud": false
+      }
     },
     {
       "id": "nonnoIntro",
@@ -297,8 +298,7 @@
       "maxSec": 150,
       "mechanic": "vedere OLDO lavorare",
       "reveals": [
-        "robot.nonno.attivo",
-        "app.flotta"
+        "robot.nonno.attivo"
       ],
       "gate": {
         "event": "nonnoFirstRestock"
@@ -314,31 +314,6 @@
         "inputLocked": false
       },
       "recurringBarkAfter": "onb.nonno.bark"
-    },
-    {
-      "id": "phone",
-      "tSec": 165,
-      "toleranceSec": 10,
-      "maxSec": 200,
-      "mechanic": "telefono: leggere un messaggio",
-      "reveals": [
-        "hud.telefono",
-        "app.messaggi"
-      ],
-      "gate": {
-        "event": "messageRead"
-      },
-      "textKeys": [
-        "onb.civetta.msg1",
-        "onb.civetta.reply",
-        "onb.civetta.msg2"
-      ],
-      "hintEscalation": {
-        "10s": "telefono vibra di nuovo",
-        "20s": "badge rosso + freccia sul telefono",
-        "40s": "mano fantasma che tocca il telefono"
-      },
-      "note": "frettoloso compare da 2:30"
     },
     {
       "id": "padNuovi",
@@ -366,29 +341,8 @@
         "20s": "freccia sul più economico pagabile",
         "40s": "camera sui due pad"
       },
-      "note": "golden path: Insegna 1 a 2:55, Scarpe 1 a 3:05"
-    },
-    {
-      "id": "ordersApp",
-      "tSec": 210,
-      "toleranceSec": 10,
-      "maxSec": 240,
-      "mechanic": "app Ordini",
-      "reveals": [
-        "app.ordini"
-      ],
-      "gate": {
-        "event": "ordersTapShowRoute"
-      },
-      "textKeys": [
-        "onb.orders.special",
-        "onb.flotta.hint"
-      ],
-      "hintEscalation": {
-        "10s": "badge rosso fisso",
-        "20s": "freccia sul telefono",
-        "40s": "mano fantasma sull'app"
-      }
+      "note": "frettoloso compare da 2:30; golden path: Insegna 1 a 2:55, Scarpe 1 a 3:05",
+      "revealWhen": "nonnoConfirm completato e t>=170"
     },
     {
       "id": "cassaPass",
@@ -417,15 +371,15 @@
       "tSec": 240,
       "toleranceSec": 10,
       "maxSec": 280,
-      "mechanic": "debito: versare alla Cassaforte",
+      "mechanic": "debito: versare alla Cassaforte (spiegato da Oma Tilde)",
       "reveals": [
-        "zona.cassaforte",
-        "hud.barraDebito"
+        "zona.cassaforte"
       ],
       "gate": {
         "event": "firstDebtDeposit"
       },
       "textKeys": [
+        "onb.debt.adaExplain",
         "onb.viktor.call1",
         "onb.viktor.call2",
         "onb.debt.pedaggioHint"
@@ -433,9 +387,25 @@
       "hintEscalation": {
         "10s": "Cassaforte pulsa",
         "20s": "freccia sulla Cassaforte",
-        "40s": "camera sulla Cassaforte + ripete onb.viktor.call2"
+        "40s": "camera sulla Cassaforte + Oma Tilde ripete onb.debt.adaExplain"
       },
-      "note": "primo versamento = 60% del portafoglio"
+      "note": "primo versamento = 60% del portafoglio; nessuna barra del debito nell'HUD",
+      "delivery": {
+        "adaBubble": [
+          "onb.debt.adaExplain",
+          "onb.debt.pedaggioHint"
+        ],
+        "lettera": "lettera GrayBox sulla Cassaforte: onb.viktor.call1 + onb.viktor.call2 (non più telefonata)"
+      },
+      "endOfDayScreen": {
+        "showsDebtProgress": true,
+        "fields": [
+          "rata corrente 8.400 LN",
+          "versato / 8.400",
+          "giorno attuale / scadenza Giorno 24"
+        ],
+        "firstShownAt": "fine del primo ciclo di gioco"
+      }
     },
     {
       "id": "wallPad",
@@ -476,5 +446,27 @@
       "hintEscalation": null,
       "maxSecNote": "0 = passo terminale senza limite di tempo e senza escalation: l'onboarding finisce al reveal di freePlay; la sessione di playtest si chiude qui o a 10 min di gioco"
     }
-  ]
+  ],
+  "hudPolicy": "HUD minimo (decisione DevOn 16/10): nel cap 1 non c'è il telefono; la combo è solo un '+N' sopra Kaia che sparisce in 1,5 s; il debito si vede solo nella schermata di fine giornata e nel fumetto di Oma Tilde quando lo spiega (nessuna barra persistente).",
+  "postponed": {
+    "toChapter": 2,
+    "reason": "nel cap 1 non c'è il telefono",
+    "items": [
+      {
+        "was": "phone (Madame Moth)",
+        "keys": [
+          "onb.civetta.msg1",
+          "onb.civetta.reply",
+          "onb.civetta.msg2"
+        ]
+      },
+      {
+        "was": "ordersApp (ordine speciale + app Flotta)",
+        "keys": [
+          "onb.orders.special",
+          "onb.flotta.hint"
+        ]
+      }
+    ]
+  }
 }

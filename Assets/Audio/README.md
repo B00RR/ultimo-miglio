@@ -18,6 +18,9 @@ Original procedural work, owned by the Bokobay project and released as **CC0 1.0
 | sfx_upgrade_complete | purchase complete chord (D major) |
 | sfx_nonno_start, sfx_nonno_mumble_01..03 | OLDO forklift cough/start + grammelot mumbles |
 | sfx_combo_x1_5, sfx_combo_x2 | zither arpeggios |
+| sfx_ui_tap_01..02 | tap UI (bottoni Impostazioni, anteprima slider Suoni) – `audio/tools/gen_ui_tutorial.py` |
+| sfx_ui_arrow_appear | comparsa freccia/evidenziazione obiettivo tutorial |
+| sfx_ui_step_complete | step tutorial completato (arpeggio Re maggiore) |
 
 ## Music/ (stereo 44.1 kHz, WAV 16-bit masters + OGG Vorbis 120 kbps)
 `mus_day_vela_e_figli_{base,perc,mel,full}` – "Sunn Depot", 100 BPM, D major, 32 bars = 76.800 s = 3,386,880 samples, all stems identical length, sample-aligned, seamless loop (reverb/release tails wrapped into the start). Same limiter gain applied to all stems so base+perc+mel = full. Full mix -16 LUFS integrated, peak -1.2 dBFS.
