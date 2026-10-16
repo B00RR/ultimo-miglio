@@ -42,8 +42,8 @@ MonoBehaviour:
           bonusLn: 120
         - parcels: 450
           bonusLn: 200
-        parcelMilestonesNote: bonus nel portafoglio + coriandoli + riga di Mamma
-          Rosa; ridotti da 80/150/250 per tenere il cap a ~34 min
+        parcelMilestonesNote: bonus nel portafoglio + coriandoli + riga di Auntie
+          Lulu; ridotti da 80/150/250 per tenere il cap a ~34 min
         debtMilestones:
         - share: 0.25
           reward: stampSoloVisivo
@@ -223,7 +223,7 @@ MonoBehaviour:
       nonno:
         unlockAtOnboardingSec: 130
         hireCostLn: 50
-        padLabel: "ASSUMI NONNO \xB7 50 LN"
+        padLabel: "ASSUMI OLDO \xB7 50 LN"
         restockPpmBase: 6
         restockPpmPerLevel: 1.5
         selfServicePpmBase: 0.5
