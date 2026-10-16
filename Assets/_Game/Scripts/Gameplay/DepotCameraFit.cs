@@ -10,7 +10,7 @@ namespace UltimoMiglio.Gameplay
     {
         public const string PrefZoom = "cam_zoom";
         public CinemachineCamera Cm; public Transform Nina;
-        public float Margin = 1.2f, TopHud = 0.18f, BottomHud = 0.08f, MinOrtho = 8f, MaxOrtho = 28f;
+        public float Margin = 1.2f, TopHud = 0.22f, BottomHud = 0.08f, MinOrtho = 8f, MaxOrtho = 28f; // B3: più banda alto per Ada/obiettivo
         public float FollowSmooth = 6f, DefaultPortraitOrtho = 13.5f;
         readonly List<Vector3> _pts = new();
         int _w, _h; float _ortho, _fullOrtho; Vector3 _centreWorld; Quaternion _rot; Vector2 _mn, _mx;
