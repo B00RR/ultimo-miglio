@@ -106,6 +106,26 @@
       "note": "Con passo +0,1 la combo mostra x1,1 → x1,2 (04_UI scrive x1,2 → x1,4: da allineare)"
     },
     {
+      "id": "nonnoIntro",
+      "tSec": 127,
+      "toleranceSec": 5,
+      "trigger": "t>=127",
+      "target": "padHireNonno",
+      "camera": {
+        "focus": "padHireNonno+nonnoSleeping",
+        "durationSec": 2.5,
+        "inputLocked": false,
+        "returnToPlayer": true
+      },
+      "arrow": "edgeArrowToPad",
+      "completeWhen": "cameraDone",
+      "textKeys": [
+        "onb.nonno.intro",
+        "onb.nonno.what"
+      ],
+      "note": "Camera su NONNO addormentato e sul pad; il joystick resta attivo. Il testo spiega cosa fa NONNO: porta i pacchi dagli Arrivi agli scaffali al posto tuo."
+    },
+    {
       "id": "hireNonno",
       "tSec": 130,
       "toleranceSec": 5,
@@ -114,12 +134,60 @@
       "label": "ASSUMI NONNO · 50 LN",
       "completeWhen": "nonnoHired",
       "textKeys": [
-        "onb.nonno.bark"
+        "onb.nonno.cost"
       ],
       "unlocks": [
         "phoneApp:Flotta"
       ],
-      "note": "Nel golden path il portafoglio ha già ≥50 LN a 130 s; se mancano LN, il pad resta acceso e la freccia punta alle monete"
+      "note": "Il pad mostra il riempimento in LN (es. 32/50). Golden path: 211 LN cumulati a 130 s, quindi pagabile subito.",
+      "padProgress": {
+        "showLnFill": true,
+        "format": "{wallet}/50 LN",
+        "holdSec": 1.5
+      },
+      "insufficientLn": {
+        "textKeys": [
+          "onb.nonno.notEnough"
+        ],
+        "arrow": "coinsOrBancone",
+        "rule": "se il portafoglio < 50 LN il pad mostra la barra e la freccia porta al Bancone; al raggiungimento di 50 LN la freccia torna sul pad con onb.nonno.ready"
+      },
+      "fallback": {
+        "idleSec": 20,
+        "textKeys": [
+          "onb.nonno.reminder"
+        ],
+        "actions": [
+          "cameraPulseOnPad",
+          "edgeArrow",
+          "padBounce"
+        ],
+        "repeatEverySec": 20
+      }
+    },
+    {
+      "id": "nonnoConfirm",
+      "tSec": 131,
+      "toleranceSec": 5,
+      "trigger": "nonnoHired",
+      "target": "nonno",
+      "camera": {
+        "focus": "nonno",
+        "durationSec": 3.0,
+        "inputLocked": false,
+        "returnToPlayer": true
+      },
+      "completeWhen": "nonnoFirstRestock",
+      "textKeys": [
+        "onb.nonno.hired",
+        "onb.nonno.working"
+      ],
+      "note": "NONNO si sveglia, prende i pacchi agli Arrivi e li porta sullo scaffale; contatore '+1' sopra lo scaffale a ogni pacco. Badge 'NONNO: 6 pacchi/min' per 4 s.",
+      "recurringBark": {
+        "textKey": "onb.nonno.bark",
+        "startAfter": "nonnoConfirmDone",
+        "note": "solo bark ricorrente di NONNO, mai insieme a onb.nonno.hired"
+      }
     },
     {
       "id": "phone",
@@ -159,7 +227,9 @@
       "trigger": "enRouteCassaforte",
       "target": "cassa",
       "completeWhen": "passedOver",
-      "note": "0 LN in run continua; serve a mostrare la Cassa"
+      "note": "0 LN in run continua; serve a mostrare la Cassa",
+      "rewardLn": 30,
+      "rewardNote": "mancia di Nonna Ada, solo al primo passaggio (16/10)"
     },
     {
       "id": "debtCard",
