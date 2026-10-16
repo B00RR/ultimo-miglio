@@ -260,3 +260,9 @@ Voci più recenti in alto. Formato: `AAAA-MM-GG HH:MM` (Europe/Rome) — [commit
 - Deciso (Tech Lead): pannello unico `SettingsController`; `Bridge/SettingsPanel` resta (usato da `HudGameBridge`) ma senza listener `OnSettingsRequested`. Ingranaggio = toggle (QA P3, `qa/playtest_web_live_p0.md` S01). Zoom su chiave unica `cam_zoom_v3` (`DepotCameraFit.PrefZoom`).
 - Riferimento #35 (chiusa). Correlate aperte: #64, #67.
 - 2026-10-16 — PR #85 (3D Artist, Refs #2): solo clienti v03-uv in `3d/export/chr/` (rider cappello limone, 3 toni pelle; residente/rider/turista/vip, vertici invariati) + review docs/review/2. Nonna Ada tolta: la consegna l'Animator (#93).
+
+## Aggiornamento 16/10 10:55 — Zone a terra senza blu/grigi (VFX, issue #69, branch `vfx/69-zone-calde`)
+- Dischi POI (`InteractionPoint`): Prendi terracotta `#C8633B` (era teal `#5E7F86`), Consegna menta `#8FC9A8`, Acquisto e upgrade (dischi, anelli, FX) giallo sole `#F4C430` (limone `#F7E26B` solo nelle scintille core e nella scia della moneta), bordo `#3B2F2A`. Schiarimenti e beacon verso crema `#F3E3C3` invece che verso il bianco (niente pali grigio-azzurri).
+- Nascosto il quadrato giallo `UI/ZoneRing` sotto i dischi (sembrava una griglia di debug); la logica del Fill resta.
+- Anello pad "Pickup" e FX pacco: da teal a terracotta.
+- Da fare: cattura 390×844 in build (CI); i pali grigi dei lampioni, se sono mesh 3D, passano al 3D Artist.
