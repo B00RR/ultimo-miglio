@@ -1,7 +1,7 @@
 # STATO PROGETTO — Bokobay
 
 > Punto di ingresso unico per chiunque (persona o agente) lavori su questo repo. Aggiornalo **nella stessa PR** in cui completi qualcosa.
-> Ultimo aggiornamento: 2026-10-16 11:18 (Europe/Rome).
+> Ultimo aggiornamento: 2026-10-16 11:47 (Europe/Rome).
 
 ## 1. Il gioco
 - **Bokobay**: gioco mobile **Android**, **Unity 6 (6000.3) URP**.
@@ -12,7 +12,7 @@
 ## 2. Vincoli fissi di Lorenzo (non negoziabili)
 1. Tutto in **italiano** (testi di gioco, documenti, commit, issue, PR).
 2. Lorenzo testa **solo tramite build WebGL nel browser** (zip/preview). **Niente video** a lui.
-3. Asset **gratuiti CC0 / licenza commerciale**, sempre **adattati** allo stile (registro in `ultimo-miglio-docs/LICENZE_ASSET.md`).
+3. Asset **gratuiti CC0 / licenza commerciale**, sempre **adattati** allo stile (registro in `docs/LICENZE_ASSET.md`; repo docs archiviato, tutto in B00RR/ultimo-miglio).
 4. **Originali**: Kaia, Nonno, robot, logo e tema non devono copiare altri giochi.
 5. **Profondità gestionale**: energia/corrente, contratti, rotte, officina, GrayBox (rivale).
 6. **Longevità lunga**: progressione a capitoli + post‑game.
@@ -23,6 +23,7 @@
 - **In pausa**: Game Designer, QA, Sound Designer, Narrative, LiveOps, Concept Artist (i loro documenti restano validi).
 
 ## 4. FATTO
+- **UI #142 anteprime `tutorial_hud_77` (PR ui/142-anteprime-nonno, in revisione)**: anteprime 360/390/412 rigenerate con il costo reale del pad OLDO (50 LN, non 10) e LN in tasca reali; solo documentazione QA, nessun C#.
 - **UI #77 + #5 (PR ui/77-tutorial-hud, in revisione)**: fumetto di Oma Tilde compatto (ritratto 36 dp + testo 14 dp, 1–2 righe senza ellissi per testi fino a 70 caratteri, sotto la riga LN/obiettivo); obiettivo spostato a destra della pillola LN nella stessa riga; suggerimenti `onb.*` come pillola terracotta sopra il joystick; freccia ▼ sopra la pillola prezzo dei pad di acquisto (colonna 3D rimossa, ribaltamento se il pad è in alto). Nuovo `UI/USS/TutorialHud.uss` (HudV2.uss non toccato). Testi passi letti per id dalla PR #62. QA anteprima 360/390/412 in `docs/qa/tutorial_hud_77/`. Da verificare in Unity.
 - Scheletro progetto Unity 6 + vertical slice cap. 1 (EconomyCore con test EditMode, gameplay, audio, import dati, script build/cattura).
 - HUD integrato agli eventi core (LN, Mora, giorno, bulloni), font Inter/Roboto (OFL), HUD responsive (1920x1080 / 1366x768 / 960x600).
@@ -49,7 +50,7 @@
 - Build Android (APK/AAB) firmata quando il gameplay è stabile.
 
 ## 7. Dove trovare la documentazione
-Repo **[B00RR/ultimo-miglio-docs](https://github.com/B00RR/ultimo-miglio-docs)**:
+Il repo **[B00RR/ultimo-miglio-docs](https://github.com/B00RR/ultimo-miglio-docs)** è **archiviato (sola lettura)**. Tutta la documentazione vive solo in **[B00RR/ultimo-miglio](https://github.com/B00RR/ultimo-miglio)** (cartella `docs/` e file di progetto):
 `00_BIBBIA.md`, `01_CORE_LOOP.md`, `02_TECH.md`, `04_UI.md`, `08_RETENTION.md`, `09_SPRINT1.md`, `10_GESTIONALE.md`, `11_CAP1_COMPLETO.md`, `11_LONGEVITA.md`, `UNITY_PROTOCOLLO.md`, `LICENZE_ASSET.md`, `UI_SPEC_BIGLIETTI.md`, cartelle `3d/`, `art/`, `audio/`, `data/`, `qa/`.
 
 ## 8. Build WebGL e test
@@ -79,6 +80,18 @@ $UNITY -batchmode -projectPath "$PWD" -runTests -testPlatform PlayMode \
 8. **Ogni voce/modifica di questo file ha data e ora** (Europe/Rome, formato `AAAA-MM-GG HH:MM`) e, se pushata, il **link al commit** (hash corto). Aggiungi la voce in cima alla sezione *Cronologia*.
 9. Non lavorare nel working tree di un altro agente: usa un clone tuo.
 10. **Parole chiave nelle PR:** ogni PR che risolve una issue scrive nella descrizione `Closes #N`, **una riga per issue**: così GitHub chiude la issue al merge su `main`. Se la issue è risolta solo in parte si scrive `Refs #N` e la issue resta aperta. Le forme in italiano (es. "Chiude #N") **non** sono riconosciute da GitHub. Usa il modello `.github/pull_request_template.md`.
+11. **Unity sul box (DevOn, 2026-10-16 11:48):** sul box gira **al massimo 1 processo Unity alla volta** (anche batchmode). Ogni avvio passa da `flock /tmp/unity-box.lock <comando>`. Prima di lanciare controlla `uptime`: se il load è sopra 16, aspetta. I test delle PR girano su GitHub Actions; il runner self-hosted resta spento finché non usa lo stesso lock con un job alla volta. Si chiudono solo i propri processi.
+
+
+## Regole del computer
+- Massimo **1 processo Unity** alla volta sul box (anche batchmode), sempre con `flock /tmp/unity-box.lock`; la coda la gestisce il Tech Lead.
+- **Build e test solo su GitHub Actions**; in locale è permessa solo la build per il QA. Il **runner self-hosted resta spento** finché non usa lo stesso lock con un job alla volta.
+- Massimo **1 server http di test** alla volta, sempre chiuso a fine lavoro.
+- Nessun processo in background dimenticato: lo chiude chi lo apre.
+- Prima di qualsiasi lavoro pesante si controlla `uptime`: se il load supera **16** si aspetta.
+- Niente clone o build duplicati: ognuno lavora solo nella propria cartella in `/tmp`.
+- I ruoli senza una issue attiva restano fermi finché il Producer non li riattiva.
+- Quando un ruolo si ferma, ferma solo i propri processi e subagenti e non manda **MAI** stop agli altri agenti: gli stop agli altri li danno solo DevOn o il Producer.
 
 ## Ruoli e responsabilità
 Ogni ruolo lavora solo sulle issue con la propria etichetta `ruolo:*`, sempre con **ramo + PR + `Closes #N`** (o `Refs #N` se parziale). Nessuno pusha su `main`.
@@ -97,7 +110,7 @@ Ogni ruolo lavora solo sulle issue con la propria etichetta `ruolo:*`, sempre co
 | **Game Designer** (`ruolo:design`) | Regole, economia, onboarding, dati di design | Lavoro fuori dalle issue `ruolo:design` |
 
 ## 10. Da dove iniziare (nuovo agente)
-1. Leggi questo file, poi `00_BIBBIA.md` e `11_CAP1_COMPLETO.md` nel repo docs.
+1. Leggi questo file, poi `docs/design/11_CAP1_COMPLETO.md` in questo repo. `00_BIBBIA.md` è ancora da migrare dal repo archiviato B00RR/ultimo-miglio-docs (sola lettura).
 2. Guarda le issue aperte: `gh issue list -R B00RR/ultimo-miglio` e scegli quelle del tuo ruolo con `priorita:alta`.
 3. Clona in una cartella tua, crea il ramo, lavora, lancia i test, apri la PR.
 4. Rispetta i vincoli della sezione 2 (italiano, WebGL, niente video, asset liberi adattati).
@@ -118,6 +131,13 @@ Ogni ruolo lavora solo sulle issue con la propria etichetta `ruolo:*`, sempre co
 
 Voci più recenti in alto. Formato: `AAAA-MM-GG HH:MM` (Europe/Rome) — [commit] — descrizione.
 
+- 2026-10-16 11:50 — Code Reviewer — [4caa545](https://github.com/B00RR/ultimo-miglio/commit/4caa5452fa083d9ecafb1c591a4257d8d979fbd5) — unita in squash la [PR #147](https://github.com/B00RR/ultimo-miglio/pull/147) (docs: sezione *Regole del computer*, repo docs archiviato). Solo `.md`; conflitto su STATO_PROGETTO.md risolto con merge di main nel branch.
+- 2026-10-16 11:50 — Code Reviewer — [8a2268e](https://github.com/B00RR/ultimo-miglio/commit/8a2268e61628a9ca3e14b79914948723b96c894c) — unita in squash la [PR #145](https://github.com/B00RR/ultimo-miglio/pull/145) (regola 1 solo Unity sul box, `flock /tmp/unity-box.lock`). Solo `.md`.
+- 2026-10-16 11:49 — Code Reviewer — [b5f6ba5](https://github.com/B00RR/ultimo-miglio/commit/b5f6ba5864023f012c1f592163100e7931789a76) — unita in squash la [PR #143](https://github.com/B00RR/ultimo-miglio/pull/143) (anteprime QA `tutorial_hud_77` con pad OLDO a 50 LN). Solo documentazione QA, nessun C#. Closes #142.
+- 2026-10-16 11:50 — Producer — aggiornate *Regole del computer*: stop solo ai propri processi/subagenti (mai agli altri; stop agli altri solo DevOn/Producer); da PR #145 portati runner self-hosted spento, soglia load 16 e Unity anche in batchmode; corretto §10.1 (`docs/design/11_CAP1_COMPLETO.md`; `00_BIBBIA.md` ancora da migrare).
+- 2026-10-16 11:48 — Regole del computer decise da DevOn su richiesta di Lorenzo (carico box 158/8 core); repo docs archiviato.
+- 2026-10-16 11:50 — Tech Lead — regola §10.11 "1 solo Unity sul box" con `flock /tmp/unity-box.lock` e soglia di load 16, dopo il blocco del box (load 200) delle 11:45. Il runner self-hosted è spento per oggi.
+- 2026-10-16 11:47 — Code Reviewer — [d039bd8](https://github.com/B00RR/ultimo-miglio/commit/d039bd8aaa9dfe52606eca05ccaae874dace65ea) — unita in squash la [PR #87](https://github.com/B00RR/ultimo-miglio/pull/87) (fix(#59): OLDO non va più in retromarcia + test PlayMode verso di marcia). Job `test` verde. Refs #59.
 - 2026-10-16 11:29 — Code Reviewer — [2f2f61f](https://github.com/B00RR/ultimo-miglio/commit/2f2f61f2d5d4946d01c8b7f65fc192d715cc0e51) — unita in squash la [PR #85](https://github.com/B00RR/ultimo-miglio/pull/85) (clienti v03-uv: rider cappello limone, 3 toni pelle; Tilde già su main via #93). Job `test` verde. Refs #2.
 - 2026-10-16 11:29 — Code Reviewer — [8ed4422](https://github.com/B00RR/ultimo-miglio/commit/8ed4422972dd7c6d3a80a45769034ec6b6c3d270) — unita in squash la [PR #135](https://github.com/B00RR/ultimo-miglio/pull/135) (Zaino 8 = 3.000 LN; combo HUD solo +N). Job `test` verde. Closes #134.
 - 2026-10-16 11:29 — Code Reviewer — [3a3864c](https://github.com/B00RR/ultimo-miglio/commit/3a3864c134075e713eef85346639d11b7b581e12) — unita in squash la [PR #113](https://github.com/B00RR/ultimo-miglio/pull/113) (testi HUD minimo cap. 1 / rinviati_cap2). Job `test` verde. Closes #105.
@@ -230,3 +250,8 @@ Voci più recenti in alto. Formato: `AAAA-MM-GG HH:MM` (Europe/Rome) — [commit
 - Deciso (Tech Lead): pannello unico `SettingsController`; `Bridge/SettingsPanel` resta (usato da `HudGameBridge`) ma senza listener `OnSettingsRequested`. Ingranaggio = toggle (QA P3, `qa/playtest_web_live_p0.md` S01). Zoom su chiave unica `cam_zoom_v3` (`DepotCameraFit.PrefZoom`).
 - Riferimento #35 (chiusa). Correlate aperte: #64, #67.
 - 2026-10-16 — PR #85 (3D Artist, Refs #2): solo clienti v03-uv in `3d/export/chr/` (rider cappello limone, 3 toni pelle; residente/rider/turista/vip, vertici invariati) + review docs/review/2. Oma Tilde tolta: la consegna l'Animator (#93).
+
+## Aggiornamento 16/10 11:15 — 11_CAP1_COMPLETO allineato all'HUD minimo (UI, issue #138, branch ui/138-cap1-hud-minimo)
+- Copia di riferimento: `docs/design/11_CAP1_COMPLETO.md` (decisione del Producer); quella in `ultimo-miglio-docs` diventa un rimando (docs#2/#3).
+- UI/UX: HUD Cap. 1 solo LN, giorno, riga obiettivo, joystick e pad; telefono di Kaia rimandato a Gioco completo (#64); combo solo "+N" sopra Kaia per 1,5 s, x1,2 non mostrato; debito solo a fine giornata e nel fumetto di Tilde; colori pad ritiro `#5E7F86`, consegna `#8FC9A8`, acquisto `#F4C430`, potenziamento `#F7E26B`. UI/UX 5 → 4 gp.
+- Sound: SFX UI telefono (swipe, notifica) segnati Gioco completo; "test speaker telefono" → test su speaker di smartphone. Nessun nuovo asset: **da rivedere col Sound Designer**.
