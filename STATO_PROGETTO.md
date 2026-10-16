@@ -1,7 +1,7 @@
 # STATO PROGETTO — Ultimo Miglio
 
 > Punto di ingresso unico per chiunque (persona o agente) lavori su questo repo. Aggiornalo **nella stessa PR** in cui completi qualcosa.
-> Ultimo aggiornamento: 2026-10-16 09:05 (Europe/Rome).
+> Ultimo aggiornamento: 2026-10-16 11:18 (Europe/Rome).
 
 ## 1. Il gioco
 - **Ultimo Miglio**: gioco mobile **Android**, **Unity 6 (6000.3) URP**.
@@ -118,6 +118,7 @@ Ogni ruolo lavora solo sulle issue con la propria etichetta `ruolo:*`, sempre co
 
 Voci più recenti in alto. Formato: `AAAA-MM-GG HH:MM` (Europe/Rome) — [commit] — descrizione.
 
+- 2026-10-16 11:17 — Code Reviewer — [ad8a98b](https://github.com/B00RR/ultimo-miglio/commit/ad8a98be83087673dcdede2ca108c4cf706d4a5d) — unita in squash la [PR #93](https://github.com/B00RR/ultimo-miglio/pull/93) (anim: Nonna Ada riggata — Idle/Walk/Talk, controller, prefab scala 0,88; Refs #118 / #2). Job `test` verde. #85 resta aperta per clienti v03 (togliere file Ada).
 - 2026-10-16 11:15 — Code Reviewer — [a65de18](https://github.com/B00RR/ultimo-miglio/commit/a65de1873055ec905d4b54b02535940313ebf2b3) — unita in squash la [PR #124](https://github.com/B00RR/ultimo-miglio/pull/124) (fix(#65): angolo SO, Nina non compenetra più il lampione).
 - 2026-10-16 11:15 — Code Reviewer — [965e36a](https://github.com/B00RR/ultimo-miglio/commit/965e36a72d586111106b7c6a4e76bbc9ad34cc08) — unita in squash la [PR #121](https://github.com/B00RR/ultimo-miglio/pull/121) (Specifica eventi di log dell'onboarding cap. 1 (playtest QA)).
 - 2026-10-16 11:15 — Code Reviewer — [dc4d728](https://github.com/B00RR/ultimo-miglio/commit/dc4d72869f0239bde76e93ce31da4c1a9b680dc6) — unita in squash la [PR #120](https://github.com/B00RR/ultimo-miglio/pull/120) (QA: checklist Cap.1 aggiornata (C13/P07/Z02) + scheda osservazione playtest).
