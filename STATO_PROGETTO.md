@@ -115,6 +115,7 @@ Ogni ruolo lavora solo sulle issue con la propria etichetta `ruolo:*`, sempre co
 
 Voci più recenti in alto. Formato: `AAAA-MM-GG HH:MM` (Europe/Rome) — [commit] — descrizione.
 
+- 2026-10-16 10:49 — Code Reviewer — [cdfc53f](https://github.com/B00RR/ultimo-miglio/commit/cdfc53ff2152b4752a8ad5b488729ed824000e4a) — unita in squash la PR #119 (Ruoli e responsabilità, solo .md). Review delle PR aperte con commenti; #114 verde su main.
 - 2026-10-16 10:46 — Producer — aggiunta la sezione **Ruoli e responsabilità**: nuovo **Code Reviewer** che unisce tutte le PR; il Tech Lead non fa più merge (aggiornato *Come lavoriamo* punto 5); Build & Release pubblica su Pages solo dopo il VIA del QA; nuove etichette `ruolo:design` e `ruolo:qa`. Assegnate #107 (P0 zone, tech), #103, #101 (tech), #111 (animator), #110, #71 (ui), #65, #70 (3d), #69 (vfx), #91 (design); nuova #118 (Nonna Ada).
 - **2026-10-16 09:35 (Europe/Rome)** — Fix P0 #58 #59 #60 (ramo fix-p0-lorenzo, [a87edf0](https://github.com/B00RR/ultimo-miglio/commit/a87edf0)): BoxCollider su muri/archi/scaffali/bancone/props, Nina clamp x −8.6..7.0, NONNO yaw 0° + sweep AgentMove, spawn sicuro. EditMode 35/35, PlayMode 11/11. LIVE P0 su 8780: `qa/playtest_web_live_p0.md`.
 
