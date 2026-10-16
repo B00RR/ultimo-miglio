@@ -232,6 +232,11 @@
         "format": "+{n}",
         "durationSec": 1.5,
         "persistentHud": false
+      },
+      "sfx": {
+        "onPlusN": "sfx_combo_plus (tick breve, tono che sale con N)",
+        "onGate": "sfx_combo_plus con N=2: il gate x1,2 coincide con il 2° cliente di fila ('+2')",
+        "note": "sfx_combo_x1_5 (+5) e sfx_combo_x2 (+10) restano per i traguardi di combo successivi, non per il gate"
       }
     },
     {
@@ -468,5 +473,6 @@
         ]
       }
     ]
-  }
+  },
+  "sfxPolicy": "Cap 1: nessun sfx di telefono (squillo, notifica, vibrazione): il telefono non c'è. Gli aiuti usano solo sfx di freccia/pulsazione (UI onboarding)."
 }
