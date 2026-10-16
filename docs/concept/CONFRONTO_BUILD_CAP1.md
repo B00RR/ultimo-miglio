@@ -35,3 +35,28 @@ Desktop 1440×900:
 - **NONNO, TICO, clienti**: non presenti/leggibili nelle catture (oggetto verde cubico vicino al muro non identificabile con certezza). Il problema clienti-capsule è già in #2; NONNO non utilizzabile in #42.
 - Notte/lanterne, FX (moneta, upgrade, scintille, polvere), bloom del Carico 0, nebbia 30-90 m, outline selettivo, scalinate a gradoni su 3 livelli (fuori inquadratura).
 - Console build: 3 errori «Shader» e «no valid NavMesh» (vedi #42) — segnalati per il Tech, non valutati visivamente.
+
+## Confronto 16/10 mattina
+Build live locale `http://127.0.0.1:8778/`, 390×844, Chrome headless (SwiftShader), catturata il 16/10/2026 ~08:58 (ora di Roma). La build **reagisce all'input** (WASD/Tab): Nina si muove.
+
+| Avvio | Scaffali/insegna | Arrivi/archi | Pad telefono |
+|---|---|---|---|
+| ![](img/cfr3/cfr3_01_start.png) | ![](img/cfr3/cfr3_04_scaffali.png) | ![](img/cfr3/cfr3_06_insegna_archi.png) | ![](img/cfr3/cfr3_07_pad.png) |
+
+Altre: `cfr3_02_movimento`, `cfr3_03_arrivi`, `cfr3_05_bancone`.
+
+### Risolti rispetto alla PR #55
+- Fughe pavimento: ora tenui e larghe, lastre crema/tufo ✅
+- Camera: iso 3/4 portrait, Nina ~120 px su 844 ✅ (in linea con ~100 px)
+- Archi: almeno un arco in tufo visibile sul muro N ✅ (parziale)
+- Insegna: la scritta «Vela & Figli» ora c'è ✅
+
+### Scostamenti ancora presenti
+| # | Area | Cosa si vede | Guida | Owner | Issue |
+|---|---|---|---|---|---|
+| C1 | Zone/pad a terra | Dischi blu-grigio scuro, pali grigio freddo, riquadri gialli tipo griglia di debug sotto i pad | Niente grigi/blu freddi; zone in menta/limone/terracotta, nessuna griglia | VFX & Technical Artist | vedi issue [Arte] zone |
+| C2 | Insegna | Pannello bianco piatto, nessun faro | Insegna in legno/terracotta con faro (§3) | 3D Artist | vedi issue [Arte] insegna |
+| C3 | Pad telefono | Ora «08:00» bianca su crema illeggibile, due barre vuote | Testo bruno #3B2A20, niente campi vuoti (§10) | UI/UX Designer | vedi issue [Arte] pad |
+
+### Non verificato
+Notte/lanterne, FX, animazioni di NONNO/TICO (non inquadrati).
