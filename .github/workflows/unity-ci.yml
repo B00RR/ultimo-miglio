@@ -60,6 +60,8 @@ jobs:
           filters: |
             playmode:
               - 'Assets/_Game/Scripts/**'
+              - 'Assets/_Game/Data/**'
+              - '.github/workflows/**'
               - 'Assets/_Game/Scenes/**'
               - 'Assets/_Game/Prefabs/**'
               - 'Assets/_Game/Tests/PlayMode/**'
