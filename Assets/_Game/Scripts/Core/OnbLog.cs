@@ -8,7 +8,7 @@ namespace UltimoMiglio.Core
     /// Formato: <c>[ONB] &lt;tipo&gt; id=&lt;idPasso&gt; n=&lt;indice&gt; t=&lt;s, 1 decimale&gt; [chiave=valore ...]</c>.</summary>
     public static class OnbLog
     {
-        public const string Pattern = @"^\[ONB\] (start|gate|hint|softgate|nolnp|skip|end) id=[A-Za-z]+ n=\d{1,2} t=\d+\.\d( [a-zA-Z]+=[^ ]+)*$";
+        public const string Pattern = @"^\[ONB\] (start|gate|hint|softgate|nolnp|skip|end) id=[A-Za-z]+ n=\d{1,2} t=\d+\.\d( [a-zA-Z][a-zA-Z0-9]*=[^ ]+)*$";
         public static readonly Regex Rx = new Regex(Pattern);
         static readonly CultureInfo Ci = CultureInfo.InvariantCulture;
 
