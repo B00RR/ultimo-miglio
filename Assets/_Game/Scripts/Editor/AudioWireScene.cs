@@ -43,7 +43,7 @@ namespace UltimoMiglio.EditorTools
             Chk("Deposito scaffale x4", All(am.Deposit, 4)); Chk("Bancone servito", am.Served); Chk("Campanello cliente", am.Bell);
             Chk("Monete drop x4", All(am.CoinDrop, 4)); Chk("Monete pickup x4", All(am.CoinPickup, 4));
             Chk("Stack MAX", am.StackMax); Chk("Upgrade loop", am.UpgradeLoop); Chk("Upgrade completo", am.UpgradeComplete);
-            Chk("Combo x1.5/x2", am.ComboX15 && am.ComboX2); Chk("NONNO", am.NonnoStart && All(am.NonnoMumble, 3));
+            Chk("Combo x1.5/x2", am.ComboX15 && am.ComboX2); Chk("Combo +N (#159)", All(am.ComboPlus, 8)); Chk("Timbro debito (#159)", All(am.DebtStamp, 3)); Chk("NONNO", am.NonnoStart && All(am.NonnoMumble, 3));
             Chk("UI tap x2", All(am.UiTap, 2)); Chk("Tutorial freccia", am.TutorialArrow); Chk("Tutorial step completato", am.TutorialStep);
             return miss;
         }
