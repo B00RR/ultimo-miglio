@@ -23,6 +23,7 @@
 - **In pausa**: Game Designer, QA, Sound Designer, Narrative, LiveOps, Concept Artist (i loro documenti restano validi).
 
 ## 4. FATTO
+- **UI #110 pad Zaino (PR ui/110-pad-zaino, in revisione)**: dopo un acquisto il pad non paga il livello successivo finché Nina non esce e rientra (niente più portafoglio prosciugato); la pillola col prezzo resta visibile anche con Nina sul pad. Costi Zaino invariati, già allineati a #75 (40, 80, 160…; `upgrades.json` non toccato). Da verificare in Unity.
 - **UI #142 anteprime `tutorial_hud_77` (PR ui/142-anteprime-nonno, in revisione)**: anteprime 360/390/412 rigenerate con il costo reale del pad NONNO (50 LN, non 10) e LN in tasca reali; solo documentazione QA, nessun C#.
 - **UI #77 + #5 (PR ui/77-tutorial-hud, in revisione)**: fumetto di Nonna Ada compatto (ritratto 36 dp + testo 14 dp, 1–2 righe senza ellissi per testi fino a 70 caratteri, sotto la riga LN/obiettivo); obiettivo spostato a destra della pillola LN nella stessa riga; suggerimenti `onb.*` come pillola terracotta sopra il joystick; freccia ▼ sopra la pillola prezzo dei pad di acquisto (colonna 3D rimossa, ribaltamento se il pad è in alto). Nuovo `UI/USS/TutorialHud.uss` (HudV2.uss non toccato). Testi passi letti per id dalla PR #62. QA anteprima 360/390/412 in `docs/qa/tutorial_hud_77/`. Da verificare in Unity.
 - Scheletro progetto Unity 6 + vertical slice cap. 1 (EconomyCore con test EditMode, gameplay, audio, import dati, script build/cattura).
