@@ -131,31 +131,48 @@
       "id": "firstCassaCollection",
       "tSec": 235,
       "toleranceSec": 10,
-      "note": "Nina passa sulla Cassa: 0 LN in run continua (nessun offline)",
-      "cumulativeEarnedLnApprox": 746
+      "note": "Nina passa sulla Cassa: mancia una tantum di 30 LN (nessun offline)",
+      "cumulativeEarnedLnApprox": 776
     },
     {
       "id": "firstDebtDeposit",
       "tSec": 240,
       "toleranceSec": 10,
       "note": "Cassaforte: card 'Giorno 3/365 · Rata 1 · 8.400 LN · scade Giorno 24'",
-      "cumulativeEarnedLnApprox": 771
+      "cumulativeEarnedLnApprox": 801
     },
     {
       "id": "wallPadShown",
       "tSec": 270,
       "toleranceSec": 10,
       "note": "Pad APRI MURO come obiettivo successivo",
-      "cumulativeEarnedLnApprox": 937
+      "cumulativeEarnedLnApprox": 967
     },
     {
       "id": "tranchePaidChapterEnd",
-      "tSec": 2100.0,
+      "tSec": 2040.0,
       "toleranceSec": 120,
-      "minSecEff12": 1980.0,
-      "maxSecEff085": 2220.0,
+      "minSecEff12": 1920.0,
+      "maxSecEff085": 2160.0,
       "note": "Rata 1 saldata (8.400 LN), fine capitolo 1",
-      "cumulativeEarnedLnApprox": 14603
+      "cumulativeEarnedLnApprox": 15240
+    }
+  ],
+  "parcelMilestones": [
+    {
+      "t": 363.0,
+      "parcels": 100,
+      "bonusLn": 60
+    },
+    {
+      "t": 745.0,
+      "parcels": 250,
+      "bonusLn": 120
+    },
+    {
+      "t": 1211.0,
+      "parcels": 450,
+      "bonusLn": 200
     }
   ],
   "purchases": [
@@ -214,7 +231,7 @@
       "cumulativeEarnedLnApprox": 481
     },
     {
-      "t": 335.0,
+      "t": 330.0,
       "pad": "zaino",
       "label": "ZAINO 4 · 320 LN",
       "costLn": 320,
@@ -223,228 +240,232 @@
       "cumulativeEarnedLnApprox": 1285
     },
     {
-      "t": 437.0,
+      "t": 407.0,
       "pad": "insegna",
       "label": "INSEGNA 2 · 243 LN",
       "costLn": 243,
       "level": 2,
-      "toleranceSec": 66,
-      "cumulativeEarnedLnApprox": 1895
+      "toleranceSec": 61,
+      "cumulativeEarnedLnApprox": 1803
     },
     {
-      "t": 478.0,
+      "t": 448.0,
       "pad": "nonnoUpgrade",
       "label": "NONNO LV 1 · 100 LN",
       "costLn": 100,
       "level": 1,
-      "toleranceSec": 72,
-      "cumulativeEarnedLnApprox": 2144
+      "toleranceSec": 67,
+      "cumulativeEarnedLnApprox": 2055
     },
     {
-      "t": 729.0,
+      "t": 666.0,
       "pad": "zaino",
-      "label": "ZAINO 5 · 640 LN",
-      "costLn": 640,
+      "label": "ZAINO 5 · 560 LN",
+      "costLn": 560,
       "level": 5,
-      "toleranceSec": 109,
-      "cumulativeEarnedLnApprox": 3742
+      "toleranceSec": 100,
+      "cumulativeEarnedLnApprox": 3456
     },
     {
-      "t": 1192.0,
+      "t": 970.0,
       "pad": "zaino",
-      "label": "ZAINO 6 · 1280 LN",
-      "costLn": 1280,
+      "label": "ZAINO 6 · 960 LN",
+      "costLn": 960,
       "level": 6,
-      "toleranceSec": 179,
-      "cumulativeEarnedLnApprox": 6943
+      "toleranceSec": 146,
+      "cumulativeEarnedLnApprox": 5671
     },
     {
-      "t": 1243.0,
+      "t": 1021.0,
       "pad": "scarpe",
       "label": "SCARPE 2 · 162 LN",
       "costLn": 162,
       "level": 2,
-      "toleranceSec": 186,
-      "cumulativeEarnedLnApprox": 7346
+      "toleranceSec": 153,
+      "cumulativeEarnedLnApprox": 6080
     },
     {
-      "t": 1446.0,
+      "t": 1212.0,
       "pad": "insegna",
       "label": "INSEGNA 3 · 656 LN",
       "costLn": 656,
       "level": 3,
-      "toleranceSec": 217,
-      "cumulativeEarnedLnApprox": 8994
+      "toleranceSec": 182,
+      "cumulativeEarnedLnApprox": 7805
     },
     {
-      "t": 1518.0,
+      "t": 1237.0,
       "pad": "nonnoUpgrade",
       "label": "NONNO LV 2 · 240 LN",
       "costLn": 240,
       "level": 2,
-      "toleranceSec": 228,
-      "cumulativeEarnedLnApprox": 9587
+      "toleranceSec": 186,
+      "cumulativeEarnedLnApprox": 8020
+    },
+    {
+      "t": 1727.0,
+      "pad": "zaino",
+      "label": "ZAINO 7 · 1700 LN",
+      "costLn": 1700,
+      "level": 7,
+      "toleranceSec": 259,
+      "cumulativeEarnedLnApprox": 12268
     }
   ],
   "debtDeposits": [
     {
       "t": 240.0,
-      "amountLn": 176,
-      "totalDepositedLn": 176
+      "amountLn": 194,
+      "totalDepositedLn": 194
     },
     {
       "t": 300.0,
       "amountLn": 195,
-      "totalDepositedLn": 371
+      "totalDepositedLn": 389
     },
     {
       "t": 360.0,
-      "amountLn": 203,
-      "totalDepositedLn": 574
+      "amountLn": 204,
+      "totalDepositedLn": 593
     },
     {
       "t": 420.0,
-      "amountLn": 211,
-      "totalDepositedLn": 785
+      "amountLn": 214,
+      "totalDepositedLn": 806
     },
     {
       "t": 480.0,
-      "amountLn": 225,
-      "totalDepositedLn": 1009
+      "amountLn": 231,
+      "totalDepositedLn": 1038
     },
     {
       "t": 540.0,
-      "amountLn": 226,
-      "totalDepositedLn": 1235
+      "amountLn": 225,
+      "totalDepositedLn": 1262
     },
     {
       "t": 600.0,
-      "amountLn": 234,
-      "totalDepositedLn": 1469
+      "amountLn": 233,
+      "totalDepositedLn": 1495
     },
     {
       "t": 660.0,
-      "amountLn": 226,
-      "totalDepositedLn": 1695
+      "amountLn": 227,
+      "totalDepositedLn": 1723
     },
     {
       "t": 720.0,
-      "amountLn": 229,
-      "totalDepositedLn": 1924
+      "amountLn": 254,
+      "totalDepositedLn": 1976
     },
     {
       "t": 780.0,
-      "amountLn": 247,
-      "totalDepositedLn": 2171
+      "amountLn": 242,
+      "totalDepositedLn": 2218
     },
     {
       "t": 840.0,
-      "amountLn": 251,
-      "totalDepositedLn": 2422
+      "amountLn": 258,
+      "totalDepositedLn": 2476
     },
     {
       "t": 900.0,
-      "amountLn": 246,
-      "totalDepositedLn": 2668
+      "amountLn": 241,
+      "totalDepositedLn": 2717
     },
     {
       "t": 960.0,
       "amountLn": 254,
-      "totalDepositedLn": 2922
+      "totalDepositedLn": 2971
     },
     {
       "t": 1020.0,
-      "amountLn": 243,
-      "totalDepositedLn": 3165
+      "amountLn": 279,
+      "totalDepositedLn": 3250
     },
     {
       "t": 1080.0,
-      "amountLn": 257,
-      "totalDepositedLn": 3422
+      "amountLn": 282,
+      "totalDepositedLn": 3532
     },
     {
       "t": 1140.0,
-      "amountLn": 241,
-      "totalDepositedLn": 3663
+      "amountLn": 289,
+      "totalDepositedLn": 3821
     },
     {
       "t": 1200.0,
-      "amountLn": 258,
-      "totalDepositedLn": 3921
+      "amountLn": 296,
+      "totalDepositedLn": 4117
     },
     {
       "t": 1260.0,
-      "amountLn": 293,
-      "totalDepositedLn": 4214
+      "amountLn": 302,
+      "totalDepositedLn": 4419
     },
     {
       "t": 1320.0,
-      "amountLn": 280,
-      "totalDepositedLn": 4494
+      "amountLn": 307,
+      "totalDepositedLn": 4725
     },
     {
       "t": 1380.0,
-      "amountLn": 287,
-      "totalDepositedLn": 4781
+      "amountLn": 313,
+      "totalDepositedLn": 5038
     },
     {
       "t": 1440.0,
-      "amountLn": 292,
-      "totalDepositedLn": 5073
+      "amountLn": 321,
+      "totalDepositedLn": 5359
     },
     {
       "t": 1500.0,
-      "amountLn": 311,
-      "totalDepositedLn": 5384
+      "amountLn": 300,
+      "totalDepositedLn": 5660
     },
     {
       "t": 1560.0,
-      "amountLn": 299,
-      "totalDepositedLn": 5683
+      "amountLn": 311,
+      "totalDepositedLn": 5970
     },
     {
       "t": 1620.0,
-      "amountLn": 307,
-      "totalDepositedLn": 5990
+      "amountLn": 318,
+      "totalDepositedLn": 6288
     },
     {
       "t": 1680.0,
-      "amountLn": 316,
-      "totalDepositedLn": 6307
+      "amountLn": 310,
+      "totalDepositedLn": 6598
     },
     {
       "t": 1740.0,
-      "amountLn": 308,
-      "totalDepositedLn": 6615
+      "amountLn": 319,
+      "totalDepositedLn": 6917
     },
     {
       "t": 1800.0,
-      "amountLn": 305,
-      "totalDepositedLn": 6920
+      "amountLn": 341,
+      "totalDepositedLn": 7258
     },
     {
       "t": 1860.0,
-      "amountLn": 312,
-      "totalDepositedLn": 7232
+      "amountLn": 340,
+      "totalDepositedLn": 7598
     },
     {
       "t": 1920.0,
-      "amountLn": 319,
-      "totalDepositedLn": 7551
+      "amountLn": 343,
+      "totalDepositedLn": 7941
     },
     {
       "t": 1980.0,
-      "amountLn": 301,
-      "totalDepositedLn": 7852
+      "amountLn": 344,
+      "totalDepositedLn": 8285
     },
     {
       "t": 2040.0,
-      "amountLn": 307,
-      "totalDepositedLn": 8159
-    },
-    {
-      "t": 2100.0,
-      "amountLn": 241,
+      "amountLn": 115,
       "totalDepositedLn": 8400
     }
   ],
@@ -491,9 +512,9 @@
     },
     {
       "t": 240.0,
-      "cumulativeEarnedLn": 771,
-      "walletLn": 115,
-      "depositedLn": 176,
+      "cumulativeEarnedLn": 801,
+      "walletLn": 127,
+      "depositedLn": 194,
       "zaino": 3,
       "scarpe": 1,
       "insegna": 1,
@@ -501,9 +522,9 @@
     },
     {
       "t": 300.0,
-      "cumulativeEarnedLn": 1096,
-      "walletLn": 245,
-      "depositedLn": 371,
+      "cumulativeEarnedLn": 1126,
+      "walletLn": 257,
+      "depositedLn": 389,
       "zaino": 3,
       "scarpe": 1,
       "insegna": 1,
@@ -511,9 +532,9 @@
     },
     {
       "t": 360.0,
-      "cumulativeEarnedLn": 1434,
-      "walletLn": 60,
-      "depositedLn": 574,
+      "cumulativeEarnedLn": 1466,
+      "walletLn": 73,
+      "depositedLn": 593,
       "zaino": 4,
       "scarpe": 1,
       "insegna": 1,
@@ -521,19 +542,19 @@
     },
     {
       "t": 420.0,
-      "cumulativeEarnedLn": 1786,
-      "walletLn": 201,
-      "depositedLn": 785,
+      "cumulativeEarnedLn": 1882,
+      "walletLn": 33,
+      "depositedLn": 806,
       "zaino": 4,
       "scarpe": 1,
-      "insegna": 1,
+      "insegna": 2,
       "nonnoLevel": 0
     },
     {
       "t": 480.0,
-      "cumulativeEarnedLn": 2160,
-      "walletLn": 8,
-      "depositedLn": 1009,
+      "cumulativeEarnedLn": 2268,
+      "walletLn": 87,
+      "depositedLn": 1038,
       "zaino": 4,
       "scarpe": 1,
       "insegna": 2,
@@ -541,9 +562,9 @@
     },
     {
       "t": 540.0,
-      "cumulativeEarnedLn": 2536,
-      "walletLn": 158,
-      "depositedLn": 1235,
+      "cumulativeEarnedLn": 2642,
+      "walletLn": 237,
+      "depositedLn": 1262,
       "zaino": 4,
       "scarpe": 1,
       "insegna": 2,
@@ -551,9 +572,9 @@
     },
     {
       "t": 600.0,
-      "cumulativeEarnedLn": 2926,
-      "walletLn": 314,
-      "depositedLn": 1469,
+      "cumulativeEarnedLn": 3030,
+      "walletLn": 392,
+      "depositedLn": 1495,
       "zaino": 4,
       "scarpe": 1,
       "insegna": 2,
@@ -561,9 +582,9 @@
     },
     {
       "t": 660.0,
-      "cumulativeEarnedLn": 3302,
-      "walletLn": 465,
-      "depositedLn": 1695,
+      "cumulativeEarnedLn": 3409,
+      "walletLn": 543,
+      "depositedLn": 1723,
       "zaino": 4,
       "scarpe": 1,
       "insegna": 2,
@@ -571,19 +592,19 @@
     },
     {
       "t": 720.0,
-      "cumulativeEarnedLn": 3684,
-      "walletLn": 617,
-      "depositedLn": 1924,
-      "zaino": 4,
+      "cumulativeEarnedLn": 3831,
+      "walletLn": 152,
+      "depositedLn": 1976,
+      "zaino": 5,
       "scarpe": 1,
       "insegna": 2,
       "nonnoLevel": 1
     },
     {
       "t": 780.0,
-      "cumulativeEarnedLn": 4096,
-      "walletLn": 142,
-      "depositedLn": 2171,
+      "cumulativeEarnedLn": 4355,
+      "walletLn": 434,
+      "depositedLn": 2218,
       "zaino": 5,
       "scarpe": 1,
       "insegna": 2,
@@ -591,9 +612,9 @@
     },
     {
       "t": 840.0,
-      "cumulativeEarnedLn": 4515,
-      "walletLn": 310,
-      "depositedLn": 2422,
+      "cumulativeEarnedLn": 4785,
+      "walletLn": 606,
+      "depositedLn": 2476,
       "zaino": 5,
       "scarpe": 1,
       "insegna": 2,
@@ -601,9 +622,9 @@
     },
     {
       "t": 900.0,
-      "cumulativeEarnedLn": 4924,
-      "walletLn": 474,
-      "depositedLn": 2668,
+      "cumulativeEarnedLn": 5187,
+      "walletLn": 766,
+      "depositedLn": 2717,
       "zaino": 5,
       "scarpe": 1,
       "insegna": 2,
@@ -611,9 +632,9 @@
     },
     {
       "t": 960.0,
-      "cumulativeEarnedLn": 5348,
-      "walletLn": 643,
-      "depositedLn": 2922,
+      "cumulativeEarnedLn": 5610,
+      "walletLn": 936,
+      "depositedLn": 2971,
       "zaino": 5,
       "scarpe": 1,
       "insegna": 2,
@@ -621,99 +642,99 @@
     },
     {
       "t": 1020.0,
-      "cumulativeEarnedLn": 5753,
-      "walletLn": 805,
-      "depositedLn": 3165,
-      "zaino": 5,
+      "cumulativeEarnedLn": 6075,
+      "walletLn": 162,
+      "depositedLn": 3250,
+      "zaino": 6,
       "scarpe": 1,
       "insegna": 2,
       "nonnoLevel": 1
     },
     {
       "t": 1080.0,
-      "cumulativeEarnedLn": 6181,
-      "walletLn": 976,
-      "depositedLn": 3422,
-      "zaino": 5,
-      "scarpe": 1,
+      "cumulativeEarnedLn": 6545,
+      "walletLn": 188,
+      "depositedLn": 3532,
+      "zaino": 6,
+      "scarpe": 2,
       "insegna": 2,
       "nonnoLevel": 1
     },
     {
       "t": 1140.0,
-      "cumulativeEarnedLn": 6583,
-      "walletLn": 1137,
-      "depositedLn": 3663,
-      "zaino": 5,
-      "scarpe": 1,
+      "cumulativeEarnedLn": 7027,
+      "walletLn": 380,
+      "depositedLn": 3821,
+      "zaino": 6,
+      "scarpe": 2,
       "insegna": 2,
       "nonnoLevel": 1
     },
     {
       "t": 1200.0,
-      "cumulativeEarnedLn": 7013,
-      "walletLn": 29,
-      "depositedLn": 3921,
+      "cumulativeEarnedLn": 7520,
+      "walletLn": 578,
+      "depositedLn": 4117,
       "zaino": 6,
-      "scarpe": 1,
+      "scarpe": 2,
       "insegna": 2,
       "nonnoLevel": 1
     },
     {
       "t": 1260.0,
-      "cumulativeEarnedLn": 7501,
-      "walletLn": 62,
-      "depositedLn": 4214,
-      "zaino": 6,
-      "scarpe": 2,
-      "insegna": 2,
-      "nonnoLevel": 1
-    },
-    {
-      "t": 1320.0,
-      "cumulativeEarnedLn": 7967,
-      "walletLn": 249,
-      "depositedLn": 4494,
-      "zaino": 6,
-      "scarpe": 2,
-      "insegna": 2,
-      "nonnoLevel": 1
-    },
-    {
-      "t": 1380.0,
-      "cumulativeEarnedLn": 8446,
-      "walletLn": 440,
-      "depositedLn": 4781,
-      "zaino": 6,
-      "scarpe": 2,
-      "insegna": 2,
-      "nonnoLevel": 1
-    },
-    {
-      "t": 1440.0,
-      "cumulativeEarnedLn": 8933,
-      "walletLn": 635,
-      "depositedLn": 5073,
-      "zaino": 6,
-      "scarpe": 2,
-      "insegna": 2,
-      "nonnoLevel": 1
-    },
-    {
-      "t": 1500.0,
-      "cumulativeEarnedLn": 9452,
-      "walletLn": 186,
-      "depositedLn": 5384,
+      "cumulativeEarnedLn": 8222,
+      "walletLn": 82,
+      "depositedLn": 4419,
       "zaino": 6,
       "scarpe": 2,
       "insegna": 3,
-      "nonnoLevel": 1
+      "nonnoLevel": 2
+    },
+    {
+      "t": 1320.0,
+      "cumulativeEarnedLn": 8733,
+      "walletLn": 287,
+      "depositedLn": 4725,
+      "zaino": 6,
+      "scarpe": 2,
+      "insegna": 3,
+      "nonnoLevel": 2
+    },
+    {
+      "t": 1380.0,
+      "cumulativeEarnedLn": 9255,
+      "walletLn": 496,
+      "depositedLn": 5038,
+      "zaino": 6,
+      "scarpe": 2,
+      "insegna": 3,
+      "nonnoLevel": 2
+    },
+    {
+      "t": 1440.0,
+      "cumulativeEarnedLn": 9790,
+      "walletLn": 710,
+      "depositedLn": 5359,
+      "zaino": 6,
+      "scarpe": 2,
+      "insegna": 3,
+      "nonnoLevel": 2
+    },
+    {
+      "t": 1500.0,
+      "cumulativeEarnedLn": 10290,
+      "walletLn": 910,
+      "depositedLn": 5660,
+      "zaino": 6,
+      "scarpe": 2,
+      "insegna": 3,
+      "nonnoLevel": 2
     },
     {
       "t": 1560.0,
-      "cumulativeEarnedLn": 9950,
-      "walletLn": 146,
-      "depositedLn": 5683,
+      "cumulativeEarnedLn": 10808,
+      "walletLn": 1117,
+      "depositedLn": 5970,
       "zaino": 6,
       "scarpe": 2,
       "insegna": 3,
@@ -721,9 +742,9 @@
     },
     {
       "t": 1620.0,
-      "cumulativeEarnedLn": 10462,
-      "walletLn": 350,
-      "depositedLn": 5990,
+      "cumulativeEarnedLn": 11338,
+      "walletLn": 1329,
+      "depositedLn": 6288,
       "zaino": 6,
       "scarpe": 2,
       "insegna": 3,
@@ -731,9 +752,9 @@
     },
     {
       "t": 1680.0,
-      "cumulativeEarnedLn": 10989,
-      "walletLn": 561,
-      "depositedLn": 6307,
+      "cumulativeEarnedLn": 11855,
+      "walletLn": 1535,
+      "depositedLn": 6598,
       "zaino": 6,
       "scarpe": 2,
       "insegna": 3,
@@ -741,85 +762,75 @@
     },
     {
       "t": 1740.0,
-      "cumulativeEarnedLn": 11503,
-      "walletLn": 767,
-      "depositedLn": 6615,
-      "zaino": 6,
+      "cumulativeEarnedLn": 12386,
+      "walletLn": 48,
+      "depositedLn": 6917,
+      "zaino": 7,
       "scarpe": 2,
       "insegna": 3,
       "nonnoLevel": 2
     },
     {
       "t": 1800.0,
-      "cumulativeEarnedLn": 12011,
-      "walletLn": 970,
-      "depositedLn": 6920,
-      "zaino": 6,
+      "cumulativeEarnedLn": 12955,
+      "walletLn": 275,
+      "depositedLn": 7258,
+      "zaino": 7,
       "scarpe": 2,
       "insegna": 3,
       "nonnoLevel": 2
     },
     {
       "t": 1860.0,
-      "cumulativeEarnedLn": 12532,
-      "walletLn": 1178,
-      "depositedLn": 7232,
-      "zaino": 6,
+      "cumulativeEarnedLn": 13522,
+      "walletLn": 502,
+      "depositedLn": 7598,
+      "zaino": 7,
       "scarpe": 2,
       "insegna": 3,
       "nonnoLevel": 2
     },
     {
       "t": 1920.0,
-      "cumulativeEarnedLn": 13063,
-      "walletLn": 1391,
-      "depositedLn": 7551,
-      "zaino": 6,
+      "cumulativeEarnedLn": 14093,
+      "walletLn": 731,
+      "depositedLn": 7941,
+      "zaino": 7,
       "scarpe": 2,
       "insegna": 3,
       "nonnoLevel": 2
     },
     {
       "t": 1980.0,
-      "cumulativeEarnedLn": 13565,
-      "walletLn": 1591,
-      "depositedLn": 7852,
-      "zaino": 6,
+      "cumulativeEarnedLn": 14666,
+      "walletLn": 960,
+      "depositedLn": 8285,
+      "zaino": 7,
       "scarpe": 2,
       "insegna": 3,
       "nonnoLevel": 2
     },
     {
       "t": 2040.0,
-      "cumulativeEarnedLn": 14076,
-      "walletLn": 1796,
-      "depositedLn": 8159,
-      "zaino": 6,
-      "scarpe": 2,
-      "insegna": 3,
-      "nonnoLevel": 2
-    },
-    {
-      "t": 2100.0,
-      "cumulativeEarnedLn": 14603,
-      "walletLn": 2007,
+      "cumulativeEarnedLn": 15240,
+      "walletLn": 1190,
       "depositedLn": 8400,
-      "zaino": 6,
+      "zaino": 7,
       "scarpe": 2,
       "insegna": 3,
       "nonnoLevel": 2
     }
   ],
   "chapterEnd": {
-    "eff10Sec": 2100.0,
-    "eff12Sec": 1980.0,
-    "eff085Sec": 2220.0,
+    "eff10Sec": 2040.0,
+    "eff12Sec": 1920.0,
+    "eff085Sec": 2160.0,
     "windowSec": 2400,
     "trancheLn": 8400,
     "dueCalendarDay": 24
   },
   "finalLevels": {
-    "zaino": 6,
+    "zaino": 7,
     "scarpe": 2,
     "insegna": 3,
     "nonno": 2,
@@ -937,7 +948,7 @@
       "action": "moveTo",
       "zoneId": "cassa",
       "holdOnZoneSec": 1.0,
-      "expect": "0 LN offline (run continua)"
+      "expect": "+30 LN mancia di Nonna Ada (solo la prima volta)"
     },
     {
       "tSec": 240,
@@ -957,10 +968,10 @@
       "action": "moveTo",
       "zoneId": "cassaforte",
       "holdOnZoneSec": 3.0,
-      "expect": "versati 371 LN"
+      "expect": "versati 389 LN"
     },
     {
-      "tSec": 335.0,
+      "tSec": 330.0,
       "action": "moveTo",
       "zoneId": "padZaino",
       "holdOnZoneSec": 3.0,
@@ -971,24 +982,24 @@
       "action": "moveTo",
       "zoneId": "cassaforte",
       "holdOnZoneSec": 3.0,
-      "expect": "versati 574 LN"
+      "expect": "versati 593 LN"
     },
     {
-      "tSec": 420.0,
-      "action": "moveTo",
-      "zoneId": "cassaforte",
-      "holdOnZoneSec": 3.0,
-      "expect": "versati 785 LN"
-    },
-    {
-      "tSec": 437.0,
+      "tSec": 407.0,
       "action": "moveTo",
       "zoneId": "padInsegna",
       "holdOnZoneSec": 3.0,
       "expect": "INSEGNA 2 · 243 LN"
     },
     {
-      "tSec": 478.0,
+      "tSec": 420.0,
+      "action": "moveTo",
+      "zoneId": "cassaforte",
+      "holdOnZoneSec": 3.0,
+      "expect": "versati 806 LN"
+    },
+    {
+      "tSec": 448.0,
       "action": "moveTo",
       "zoneId": "padNonnoUpgrade",
       "holdOnZoneSec": 3.0,
@@ -999,227 +1010,227 @@
       "action": "moveTo",
       "zoneId": "cassaforte",
       "holdOnZoneSec": 3.0,
-      "expect": "versati 1009 LN"
+      "expect": "versati 1038 LN"
     },
     {
       "tSec": 540.0,
       "action": "moveTo",
       "zoneId": "cassaforte",
       "holdOnZoneSec": 3.0,
-      "expect": "versati 1235 LN"
+      "expect": "versati 1262 LN"
     },
     {
       "tSec": 600.0,
       "action": "moveTo",
       "zoneId": "cassaforte",
       "holdOnZoneSec": 3.0,
-      "expect": "versati 1469 LN"
+      "expect": "versati 1495 LN"
     },
     {
       "tSec": 660.0,
       "action": "moveTo",
       "zoneId": "cassaforte",
       "holdOnZoneSec": 3.0,
-      "expect": "versati 1695 LN"
+      "expect": "versati 1723 LN"
+    },
+    {
+      "tSec": 666.0,
+      "action": "moveTo",
+      "zoneId": "padZaino",
+      "holdOnZoneSec": 3.0,
+      "expect": "ZAINO 5 · 560 LN"
     },
     {
       "tSec": 720.0,
       "action": "moveTo",
       "zoneId": "cassaforte",
       "holdOnZoneSec": 3.0,
-      "expect": "versati 1924 LN"
-    },
-    {
-      "tSec": 729.0,
-      "action": "moveTo",
-      "zoneId": "padZaino",
-      "holdOnZoneSec": 3.0,
-      "expect": "ZAINO 5 · 640 LN"
+      "expect": "versati 1976 LN"
     },
     {
       "tSec": 780.0,
       "action": "moveTo",
       "zoneId": "cassaforte",
       "holdOnZoneSec": 3.0,
-      "expect": "versati 2171 LN"
+      "expect": "versati 2218 LN"
     },
     {
       "tSec": 840.0,
       "action": "moveTo",
       "zoneId": "cassaforte",
       "holdOnZoneSec": 3.0,
-      "expect": "versati 2422 LN"
+      "expect": "versati 2476 LN"
     },
     {
       "tSec": 900.0,
       "action": "moveTo",
       "zoneId": "cassaforte",
       "holdOnZoneSec": 3.0,
-      "expect": "versati 2668 LN"
+      "expect": "versati 2717 LN"
     },
     {
       "tSec": 960.0,
       "action": "moveTo",
       "zoneId": "cassaforte",
       "holdOnZoneSec": 3.0,
-      "expect": "versati 2922 LN"
+      "expect": "versati 2971 LN"
+    },
+    {
+      "tSec": 970.0,
+      "action": "moveTo",
+      "zoneId": "padZaino",
+      "holdOnZoneSec": 3.0,
+      "expect": "ZAINO 6 · 960 LN"
     },
     {
       "tSec": 1020.0,
       "action": "moveTo",
       "zoneId": "cassaforte",
       "holdOnZoneSec": 3.0,
-      "expect": "versati 3165 LN"
+      "expect": "versati 3250 LN"
     },
     {
-      "tSec": 1080.0,
-      "action": "moveTo",
-      "zoneId": "cassaforte",
-      "holdOnZoneSec": 3.0,
-      "expect": "versati 3422 LN"
-    },
-    {
-      "tSec": 1140.0,
-      "action": "moveTo",
-      "zoneId": "cassaforte",
-      "holdOnZoneSec": 3.0,
-      "expect": "versati 3663 LN"
-    },
-    {
-      "tSec": 1192.0,
-      "action": "moveTo",
-      "zoneId": "padZaino",
-      "holdOnZoneSec": 3.0,
-      "expect": "ZAINO 6 · 1280 LN"
-    },
-    {
-      "tSec": 1200.0,
-      "action": "moveTo",
-      "zoneId": "cassaforte",
-      "holdOnZoneSec": 3.0,
-      "expect": "versati 3921 LN"
-    },
-    {
-      "tSec": 1243.0,
+      "tSec": 1021.0,
       "action": "moveTo",
       "zoneId": "padScarpe",
       "holdOnZoneSec": 3.0,
       "expect": "SCARPE 2 · 162 LN"
     },
     {
-      "tSec": 1260.0,
+      "tSec": 1080.0,
       "action": "moveTo",
       "zoneId": "cassaforte",
       "holdOnZoneSec": 3.0,
-      "expect": "versati 4214 LN"
+      "expect": "versati 3532 LN"
     },
     {
-      "tSec": 1320.0,
+      "tSec": 1140.0,
       "action": "moveTo",
       "zoneId": "cassaforte",
       "holdOnZoneSec": 3.0,
-      "expect": "versati 4494 LN"
+      "expect": "versati 3821 LN"
     },
     {
-      "tSec": 1380.0,
+      "tSec": 1200.0,
       "action": "moveTo",
       "zoneId": "cassaforte",
       "holdOnZoneSec": 3.0,
-      "expect": "versati 4781 LN"
+      "expect": "versati 4117 LN"
     },
     {
-      "tSec": 1440.0,
-      "action": "moveTo",
-      "zoneId": "cassaforte",
-      "holdOnZoneSec": 3.0,
-      "expect": "versati 5073 LN"
-    },
-    {
-      "tSec": 1446.0,
+      "tSec": 1212.0,
       "action": "moveTo",
       "zoneId": "padInsegna",
       "holdOnZoneSec": 3.0,
       "expect": "INSEGNA 3 · 656 LN"
     },
     {
-      "tSec": 1500.0,
-      "action": "moveTo",
-      "zoneId": "cassaforte",
-      "holdOnZoneSec": 3.0,
-      "expect": "versati 5384 LN"
-    },
-    {
-      "tSec": 1518.0,
+      "tSec": 1237.0,
       "action": "moveTo",
       "zoneId": "padNonnoUpgrade",
       "holdOnZoneSec": 3.0,
       "expect": "NONNO LV 2 · 240 LN"
     },
     {
+      "tSec": 1260.0,
+      "action": "moveTo",
+      "zoneId": "cassaforte",
+      "holdOnZoneSec": 3.0,
+      "expect": "versati 4419 LN"
+    },
+    {
+      "tSec": 1320.0,
+      "action": "moveTo",
+      "zoneId": "cassaforte",
+      "holdOnZoneSec": 3.0,
+      "expect": "versati 4725 LN"
+    },
+    {
+      "tSec": 1380.0,
+      "action": "moveTo",
+      "zoneId": "cassaforte",
+      "holdOnZoneSec": 3.0,
+      "expect": "versati 5038 LN"
+    },
+    {
+      "tSec": 1440.0,
+      "action": "moveTo",
+      "zoneId": "cassaforte",
+      "holdOnZoneSec": 3.0,
+      "expect": "versati 5359 LN"
+    },
+    {
+      "tSec": 1500.0,
+      "action": "moveTo",
+      "zoneId": "cassaforte",
+      "holdOnZoneSec": 3.0,
+      "expect": "versati 5660 LN"
+    },
+    {
       "tSec": 1560.0,
       "action": "moveTo",
       "zoneId": "cassaforte",
       "holdOnZoneSec": 3.0,
-      "expect": "versati 5683 LN"
+      "expect": "versati 5970 LN"
     },
     {
       "tSec": 1620.0,
       "action": "moveTo",
       "zoneId": "cassaforte",
       "holdOnZoneSec": 3.0,
-      "expect": "versati 5990 LN"
+      "expect": "versati 6288 LN"
     },
     {
       "tSec": 1680.0,
       "action": "moveTo",
       "zoneId": "cassaforte",
       "holdOnZoneSec": 3.0,
-      "expect": "versati 6307 LN"
+      "expect": "versati 6598 LN"
+    },
+    {
+      "tSec": 1727.0,
+      "action": "moveTo",
+      "zoneId": "padZaino",
+      "holdOnZoneSec": 3.0,
+      "expect": "ZAINO 7 · 1700 LN"
     },
     {
       "tSec": 1740.0,
       "action": "moveTo",
       "zoneId": "cassaforte",
       "holdOnZoneSec": 3.0,
-      "expect": "versati 6615 LN"
+      "expect": "versati 6917 LN"
     },
     {
       "tSec": 1800.0,
       "action": "moveTo",
       "zoneId": "cassaforte",
       "holdOnZoneSec": 3.0,
-      "expect": "versati 6920 LN"
+      "expect": "versati 7258 LN"
     },
     {
       "tSec": 1860.0,
       "action": "moveTo",
       "zoneId": "cassaforte",
       "holdOnZoneSec": 3.0,
-      "expect": "versati 7232 LN"
+      "expect": "versati 7598 LN"
     },
     {
       "tSec": 1920.0,
       "action": "moveTo",
       "zoneId": "cassaforte",
       "holdOnZoneSec": 3.0,
-      "expect": "versati 7551 LN"
+      "expect": "versati 7941 LN"
     },
     {
       "tSec": 1980.0,
       "action": "moveTo",
       "zoneId": "cassaforte",
       "holdOnZoneSec": 3.0,
-      "expect": "versati 7852 LN"
+      "expect": "versati 8285 LN"
     },
     {
       "tSec": 2040.0,
-      "action": "moveTo",
-      "zoneId": "cassaforte",
-      "holdOnZoneSec": 3.0,
-      "expect": "versati 8159 LN"
-    },
-    {
-      "tSec": 2100.0,
       "action": "moveTo",
       "zoneId": "cassaforte",
       "holdOnZoneSec": 3.0,

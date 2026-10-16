@@ -19,5 +19,48 @@
     "baseSpeedMps": 3.0,
     "fullStackSlowdown": 0.1,
     "startStackCapacity": 5
+  },
+  "rewards": {
+    "source": "GD 16/10/2026, liveops/REVISIONE_ECONOMIA_CAP1.md (verificato con qa/eval_liveops_ch1.py)",
+    "parcelMilestones": [
+      {
+        "parcels": 100,
+        "bonusLn": 60
+      },
+      {
+        "parcels": 250,
+        "bonusLn": 120
+      },
+      {
+        "parcels": 450,
+        "bonusLn": 200
+      }
+    ],
+    "parcelMilestonesNote": "bonus nel portafoglio + coriandoli + riga di Mamma Rosa; ridotti da 80/150/250 per tenere il cap a ~34 min",
+    "debtMilestones": [
+      {
+        "share": 0.25,
+        "reward": "stampSoloVisivo"
+      },
+      {
+        "share": 0.5,
+        "reward": "reputation",
+        "amount": 1
+      },
+      {
+        "share": 0.75,
+        "reward": "decor",
+        "itemId": "decor_foto_nonna_ada"
+      }
+    ],
+    "cassaFirstVisitTipLn": 30,
+    "nextPadArrow": {
+      "fromSec": 480,
+      "candidates": [
+        "scarpe:2",
+        "nonno:2"
+      ],
+      "rule": "freccia sul pad più economico tra i candidati, solo se il portafoglio ne copre il costo; sparisce all'acquisto o dopo 20 s"
+    }
   }
 }
