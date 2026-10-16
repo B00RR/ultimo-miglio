@@ -1,0 +1,52 @@
+/* Tutorial + HUD minimo (issue tutorial-HUD). Caricato DOPO HudV2/LegnoCartone in Hud.uxml.
+   Non tocca HudV2.uss (PR #36 aperta): sovrascrive con selettori più specifici +.
+   Fascia alta ≤ ~117 dp (350 px su 1170×2532); fascia bassa ≤ ~167 dp (500 px). Unità = dp. */
+
+/* --- Riga 1: LN/giorno a sinistra, obiettivo a destra, ingranaggio. Tutto in 48 dp. --- */
+#safe-root .top-left { max-width: 44%; }
+#safe-root .tutorial-objective {
+    left: 46%; right: 44px; top: 14px;
+    height: 28px; max-height: 28px; font-size: 13px;
+    -unity-text-align: middle-center;
+}
+
+/* --- Fumetto Nonna Ada: ritratto 32 dp + testo 14 dp, 1 riga o max 2 righe, mai ellissi --- */
+#hud-root .ada-band.ada-band { top: 54px; height: auto; max-height: 52px; justify-content: center; }
+#hud-root .ada-note.ada-note {
+    width: 100%; max-width: 420px; height: auto; min-height: 36px; max-height: 52px;
+    padding: 3px 10px 3px 4px; flex-direction: row; align-items: center;
+    border-width: 3px; border-bottom-width: 4px; border-color: #3B2F2A; border-radius: 12px;
+}
+#hud-root .ada-face.ada-face--portrait {
+    display: flex; width: 36px; height: 36px; flex-shrink: 0; margin: 0 8px 0 0;
+    border-radius: 18px; border-width: 2px; border-color: #3B2A20; background-color: #C8633B;
+    background-image: url("project://database/Assets/_Game/UI/Textures/tex_ada_portrait.png");
+    -unity-background-scale-mode: scale-and-crop;
+}
+#hud-root .ada-text.ada-text {
+    font-size: 14px; color: #3B2A20; white-space: normal; text-overflow: clip;
+    height: auto; max-height: 44px; -unity-text-align: middle-left;
+    -unity-font-definition: url("project://database/Assets/_Game/UI/Fonts/Fredoka-SemiBold.ttf");
+}
+
+/* --- Suggerimento/CTA tutorial (onb.*): in alto nella fascia bassa (130–158 dp dal fondo), sopra la zona joystick a riposo (12–124 dp); si nasconde se il joystick flottante lo tocca --- */
+.tut-hint {
+    position: absolute; left: 12px; right: 12px; bottom: 130px; height: 28px; flex-direction: row; justify-content: center; display: none;
+}
+.tut-hint--on { display: flex; }
+.tut-hint__pill {
+    flex-direction: row; align-items: center; height: 28px; padding: 0 10px 0 3px; max-width: 100%;
+    border-radius: 14px; border-width: 3px; border-color: #3B2A20; background-color: #C8633B;
+}
+.tut-hint__go { width: 20px; height: 20px; margin-right: 6px; border-radius: 10px; background-color: #F4C430;
+    background-image: url("project://database/Assets/_Game/UI/Icons/ic_arrow.png"); -unity-background-image-tint-color: #3B2A20; -unity-background-scale-mode: scale-to-fit; }
+.tut-hint__text { font-size: 13px; color: #F3E3C3; white-space: nowrap; text-overflow: ellipsis; overflow: hidden;
+    -unity-font-definition: url("project://database/Assets/_Game/UI/Fonts/Fredoka-Bold.ttf"); margin: 0; padding: 0; }
+
+/* --- Freccia sopra la pillola prezzo dei pad di acquisto (InteractionPoint) --- */
+.poi-chip-col { position: absolute; flex-direction: column; align-items: center; translate: -50% -100%; }
+.poi-chevron { width: 32px; height: 26px; margin-bottom: 3px; display: none;
+    background-image: url("project://database/Assets/_Game/UI/Icons/ic_chevron_down.png"); -unity-background-scale-mode: scale-to-fit; }
+.poi-chevron--on { display: flex; }
+.poi-chip-col--flip { translate: -50% 0; }
+.poi-chip-col--flip .poi-chevron { rotate: 180deg; }

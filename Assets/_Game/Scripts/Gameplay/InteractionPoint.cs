@@ -18,7 +18,11 @@ namespace UltimoMiglio.Gameplay
         public static readonly Color Blu = new(0.369f, 0.498f, 0.525f), Verde = new(0.561f, 0.788f, 0.659f), Giallo = new(0.957f, 0.769f, 0.188f), Ink = new(0.231f, 0.165f, 0.125f);
 
         Transform _rim, _fill, _beacon; Material _fillMat, _beaconMat; Color _col;
-        VisualElement _chip; Label _text; UltimoMiglio.UI.HudController _hud; Camera _cam; TutorialManager _tut;
+        VisualElement _chip, _chipCol, _chevron, _bar, _barFill; Label _text, _barLabel;
+        /// <summary>#94: aiuto livello 1 (10 s fermo): il bersaglio pulsa più forte (pad a terra + pillola).</summary>
+        public bool HintPulse { get; set; }
+        /// <summary>#94: barra LN sempre visibile (es. aiuto 40 s su Zaino/NONNO), altrimenti solo con pagamento iniziato o Nina vicina.</summary>
+        public bool ForceBar { get; set; } UltimoMiglio.UI.HudController _hud; Camera _cam; TutorialManager _tut;
         bool _active; float _phase;
 
 
@@ -85,12 +89,14 @@ namespace UltimoMiglio.Gameplay
             _cam = Camera.main;
             var layer = _hud.Root.Q("world-layer") ?? _hud.Root;
             _chip = new VisualElement { name = "poi-chip", pickingMode = PickingMode.Ignore };
-            var s = _chip.style; s.position = Position.Absolute; s.flexDirection = FlexDirection.Row; s.alignItems = Align.Center;
-            s.translate = new Translate(Length.Percent(-50), Length.Percent(-100));
+            // Colonna: freccia ▼ terracotta SOPRA la pillola (mai sovrapposta al prezzo), centrata sullo stesso asse; ancora = fondo pillola
+            _chipCol = new VisualElement { name = "poi-chip-col", pickingMode = PickingMode.Ignore }; _chipCol.AddToClassList("poi-chip-col");
+            _chevron = new VisualElement { name = "poi-chevron", pickingMode = PickingMode.Ignore }; _chevron.AddToClassList("poi-chevron");
+            var s = _chip.style; s.flexDirection = FlexDirection.Row; s.alignItems = Align.Center; s.alignSelf = Align.Center;
             s.paddingLeft = 8; s.paddingRight = 12; s.paddingTop = 4; s.paddingBottom = 4;
             s.backgroundColor = Kind == PoiKind.Acquisto ? Giallo : new Color(1f, 0.976f, 0.933f);
             s.borderTopLeftRadius = s.borderTopRightRadius = s.borderBottomLeftRadius = s.borderBottomRightRadius = 999;
-            s.borderLeftWidth = s.borderRightWidth = s.borderTopWidth = s.borderBottomWidth = 6;
+            s.borderLeftWidth = s.borderRightWidth = s.borderTopWidth = s.borderBottomWidth = 3; // bordo 3–4 px (GUIDA §10)
             s.borderLeftColor = s.borderRightColor = s.borderTopColor = s.borderBottomColor = Ink;
             var ic = new VisualElement { pickingMode = PickingMode.Ignore };
             var i = ic.style; i.width = 28; i.height = 28; i.borderTopLeftRadius = i.borderTopRightRadius = i.borderBottomLeftRadius = i.borderBottomRightRadius = 36;
@@ -101,7 +107,14 @@ namespace UltimoMiglio.Gameplay
             _text = new Label(Label) { pickingMode = PickingMode.Ignore };
             var t = _text.style; t.fontSize = Kind == PoiKind.Acquisto ? 18 : 16; t.color = Ink; t.unityFontStyleAndWeight = FontStyle.Bold; t.whiteSpace = WhiteSpace.NoWrap;
             if (LabelFont) t.unityFontDefinition = FontDefinition.FromFont(LabelFont);
-            _chip.Add(ic); _chip.Add(_text); layer.Add(_chip);
+            _chip.Add(ic); _chip.Add(_text);
+            // #94: barra LN "32/50" fra la freccia e la pillola: freccia ▼ → barra → pillola, stesso asse
+            _bar = new VisualElement { name = "poi-bar", pickingMode = PickingMode.Ignore }; _bar.AddToClassList("poi-bar");
+            var track = new VisualElement { pickingMode = PickingMode.Ignore }; track.AddToClassList("poi-bar__track");
+            _barFill = new VisualElement { pickingMode = PickingMode.Ignore }; _barFill.AddToClassList("poi-bar__fill"); track.Add(_barFill);
+            _barLabel = new Label { pickingMode = PickingMode.Ignore }; _barLabel.AddToClassList("poi-bar__label");
+            _bar.Add(track); _bar.Add(_barLabel);
+            _chipCol.Add(_chevron); _chipCol.Add(_bar); _chipCol.Add(_chip); layer.Add(_chipCol);
             var arrow = _hud.Root.Q("edge-arrow"); arrow?.BringToFront(); // the off-screen arrow is never under a chip/card
         }
 
@@ -114,7 +127,7 @@ namespace UltimoMiglio.Gameplay
             _active = avail && target && (target.position - transform.position).sqrMagnitude < 9f;
             _beacon.gameObject.SetActive(_active);
             float t = Time.time * (_active ? 4.5f : 2.2f) + _phase, k = 0.5f + 0.5f * Mathf.Sin(t);
-            float big = _active ? 1.12f : 1f, amp = _active ? 0.07f : 0.04f;
+            float big = _active ? 1.12f : 1f, amp = HintPulse ? 0.16f : _active ? 0.07f : 0.04f; // #94: pulsazione forte all'aiuto 10 s
             float sc = big * (1f + amp * k);
             _rim.localScale = new Vector3(Radius * 2.15f * sc, 0.06f, Radius * 2.15f * sc);
             _fill.localScale = new Vector3(Radius * 1.95f * sc, 0.08f, Radius * 1.95f * sc);
@@ -122,11 +135,25 @@ namespace UltimoMiglio.Gameplay
             var fill = Color.Lerp(_col, Color.white, (_active ? 0.22f : 0.08f) * k);
             fill.a = baseA * (0.88f + 0.12f * k); // pulse leggibile
             _fillMat.SetColor("_BaseColor", fill); if (_fillMat.HasProperty("_Color")) _fillMat.SetColor("_Color", fill);
-            if (_active) { _beacon.localScale = new Vector3(0.18f, 2.2f + 0.3f * k, 0.18f); _beaconMat.SetColor("_BaseColor", Color.Lerp(_col, Color.white, 0.3f + 0.4f * k)); }
+            if (Kind == PoiKind.Acquisto) _beacon.gameObject.SetActive(false); // la colonna 3D attraversava la pillola prezzo: ora freccia UI sopra la pillola
+            if (_active && _beacon.gameObject.activeSelf) { _beacon.localScale = new Vector3(0.18f, 2.2f + 0.3f * k, 0.18f); _beaconMat.SetColor("_BaseColor", Color.Lerp(_col, Color.white, 0.3f + 0.4f * k)); }
 
             EnsureChip();
             if (_chip == null || !_cam) return;
-            if (Pad && GameRoot.Ready && Kind == PoiKind.Acquisto && _text != null) { var eco = GameRoot.I.Eco; double left = eco.Cost(Pad.Kind) - eco.S.PadPaid[(int)Pad.Kind]; if (!double.IsInfinity(left)) _text.text = Mathf.CeilToInt((float)Mathf.Max(0, (float)left)) + " LN"; }
+            bool barOn = false;
+            if (Pad && GameRoot.Ready && Kind == PoiKind.Acquisto && _text != null)
+            {
+                var eco = GameRoot.I.Eco; double cost = eco.Cost(Pad.Kind), paid = eco.S.PadPaid[(int)Pad.Kind];
+                if (!double.IsInfinity(cost))
+                {
+                    _text.text = Mathf.CeilToInt((float)Mathf.Max(0, (float)(cost - paid))) + " LN"; // pillola = quanto manca
+                    int pd = Mathf.FloorToInt((float)paid), c = Mathf.CeilToInt((float)cost);
+                    _barLabel.text = pd + "/" + c; _barFill.style.width = Length.Percent(c > 0 ? Mathf.Clamp01((float)(paid / cost)) * 100f : 0f);
+                    var n = GameRoot.I.Nina; bool close = n && (n.transform.position - transform.position).sqrMagnitude < 9f;
+                    barOn = ForceBar || paid > 0.01 || close;
+                }
+            }
+            if (_bar != null) _bar.EnableInClassList("poi-bar--on", barOn);
             var nina = GameRoot.I ? GameRoot.I.Nina : null;
             bool near = nina && (nina.transform.position - transform.position).sqrMagnitude < 9f;
             if (Ring && !Pad) Ring.SetProgress(near ? 1f : 0f);
@@ -139,24 +166,31 @@ namespace UltimoMiglio.Gameplay
             if (sp.z > 0 && sp.y > Screen.height * 0.72f)
                 sp = _cam.WorldToScreenPoint(transform.position + Vector3.up * (1.05f + bob * 0.5f));
             bool show = avail && !(HasCard && near) && sp.z > 0 && sp.x > 0 && sp.x < Screen.width && sp.y > 0 && sp.y < Screen.height;
-            _chip.style.display = show ? DisplayStyle.Flex : DisplayStyle.None;
+            _chipCol.style.display = show ? DisplayStyle.Flex : DisplayStyle.None;
             if (!show || _chip.panel == null) return;
+            _chevron.EnableInClassList("poi-chevron--on", _active);
+            _chipCol.EnableInClassList("poi-chip-col--pulse", HintPulse && Mathf.Repeat(Time.time, 0.8f) < 0.4f); // #94 aiuto 10 s // indica il pad SOLO quando è l'obiettivo del tutorial
+            _chevron.style.translate = new Translate(0, 3f * Mathf.Sin(Time.time * 6f), 0);
             var p = UltimoMiglio.UI.SafeAreaUtil.ScreenToPanel(_chip.panel, sp);
             // QA v5 P2: non sotto la riga obiettivo; QA v6 P3: non tagliata sui bordi SX/DX
-            const float hudTopReserve = 92f;
-            if (p.y < hudTopReserve) p.y = hudTopReserve;
+            const float hudTopReserve = 206f; // fondo fumetto Ada (106 dp) + 8 + pillola 44 + barra LN 22 (#94) + freccia 26: la colonna non entra mai nella fascia alta HUD
+            // Pad alto sullo schermo: niente clamp che stacca la pillola dal pad. La colonna si ribalta SOTTO il pad
+            // (freccia ▲ verso il pad, pillola sotto), così indica sempre il pad e non entra nella fascia alta.
+            bool flip = p.y < hudTopReserve;
+            if (flip) { var pad = UltimoMiglio.UI.SafeAreaUtil.ScreenToPanel(_chip.panel, _cam.WorldToScreenPoint(transform.position)); p.y = Mathf.Max(pad.y + 10f, hudTopReserve - 70f); }
+            _chipCol.EnableInClassList("poi-chip-col--flip", flip);
             float panelW = _chip.panel.visualTree.worldBound.width;
             if (panelW < 1f) panelW = Screen.width;
             float halfChip = 70f; // pillola ~140px, anchor al centro (translate -50%)
             const float edgePad = 10f;
             if (p.x < halfChip + edgePad) p.x = halfChip + edgePad;
             if (p.x > panelW - halfChip - edgePad) p.x = panelW - halfChip - edgePad;
-            _chip.style.left = p.x; _chip.style.top = p.y;
-            _chip.style.scale = new Scale(Vector3.one * (_active ? 1.12f : 1f));
+            _chipCol.style.left = p.x; _chipCol.style.top = p.y;
+            _chip.style.scale = new Scale(Vector3.one * (_active ? 1.08f : 1f));
             // Chip sopra il world-layer ma sotto i controlli: porta in cima al world-layer
-            _chip.BringToFront();
+            _chipCol.BringToFront();
         }
 
-        void OnDestroy() { _chip?.RemoveFromHierarchy(); }
+        void OnDestroy() { _chipCol?.RemoveFromHierarchy(); }
     }
 }
