@@ -14,6 +14,10 @@ Formato Given/When/Then; ogni criterio è misurabile dal bot di playtest (`botSt
 | ONB-07 | portafoglio ≥ 40 LN | Nina sta 3 s sul pad ZAINO LV 1 | Zaino 1 comprato a 1:23 ±20 s; il flusso non si mette mai in pausa |
 | ONB-08 | t ≥ 1:40 | due clienti serviti a distanza ≤ 5 s | combo mostrata x1,1 poi x1,2 |
 | ONB-09 | t ≥ 2:10 e portafoglio ≥ 50 LN | Nina sul pad ASSUMI NONNO | NONNO assunto a 2:10 ±5 s; restock 6 pacchi/min ±0,5 misurato su 60 s |
+| ONB-09a | t ≥ 2:07 | parte il passo `nonnoIntro` | la camera inquadra pad e NONNO per 2,5 s ±0,3, il joystick resta attivo, a schermo `onb.nonno.what` (dice che NONNO porta i pacchi al posto tuo) |
+| ONB-09b | Nina sul pad di NONNO con portafoglio < 50 LN | — | il pad mostra "X/50 LN" coerente col portafoglio (±1 LN), compare `onb.nonno.notEnough` e la freccia punta al Bancone; arrivati a 50 LN la freccia torna al pad entro 1 s |
+| ONB-09c | pad di NONNO attivo | il giocatore non ci va per 20 s ±1 | promemoria `onb.nonno.reminder` + freccia + camera che pulsa; si ripete ogni 20 s fino all'assunzione |
+| ONB-09d | NONNO assunto | — | camera su NONNO per 3 s ±0,3; NONNO consegna il primo pacco allo scaffale entro 12 s; badge "6 pacchi/min" visibile |
 | ONB-10 | NONNO assunto | passano 35 s | il telefono vibra (Civetta) a 2:45 ±10 s |
 | ONB-11 | t ≥ 3:30 | tap su notifica Ordini | si apre l'ordine speciale; "Mostra la strada" disegna la freccia |
 | ONB-12 | primo passaggio sulla Cassa (3:55 ±10 s) | Nina ci passa sopra | +30 LN una sola volta; al secondo passaggio 0 LN extra |
