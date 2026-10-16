@@ -80,8 +80,7 @@ namespace UltimoMiglio.UI.Bridge
             if (_settingsWired || !Hud || Hud.Root == null) return;
             _settings = gameObject.GetComponent<SettingsPanel>() ?? gameObject.AddComponent<SettingsPanel>();
             _settings.Bind(Hud, Hud.Root);
-            Hud.OnSettingsRequested -= _settings.Toggle;
-            Hud.OnSettingsRequested += _settings.Toggle;
+            // Pannello unico = SettingsController (PR #36): SettingsPanel non si apre più dall'ingranaggio.
             _settingsWired = true;
         }
 
