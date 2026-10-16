@@ -28,6 +28,7 @@ public class TutorialToNonnoTest
 
         try
         {
+            PlayerPrefs.SetInt(UltimoMiglio.Gameplay.TutorialManager.PrefGraduale, 0); // #94: test non di onboarding → niente rivelazione graduale
             yield return SceneManager.LoadSceneAsync("Ch1_Deposito");
             Time.timeScale = 3f;
             while (!GameRoot.Ready || !GameRoot.I.Nina) yield return null;
@@ -131,6 +132,7 @@ public class TutorialToNonnoTest
         PlayerPrefs.DeleteAll(); UltimoMiglio.Gameplay.TutorialManager.TestSenzaComparse = true; /* #101: niente comparse graduali */
         var save = System.IO.Path.Combine(Application.persistentDataPath, "save_v1.json");
         if (System.IO.File.Exists(save)) System.IO.File.Delete(save);
+        PlayerPrefs.SetInt(UltimoMiglio.Gameplay.TutorialManager.PrefGraduale, 0); // #94: test non di onboarding → niente rivelazione graduale
         yield return SceneManager.LoadSceneAsync("Ch1_Deposito");
         Time.timeScale = 3f;
         try

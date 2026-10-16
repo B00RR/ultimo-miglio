@@ -24,6 +24,7 @@ namespace UltimoMiglio.Core
         public int AdDoublesToday; public long AdDayIndex;
         public int CustomersServed, CustomersLost;
         public bool ChapterComplete;
+        public int ParcelMilestonesHit, DebtMilestonesHit, Reputation; public bool CassaTipGiven; // #103 rewards (save)
         public double Bulloni; public int ProrogaTokens = -1; public double DueActiveSec = -1; public bool Mora; public int Day = 1;
     }
 
@@ -37,6 +38,8 @@ namespace UltimoMiglio.Core
         public event Action<bool> OnMoraChanged;
         public event Action<int> DayChanged;          // calendar day 1..YearDays
         public event Action<double> BulloniChanged;    // new total
+        /// <summary>#103: ricompensa intermedia (kind = "parcel" | "debt" | "cassa_tip", index soglia, LN accreditati). Hook per coriandoli/timbro/decor/riga di Mamma Rosa.</summary>
+        public event Action<string, int, double> RewardGranted;
 
         public EconomyCore(EconomyConfig cfg, EconomyState state = null) { Cfg = cfg ?? throw new ArgumentNullException(nameof(cfg)); S = state ?? new EconomyState();
             if (S.ProrogaTokens < 0) S.ProrogaTokens = Math.Min(Cfg.ProrogaTokensAtActStart, Cfg.ProrogaTokensMax); // cap 1 = start of Act I
@@ -90,6 +93,7 @@ namespace UltimoMiglio.Core
             S.Combo = Math.Min(Cfg.ComboMax, S.Combo + Cfg.ComboStep);
             S.LastServeTime = t; S.CustomersServed++;
             Emit("serve", $"\"ln\":{F(ln)},\"combo\":{F(S.Combo)}");
+            CheckParcelMilestones();
             return ln;
         }
         public void CustomerLost() { S.CustomersLost++; Emit("customer_lost", ""); }
@@ -106,6 +110,7 @@ namespace UltimoMiglio.Core
             S.Wallet += ln * Cfg.PlayerSpendShare;
             double toDebt = ln * (1 - Cfg.PlayerSpendShare);
             S.DebtPaid += toDebt;
+            CheckDebtMilestones();
             if (!S.ChapterComplete && S.DebtPaid >= TrancheDue)
             {
                 S.ChapterComplete = true; Emit("vault_deposit", $"\"tranche\":{F(TrancheDue)}");
@@ -113,6 +118,59 @@ namespace UltimoMiglio.Core
                 SetMora(false);
                 Emit("chapter_complete", $"\"chapter\":{Cfg.Chapter},\"active_min\":{F(S.ActiveSec / 60)}");
             }
+        }
+
+        // ---------- Ricompense intermedie (#103, economy.json → rewards) ----------
+        /// <summary>Pacchi consegnati = clienti serviti (1 pacco per cliente). Bonus LN diretto nel portafoglio (non diviso col debito).</summary>
+        void CheckParcelMilestones()
+        {
+            while (S.ParcelMilestonesHit < Cfg.ParcelMilestones.Length && S.CustomersServed >= Cfg.ParcelMilestones[S.ParcelMilestonesHit])
+            {
+                int i = S.ParcelMilestonesHit++; double b = i < Cfg.ParcelMilestoneBonusLn.Length ? Cfg.ParcelMilestoneBonusLn[i] : 0;
+                S.Wallet += b;
+                Emit("reward", $"\"kind\":\"parcel\",\"parcels\":{Cfg.ParcelMilestones[i]},\"ln\":{F(b)}");
+                RewardGranted?.Invoke("parcel", i, b);
+            }
+        }
+        public double DebtShare => TrancheDue <= 0 ? 0 : S.DebtPaid / TrancheDue;
+        /// <summary>25% timbro (solo visivo, hook), 50% +1 reputazione, 75% decor (hook con itemId in Cfg).</summary>
+        void CheckDebtMilestones()
+        {
+            while (S.DebtMilestonesHit < Cfg.DebtMilestoneShares.Length && DebtShare + 1e-9 >= Cfg.DebtMilestoneShares[S.DebtMilestonesHit])
+            {
+                int i = S.DebtMilestonesHit++;
+                string r = i < Cfg.DebtMilestoneRewards.Length ? Cfg.DebtMilestoneRewards[i] : "";
+                if (r == "reputation") S.Reputation += i < Cfg.DebtMilestoneAmounts.Length ? Math.Max(1, Cfg.DebtMilestoneAmounts[i]) : 1;
+                Emit("reward", $"\"kind\":\"debt\",\"share\":{F(Cfg.DebtMilestoneShares[i])},\"reward\":\"{r}\"");
+                RewardGranted?.Invoke("debt", i, 0);
+            }
+        }
+        /// <summary>Mancia della Cassa alla prima visita (una volta per partita). Ritorna i LN dati.</summary>
+        public double CassaFirstVisitTip()
+        {
+            if (S.CassaTipGiven || Cfg.CassaFirstVisitTipLn <= 0) return 0;
+            S.CassaTipGiven = true; S.Wallet += Cfg.CassaFirstVisitTipLn;
+            Emit("reward", $"\"kind\":\"cassa_tip\",\"ln\":{F(Cfg.CassaFirstVisitTipLn)}");
+            RewardGranted?.Invoke("cassa_tip", 0, Cfg.CassaFirstVisitTipLn);
+            return Cfg.CassaFirstVisitTipLn;
+        }
+        static readonly System.Collections.Generic.Dictionary<string, UpgradeKind> PadIds = new System.Collections.Generic.Dictionary<string, UpgradeKind>
+        { { "zaino", UpgradeKind.Zaino }, { "scarpe", UpgradeKind.Scarpe }, { "insegna", UpgradeKind.Insegna }, { "nonno", UpgradeKind.NonnoLevel } };
+        /// <summary>Livello che il prossimo acquisto del pad porterebbe ("scarpe:2" = Scarpe livello 2; "nonno:2" = NONNO livello 2).</summary>
+        public int NextLevel(UpgradeKind k) { switch (k) { case UpgradeKind.Zaino: return S.Zaino + 1; case UpgradeKind.Scarpe: return S.Scarpe + 1; case UpgradeKind.Insegna: return S.Insegna + 1; case UpgradeKind.NonnoHire: return 0; default: return S.NonnoLevel + 1; } }
+        /// <summary>#103 nextPadArrow: dal fromSec di gioco attivo, il candidato più economico ancora da comprare e coperto dal portafoglio; null se nessuno.</summary>
+        public UpgradeKind? NextPadArrowTarget()
+        {
+            if (Cfg.NextPadArrowFromSec <= 0 || S.ActiveSec < Cfg.NextPadArrowFromSec) return null;
+            UpgradeKind? best = null; double bestCost = double.PositiveInfinity;
+            foreach (var c in Cfg.NextPadArrowCandidates)
+            {
+                var parts = (c ?? "").Split(':'); if (parts.Length != 2 || !PadIds.TryGetValue(parts[0].Trim().ToLowerInvariant(), out var k)) continue;
+                if (!int.TryParse(parts[1], out int lvl) || NextLevel(k) != lvl) continue;
+                double cost = Cost(k); if (double.IsInfinity(cost) || cost - S.PadPaid[(int)k] > S.Wallet + 1e-9) continue;
+                if (cost < bestCost) { bestCost = cost; best = k; }
+            }
+            return best;
         }
 
         // ---------- Upgrades / pads (installments) ----------

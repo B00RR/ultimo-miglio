@@ -6,7 +6,7 @@
 .reveal--hidden { opacity: 0; scale: 0.6 0.6; }
 .reveal--in { transform-origin: center; }
 
-/* --- 2. Barra LN sui pad: freccia ▼ (#78) → barra "32/50" → pillola prezzo, stesso asse verticale --- */
+/* --- 2. Barra LN sui pad: freccia ▼ (#78) → barra "32/40" → pillola prezzo, stesso asse verticale --- */
 .poi-bar { display: none; flex-direction: row; align-items: center; height: 18px; margin-bottom: 4px; padding: 0 6px 0 3px;
     border-radius: 9px; border-width: 2px; border-color: #3B2A20; background-color: #F3E3C3; }
 .poi-bar--on { display: flex; }
@@ -42,6 +42,6 @@
 .hud--skip #safe-root .top-left { max-width: 104px; }
 .hud--skip #safe-root .tutorial-objective { left: 112px; right: 134px; }
 
-/* --- Combo (decisione DevOn): niente contatore HUD; "+N" / "x1,2" sopra Nina (2,3 m), sale 40 dp, sparisce in 1,5 s --- */
+/* --- Combo (decisione DevOn): niente contatore HUD; solo "+N" (clienti di fila) sopra Nina, mai il moltiplicatore (2,3 m), sale 40 dp, sparisce in 1,5 s --- */
 .combo-popup { position: absolute; translate: -50% -100%; font-size: 16px; color: #F4C430; -unity-text-outline-width: 2px; -unity-text-outline-color: #3B2A20;
     -unity-font-definition: url("project://database/Assets/_Game/UI/Fonts/Fredoka-Bold.ttf"); margin: 0; padding: 0; white-space: nowrap; }

@@ -16,7 +16,7 @@ namespace UltimoMiglio.Gameplay
         public static void Request(Vector3 worldPos, float seconds = DefaultSec)
         {
             _pos = worldPos; _start = Time.unscaledTime; _dur = Mathf.Clamp(seconds, 0.8f, 3f); float ramp = Mathf.Min(RampSec, _dur * 0.3f); _ramp = ramp;
-            Debug.Log($"[Onb] cameraPeek {worldPos} {_dur:0.00}s");
+            UltimoMiglio.UI.OnbLog.Write($"cameraPeek {worldPos} {_dur:0.00}s");
         }
 
         /// <summary>Input del giocatore: accorcia la tenuta (ritorno in RampSec), non blocca mai il movimento.</summary>

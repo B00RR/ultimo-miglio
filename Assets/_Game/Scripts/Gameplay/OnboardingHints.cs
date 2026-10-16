@@ -32,7 +32,7 @@ namespace UltimoMiglio.Gameplay
 
         void Clear()
         {
-            if (_level > 0) Debug.Log("[Onb] hint reset");
+            if (_level > 0) OnbLog.Write("hint reset");
             _level = 0;
             if (_ip) { _ip.HintPulse = false; _ip = null; }
             if (_edge) _edge.Clear();
@@ -82,7 +82,7 @@ namespace UltimoMiglio.Gameplay
             if (_handOn) AnimateHand(target, np);
         }
 
-        void Log(string what = null) => Debug.Log($"[Onb] hint step={_tut.Current} level={_level}{(what != null ? " " + what : "")} idle={_idle:0.0}s");
+        void Log(string what = null) => OnbLog.Write($"hint step={_tut.Current} level={_level}{(what != null ? " " + what : "")} idle={_idle:0.0}s");
 
         static bool OnScreen(Vector3 w)
         {

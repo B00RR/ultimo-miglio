@@ -42,6 +42,8 @@ namespace UltimoMiglio.Gameplay
             OpenQaLog();
             Qa.Log("session_start", null);
             Eco.ApplyOffline(DateTimeOffset.UtcNow.ToUnixTimeSeconds());
+            Eco.RewardGranted += (k, i, ln) => Debug.Log($"[REWARD] kind={k} i={i} ln={ln:0.#}");
+            if (!GetComponent<NextPadArrow>()) gameObject.AddComponent<NextPadArrow>();
         }
 
         void OpenQaLog()

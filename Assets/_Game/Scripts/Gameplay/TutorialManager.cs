@@ -80,9 +80,11 @@ namespace UltimoMiglio.Gameplay
             RegisterWorldReveals();
             // Graduale solo per una partita NUOVA (nessun passo salvato) o iniziata già in graduale; salvataggi precedenti = tutto visibile
             bool nuova = !PlayerPrefs.HasKey(PrefKey);
-            // #101: nelle nuove partite RivelaGraduale è sempre acceso (anche se la scena serializzava false); i salvataggi esistenti restano come sono
-            if (nuova) { RivelaGraduale = true; PlayerPrefs.SetInt(PrefGraduale, 1); PlayerPrefs.Save(); }
-            bool graduale = Current < Step.Fine && (nuova ? RivelaGraduale : PlayerPrefs.GetInt(PrefGraduale, 0) == 1);
+            // #101: nelle nuove partite il graduale è sempre acceso (anche se la scena serializzava false); i salvataggi esistenti restano come sono.
+            // #94 (main): um_onb_graduale = 0 impostato da test/QA → tutto visibile subito.
+            bool escluso = PlayerPrefs.HasKey(PrefGraduale) && PlayerPrefs.GetInt(PrefGraduale) == 0;
+            if (nuova && !escluso) { RivelaGraduale = true; PlayerPrefs.SetInt(PrefGraduale, 1); PlayerPrefs.Save(); }
+            bool graduale = !escluso && Current < Step.Fine && (nuova ? RivelaGraduale : PlayerPrefs.GetInt(PrefGraduale, 0) == 1);
             if (TestSenzaComparse) graduale = false;
             if (graduale) UltimoMiglio.UI.HudReveal.HideAll(LockedAtStart);
             for (var k = Step.ColdOpen; k < Current; k++) RevealFor(k); // ripresa da PlayerPrefs: ciò che è già stato rivelato resta visibile
@@ -243,14 +245,15 @@ namespace UltimoMiglio.Gameplay
             UltimoMiglio.UI.HudReveal.Register("hud.pillolaValute", _hud.Root.Q("currency-pill"));
         }
 
-        /// <summary>Da chiamare quando il moltiplicatore combo supera la soglia del passo combo (onboarding.json: comboReached ≥ 1,2).</summary>
-        public void NotifyCombo() => NotifyCombo(0f);
+        /// <summary>Soglia del gate combo (onboarding.json: comboReached ≥ 1,2). Il moltiplicatore è interno: non si mostra mai.</summary>
+        public const float ComboGate = 1.2f;
 
-        /// <summary>Combo raggiunta (moltiplicatore, es. 1.2): popup "x1,2" sopra Nina (1,5 s) e, la prima volta, gate comboReached → "Salta tutorial".</summary>
-        public void NotifyCombo(float multiplier)
+        /// <summary>Cliente servito in combo (Game Designer, #106): a schermo solo "+N" sopra Nina (N = clienti serviti di fila, 1,5 s).
+        /// Il moltiplicatore serve solo per la soglia del passo combo (≥ 1,2 → gate comboReached → "Salta tutorial").</summary>
+        public void NotifyCombo(int clientiDiFila, float moltiplicatore)
         {
-            ComboPopup.Show(multiplier > 0f ? "x" + multiplier.ToString("0.0", System.Globalization.CultureInfo.GetCultureInfo("it-IT")) : "Combo!");
-            if (!_comboSeen) { _comboSeen = true; Debug.Log($"[Onb] comboReached x{multiplier:0.0}"); }
+            if (clientiDiFila >= 2) ComboPopup.Show(clientiDiFila); // il primo cliente non è ancora una combo
+            if (!_comboSeen && moltiplicatore >= ComboGate - 1e-4f) { _comboSeen = true; UltimoMiglio.UI.OnbLog.Write("gate comboReached"); }
         }
 
         void EnsureSkip()
@@ -297,6 +300,8 @@ namespace UltimoMiglio.Gameplay
             var t = Target();
             // #94: con gli aiuti progressivi la freccia a bordo schermo arriva solo dopo 20 s di inattività (OnboardingHints)
             if (_edge) { if (t && !OnboardingHints.Active) _edge.SetTarget(t, s.ToString().ToUpper()); else _edge.Clear(); }
+            // #4 (VFX): anello pulsante a terra sul bersaglio + freccia a terra davanti a Nina (niente waypoint fluttuante, QA #44)
+            if (t) UltimoMiglio.VFX.UM_TutorialMarker.Show(t, GameRoot.I && GameRoot.I.Nina ? GameRoot.I.Nina.transform : null); else UltimoMiglio.VFX.UM_TutorialMarker.Hide();
             if (_marker) _marker.gameObject.SetActive(false); // QA v2: no world waypoint if edge arrow exists
         }
 

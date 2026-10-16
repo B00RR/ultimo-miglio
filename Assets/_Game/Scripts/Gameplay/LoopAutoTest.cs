@@ -27,6 +27,9 @@ namespace UltimoMiglio.Gameplay
 #endif
         void Log(string m) => Debug.Log($"[LoopTest] t={Time.time:0.0} {m} | stack={N?.Stack.Count} wallet={E?.S.Wallet:0.##} served={E?.S.CustomersServed} zaino={E?.S.Zaino} padPaid={E?.S.PadPaid[(int)UpgradeKind.Zaino]:0.##} cost={E?.Cost(UpgradeKind.Zaino):0.##}");
 
+        // #94: l'autotest del ciclo non riguarda l'onboarding graduale: tutto visibile (AfterSceneLoad → prima di TutorialManager.Start)
+        void Awake() { PlayerPrefs.SetInt(TutorialManager.PrefGraduale, 0); }
+
         IEnumerator Start()
         {
             Result = null;
