@@ -112,7 +112,7 @@ namespace UltimoMiglio.EditorTools
             }
             var anchor = new GameObject("StackAnchor").transform; anchor.SetParent(nina.transform, false); anchor.localPosition = new Vector3(0, 0.9f, 0.38f);
             var shadowPf = AssetDatabase.LoadAssetAtPath<GameObject>("Assets/_Game/VFX/Prefabs/fx_contact_shadow.prefab");
-            if (shadowPf) { var sh = (GameObject)PrefabUtility.InstantiatePrefab(shadowPf); sh.transform.SetParent(nina.transform, false); sh.transform.localPosition = new Vector3(0, 0.02f, 0); }
+            OmbraPiedi(nina.transform); // #171: ombra morbida sotto i piedi di Kaia (sostituisce il blob generico fx_contact_shadow su di lei)
             var stack = nina.AddComponent<PackageStack>(); stack.Anchor = anchor; stack.ParcelPrefab = parcel;
             var ctrl = nina.AddComponent<NinaController>(); ctrl.Stack = stack; ctrl.Animator = ninaAnim; root.Nina = ctrl;
             // HUD (UI/UX, UI Toolkit): HUD.prefab owns the FloatingJoystick (overlay exclusion + graphics)
@@ -212,7 +212,7 @@ namespace UltimoMiglio.EditorTools
             {
                 Texture2D I(string n) => AssetDatabase.LoadAssetAtPath<Texture2D>($"Assets/_Game/UI/Icons/{n}.png");
                 var font = AssetDatabase.LoadAssetAtPath<Font>("Assets/_Game/UI/Fonts/Fredoka-Bold.ttf");
-                var ringPf = AssetDatabase.LoadAssetAtPath<GameObject>("Assets/_Game/VFX/Prefabs/fx_pad_fill_ring.prefab");
+                var ringPf = AssetDatabase.LoadAssetAtPath<GameObject>("Assets/_Game/VFX/Prefabs/fx_pad_fill_ring.prefab"); FillRingRadius = FillRingNativeRadius(ringPf);
                 var ringModel = AssetDatabase.LoadAssetAtPath<GameObject>(ZoneRingPath);
                 var atlasMat = AssetDatabase.LoadAssetAtPath<Material>("Assets/_Game/VFX/Materials/M_Diorama_Atlas.mat");
                 foreach (var z in Object.FindObjectsByType<ProximityZone>(FindObjectsSortMode.None))
@@ -319,10 +319,40 @@ namespace UltimoMiglio.EditorTools
         {
             var pad = Zone<UpgradePad>(name, pos, new Vector3(1.4f, 1, 1.4f), UM_Palette.Crema, m); pad.Kind = k; pad.UnlockAtActiveSec = unlock; pad.Priority = 1;
         }
+        /// <summary>#171: ombra a disco low-poly (16 lati) sotto i piedi di Kaia. Mesh salvata come asset, materiale condiviso
+        /// M_FX_ContactShadow (ScuroCaldo α 0,45, texture blob morbida): niente istanze a runtime, nessuna allocazione per frame.
+        /// Raggio 0,42 m: il nucleo scuro della texture cade sul raggio del CharacterController (0,3), così si legge dove sono i piedi.</summary>
+        public const float OmbraPiediRadius = 0.42f;
+        const string OmbraPiediMeshPath = "Assets/_Game/Art/FX/Mesh_OmbraPiedi_Kaia.asset";
+        static void OmbraPiedi(Transform nina)
+        {
+            var mesh = AssetDatabase.LoadAssetAtPath<Mesh>(OmbraPiediMeshPath);
+            if (!mesh)
+            {
+                const int n = 16; var v = new Vector3[n + 1]; var uv = new Vector2[n + 1]; var t = new int[n * 3];
+                v[0] = Vector3.zero; uv[0] = new Vector2(0.5f, 0.5f);
+                for (int i = 0; i < n; i++) { float a = i * Mathf.PI * 2 / n; var d = new Vector2(Mathf.Cos(a), Mathf.Sin(a)); v[i + 1] = new Vector3(d.x, 0, d.y) * OmbraPiediRadius; uv[i + 1] = new Vector2(0.5f, 0.5f) + d * 0.5f; t[i * 3] = 0; t[i * 3 + 1] = (i + 1) % n + 1; t[i * 3 + 2] = i + 1; }
+                mesh = new Mesh { name = "Mesh_OmbraPiedi_Kaia", vertices = v, uv = uv, triangles = t }; mesh.RecalculateNormals(); mesh.RecalculateBounds();
+                AssetDatabase.CreateAsset(mesh, OmbraPiediMeshPath); AssetDatabase.SaveAssets();
+            }
+            var go = new GameObject("OmbraPiedi"); go.transform.SetParent(nina, false); go.transform.localPosition = new Vector3(0, 0.015f, 0);
+            go.AddComponent<MeshFilter>().sharedMesh = mesh;
+            var mr = go.AddComponent<MeshRenderer>(); mr.sharedMaterial = AssetDatabase.LoadAssetAtPath<Material>("Assets/_Game/VFX/Materials/M_FX_ContactShadow.mat");
+            mr.shadowCastingMode = UnityEngine.Rendering.ShadowCastingMode.Off; mr.receiveShadows = false; mr.lightProbeUsage = UnityEngine.Rendering.LightProbeUsage.Off; mr.reflectionProbeUsage = UnityEngine.Rendering.ReflectionProbeUsage.Off;
+        }
         /// <summary>Raggio del CharacterController di Kaia (Nina), usato anche per i trigger dei pad.</summary>
         public const float NinaRadius = 0.3f;
-        /// <summary>Raggio nativo (m, a scala 1) dell'anello fx_pad_fill_ring.</summary>
-        const float FillRingRadius = 0.95f;
+        /// <summary>#171: raggio nativo (m, a scala 1) del BORDO ESTERNO della banda visibile di fx_pad_fill_ring.
+        /// Il quad del prefab è Ø 2,2 m (UM_FxFactory.BuildPadFillRing, metà = 1,1: da qui il «×1,1» che si vedeva nei bounds)
+        /// e lo shader disegna la banda a _Radius ± _Thickness/2 in UV: raggio = (_Radius + _Thickness/2) × lato del quad.
+        /// Prima era la costante 0,95, a occhio; ora si legge dal prefab, così fx = anello = disco.</summary>
+        static float FillRingRadius = 0.95f;
+        public static float FillRingNativeRadius(GameObject ringPf)
+        {
+            var r = ringPf ? ringPf.GetComponentInChildren<MeshRenderer>(true) : null; if (!r || !r.sharedMaterial) return 0.95f;
+            var m = r.sharedMaterial; float rad = m.HasProperty("_Radius") ? m.GetFloat("_Radius") : 0.4f, th = m.HasProperty("_Thickness") ? m.GetFloat("_Thickness") : 0.07f;
+            return (rad + th * 0.5f) * r.transform.localScale.x;
+        }
         /// <summary>#171 + #187 («anello = trigger»): il BoxCollider quadrato del pad rispondeva anche fuori dal cerchio sulle diagonali.
         /// Ora è un cilindro centrato sul cerchio con raggio = raggio del cerchio - raggio di Kaia: il pad si attiva quando il centro di Kaia entra nel cerchio.</summary>
         static void PadTriggerTondo(UpgradePad up, float raggioCerchio)
