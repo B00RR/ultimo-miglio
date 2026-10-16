@@ -27,6 +27,7 @@ _D=os.path.join(HERE,'..','data','ch1'); _UP=json.load(open(os.path.join(_D,'upg
 ZCOST={L['level']:L['costLn'] for L in _UP['zaino']['levels']}
 MIL=[(x['parcels'],x['bonusLn']) for x in _RW.get('parcelMilestones',[])]; CASSA_TIP=_RW.get('cassaFirstVisitTipLn',0)
 REP50=any(x['reward']=='reputation' for x in _RW.get('debtMilestones',[]))
+PADS_REVEAL=170   # passo 'padNuovi' di onboarding.json
 FIRST_INCOME=70; DEPOSIT_EVERY=60; DEPOSIT_START=240
 
 def play(eff, log=True):
@@ -47,8 +48,9 @@ def play(eff, log=True):
             wallet+=inc*sp; debt_share+=inc*(1-sp)
         if not nonno and t>=m.NONNO_T*60 and wallet>=m.NONNO_COST:
             wallet-=m.NONNO_COST; nonno=True; buys.append(dict(t=t,pad="hireNonno",label="ASSUMI NONNO · 50 LN",costLn=50,level=1))
-        if nonno or t>=m.NONNO_T*60:   # dopo l'onboarding di NONNO la politica di acquisto e' libera (prima solo Zaino LV1 e' visibile)
-            vis=m.LINES
+        # onboarding graduale (16/10): Zaino 1 dal passo 6; altri livelli Zaino da NONNO; Scarpe/Insegna/NONNO LV dal passo 'pad nuovi' (PADS_REVEAL)
+        if t>=PADS_REVEAL: vis=m.LINES
+        elif nonno: vis={'zaino':m.LINES['zaino']}
         else: vis={'zaino':m.LINES['zaino']} if lv['zaino']==0 else {}
         while True:
             base,_=m.income_rate(c,lv,nonno,False,m.est_combo(c,lv,nonno)); best=None

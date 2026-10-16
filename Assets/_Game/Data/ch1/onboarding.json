@@ -1,276 +1,479 @@
 {
-  "source": "04_UI §4 + 01 v3.3 + playthrough_expected.json",
+  "source": "Game Designer 16/10/2026: onboarding graduale (richiesta Lorenzo via DevOn); testi in onboarding_testi.json (PR #62)",
   "chapter": 1,
-  "fallback": {
-    "idleSecBeforeHint": 5,
-    "hint": "manoFantasma+freccia",
-    "skipTutorialAvailableAfterStep": "combo"
+  "principle": "una meccanica per passo; il passo successivo si sblocca solo col gate (evento osservabile) del precedente",
+  "lockedAtStart": [
+    "hud.pillolaValute",
+    "hud.telefono",
+    "hud.barraDebito",
+    "hud.combo",
+    "zona.arrivi",
+    "zona.scaffaleTerracotta",
+    "zona.altriScaffali",
+    "zona.bancone",
+    "zona.cassa",
+    "zona.cassaforte",
+    "pad.zaino",
+    "pad.assumiNonno",
+    "pad.scarpe",
+    "pad.insegna",
+    "pad.nonnoUpgrade",
+    "pad.apriMuro",
+    "robot.nonno.attivo",
+    "clienti.normali",
+    "clienti.anziano",
+    "clienti.frettoloso",
+    "app.flotta",
+    "app.messaggi",
+    "app.ordini"
+  ],
+  "hintEscalationDefault": {
+    "10s": "ripete il suggerimento e fa pulsare il bersaglio",
+    "20s": "freccia a bordo schermo / mano fantasma",
+    "40s": "camera breve sul bersaglio (≤1,5 s, input attivo)"
+  },
+  "keyLegend": "step:<id> = biglietto di Nonna Ada in onboarding_testi.json steps[]; NEW: = chiave nuova da creare (Narrative)",
+  "skipTutorial": {
+    "availableAfterStep": "combo",
+    "effect": "sblocca tutto ciò che i passi saltati avrebbero rivelato"
   },
   "steps": [
     {
       "id": "coldOpen",
       "tSec": 0,
-      "durationSec": 15,
-      "trigger": "sceneStart",
-      "hud": "hidden",
+      "toleranceSec": 1,
+      "maxSec": 15,
+      "mechanic": "nessuna (scena)",
+      "reveals": [],
+      "gate": {
+        "event": "coldOpenEnd"
+      },
       "textKeys": [
         "onb.cold.letterAda",
         "onb.cold.letterOmni"
       ],
-      "camera": "discesaQuartiere",
-      "skippable": false
+      "hintEscalation": null,
+      "note": "non saltabile, HUD nascosto"
     },
     {
       "id": "move",
       "tSec": 15,
       "toleranceSec": 5,
-      "trigger": "coldOpenEnd",
-      "completeWhen": "walkedM>=1.5",
-      "textKeys": [
-        "onb.move.card"
+      "maxSec": 30,
+      "mechanic": "muoversi col joystick",
+      "reveals": [
+        "input.joystick"
       ],
-      "hint": "manoFantasmaJoystick"
+      "gate": {
+        "event": "playerMoved",
+        "value": 1.5,
+        "unit": "m"
+      },
+      "textKeys": [
+        "onb.move.card",
+        "step:move"
+      ],
+      "hintEscalation": {
+        "10s": "ripete onb.move.card, joystick fantasma pulsa",
+        "20s": "mano fantasma che trascina",
+        "40s": "mano fantasma in loop + vibrazione leggera"
+      }
     },
     {
       "id": "pickUp",
       "tSec": 30,
       "toleranceSec": 10,
-      "trigger": "moveDone",
-      "spawn": "furgoneScaricaArrivi:5",
-      "target": "arrivi",
-      "completeWhen": "stack==5",
+      "maxSec": 45,
+      "mechanic": "raccogliere pacchi (stare sulla zona)",
+      "reveals": [
+        "zona.arrivi"
+      ],
+      "gate": {
+        "event": "parcelPicked",
+        "value": 1
+      },
       "textKeys": [
+        "step:pickup",
         "onb.pick.max"
-      ]
+      ],
+      "hintEscalation": {
+        "10s": "cerchio Arrivi pulsa più forte",
+        "20s": "freccia a bordo schermo verso gli Arrivi",
+        "40s": "camera si sposta 1,5 s sugli Arrivi e torna"
+      },
+      "note": "la pila si riempie fino a 5 (MAX) restando sulla zona"
     },
     {
-      "id": "deposit",
+      "id": "shelve",
       "tSec": 50,
       "toleranceSec": 10,
-      "trigger": "stackFull",
-      "target": "shelfTerracotta",
-      "completeWhen": "shelfStock>=5",
+      "maxSec": 60,
+      "mechanic": "depositare sullo scaffale",
+      "reveals": [
+        "zona.scaffaleTerracotta"
+      ],
+      "gate": {
+        "event": "shelfDeposit",
+        "value": 1
+      },
       "textKeys": [
+        "step:shelve",
         "onb.deposit.hint"
-      ]
+      ],
+      "hintEscalation": {
+        "10s": "scaffale lampeggia",
+        "20s": "freccia verso lo scaffale",
+        "40s": "camera sullo scaffale + ripete onb.deposit.hint"
+      },
+      "revealWhen": "stack>=5 oppure Nina lascia gli Arrivi con ≥1 pacco"
     },
     {
-      "id": "firstCustomer",
+      "id": "serve",
       "tSec": 70,
       "toleranceSec": 15,
-      "trigger": "depositDone",
-      "spawn": "cliente:vipMammaRosa",
-      "target": "bancone",
-      "arrow": "edgeArrow",
-      "completeWhen": "customersServed>=1",
-      "textKeys": [
-        "onb.cust.first",
-        "onb.coins.walk"
+      "maxSec": 90,
+      "mechanic": "servire al Bancone (pacco dallo scaffale al cliente)",
+      "reveals": [
+        "zona.bancone",
+        "cliente.mammaRosa"
       ],
-      "showHud": [
-        "pillolaValute"
-      ]
+      "gate": {
+        "event": "customerServed",
+        "value": 1
+      },
+      "textKeys": [
+        "step:serve",
+        "onb.cust.first"
+      ],
+      "hintEscalation": {
+        "10s": "Mamma Rosa saluta (bark) e la stella pulsa",
+        "20s": "freccia sul Bancone; se Nina ha 0 pacchi la freccia va prima allo scaffale",
+        "40s": "camera sul Bancone + ripete onb.cust.first"
+      }
     },
     {
       "id": "coins",
       "tSec": 75,
       "toleranceSec": 15,
-      "trigger": "firstCustomerServed",
-      "target": "coinDrop",
-      "completeWhen": "coinsCollected>0"
+      "maxSec": 95,
+      "mechanic": "raccogliere monete",
+      "reveals": [
+        "hud.pillolaValute",
+        "monete"
+      ],
+      "gate": {
+        "event": "coinsCollected",
+        "value": 1
+      },
+      "textKeys": [
+        "step:coins",
+        "onb.coins.walk"
+      ],
+      "hintEscalation": {
+        "10s": "monete brillano",
+        "20s": "freccia sulle monete",
+        "40s": "le monete saltellano verso Nina (raggio +0,5 m)"
+      }
     },
     {
       "id": "zainoPad",
       "tSec": 83,
       "toleranceSec": 20,
-      "trigger": "walletLn>=40",
-      "target": "padZaino",
-      "label": "ZAINO LV 1 · 40 LN",
-      "optional": true,
-      "completeWhen": "zainoLevel>=1",
+      "maxSec": 120,
+      "mechanic": "comprare un pad (stare sopra finché si riempie)",
+      "reveals": [
+        "pad.zaino"
+      ],
+      "gate": {
+        "event": "padPurchased",
+        "pad": "zaino",
+        "level": 1
+      },
       "textKeys": [
+        "step:upgrade_zaino",
         "onb.zaino.hint"
       ],
-      "note": "Nessuna pausa: il pad si accende appena il portafoglio arriva a 40 LN; nel golden path viene comprato a 1:23"
+      "hintEscalation": {
+        "10s": "pad pulsa",
+        "20s": "freccia sul pad",
+        "40s": "camera sul pad + barra 'LN/40'"
+      },
+      "revealWhen": "walletLn>=40",
+      "insufficientLn": {
+        "rule": "il pad compare solo a 40 LN; prima si torna in loop serve/coins",
+        "textKeys": [
+          "NEW:onb.zaino.notEnough"
+        ]
+      },
+      "note": "il gate prova che il giocatore sa comprare: serve per NONNO"
     },
     {
       "id": "combo",
       "tSec": 100,
       "toleranceSec": 15,
-      "trigger": "t>=100",
-      "spawn": "cliente:normale x2 ravvicinati",
-      "completeWhen": "comboMultiplier>=1.2",
+      "maxSec": 125,
+      "mechanic": "combo: servire clienti di fila",
+      "reveals": [
+        "clienti.normali",
+        "hud.combo"
+      ],
+      "gate": {
+        "event": "comboReached",
+        "value": 1.2
+      },
       "textKeys": [
         "onb.combo"
       ],
-      "note": "Con passo +0,1 la combo mostra x1,1 → x1,2 (04_UI scrive x1,2 → x1,4: da allineare)"
+      "hintEscalation": {
+        "10s": "numero combo pulsa",
+        "20s": "freccia sul Bancone quando c'è coda",
+        "40s": "ripete onb.combo; dopo 40 s il gate si considera passato (combo non bloccante)"
+      },
+      "revealWhen": "zainoPad completato",
+      "softGateSec": 40,
+      "note": "anziano compare da 1:40"
     },
     {
       "id": "nonnoIntro",
       "tSec": 127,
       "toleranceSec": 5,
-      "trigger": "t>=127",
-      "target": "padHireNonno",
-      "camera": {
-        "focus": "padHireNonno+nonnoSleeping",
-        "durationSec": 2.5,
-        "inputLocked": false,
-        "returnToPlayer": true
+      "maxSec": 132,
+      "mechanic": "conoscere NONNO (solo guardare)",
+      "reveals": [
+        "robot.nonno.dorme"
+      ],
+      "gate": {
+        "event": "cameraDone"
       },
-      "arrow": "edgeArrowToPad",
-      "completeWhen": "cameraDone",
       "textKeys": [
         "onb.nonno.intro",
         "onb.nonno.what"
       ],
-      "note": "Camera su NONNO addormentato e sul pad; il joystick resta attivo. Il testo spiega cosa fa NONNO: porta i pacchi dagli Arrivi agli scaffali al posto tuo."
+      "hintEscalation": null,
+      "camera": {
+        "focus": "padHireNonno+nonnoSleeping",
+        "durationSec": 2.5,
+        "inputLocked": false
+      },
+      "revealWhen": "t>=127 e combo completato"
     },
     {
       "id": "hireNonno",
       "tSec": 130,
       "toleranceSec": 5,
-      "trigger": "t>=130",
-      "target": "padHireNonno",
-      "label": "ASSUMI NONNO · 50 LN",
-      "completeWhen": "nonnoHired",
+      "maxSec": 160,
+      "mechanic": "assumere un robot (pad da 50 LN)",
+      "reveals": [
+        "pad.assumiNonno"
+      ],
+      "gate": {
+        "event": "nonnoHired"
+      },
       "textKeys": [
-        "onb.nonno.cost"
+        "onb.nonno.cost",
+        "step:unlock_nonno"
       ],
-      "unlocks": [
-        "phoneApp:Flotta"
-      ],
-      "note": "Il pad mostra il riempimento in LN (es. 32/50). Golden path: 211 LN cumulati a 130 s, quindi pagabile subito.",
+      "hintEscalation": {
+        "10s": "onb.nonno.reminder + pad rimbalza",
+        "20s": "freccia + camera pulsa sul pad",
+        "40s": "camera 1,5 s sul pad + ripete onb.nonno.what"
+      },
       "padProgress": {
-        "showLnFill": true,
         "format": "{wallet}/50 LN",
         "holdSec": 1.5
       },
       "insufficientLn": {
         "textKeys": [
-          "onb.nonno.notEnough"
+          "onb.nonno.notEnough",
+          "onb.nonno.ready"
         ],
-        "arrow": "coinsOrBancone",
-        "rule": "se il portafoglio < 50 LN il pad mostra la barra e la freccia porta al Bancone; al raggiungimento di 50 LN la freccia torna sul pad con onb.nonno.ready"
-      },
-      "fallback": {
-        "idleSec": 20,
-        "textKeys": [
-          "onb.nonno.reminder"
-        ],
-        "actions": [
-          "cameraPulseOnPad",
-          "edgeArrow",
-          "padBounce"
-        ],
-        "repeatEverySec": 20
+        "arrow": "bancone"
       }
     },
     {
       "id": "nonnoConfirm",
       "tSec": 131,
       "toleranceSec": 5,
-      "trigger": "nonnoHired",
-      "target": "nonno",
-      "camera": {
-        "focus": "nonno",
-        "durationSec": 3.0,
-        "inputLocked": false,
-        "returnToPlayer": true
+      "maxSec": 150,
+      "mechanic": "vedere NONNO lavorare",
+      "reveals": [
+        "robot.nonno.attivo",
+        "app.flotta"
+      ],
+      "gate": {
+        "event": "nonnoFirstRestock"
       },
-      "completeWhen": "nonnoFirstRestock",
       "textKeys": [
         "onb.nonno.hired",
         "onb.nonno.working"
       ],
-      "note": "NONNO si sveglia, prende i pacchi agli Arrivi e li porta sullo scaffale; contatore '+1' sopra lo scaffale a ogni pacco. Badge 'NONNO: 6 pacchi/min' per 4 s.",
-      "recurringBark": {
-        "textKey": "onb.nonno.bark",
-        "startAfter": "nonnoConfirmDone",
-        "note": "solo bark ricorrente di NONNO, mai insieme a onb.nonno.hired"
-      }
+      "hintEscalation": null,
+      "camera": {
+        "focus": "nonno",
+        "durationSec": 3.0,
+        "inputLocked": false
+      },
+      "recurringBarkAfter": "onb.nonno.bark"
     },
     {
       "id": "phone",
       "tSec": 165,
       "toleranceSec": 10,
-      "trigger": "nonnoHired+35s",
-      "ui": "iconaTelefonoVibra",
-      "completeWhen": "messageRead",
+      "maxSec": 200,
+      "mechanic": "telefono: leggere un messaggio",
+      "reveals": [
+        "hud.telefono",
+        "app.messaggi"
+      ],
+      "gate": {
+        "event": "messageRead"
+      },
       "textKeys": [
         "onb.civetta.msg1",
         "onb.civetta.reply",
         "onb.civetta.msg2"
       ],
-      "unlocks": [
-        "phoneApp:Messaggi"
-      ]
+      "hintEscalation": {
+        "10s": "telefono vibra di nuovo",
+        "20s": "badge rosso + freccia sul telefono",
+        "40s": "mano fantasma che tocca il telefono"
+      },
+      "note": "frettoloso compare da 2:30"
+    },
+    {
+      "id": "padNuovi",
+      "tSec": 170,
+      "toleranceSec": 10,
+      "maxSec": 230,
+      "mechanic": "scegliere tra più pad (Scarpe, Insegna)",
+      "reveals": [
+        "pad.scarpe",
+        "pad.insegna",
+        "pad.zaino.livelliSuccessivi"
+      ],
+      "gate": {
+        "event": "padPurchasedAny",
+        "pads": [
+          "scarpe",
+          "insegna"
+        ]
+      },
+      "textKeys": [
+        "NEW:onb.pads.new"
+      ],
+      "hintEscalation": {
+        "10s": "i due pad pulsano",
+        "20s": "freccia sul più economico pagabile",
+        "40s": "camera sui due pad"
+      },
+      "note": "golden path: Insegna 1 a 2:55, Scarpe 1 a 3:05"
     },
     {
       "id": "ordersApp",
       "tSec": 210,
       "toleranceSec": 10,
-      "trigger": "t>=210",
-      "ui": "appOrdini",
-      "completeWhen": "mostraLaStradaTapped",
+      "maxSec": 240,
+      "mechanic": "app Ordini",
+      "reveals": [
+        "app.ordini"
+      ],
+      "gate": {
+        "event": "ordersTapShowRoute"
+      },
       "textKeys": [
         "onb.orders.special",
         "onb.flotta.hint"
       ],
-      "unlocks": [
-        "phoneApp:Ordini"
-      ]
+      "hintEscalation": {
+        "10s": "badge rosso fisso",
+        "20s": "freccia sul telefono",
+        "40s": "mano fantasma sull'app"
+      }
     },
     {
       "id": "cassaPass",
       "tSec": 235,
       "toleranceSec": 10,
-      "trigger": "enRouteCassaforte",
-      "target": "cassa",
-      "completeWhen": "passedOver",
-      "note": "0 LN in run continua; serve a mostrare la Cassa",
-      "rewardLn": 30,
-      "rewardNote": "mancia di Nonna Ada, solo al primo passaggio (16/10)"
+      "maxSec": 255,
+      "mechanic": "Cassa: incasso passandoci sopra",
+      "reveals": [
+        "zona.cassa"
+      ],
+      "gate": {
+        "event": "cassaPassed"
+      },
+      "textKeys": [
+        "NEW:onb.cassa.tip"
+      ],
+      "hintEscalation": {
+        "10s": "Cassa luccica",
+        "20s": "freccia sulla Cassa",
+        "40s": "camera sulla Cassa"
+      },
+      "rewardLn": 30
     },
     {
       "id": "debtCard",
       "tSec": 240,
       "toleranceSec": 10,
-      "trigger": "t>=240",
-      "call": "viktor",
-      "target": "cassaforte",
-      "completeWhen": "firstDeposit",
-      "card": {
-        "day": 3,
-        "yearDays": 365,
-        "tranche": 1,
-        "trancheLn": 8400,
-        "dueDay": 24
+      "maxSec": 280,
+      "mechanic": "debito: versare alla Cassaforte",
+      "reveals": [
+        "zona.cassaforte",
+        "hud.barraDebito"
+      ],
+      "gate": {
+        "event": "firstDebtDeposit"
       },
       "textKeys": [
         "onb.viktor.call1",
         "onb.viktor.call2",
         "onb.debt.pedaggioHint"
       ],
-      "note": "Primo versamento = 60% del portafoglio (~176 LN nel golden path)"
+      "hintEscalation": {
+        "10s": "Cassaforte pulsa",
+        "20s": "freccia sulla Cassaforte",
+        "40s": "camera sulla Cassaforte + ripete onb.viktor.call2"
+      },
+      "note": "primo versamento = 60% del portafoglio"
     },
     {
       "id": "wallPad",
       "tSec": 270,
       "toleranceSec": 10,
-      "trigger": "firstDeposit+30s",
-      "target": "padWallBancone",
-      "label": "APRI MURO · …",
-      "completeWhen": "shown",
+      "maxSec": 300,
+      "mechanic": "obiettivo successivo",
+      "reveals": [
+        "pad.apriMuro"
+      ],
+      "gate": {
+        "event": "goalSeen",
+        "value": 3,
+        "unit": "s in vista"
+      },
       "textKeys": [
         "onb.wall.goal"
       ],
-      "permission": "notificheAndroid13"
+      "hintEscalation": null,
+      "note": "permesso notifiche Android 13+"
     },
     {
       "id": "freePlay",
       "tSec": 300,
-      "trigger": "wallPadShown",
-      "note": "Fine onboarding. Bottega sbloccabile da 5:00. Nessun totem prima del cap 4."
+      "toleranceSec": 0,
+      "maxSec": null,
+      "mechanic": "gioco libero",
+      "reveals": [
+        "pad.nonnoUpgrade",
+        "tutto il resto del cap 1"
+      ],
+      "gate": {
+        "event": "none"
+      },
+      "textKeys": [
+        "fine"
+      ],
+      "hintEscalation": null
     }
   ]
 }
