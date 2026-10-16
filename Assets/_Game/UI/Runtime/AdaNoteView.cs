@@ -11,8 +11,8 @@ namespace UltimoMiglio.UI
     /// </summary>
     public sealed class AdaNoteView
     {
-        public const int MaxChars = 60;
-        public const float MinVisibleSec = 1.5f, FadeSec = 0.25f, MinBodyDp = 14f, MinTitleDp = 12f, MaxHeightDp = 36f;
+        public const int MaxChars = 70; // testi Narrative (PR #62): max 70 caratteri, mai ellissi
+        public const float MinVisibleSec = 1.5f, FadeSec = 0.25f, MinBodyDp = 14f, MinTitleDp = 12f, MaxHeightDp = 52f, TopDp = 54f;
 
         struct Item { public string text; public float seconds; public bool sticky; }
         readonly Queue<Item> queue = new Queue<Item>();
@@ -27,7 +27,7 @@ namespace UltimoMiglio.UI
             band = new VisualElement { name = "ada-band", pickingMode = PickingMode.Ignore }; band.AddToClassList("ada-band");
             note = new VisualElement { name = "ada-note", pickingMode = PickingMode.Ignore }; note.AddToClassList("ada-note");
             var face = new VisualElement { name = "ada-face", pickingMode = PickingMode.Ignore };
-            face.AddToClassList("ada-face"); face.AddToClassList("ada-face--portrait");
+            face.AddToClassList("ada-face"); face.AddToClassList("ada-face--portrait"); // ritratto tex_ada_portrait.png via USS
             var col = new VisualElement { pickingMode = PickingMode.Ignore }; col.AddToClassList("ada-col");
             who = new Label(speaker) { pickingMode = PickingMode.Ignore }; who.AddToClassList("ada-name");
             body = new Label { pickingMode = PickingMode.Ignore }; body.AddToClassList("ada-text");
@@ -65,9 +65,9 @@ namespace UltimoMiglio.UI
         void Present(Item it)
         {
             string t = it.text ?? "";
-            if (t.Length > MaxChars) { Debug.LogWarning($"[AdaNote] {t.Length} caratteri > {MaxChars}: tagliato. Accorciare il testo nei dati."); t = t.Substring(0, MaxChars - 1) + "…"; }
+            if (t.Length > MaxChars) Debug.LogWarning($"[AdaNote] {t.Length} caratteri > {MaxChars}: il fumetto va a capo, accorciare il testo nei dati.");
             current = it; hasCurrent = true; shownAt = Time.unscaledTime; hideAt = -1;
-            if (t.Length > 42) t = t.Substring(0, 41) + "…"; body.text = t;
+            body.text = t; // #UI: niente taglio a 42 caratteri: 2 righe compatte
             band.style.display = DisplayStyle.Flex;
             note.RemoveFromClassList("ada-note--out"); note.AddToClassList("ada-note--in");
             note.schedule.Execute(() => note.RemoveFromClassList("ada-note--in")).StartingIn(16); // USS transition: from in → rest
@@ -81,22 +81,17 @@ namespace UltimoMiglio.UI
 
         void Next() { if (queue.Count > 0) Present(queue.Dequeue()); }
 
-        /// <summary>(old) Banda: top = max(fondo safe area, fondo delle pillole valute) + 16 px; larghezza fra gli angoli HUD.
-        /// Font: corpo ≥ 16 dp, titolo ≥ 20 dp anche a scala minima (WebGL 960x600).</summary>
+        /// <summary>Fumetto compatto (issue tutorial-HUD): fascia alta sotto la riga LN/giorno/obiettivo.
+        /// top = safe area + 54 dp; altezza 36–52 dp (1 riga, al massimo 2 righe senza ellissi a 360 dp);
+        /// la fascia alta resta entro ~117 dp (350 px su 1170×2532). Stili in TutorialHud.uss.</summary>
         void Layout(float scale)
         {
             var safe = root.Q("safe-root");
             float safeTop = safe != null ? safe.resolvedStyle.paddingTop : 0f;
             band.style.position = Position.Absolute;
-            band.style.left = 8; band.style.right = 8; band.style.top = Mathf.Max(safeTop, 48f);
-            band.style.height = MaxHeightDp; band.style.maxHeight = MaxHeightDp; band.style.overflow = Overflow.Hidden;
-            note.style.maxHeight = MaxHeightDp; note.style.height = MaxHeightDp;
-            note.style.paddingTop = 2; note.style.paddingBottom = 2; note.style.paddingLeft = 10; note.style.paddingRight = 10;
-            note.style.flexDirection = FlexDirection.Row; note.style.alignItems = Align.Center;
-            body.style.fontSize = 14f; body.style.whiteSpace = WhiteSpace.NoWrap;
-            body.style.overflow = Overflow.Hidden; body.style.textOverflow = TextOverflow.Ellipsis;
+            band.style.left = 8; band.style.right = 8; band.style.top = safeTop + TopDp;
+            band.style.maxHeight = MaxHeightDp; band.style.overflow = Overflow.Hidden;
             if (who != null) who.style.display = DisplayStyle.None;
         }
-
     }
 }
