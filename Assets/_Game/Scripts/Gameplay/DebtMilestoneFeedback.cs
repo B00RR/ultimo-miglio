@@ -19,11 +19,10 @@ namespace UltimoMiglio.Gameplay
 
         void Start()
         {
+            // Lo aggiunge GameRoot.Awake, quindi qui GameRoot è già pronto; se i dati del capitolo non si caricano, resta spento.
             if (!GameRoot.Ready) { enabled = false; return; }
             _eco = GameRoot.I.Eco;
-            int mask = PlayerPrefs.GetInt(DebtMilestoneQueue.PrefKey, 0);
-            for (int i = 0; i < _eco.S.DebtMilestonesHit && i < DebtMilestoneQueue.Count; i++) mask |= 1 << i; // salvataggi precedenti: già raggiunte
-            _q = new DebtMilestoneQueue(mask);
+            _q = DebtMilestoneQueue.FromState(_eco.S);
             _hud = FindAnyObjectByType<UltimoMiglio.UI.HudController>();
             _tut = FindAnyObjectByType<TutorialManager>();
             _eco.RewardGranted += OnReward;
@@ -34,7 +33,7 @@ namespace UltimoMiglio.Gameplay
         void OnReward(string kind, int i, double ln)
         {
             if (kind != "debt" || !_q.Enqueue(i)) return;
-            PlayerPrefs.SetInt(DebtMilestoneQueue.PrefKey, _q.Mask); PlayerPrefs.Save();
+            _eco.S.debt_ms = _q.Mask; // salvato con um_save_v1 da GameRoot
         }
 
         void Update()

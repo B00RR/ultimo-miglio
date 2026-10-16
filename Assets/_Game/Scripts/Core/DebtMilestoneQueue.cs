@@ -1,11 +1,10 @@
 namespace UltimoMiglio.Core
 {
     /// <summary>#136/#203: coda delle tappe del debito (25/50/75%). Ogni tappa scatta una sola volta per salvataggio
-    /// (bitmask salvata nella chiave "debt_ms"); se un versamento ne supera più di una, escono in ordine a 1,0 s di distanza.
+    /// (bitmask nel campo <c>debt_ms</c> di EconomyState, quindi dentro il salvataggio um_save_v1); se un versamento ne supera più di una, escono in ordine a 1,0 s di distanza.
     /// Logica pura, senza allocazioni: la usa DebtMilestoneFeedback (Gameplay).</summary>
     public sealed class DebtMilestoneQueue
     {
-        public const string PrefKey = "debt_ms";
         public const int Count = 3;
         public const double SpacingSec = 1.0;
         public const float LineSec = 3f;
@@ -17,6 +16,14 @@ namespace UltimoMiglio.Core
         double _nextAt = double.NegativeInfinity;
 
         public DebtMilestoneQueue(int mask = 0) { Mask = mask & ((1 << Count) - 1); }
+
+        /// <summary>Coda dallo stato salvato: debt_ms più le tappe già contate da EconomyCore (salvataggi precedenti alla #136).</summary>
+        public static DebtMilestoneQueue FromState(EconomyState s)
+        {
+            int mask = s.debt_ms;
+            for (int i = 0; i < s.DebtMilestonesHit && i < Count; i++) mask |= 1 << i;
+            return new DebtMilestoneQueue(mask);
+        }
 
         public bool Reached(int i) => i >= 0 && i < Count && (Mask & (1 << i)) != 0;
         public bool HasPending => _len > 0;

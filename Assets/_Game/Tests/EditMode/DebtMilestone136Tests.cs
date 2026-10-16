@@ -40,7 +40,26 @@ public class DebtMilestone136Tests
     {
         var q = new DebtMilestoneQueue(0b011);
         Assert.IsFalse(q.Enqueue(0)); Assert.IsFalse(q.Enqueue(1)); Assert.IsTrue(q.Enqueue(2));
-        Assert.AreEqual(0b111, q.Mask); Assert.AreEqual("debt_ms", DebtMilestoneQueue.PrefKey);
+        Assert.AreEqual(0b111, q.Mask);
         CollectionAssert.AreEqual(new[] { "onb.debt.milestone1", "onb.debt.milestone2", "onb.debt.milestone3" }, DebtMilestoneQueue.LineKeys);
+    }
+
+    [Test] public void BitmaskNelSalvataggio_RipristinataDalloStato()
+    {
+        var s = new EconomyState { debt_ms = 0b001 };
+        var j = UnityEngine.JsonUtility.ToJson(s);
+        StringAssert.Contains("\"debt_ms\":1", j);
+        var q = DebtMilestoneQueue.FromState(UnityEngine.JsonUtility.FromJson<EconomyState>(j));
+        Assert.IsFalse(q.Enqueue(0), "dopo il riavvio la tappa 1 non ricompare");
+    }
+
+    [Test] public void DopoResetDelSalvataggio_LaTappa1ScattaDiNuovo()
+    {
+        var vecchio = new EconomyState { debt_ms = 0b111, DebtMilestonesHit = 3 };
+        Assert.IsFalse(DebtMilestoneQueue.FromState(vecchio).Enqueue(0));
+        var e = Ch1(); var q = DebtMilestoneQueue.FromState(e.S); // partita nuova: stato azzerato
+        var seen = new List<int>(); e.RewardGranted += (k, i, ln) => { if (k == "debt" && q.Enqueue(i)) seen.Add(i); };
+        e.CollectActive(e.TrancheDue / (1 - e.Cfg.PlayerSpendShare) * 0.26);
+        CollectionAssert.AreEqual(new[] { 0 }, seen);
     }
 }
