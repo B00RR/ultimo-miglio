@@ -1,7 +1,7 @@
 # STATO PROGETTO — Ultimo Miglio
 
 > Punto di ingresso unico per chiunque (persona o agente) lavori su questo repo. Aggiornalo **nella stessa PR** in cui completi qualcosa.
-> Ultimo aggiornamento: 2026-10-16 14:19 (Europe/Rome).
+> Ultimo aggiornamento: 2026-10-16 14:39 (Europe/Rome).
 
 ## 1. Il gioco
 - **Ultimo Miglio**: gioco mobile **Android**, **Unity 6 (6000.3) URP**.
@@ -38,6 +38,7 @@
 - Documentazione di design: bibbia, core loop, tech, UI, retention, sprint 1, gestionale, longevità, cap. 1 completo, protocollo Unity.
 
 ## 5. IN CORSO (oggi 16/10)
+- **UI #172 HUD direzione C, insegna di noce (PR #175, milestone Gioco completo, fuori dalla build del capitolo 1)**: insegna appesa, cartellino GIORNO, ordine che si ritrae a icona dopo 3 s, joystick e pad PRENDI in terracotta. Debito e telefono fuori dall'HUD. Font Baloo 2 (OFL). Via visivo già dato dal Concept Artist sul mockup C v2. Tavola `docs/qa/hud_insegna_c/confronto_390_icona.png`.
 - **main @ 7dd1767** — QA live **v5 VIA** (PR #55: #47 deposito + #48 luce/camera). Build QA su `build/WebGL` :8777; art night su `build/WebGL_next` :8778 (non toccare).
 - P2 aperti da QA v5: camera follow (Nina esce/coperta), pillola prezzo LN sotto riga obiettivo.
 - **Merge del ramo `animator`** (fix camminata): conflitto su `chr_nina_vela.fbx` e `bot_nonno.fbx`.
@@ -148,8 +149,12 @@ Ogni ruolo lavora solo sulle issue con la propria etichetta `ruolo:*`, sempre co
 
 Voci più recenti in alto. Formato: `AAAA-MM-GG HH:MM` (Europe/Rome) — [commit] — descrizione.
 
+- 2026-10-16 14:39 — UI/UX — [8b8d9bd](https://github.com/B00RR/ultimo-miglio/commit/8b8d9bd5ec48d34fb666857482f55bc8d5daa81b) — merge di main nel ramo `ui/172-hud-insegna-noce` (niente force-push). La #172 e la PR #175 stanno nella milestone Gioco completo, fuori dalla build del capitolo 1 (nessuna data fissa). Tavola `docs/qa/hud_insegna_c/confronto_390_icona.png`: cattura 390 a icona con i righelli 117/140 del mockup C v2. Il PNG allegato non è nel workspace.
+- 2026-10-16 14:23 — UI/UX — catture Unity 390×844 e 360×800 in `docs/qa/hud_insegna_c/` (CI verde, run 38897133634). Via visivo già dato dal Concept Artist sul mockup C v2. Responsabile: UI/UX Designer. Scadenza: milestone Gioco completo (nessuna data fissa).
 - 2026-10-16 14:19 — Regola fissa di Lorenzo: nessun agente gli scrive; tutto passa dal Producer a DevOn.
 - 2026-10-16 14:01 — Regole di consumo approvate da Lorenzo: coordinamento al Producer, pausa per chi ha finito, Sound, LiveOps e Concept in pausa fino al capitolo 2, CI esclusa per le PR di soli documenti.
+- 2026-10-16 13:56 — UI/UX — [fea37a1](https://github.com/B00RR/ultimo-miglio/commit/fea37a10208476a591e4d105de9060ae45976519) — cattura HUD: /root scrivibile così la licenza Unity resta nel container (il job precedente usciva 198). Main allineato dopo #162, senza force-push.
+- 2026-10-16 13:32 — UI/UX — [05c97af](https://github.com/B00RR/ultimo-miglio/commit/05c97afc8cc50a6a84284fce4316c22de8145855) — HUD direzione C (issue #172): insegna di noce appesa, cartellino GIORNO, ordine che si ritrae a icona dopo 3 s, pad PRENDI e joystick a 24 dp. Combo solo +N sopra Kaia. Font Baloo 2 (OFL). Non tocca il telefono di capitolo 1 né i nomi Bokobay.
 - 2026-10-16 13:28 — Regole di lavoro approvate da Lorenzo: etichette e milestone obbligatorie, niente segreti nel repo, PR piccole, test veloci prima della CI, responsabile e scadenza per ogni via, meno messaggi, pausa per chi non ha issue.
 - 2026-10-16 11:54 — Tech Lead — [c859f94](https://github.com/B00RR/ultimo-miglio/commit/c859f94ea08537f7a4d55aa3b9ba418f1202c3de) — PR #103 rewards: soglie pacchi 100/250/450, traguardi debito 25/50/75%, mancia Cassa 30 LN, freccia prossimo pad da 480 s; test EditMode EconomyRewardsTests.
 - 2026-10-16 12:12 — Code Reviewer — [4a1b26b](https://github.com/B00RR/ultimo-miglio/commit/4a1b26b6256d5f16153e713698f1ac4d3cfd5b72) — unita in squash la [PR #153](https://github.com/B00RR/ultimo-miglio/pull/153) (Audio: sfx combo +N e timbro del debito per la #137). Job `test` verde, asset OGG + README/licenze. Refs #136.
