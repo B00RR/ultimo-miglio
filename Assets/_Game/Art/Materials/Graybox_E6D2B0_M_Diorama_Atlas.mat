@@ -52,13 +52,13 @@ Material:
     - _WallAO: 0.3
     - _WallAOHeight: 0.5
     m_Colors:
-    - _BaseColor: {r: 0.9019608, g: 0.8235294, b: 0.6901961, a: 1}
+    - _BaseColor: {r: 0.9529, g: 0.8902, b: 0.7647, a: 1}
     - _EmissionColor: {r: 0, g: 0, b: 0, a: 1}
     - _FloorTint: {r: 1, g: 1, b: 1, a: 1}
     - _FloorTintB: {r: 1, g: 1, b: 1, a: 1}
     - _FloorTintC: {r: 1, g: 1, b: 1, a: 1}
     - _OutlineColor: {r: 0.231, g: 0.184, b: 0.165, a: 1}
     - _RimColor: {r: 1, g: 0.957, b: 0.839, a: 1}
-    - _ShadowTint: {r: 0.56078434, g: 0.47843137, b: 0.4627451, a: 1}
+    - _ShadowTint: {r: 0.6196, g: 0.4706, b: 0.451, a: 1}
   m_BuildTextureStacks: []
   m_AllowLocking: 1
