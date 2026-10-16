@@ -15,7 +15,7 @@ namespace UltimoMiglio.UI.World
             else if (ActiveCard == this) ActiveCard = null;
             base.ShowOnPad(on);
         }
-        [SerializeField] string title = "ASSUMI NONNO";
+        [SerializeField] string title = "ASSUMI OLDO";
         [SerializeField] string iconClass = "icon-robot";
         [SerializeField] ZoneFillRing padFill; // optional: pad fills with terracotta from below
 
@@ -36,7 +36,7 @@ namespace UltimoMiglio.UI.World
         void Refresh()
         {
             if (Element == null) return;
-            titleL.text = title;
+            titleL.text = UltimoMiglio.Core.DisplayNames.Apply(title); // #129
             if (icon != null) { icon.ClearClassList(); icon.AddToClassList("icon"); icon.AddToClassList(iconClass); }
             bool locked = lockedChapter > 0;
             Element.EnableInClassList("pad-card--locked", locked);

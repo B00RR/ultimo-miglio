@@ -20,7 +20,7 @@ namespace UltimoMiglio.Gameplay
         public static TutorialManager I { get; private set; }
         public static System.Action<Step> StepChanged;
 
-        public string Speaker = "Nonna Ada";
+        public string Speaker = "Oma Tilde";
         [TextArea] public string[] Texts = new string[StepCount]; [TextArea] public string EndText;
         public Transform Arrivi, Scaffale, Bancone, Monete, PadZaino, PadNonno;
         [Tooltip("Durate dei passi 'solo guardare' (coldOpen, nonnoIntro, wallPad), s")] public float ColdOpenSec = 15f, NonnoIntroSec = 2.5f, WallPadSec = 3f, NonnoConfirmMaxSec = 20f, ComboSoftGateSec = 40f;
@@ -68,7 +68,7 @@ namespace UltimoMiglio.Gameplay
         }
         Transform _marker, _markerArrow; VisualElement _banner; Label _bannerText, _objective;
         static readonly string[] Objectives = { "Benvenuta al Deposito", "Muoviti", "Vai agli Arrivi", "Metti sullo scaffale", "Porta al Bancone", "Raccogli le monete", "Compra lo Zaino",
-            "Servi di fila", "Ecco NONNO", "Assumi NONNO", "NONNO lavora", "Nuovi pad", "Passa dalla Cassa", "Versa il debito", "Prossimo obiettivo" };
+            "Servi di fila", "Ecco OLDO", "Assumi OLDO", "OLDO lavora", "Nuovi pad", "Passa dalla Cassa", "Versa il debito", "Prossimo obiettivo" };
         UltimoMiglio.UI.EdgeArrow _edge; UltimoMiglio.UI.HudController _hud;
 
         void Awake() { I = this; }
@@ -151,7 +151,7 @@ namespace UltimoMiglio.Gameplay
             fs.borderTopLeftRadius = fs.borderTopRightRadius = fs.borderBottomLeftRadius = fs.borderBottomRightRadius = 40; fs.color = Color.white;
             fs.unityTextAlign = TextAnchor.MiddleCenter; fs.fontSize = 24; fs.unityFontStyleAndWeight = FontStyle.Bold; fs.flexShrink = 0;
             var col = new VisualElement { pickingMode = PickingMode.Ignore }; col.style.flexShrink = 1;
-            var who = new Label(Speaker) { pickingMode = PickingMode.Ignore }; who.style.color = new Color(0.78f, 0.33f, 0.24f); who.style.fontSize = 16; who.style.unityFontStyleAndWeight = FontStyle.Bold;
+            var who = new Label(DisplayNames.Apply(Speaker)) { pickingMode = PickingMode.Ignore }; who.style.color = new Color(0.78f, 0.33f, 0.24f); who.style.fontSize = 16; who.style.unityFontStyleAndWeight = FontStyle.Bold;
             _bannerText = new Label { pickingMode = PickingMode.Ignore }; _bannerText.style.color = new Color(0.23f, 0.16f, 0.12f); _bannerText.style.fontSize = 22; _bannerText.style.whiteSpace = WhiteSpace.Normal;
             col.Add(who); col.Add(_bannerText); _banner.Add(face); _banner.Add(col);
             _hud.Root.Add(_banner);
@@ -336,7 +336,7 @@ namespace UltimoMiglio.Gameplay
             if (UseAdaNote && _hud && _adaShown != Current)
             {
                 _adaShown = Current; var at = CurrentText;
-                if (Current <= Step.Fine && !string.IsNullOrEmpty(at)) _hud.ShowAdaNote(at, sticky: Current < Step.Fine, seconds: EndSeconds);
+                if (Current <= Step.Fine && !string.IsNullOrEmpty(at)) _hud.ShowAdaNote(DisplayNames.Apply(at), sticky: Current < Step.Fine, seconds: EndSeconds);
                 else _hud.CompleteAdaNote();
             }
             EnsureUiReveals();
@@ -350,7 +350,7 @@ namespace UltimoMiglio.Gameplay
             EnsureHint();
             if (_hint != null) { var h = Current < Step.Fine ? CurrentHint() : null; var joy = _hud.Root.Q("joystick-base"); bool joyOver = joy != null && joy.resolvedStyle.display == DisplayStyle.Flex && joy.resolvedStyle.opacity > 0.05f && joy.worldBound.Overlaps(_hint.worldBound);
                 _hint.EnableInClassList("tut-hint--on", !string.IsNullOrEmpty(h) && !joyOver); // mai sotto il pollice/joystick flottante
-                if (_hintText != null && h != null) _hintText.text = h; }
+                if (_hintText != null && h != null) _hintText.text = DisplayNames.Apply(h); }
             // B4 P2: testi Ada nel fumetto HUD (non solo console)
             if (_banner != null)
             {
