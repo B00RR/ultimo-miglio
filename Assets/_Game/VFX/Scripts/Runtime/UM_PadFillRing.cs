@@ -7,7 +7,7 @@ namespace UltimoMiglio.VFX
     {
         public enum Kind { Purchase, Upgrade, Pickup, Delivery }
         public Renderer ring;
-        [Tooltip("Colore UI dell'anello (pulsazione + riempimento). Purchase = sole #F4C430, Upgrade = limone #F7E26B, Pickup = teal #5E7F86, Delivery = menta #8FC9A8")]
+        [Tooltip("Colore UI dell'anello (pulsazione + riempimento). Purchase = sole #F4C430, Upgrade = sole #F4C430 (#69), Pickup = terracotta #C8633B (#69), Delivery = menta #8FC9A8")]
         public Kind kind = Kind.Purchase;
         [Tooltip("Velocità con cui il riempimento visivo insegue il valore (1/s)")] public float followSpeed = 8f;
         public float pulseSpeed = 2.2f, flashTime = 0.45f;
@@ -26,7 +26,7 @@ namespace UltimoMiglio.VFX
         }
         /// Cambia il colore UI dell'anello (es. pad acquisto vs zona pacco/cliente).
         public void SetKind(Kind k) { kind = k; Push(); }
-        public static Color ColorOf(Kind k) => k == Kind.Pickup ? UM_Palette.UiPacco : k == Kind.Delivery ? UM_Palette.UiCliente : k == Kind.Upgrade ? UM_Palette.UiUpgrade : UM_Palette.UiSole;
+        public static Color ColorOf(Kind k) => k == Kind.Pickup ? UM_Palette.Terracotta /* #69: niente teal nelle zone */ : k == Kind.Delivery ? UM_Palette.UiCliente : k == Kind.Upgrade ? UM_Palette.UiSole /* #69: upgrade = sole come acquisto */ : UM_Palette.UiSole;
         public void ResetRing() { _target = _shown = 0; _completed = false; _flash = 0; Push(); }
         /// Per screenshot/test: applica subito senza inseguimento.
         public void SetImmediate(float p, float flash = 0) { _target = _shown = Mathf.Clamp01(p); _flash = flash; Push(); }
