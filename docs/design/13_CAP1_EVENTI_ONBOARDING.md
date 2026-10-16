@@ -18,7 +18,7 @@ Scopo: il QA legge dalla console del browser (build WebGL) ogni sblocco di passo
 | Tipo | Quando si emette | Campi extra | Esempio |
 |---|---|---|---|
 | `start` | il passo diventa attivo (reveal dei suoi elementi) | `reveals=<n elementi>` `ln=<LN in tasca>` | `[ONB] start id=hireNonno n=9 t=130.0 reveals=1 ln=211` |
-| `gate` | l'evento di completamento del passo avviene (§3) | `event=<nome gate>` `dur=<s dal start, 1 dec.>` `ln=<LN in tasca>` `spent=<LN spesi totali>` | `[ONB] gate id=hireNonno n=9 t=131.2 event=nonnoHired dur=1.2 ln=161 spent=90` |
+| `gate` | l'evento di completamento del passo avviene (§3) | `event=<nome gate>` `dur=<s dal start, 1 dec.>` `ln=<LN in tasca>` `spent=<LN spesi totali>` | `[ONB] gate id=hireNonno n=9 t=131.2 event=nonnoHired dur=1.2 ln=121 spent=90` |
 | `hint` | scatta un livello di aiuto per inattività sul passo | `lvl=1\|2\|3` (10/20/40 s) `idle=<s>` `kind=<tipo aiuto>` | `[ONB] hint id=move n=1 t=36.0 lvl=2 idle=20.0 kind=manoFantasma` |
 | `softgate` | solo `combo`: avanza dopo 40 s senza x1,2 | `idle=40.0` | `[ONB] softgate id=combo n=7 t=140.0 idle=40.0` |
 | `nolnp` | il giocatore è sul pad del passo ma non ha LN sufficienti | `pad=<id>` `need=<costo LN>` `have=<LN in tasca>` | `[ONB] nolnp id=hireNonno n=9 t=129.5 pad=assumiNonno need=50 have=32` |
