@@ -17,7 +17,13 @@ namespace UltimoMiglio.VFX
         /// Post-process: OFF di default su Web (in WebGL ha dato schermo magenta). Abilitarlo solo dopo verifica in build.
         public static bool AllowPostOnWeb = false;
         public static bool PostProcessingEnabled { get; private set; }
-        public const float ShadowDistAlto = 26f, ShadowDistWeb = 24f;
+        /// v2.1 (#48) anti-scalettatura: camera ortho a 20 m (DepotCameraFit.CameraDistance) invece di 40.
+        /// La shadow map copre [near, shadowDistance]: con 40 m metà texel finivano nel vuoto davanti alla scena.
+        /// Ora 20 + ~7 m di profondità visibile (pitch 50°, ortho 8) + margine = 30 m -> texel ~1,7 cm a 2048.
+        public const float CameraDistance = 20f;
+        public const float ShadowDistAlto = 30f, ShadowDistWeb = 30f;
+        public const int ShadowResAlto = 2048, ShadowResWeb = 2048;
+        public const float ShadowDepthBias = 0.6f, ShadowNormalBias = 0.7f;
         static bool OutlineTier(UMTier t) => t == UMTier.Alto || t == UMTier.Web;
 
         public static void Apply(UMTier tier, Material[] toonMaterials = null)
@@ -30,13 +36,20 @@ namespace UltimoMiglio.VFX
                 // Shadow distance is measured from the camera: = camera distance + play-area depth. Assumes CameraRigSetup.Distance = 15 (see README).
                 urp.shadowDistance = tier == UMTier.Alto ? ShadowDistAlto : tier == UMTier.Web ? ShadowDistWeb : 0f;  // none on Base/Standard (02_TECH)
                 urp.shadowCascadeCount = 1;
-                if (tier == UMTier.Alto) urp.mainLightShadowmapResolution = 2048;
-                if (tier == UMTier.Web) urp.mainLightShadowmapResolution = 1024;
+                if (tier == UMTier.Alto) urp.mainLightShadowmapResolution = ShadowResAlto;
+                if (tier == UMTier.Web) urp.mainLightShadowmapResolution = ShadowResWeb; // WebGL2 desktop: 2048 ok, 1 cascata
+                urp.shadowDepthBias = ShadowDepthBias; urp.shadowNormalBias = ShadowNormalBias;
                 urp.msaaSampleCount = (tier == UMTier.Alto || tier == UMTier.Web) ? 2 : 1;  // Web: MSAA 2x (niente FXAA: il post è spento)
                 urp.supportsHDR = false;
             }
             var sun = RenderSettings.sun;
-            if (sun != null) sun.shadows = (tier == UMTier.Alto || tier == UMTier.Web) ? LightShadows.Soft : LightShadows.None; // soft = URP Low quality (4-tap) set in UM_LightingSetup
+            if (sun != null)
+            {
+                sun.shadows = (tier == UMTier.Alto || tier == UMTier.Web) ? LightShadows.Soft : LightShadows.None;
+                // v2.1: PCF Medium (9 tap) su Alto/Web = bordo morbido senza scalini; Low altrove.
+                var ld = sun.GetUniversalAdditionalLightData();
+                if (ld) ld.softShadowQuality = (tier == UMTier.Alto || tier == UMTier.Web) ? SoftShadowQuality.Medium : SoftShadowQuality.Low;
+            }
 
             if (toonMaterials != null)
                 foreach (var m in toonMaterials)

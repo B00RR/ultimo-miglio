@@ -20,18 +20,19 @@ namespace UltimoMiglio.VFX.EditorTools
             rig.Apply();
             RenderSettings.skybox = null; // flat Cielo background via camera clear color
             foreach (var cam in Object.FindObjectsByType<Camera>(FindObjectsSortMode.None))
-            { cam.clearFlags = CameraClearFlags.SolidColor; cam.backgroundColor = UM_Palette.Cielo; }
+            { cam.clearFlags = CameraClearFlags.SolidColor; cam.backgroundColor = UM_Palette.CieloOriz; } // pesca caldo, mai azzurro
 
             var urp = GraphicsSettings.defaultRenderPipeline as UniversalRenderPipelineAsset;
             if (urp)
             {
                 // Mobile shadows (tier Alto default; UM_QualityTier zeroes distance on Base/Standard)
-                urp.shadowDistance = UM_QualityTier.ShadowDistAlto; // camera dist 15 + play depth
+                urp.shadowDistance = UM_QualityTier.ShadowDistWeb; // camera 20 m + profondità visibile (v2.1)
                 urp.shadowCascadeCount = 1;
-                urp.mainLightShadowmapResolution = 2048;
+                urp.mainLightShadowmapResolution = UM_QualityTier.ShadowResWeb;
+                urp.shadowDepthBias = UM_QualityTier.ShadowDepthBias; urp.shadowNormalBias = UM_QualityTier.ShadowNormalBias;
                 var so = new SerializedObject(urp);  // supportsSoftShadows setter is internal in URP 17
                 so.FindProperty("m_SoftShadowsSupported").boolValue = true;
-                so.FindProperty("m_SoftShadowQuality").intValue = 1; // Low = 4 taps, WebGL2/mobile safe
+                so.FindProperty("m_SoftShadowQuality").intValue = 2; // Medium = 9 tap (v2.1 anti-scalettatura), WebGL2 ok
                 so.ApplyModifiedPropertiesWithoutUndo();
                 urp.maxAdditionalLightsCount = 4;  // night lanterns; prefer baked
                 urp.supportsHDR = false;           // LDR keeps bandwidth low; bloom works in LDR

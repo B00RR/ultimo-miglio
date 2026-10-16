@@ -8,7 +8,7 @@ namespace UltimoMiglio.Gameplay
     /// Steps complete from game state (EconomyState / stack / shelves). Progress saved in PlayerPrefs "um_tut_step".</summary>
     public sealed class TutorialManager : MonoBehaviour
     {
-        public enum Step { Muoviti, Arrivi, Scaffali, Bancone, Monete, Zaino, Nonno, Fine, Chiuso }
+        public enum Step { Muoviti, Arrivi, Scaffali, Bancone, Monete, Nonno, Zaino, Fine, Chiuso }
         public const string PrefKey = "um_tut_step";
         public static TutorialManager I { get; private set; }
         public static System.Action<Step> StepChanged;
@@ -19,8 +19,10 @@ namespace UltimoMiglio.Gameplay
         public float EndSeconds = 6f;
 
         public Step Current { get; private set; }
+        public string CurrentObjectiveText => Current < Step.Fine && (int)Current < Objectives.Length ? Objectives[(int)Current] : (Current == Step.Fine ? "Deposito aperto!" : "");
         Vector3 _startPos; int _shelfBase, _servedBase; double _walletBase; float _endT;
-        Transform _marker, _markerArrow; VisualElement _banner; Label _bannerText;
+        Transform _marker, _markerArrow; VisualElement _banner; Label _bannerText, _objective;
+        static readonly string[] Objectives = { "Muoviti", "Vai agli Arrivi", "Metti sullo scaffale", "Porta al Bancone", "Raccogli le monete", "Assumi NONNO", "Compra lo Zaino" };
         UltimoMiglio.UI.EdgeArrow _edge; UltimoMiglio.UI.HudController _hud;
 
         void Awake() { I = this; }
@@ -42,7 +44,7 @@ namespace UltimoMiglio.Gameplay
             var ring = GameObject.CreatePrimitive(PrimitiveType.Cylinder); Destroy(ring.GetComponent<Collider>());
             ring.transform.SetParent(_marker, false); ring.transform.localScale = new Vector3(1.4f, 0.01f, 1.4f); ring.transform.localPosition = new Vector3(0, 0.04f, 0);
             ring.GetComponent<Renderer>().sharedMaterial = mat;
-            _markerArrow = new GameObject("Arrow").transform; _markerArrow.SetParent(_marker, false);
+            _markerArrow = new GameObject("Arrow").transform; _markerArrow.SetParent(_marker, false); _markerArrow.gameObject.SetActive(false); // QA #44: no floating mid-screen waypoint
             for (int s = -1; s <= 1; s += 2)
             {   // chevron pointing down made of two bars
                 var bar = GameObject.CreatePrimitive(PrimitiveType.Cube); Destroy(bar.GetComponent<Collider>());
@@ -52,25 +54,43 @@ namespace UltimoMiglio.Gameplay
             }
         }
 
+
+        void EnsureObjective()
+        {
+            if (_objective != null || !_hud || _hud.Root == null) return;
+            _objective = _hud.Root.Q<Label>("tutorial-objective");
+            if (_objective != null) return; // HUD v3 (#39)
+            _objective = new Label { name = "tut-objective", pickingMode = PickingMode.Ignore };
+            var st = _objective.style;
+            st.position = Position.Absolute; st.left = Length.Percent(50); st.top = 8; st.translate = new Translate(Length.Percent(-50), 0);
+            st.fontSize = 18; st.unityFontStyleAndWeight = FontStyle.Bold; st.color = new Color(0.23f, 0.16f, 0.12f);
+            st.backgroundColor = new Color(1f, 0.96f, 0.88f, 0.92f);
+            st.paddingLeft = 14; st.paddingRight = 14; st.paddingTop = 6; st.paddingBottom = 6;
+            st.borderTopLeftRadius = st.borderTopRightRadius = st.borderBottomLeftRadius = st.borderBottomRightRadius = 14;
+            st.borderLeftWidth = st.borderRightWidth = st.borderTopWidth = st.borderBottomWidth = 3;
+            st.borderLeftColor = st.borderRightColor = st.borderTopColor = st.borderBottomColor = new Color(0.23f, 0.16f, 0.12f);
+            st.unityTextAlign = TextAnchor.MiddleCenter; st.maxHeight = 40;
+            _hud.Root.Add(_objective);
+        }
         void EnsureBanner()
         {
             if (_banner != null || !_hud || _hud.Root == null) return;
             _banner = new VisualElement { name = "tutorial-banner", pickingMode = PickingMode.Ignore };
             var st = _banner.style;
-            st.position = Position.Absolute; st.left = Length.Percent(50); st.bottom = Length.Percent(6); st.translate = new Translate(Length.Percent(-50), 0);
-            st.maxWidth = Length.Percent(86); st.minWidth = 360; st.flexDirection = FlexDirection.Row; st.alignItems = Align.Center;
+            st.position = Position.Absolute; st.left = Length.Percent(50); st.top = 56; st.translate = new Translate(Length.Percent(-50), 0); // B4: sotto obiettivo, leggibile
+            st.width = Length.Percent(92); st.maxWidth = 900; st.maxHeight = 120; st.overflow = Overflow.Hidden; st.flexDirection = FlexDirection.Row; st.alignItems = Align.Center;
             st.paddingLeft = 22; st.paddingRight = 28; st.paddingTop = 14; st.paddingBottom = 14;
             st.backgroundColor = new Color(1f, 0.96f, 0.88f, 0.97f);
             st.borderTopLeftRadius = st.borderTopRightRadius = st.borderBottomLeftRadius = st.borderBottomRightRadius = 28;
             st.borderLeftWidth = st.borderRightWidth = st.borderTopWidth = st.borderBottomWidth = 4;
             st.borderLeftColor = st.borderRightColor = st.borderTopColor = st.borderBottomColor = new Color(0.27f, 0.18f, 0.12f);
             var face = new Label("ADA") { pickingMode = PickingMode.Ignore };
-            var fs = face.style; fs.width = 64; fs.height = 64; fs.marginRight = 16; fs.backgroundColor = new Color(0.78f, 0.33f, 0.24f);
-            fs.borderTopLeftRadius = fs.borderTopRightRadius = fs.borderBottomLeftRadius = fs.borderBottomRightRadius = 32; fs.color = Color.white;
-            fs.unityTextAlign = TextAnchor.MiddleCenter; fs.fontSize = 18; fs.unityFontStyleAndWeight = FontStyle.Bold; fs.flexShrink = 0;
+            var fs = face.style; fs.width = 80; fs.height = 80; fs.marginRight = 16; fs.backgroundColor = new Color(0.78f, 0.33f, 0.24f);
+            fs.borderTopLeftRadius = fs.borderTopRightRadius = fs.borderBottomLeftRadius = fs.borderBottomRightRadius = 40; fs.color = Color.white;
+            fs.unityTextAlign = TextAnchor.MiddleCenter; fs.fontSize = 24; fs.unityFontStyleAndWeight = FontStyle.Bold; fs.flexShrink = 0;
             var col = new VisualElement { pickingMode = PickingMode.Ignore }; col.style.flexShrink = 1;
-            var who = new Label(Speaker) { pickingMode = PickingMode.Ignore }; who.style.color = new Color(0.78f, 0.33f, 0.24f); who.style.fontSize = 20; who.style.unityFontStyleAndWeight = FontStyle.Bold;
-            _bannerText = new Label { pickingMode = PickingMode.Ignore }; _bannerText.style.color = new Color(0.23f, 0.16f, 0.12f); _bannerText.style.fontSize = 30; _bannerText.style.whiteSpace = WhiteSpace.Normal;
+            var who = new Label(Speaker) { pickingMode = PickingMode.Ignore }; who.style.color = new Color(0.78f, 0.33f, 0.24f); who.style.fontSize = 16; who.style.unityFontStyleAndWeight = FontStyle.Bold;
+            _bannerText = new Label { pickingMode = PickingMode.Ignore }; _bannerText.style.color = new Color(0.23f, 0.16f, 0.12f); _bannerText.style.fontSize = 22; _bannerText.style.whiteSpace = WhiteSpace.Normal;
             col.Add(who); col.Add(_bannerText); _banner.Add(face); _banner.Add(col);
             _hud.Root.Add(_banner);
         }
@@ -83,15 +103,25 @@ namespace UltimoMiglio.Gameplay
             var eco = GameRoot.Ready ? GameRoot.I.Eco : null;
             if (GameRoot.I && GameRoot.I.Nina) _startPos = GameRoot.I.Nina.transform.position;
             _shelfBase = ShelfTotal(); _servedBase = eco?.S.CustomersServed ?? 0; _walletBase = eco?.S.Wallet ?? 0; _endT = 0;
+            // QA #42: after Arrivi/Bancone path, enough LN to hire NONNO within ~90s tutorial
+            if (s == Step.Nonno && eco != null && eco.S.NonnoLevel < 0)
+            {
+                double need = eco.Cost(UpgradeKind.NonnoHire);
+                if (!double.IsInfinity(need) && eco.S.Wallet < need)
+                    eco.S.Wallet = need;
+            }
+            if (s == Step.Monete && eco != null && eco.S.Wallet < 4)
+                eco.S.Wallet = System.Math.Max(eco.S.Wallet, 4);
             Debug.Log($"[Tutorial] step {(int)s} {s}: {CurrentText}");
             StepChanged?.Invoke(s);
             var t = Target();
             if (_edge) { if (t) _edge.SetTarget(t, s.ToString().ToUpper()); else _edge.Clear(); }
-            if (_marker) _marker.gameObject.SetActive(t);
+            if (_marker) _marker.gameObject.SetActive(false); // QA v2: no world waypoint if edge arrow exists
         }
 
         static int ShelfTotal() { int n = 0; foreach (var sh in FindObjectsByType<Shelf>(FindObjectsSortMode.None)) n += sh.Count; return n; }
 
+        public Transform CurrentTarget => Target();
         Transform Target() => Current switch
         {
             Step.Arrivi => Arrivi, Step.Scaffali => Scaffale, Step.Bancone => Bancone, Step.Monete => Monete,
@@ -102,9 +132,18 @@ namespace UltimoMiglio.Gameplay
         {
             if (!GameRoot.Ready) return;
             EnsureBanner();
-            if (_bannerText != null) { var txt = CurrentText; if (_bannerText.text != txt) _bannerText.text = txt ?? ""; if (_banner != null) _banner.style.display = txt == null ? DisplayStyle.None : DisplayStyle.Flex; }
+            EnsureObjective();
+            if (_objective != null) { _objective.text = CurrentObjectiveText; _objective.style.display = Current <= Step.Fine ? DisplayStyle.Flex : DisplayStyle.None; _objective.BringToFront(); }
+            // B4 P2: testi Ada nel fumetto HUD (non solo console)
+            if (_banner != null)
+            {
+                var txt = CurrentText;
+                bool show = Current <= Step.Fine && !string.IsNullOrEmpty(txt);
+                _banner.style.display = show ? DisplayStyle.Flex : DisplayStyle.None;
+                if (show && _bannerText != null) _bannerText.text = txt;
+            }
             var t = Target();
-            if (_marker && t) { _marker.position = new Vector3(t.position.x, 0, t.position.z); _markerArrow.localPosition = new Vector3(0, 1.4f + Mathf.Abs(Mathf.Sin(Time.time * 4f)) * 0.4f, 0); var cam = Camera.main; if (cam) _markerArrow.rotation = Quaternion.LookRotation(Vector3.ProjectOnPlane(cam.transform.forward, Vector3.up)); _marker.GetChild(0).localScale = new Vector3(1.4f, 0.01f, 1.4f) * (1f + 0.12f * Mathf.Sin(Time.time * 5f)); }
+            if (_marker) _marker.gameObject.SetActive(false);
             var eco = GameRoot.I.Eco; var nina = GameRoot.I.Nina;
             bool done = Current switch
             {
@@ -112,7 +151,8 @@ namespace UltimoMiglio.Gameplay
                 Step.Arrivi => nina && nina.Stack.Count >= Mathf.Min(3, nina.Stack.Capacity),
                 Step.Scaffali => ShelfTotal() > _shelfBase,
                 Step.Bancone => eco.S.CustomersServed > _servedBase,
-                Step.Monete => eco.S.Wallet > _walletBase + 0.01,
+                // LN già accreditati su Bancone.Serve (CollectActive); monete a terra = Burst VFX
+                Step.Monete => eco.S.Wallet > 0.01,
                 Step.Zaino => eco.S.Zaino >= 1,
                 Step.Nonno => eco.S.NonnoLevel >= 0,
                 Step.Fine => (_endT += Time.deltaTime) > EndSeconds,

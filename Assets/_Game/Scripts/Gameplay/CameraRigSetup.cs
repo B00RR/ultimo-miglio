@@ -7,7 +7,7 @@ namespace UltimoMiglio.Gameplay
     /// look-ahead (1.5 m at Nina's max speed), optional confiner per room. No player pan/zoom.</summary>
     public sealed class CameraRigSetup : MonoBehaviour
     {
-        public Transform Target; public float OrthoSize = 4.5f, Distance = 30f, Pitch = 35.3f, Yaw = 45f;
+        public Transform Target; public float OrthoSize = 4.5f, Distance = 20f, /* #48: camera più vicina e shadow map densa */ Pitch = 50f, Yaw = 45f;
         public Collider ConfinerVolume;
 
         public CinemachineCamera Build(Camera main)
@@ -21,6 +21,7 @@ namespace UltimoMiglio.Gameplay
             var pc = go.AddComponent<CinemachinePositionComposer>();
             pc.CameraDistance = Distance; pc.Damping = new Vector3(0.25f, 0.25f, 0.25f);
             pc.Lookahead = new LookaheadSettings { Enabled = true, Time = 0.5f, Smoothing = 5f, IgnoreY = true }; // 0.5 s × 3 m/s ≈ 1.5 m
+            var fit = go.AddComponent<DepotCameraFit>(); fit.Cm = cm; fit.Nina = Target;
             if (ConfinerVolume) go.AddComponent<CinemachineConfiner3D>().BoundingVolume = ConfinerVolume;
             return cm;
         }

@@ -6,7 +6,7 @@ using UltimoMiglio.Core;
 namespace UltimoMiglio.Gameplay
 {
     /// <summary>Owns the EconomyCore, save, QA log and the active-time clock. One per scene.</summary>
-    [DefaultExecutionOrder(-100)]
+    [DefaultExecutionOrder(-10000)]
     public sealed class GameRoot : MonoBehaviour
     {
         public static GameRoot I { get; private set; }
@@ -26,6 +26,8 @@ namespace UltimoMiglio.Gameplay
         void Awake()
         {
             I = this;
+            // WebGL: nessun NavMesh bake runtime → elimina ogni NavMeshAgent subito
+            NonnoRobot.StripAllNavMeshAgentsInScene();
 #if UNITY_WEBGL && !UNITY_EDITOR
             Application.targetFrameRate = -1;
 #else
