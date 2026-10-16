@@ -187,10 +187,11 @@ namespace UltimoMiglio.EditorTools
             // --- onboarding (Nonna Ada)
             var tut = new GameObject("Tutorial").AddComponent<TutorialManager>(); tut.transform.SetParent(root.transform);
             var tj = AssetDatabase.LoadAssetAtPath<TextAsset>("Assets/_Game/Data/ch1/onboarding_testi.json");
-            if (tj) { var td = JsonUtility.FromJson<TutTexts>(tj.text); tut.Speaker = td.speaker; tut.Texts = td.steps.Select(x => x.text).ToArray(); tut.EndText = td.fine; }
+            if (tj) { var td = JsonUtility.FromJson<TutTexts>(tj.text); tut.Speaker = td.speaker; tut.Texts = td.steps.Select(x => x.text).ToArray(); tut.EndText = td.fine; tut.TestiJson = tj; }
             tut.Arrivi = arrivals.transform; tut.Scaffale = shelves[0].transform; tut.Bancone = bancone.transform;
             tut.Monete = new GameObject("Tut_Monete").transform; tut.Monete.position = banPos + Vector3.right * 0.8f;
             foreach (var pz in Object.FindObjectsByType<UpgradePad>(FindObjectsSortMode.None)) { if (pz.Kind == UpgradeKind.Zaino) tut.PadZaino = pz.transform; if (pz.Kind == UpgradeKind.NonnoHire) tut.PadNonno = pz.transform; }
+            TryRun("UltimoMiglio.VFX.EditorTools.UM_TutorialMarkerSetup", "Setup"); // #4: marker tutorial con materiali assegnati (in build Shader.Find non trova shader non referenziati)
 
             TryRun("UltimoMiglio.VFX.EditorTools.UM_FxPrefabBuilder", "BuildAll");
             // --- punti di interazione stile My Little Universe (pad a terra + chip billboard)
@@ -352,16 +353,21 @@ namespace UltimoMiglio.EditorTools
         static AudioManager BuildAudio(Transform parent)
         {
             var am = new GameObject("AudioManager").AddComponent<AudioManager>(); am.transform.SetParent(parent);
+            WireAudioClips(am); return am;
+        }
+        /// <summary>Assegna tutte le clip all'AudioManager (usato dal builder e da Audio/WireScene, che non rigenera la scena).</summary>
+        public static void WireAudioClips(AudioManager am)
+        {
             AudioClip C(string n) => AssetDatabase.LoadAssetAtPath<AudioClip>($"Assets/_Game/Audio/{n}.ogg") ?? AssetDatabase.LoadAssetAtPath<AudioClip>($"Assets/Audio/{(n.StartsWith("mus_") ? "Music" : "SFX")}/{n}.ogg");
             AudioClip[] R(string pfx, int n) => Enumerable.Range(1, n).Select(i => C($"{pfx}_{i:00}")).Where(c => c).ToArray();
             am.MusicStems = new[] { C("mus_day_vela_e_figli_base"), C("mus_day_vela_e_figli_perc"), C("mus_day_vela_e_figli_mel") };
             am.MusicFull = C("mus_day_vela_e_figli_full");
             am.Pickup = R("sfx_parcel_pickup", 8); am.Deposit = R("sfx_parcel_deposit", 4); am.CoinDrop = R("sfx_coin_drop", 4); am.CoinPickup = R("sfx_coin_pickup", 4);
-            am.NonnoMumble = R("sfx_nonno_mumble", 3); am.Steps = R("sfx_step_stone", 4).Concat(R("sfx_step_wood", 4)).ToArray();
+            am.NonnoMumble = R("sfx_nonno_mumble", 3); am.Steps = R("sfx_step_stone", 4); // pavimento a lastre: solo pietra (wood per pedane future)
+            am.UiTap = R("sfx_ui_tap", 2); am.TutorialArrow = C("sfx_ui_arrow_appear"); am.TutorialStep = C("sfx_ui_step_complete");
             am.StackMax = C("sfx_stack_max"); am.Bell = C("sfx_customer_bell"); am.Served = C("sfx_customer_served");
             am.UpgradeLoop = C("sfx_upgrade_tick_loop"); am.UpgradeComplete = C("sfx_upgrade_complete");
             am.ComboX15 = C("sfx_combo_x1_5"); am.ComboX2 = C("sfx_combo_x2"); am.NonnoStart = C("sfx_nonno_start");
-            return am;
         }
     }
 

@@ -1,0 +1,33 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!319 &31900000
+AvatarMask:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_Name: bot_nonno_forche
+  m_Mask: 01000000010000000100000001000000010000000100000001000000010000000100000001000000010000000100000001000000
+  m_Elements:
+  - m_Path: 
+    m_Weight: 0
+  - m_Path: bot_nonno_LOD0
+    m_Weight: 0
+  - m_Path: bot_nonno_rig
+    m_Weight: 0
+  - m_Path: bot_nonno_rig/root
+    m_Weight: 0
+  - m_Path: bot_nonno_rig/root/body
+    m_Weight: 0
+  - m_Path: bot_nonno_rig/root/body/head
+    m_Weight: 0
+  - m_Path: bot_nonno_rig/root/body/head/mustache
+    m_Weight: 0
+  - m_Path: bot_nonno_rig/root/body/mast
+    m_Weight: 1
+  - m_Path: bot_nonno_rig/root/body/mast/forks
+    m_Weight: 1
+  - m_Path: bot_nonno_rig/root/wheels_front
+    m_Weight: 0
+  - m_Path: bot_nonno_rig/root/wheels_rear
+    m_Weight: 0
