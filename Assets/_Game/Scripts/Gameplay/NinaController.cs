@@ -33,6 +33,18 @@ namespace UltimoMiglio.Gameplay
             _vel = Vector3.MoveTowards(_vel, target, rate);
             _vy = _cc.isGrounded ? -1f : _vy + Gravity * Time.deltaTime;
             _cc.Move((_vel + Vector3.up * _vy) * Time.deltaTime);
+            // B3 P2: non uscire sotto l'HUD in alto — clamp playable (Arrivi z≈6 resta raggiungibile)
+            var p = transform.position;
+            float nx = Mathf.Clamp(p.x, -8.2f, 8.2f);
+            float nz = Mathf.Clamp(p.z, -10.2f, 7.0f);
+            if (Mathf.Abs(nx - p.x) > 0.001f || Mathf.Abs(nz - p.z) > 0.001f)
+            {
+                bool was = _cc.enabled; _cc.enabled = false;
+                transform.position = new Vector3(nx, p.y, nz);
+                _cc.enabled = was;
+                if (nx != p.x) _vel.x = 0;
+                if (nz != p.z) _vel.z = 0;
+            }
             if (_vel.sqrMagnitude > 0.01f)
                 transform.rotation = Quaternion.Slerp(transform.rotation, Quaternion.LookRotation(_vel), 1 - Mathf.Exp(-TurnRate * Time.deltaTime));
             if (Animator) { Animator.SetFloat(SpeedId, _vel.magnitude); Animator.SetBool(CarryId, Stack && Stack.Count > 0); }
