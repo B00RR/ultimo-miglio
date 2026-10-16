@@ -17,14 +17,14 @@ Formato Given/When/Then; ogni criterio è misurabile dal bot di playtest (`botSt
 | ONB-09a | t ≥ 2:07 | parte il passo `nonnoIntro` | la camera inquadra pad e NONNO per 2,5 s ±0,3, il joystick resta attivo, a schermo `onb.nonno.what` (dice che NONNO porta i pacchi al posto tuo) |
 | ONB-09b | Nina sul pad di NONNO con portafoglio < 50 LN | — | il pad mostra "X/50 LN" coerente col portafoglio (±1 LN), compare `onb.nonno.notEnough` e la freccia punta al Bancone; arrivati a 50 LN la freccia torna al pad entro 1 s |
 | ONB-09c | pad di NONNO attivo | il giocatore non ci va per 20 s ±1 | promemoria `onb.nonno.reminder` + freccia + camera che pulsa; si ripete ogni 20 s fino all'assunzione |
-| ONB-09d | NONNO assunto | — | camera su NONNO per 3 s ±0,3; NONNO consegna il primo pacco allo scaffale entro 12 s; badge "6 pacchi/min" visibile |
-| ONB-10 | NONNO assunto | passano 35 s | il telefono vibra (Civetta) a 2:45 ±10 s |
+| ONB-09d | NONNO assunto | — | camera su NONNO per 3 s ±0,3; NONNO consegna il primo pacco allo scaffale entro 12 s; badge "6 pacchi/min" visibile; a schermo `onb.nonno.hired` e `onb.nonno.working`, mai `onb.nonno.bark` nello stesso momento (il bark parte solo a conferma finita) |
+| ONB-10 | NONNO assunto | passano 35 s | il telefono vibra (Civetta) a 2:45 ±10 s; sequenza testi `onb.civetta.msg1` → risposta `onb.civetta.reply` → `onb.civetta.msg2` |
 | ONB-11 | t ≥ 3:30 | tap su notifica Ordini | si apre l'ordine speciale; "Mostra la strada" disegna la freccia |
 | ONB-12 | primo passaggio sulla Cassa (3:55 ±10 s) | Nina ci passa sopra | +30 LN una sola volta; al secondo passaggio 0 LN extra |
-| ONB-13 | t ≥ 4:00 | Nina sulla Cassaforte | chiamata di Viktor e scheda "Giorno 3/365 · Rata 1 · 8.400 LN · scade Giorno 24"; primo versamento = 60% del portafoglio ±1 LN |
+| ONB-13 | t ≥ 4:00 | Nina sulla Cassaforte | chiamata di Viktor (`onb.viktor.call1` poi `onb.viktor.call2`) e scheda "Giorno 3/365 · Rata 1 · 8.400 LN · scade Giorno 24"; primo versamento = 60% del portafoglio ±1 LN |
 | ONB-14 | primo versamento + 30 s | — | pad APRI MURO mostrato come obiettivo; richiesta permesso notifiche solo su Android 13+ |
 | ONB-15 | qualsiasi passo dopo l'8 | il giocatore tocca "Salta tutorial" | si passa al gioco libero con tutti gli sblocchi dei passi saltati; prima del passo 8 il tasto non c'è |
-| ONB-16 | ogni passo | testo mostrato | una sola riga, ≤ 70 caratteri, chiave presente in `onboarding_testi.json` (nessuna chiave grezza `onb.*` a schermo) |
+| ONB-16 | ogni passo | testo mostrato | una sola riga, ≤ 70 caratteri, chiave presente in `onboarding_testi.json` (PR #62) (nessuna chiave grezza `onb.*` a schermo) |
 
 ## B. Clienti
 | ID | Given | When | Then |
