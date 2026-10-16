@@ -143,6 +143,7 @@ public class AnimFacingTest
 /// <summary>#2: in scena i clienti sono i 6 personaggi riggati (non capsule), Humanoid valido, AlwaysAnimate, senza root motion.</summary>
 public class ClientiRigTest
 {
+    [TearDown] public void TearDown() => UltimoMiglio.UI.HudReveal.ResetAll(); // isolamento: lo stato statico non passa ai test successivi
     [UnityTest] public IEnumerator Clienti_SonoIRiggatiNonCapsule()
     {
         // Solo le chiavi del gioco: i volumi (vol_music/vol_sfx, #36) restano intatti
