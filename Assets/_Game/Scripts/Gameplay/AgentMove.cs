@@ -43,9 +43,9 @@ namespace UltimoMiglio.Gameplay
         }
 
         /// <summary>Muove t di step (piano XZ) senza attraversare collider solidi; ritorna lo spostamento applicato.</summary>
-        public static Vector3 Slide(Transform t, Vector3 step, float radius = 0.35f)
+        public static Vector3 Slide(Transform t, Vector3 step, float radius = 0.35f, bool ignoreAgents = false)
         {
-            LastBlockedByAgent = false; Separate(t);
+            LastBlockedByAgent = false; if (!ignoreAgents) Separate(t);
             step.y = 0; var start = t.position; var applied = Vector3.zero;
             for (int it = 0; it < 2 && step.sqrMagnitude > 1e-8f; it++)
             {
@@ -56,6 +56,7 @@ namespace UltimoMiglio.Gameplay
                 {
                     var h = Hits[i]; if (h.collider.transform.IsChildOf(t)) continue;
                     bool agent = IsAgent(h.collider);
+                    if (agent && ignoreAgents) continue; // #111: chi esce (cliente servito/arrabbiato) non blocca né viene bloccato
                     if (!agent && h.collider.attachedRigidbody) continue;
                     if (h.distance <= 0f)
                     {

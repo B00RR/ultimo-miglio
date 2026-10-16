@@ -61,12 +61,13 @@ public class AgentSpaceTest
             Place(n, spot);
             yield return null; t += Time.deltaTime;
             var cs = Object.FindObjectsByType<Customer>(FindObjectsSortMode.None).Where(c => c.isActiveAndEnabled).ToArray(); seen = Mathf.Max(seen, cs.Length);
-            foreach (var c in cs) minN = Mathf.Min(minN, Flat(c.transform.position, n.transform.position));
+            foreach (var c in cs.Where(c => !c.Leaving)) minN = Mathf.Min(minN, Flat(c.transform.position, n.transform.position));
             // niente teletrasporti: spostamento per frame entro la velocità massima (+ separazione 3 cm); i clienti appena (ri)spawnati alla porta esclusi
             var next = new System.Collections.Generic.Dictionary<Customer, Vector3>(); var nextW = new System.Collections.Generic.Dictionary<Customer, float>();
             foreach (var c in cs) { nextW[c] = c.Waited; if (prev.TryGetValue(c, out var p0) && prevW.TryGetValue(c, out var w0) && c.Waited >= w0) maxJump = Mathf.Max(maxJump, Flat(c.transform.position, p0) - (c.Speed * Time.deltaTime + 0.03f)); next[c] = c.transform.position; }
             prev = next; prevW = nextW;
-            for (int i = 0; i < cs.Length; i++) for (int j = i + 1; j < cs.Length; j++) minC = Mathf.Min(minC, Flat(cs[i].transform.position, cs[j].transform.position));
+            var line = cs.Where(c => !c.Leaving).ToArray(); // chi esce ha il corpo spento e attraversa la fila (non è compenetrazione in coda)
+            for (int i = 0; i < line.Length; i++) for (int j = i + 1; j < line.Length; j++) minC = Mathf.Min(minC, Flat(line[i].transform.position, line[j].transform.position));
         }
         Debug.Log($"[AgentSpace] salto oltre velocità max={maxJump:F3} m");
         Assert.LessOrEqual(maxJump, 0.01f, $"cliente teletrasportato: salto di {maxJump:F2} m oltre la velocità massima per frame");
