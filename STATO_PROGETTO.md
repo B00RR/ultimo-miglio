@@ -158,6 +158,7 @@ Ogni ruolo lavora solo sulle issue con la propria etichetta `ruolo:*`, sempre co
 
 Voci più recenti in alto. Formato: `AAAA-MM-GG HH:MM` (Europe/Rome) — [commit] — descrizione.
 
+- **16/10/2026 22:04 (Europe/Rome)**: unita in squash la #249 (Tech Lead, Closes #171 e #243: il pad si attiva quando i piedi di Kaia sono entro il raggio del disco, test PadTriggerCerchioTest sulla scena reale). Main verde su e763480 prima del merge. Commit [9446c59](https://github.com/B00RR/ultimo-miglio/commit/9446c597196ac47b53cfcf488ce8fb2041c883eb).
 - **16/10/2026 21:37 (Europe/Rome)**: unita in squash la #229 (Animator, Closes #223: il debito parte solo dopo la carta e un versamento vero). Commit [e763480](https://github.com/B00RR/ultimo-miglio/commit/e7634804a587123921096509d797446e1e05f8d8).
 - **16/10/2026 21:17 (Europe/Rome)**: main di nuovo verde su 2515ee0 (#242). Unita in squash la #238 (Animator, Closes #222: il gate dello scaffale nel tutorial aspetta un deposito vero). Commit [27003ef](https://github.com/B00RR/ultimo-miglio/commit/27003ef45612d277089433d71be2fee409e1ea03).
 - **16/10/2026 21:05 (Europe/Rome)**: unita in squash la #242 (Tech Lead, Closes #226: NONNO tiene 0,20 m di margine da Nina agli Arrivi, distanza minima da 0,69 a 0,96 m, soglia del test invariata). Corregge il main rosso su 2150050. Commit [2515ee0](https://github.com/B00RR/ultimo-miglio/commit/2515ee0d10bb30a3be78a252486a81f208746783).
