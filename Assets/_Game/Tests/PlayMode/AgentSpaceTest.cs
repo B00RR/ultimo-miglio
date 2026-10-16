@@ -16,7 +16,8 @@ public class AgentSpaceTest
     static float Flat(Vector3 a, Vector3 b) { a.y = b.y = 0; return Vector3.Distance(a, b); }
     static IEnumerator Load()
     {
-        PlayerPrefs.DeleteKey("um_save_v1" /* GameRoot.SaveKey */); PlayerPrefs.DeleteKey(TutorialManager.PrefKey); Time.timeScale = 1f; // solo chiavi di gioco, non i volumi (#36)
+        PlayerPrefs.DeleteKey("um_save_v1" /* GameRoot.SaveKey */); PlayerPrefs.DeleteKey(TutorialManager.PrefKey); PlayerPrefs.DeleteKey(DepotCameraFit.PrefZoom); Time.timeScale = 1f; // solo chiavi di gioco, non i volumi (#36)
+        PlayerPrefs.SetInt(TutorialManager.PrefGraduale, 0); // #94: test non di onboarding → niente rivelazione graduale (NONNO e pad non nascosti, stato HudReveal non sporcato per i test successivi)
         yield return SceneManager.LoadSceneAsync("Ch1_Deposito");
         for (int i = 0; i < 60 && !GameRoot.Ready; i++) yield return null;
         Assert.IsTrue(GameRoot.Ready);
