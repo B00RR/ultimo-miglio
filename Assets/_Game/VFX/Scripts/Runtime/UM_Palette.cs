@@ -15,14 +15,14 @@ namespace UltimoMiglio.VFX
         public static readonly Color TealOmni   = H("#5E7F86");
         public static readonly Color Tufo       = H("#E8D3AC");
         public static readonly Color Pavimento  = H("#F3E3C3");
-        public static readonly Color Legno      = H("#7A4A2E"); // noce leggibile (Concept)
+        public static readonly Color Legno      = H("#74503A"); // #81: legno della guida §2 (noce = Noce)
         public static readonly Color Cartone    = H("#C99A62");
         public static readonly Color ScuroCaldo = H("#3B2F2A");
         public static readonly Color AranceNina = H("#E8913A");
         public static readonly Color Crema      = H("#F3E3C3");
         public static readonly Color Cielo      = H("#F3DDB6");
         // VFX/lighting derivati (proposti dal VFX, da validare col Concept Artist)
-        public static readonly Color Sole       = H("#FFF0D4"); // key caldo ma meno pesca
+        public static readonly Color Sole       = H("#FFE6B8"); // #81: guida §9 (decisione DevOn: vince la guida)
         public static readonly Color AmbSky     = H("#E6D9C8"); // crema neutro caldo
         public static readonly Color AmbEquator = H("#E8D3AC"); // tufo, non pesca
         public static readonly Color AmbGround  = H("#9E7873");
@@ -58,7 +58,7 @@ namespace UltimoMiglio.VFX
         public static readonly Color CremaVarB   = H("#E9D2A8");
         public static readonly Color OmniScuro   = H("#3E5A61");
         public static readonly Color Outline     = H("#3B2F2A");
-        public static readonly Color Ombra       = H("#8F7A76"); // ombra calda + lieve fresco
+        public static readonly Color Ombra       = H("#9E7873"); // #81: guida §2/§9 (la nota fresca lieve resta in shader, _ShadowCool)
         public static readonly Color ValoreMin   = H("#5A4A55"); // valore minimo volumi = ambient notte
         public static readonly Color FondoNotte  = H("#2B2230");
         public static readonly Color Lanterna2   = H("#FFB347");

@@ -1,19 +1,19 @@
-const { chromium } = require('/workspace/shots/node_modules/playwright-core');
+const { chromium } = require('/workspace/qa71/node_modules/playwright-core');
 const T=JSON.parse(require('fs').readFileSync('/workspace/qa0853/testi62.json','utf8'));
 const S=T.steps, G=T.suggerimenti;
 const cases=[
  {k:'move',ada:S[0].text,obj:'Muoviti',hint:G['onb.move.card']},
  {k:'pickup',ada:S[1].text,obj:'Vai agli Arrivi',hint:G['onb.pick.max']},
  {k:'shelve',ada:S[2].text,obj:'Metti sullo scaffale',hint:G['onb.deposit.hint']},
- {k:'nonno',ada:S[6].text,obj:'Assumi NONNO',hint:null,chev:1,price:'10 LN',py:0.45},
- {k:'nonno_alto',ada:S[6].text,obj:'Assumi NONNO',hint:null,chev:1,price:'10 LN',py:0.16},
+ {k:'nonno',ada:S[6].text,obj:'Assumi NONNO',hint:null,chev:1,price:'50 LN',ln:'50',py:0.45},
+ {k:'nonno_alto',ada:S[6].text,obj:'Assumi NONNO',hint:null,chev:1,price:'50 LN',ln:'50',py:0.16},
  {k:'fine70',ada:T.fine,obj:'Deposito aperto!',hint:null},
 ];
 (async()=>{
  const b=await chromium.launch({executablePath:'/usr/bin/google-chrome'}); const out=[];
  for (const [w,h] of [[360,800],[390,844],[412,915]]) for (const c of cases){
   const p=await b.newPage({viewport:{width:w,height:h},deviceScaleFactor:2});
-  const u=new URLSearchParams({ada:c.ada,obj:c.obj,...(c.hint?{hint:c.hint}:{}),...(c.chev?{chev:'1',price:c.price,py:String(c.py)}:{})});
+  const u=new URLSearchParams({ada:c.ada,obj:c.obj,...(c.hint?{hint:c.hint}:{}),...(c.chev?{chev:'1',price:c.price,ln:c.ln,py:String(c.py)}:{})});
   await p.goto('http://127.0.0.1:8853/index.html?'+u); await p.evaluate(()=>document.fonts.ready); await p.waitForTimeout(200);
   const r=await p.evaluate(()=>{const R=id=>{const e=document.getElementById(id);if(!e||getComputedStyle(e).display=='none'||e.offsetParent===null&&id!='hud-root')return null;const b=e.getBoundingClientRect();return {x:b.left,y:b.top,r:b.right,b:b.bottom}};
    const H=innerHeight,fT=H*350/2532,fB=H-H*500/2532;
