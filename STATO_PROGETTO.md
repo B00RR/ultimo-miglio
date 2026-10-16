@@ -196,3 +196,8 @@ Voci più recenti in alto. Formato: `AAAA-MM-GG HH:MM` (Europe/Rome) — [commit
 - Catture anteprima 390x844 (HTML/Playwright, non Unity): `docs/ui/catture/pr36/`.
 - Deciso (Tech Lead): pannello unico `SettingsController`; `Bridge/SettingsPanel` resta (usato da `HudGameBridge`) ma senza listener `OnSettingsRequested`. Ingranaggio = toggle (QA P3, `qa/playtest_web_live_p0.md` S01). Zoom su chiave unica `cam_zoom_v3` (`DepotCameraFit.PrefZoom`).
 - Riferimento #35 (chiusa). Correlate aperte: #64, #67.
+
+## Aggiornamento 16/10 11:10 — Build riallineata alla guida visiva (VFX, issue #81, branch `vfx/81-allinea-guida`)
+- Decisione DevOn: **vince la guida**. La guida torna alla v1 (annullata la v1.1 di #86) e il codice si adegua: sole `#FFE6B8`, ombra `#9E7873` (29 materiali), legno `#74503A`, lastre pavimento 0,25 m con una fuga per lastra, notte al 47% del giorno.
+- Atlas `T_Palette_Atlas.png`: 8 swatch del vecchio pipeline portati ai valori della guida (sostituiti solo i pixel esattamente uguali); 9 materiali Graybox aggiornati allo stesso modo.
+- In attesa del via libera finale del Concept Artist prima della review.
