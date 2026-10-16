@@ -215,7 +215,7 @@ public class P0CollisionFacingTest
             if (b.max.x < ban.x - 1.2f || b.min.x > ban.x + 1.2f || b.center.z < ban.z || b.center.z > ban.z + 4f) continue;
             face = Mathf.Min(face, b.min.z - ban.z);
         }
-        Assert.GreaterOrEqual(face, 1.06f, "muro dietro il Bancone troppo vicino");
+        Assert.GreaterOrEqual(face, 1.15f, "muro dietro il Bancone troppo vicino");
         Assert.LessOrEqual(face, 1.3f, "sacca dietro il Bancone: muro a " + face);
         // Nina arriva in Zona_Bancone seguendo il NavMesh
         var nina = GameRoot.I.Nina; Teleport(nina, ban + new Vector3(2.2f, 0.05f, -2.4f)); yield return null; var from = nina.transform.position;
@@ -235,5 +235,37 @@ public class P0CollisionFacingTest
         nina.ScriptedInput = Vector3.zero;
         var p = nina.transform.position;
         Assert.Less(new Vector2(p.x - ban.x, p.z - ban.z).magnitude, 0.6f, "Nina bloccata prima di Zona_Bancone: " + p + " da " + from + " waypoint " + k);
+    }
+
+    // #97: varco ovest del Bancone (tra vaso di limoni e pila di pacchi / Bancone): chiuso (<0.6, Nina non entra) oppure aperto >= 0.8 m
+    [UnityTest, Timeout(180000)]
+    public IEnumerator BanconeWestGap_ClosedOrWide_NinaFromWest()
+    {
+        yield return Load();
+        var ban = GameObject.Find("Zona_Bancone").transform.position;
+        Bounds? lemon = null, stack = null, counter = null;
+        foreach (var bc in Object.FindObjectsByType<BoxCollider>(FindObjectsSortMode.None))
+        {
+            var b = bc.bounds; var r = b.center - ban; if (r.x > -0.9f || r.x < -2.6f || r.z < -2f || r.z > 1.5f) { if (bc.name.StartsWith("prop_counter_2m") && Mathf.Abs(r.x) < 0.5f) counter = b; continue; }
+            if (bc.name.StartsWith("prop_lemontree_pot")) lemon = b; else if (bc.name.StartsWith("prop_parcel_stack_a")) stack = b;
+        }
+        Assert.IsTrue(lemon.HasValue && stack.HasValue && counter.HasValue, "vaso/pila/Bancone non trovati");
+        float gapZ = stack.Value.min.z - lemon.Value.max.z;           // vaso <-> pila
+        float gapX = lemon.Value.min.z < counter.Value.max.z ? counter.Value.min.x - lemon.Value.max.x : 99f; // vaso <-> Bancone
+        float gap = Mathf.Min(gapZ, gapX);
+        Debug.Log($"[#97] varco ovest: vaso-pila {gapZ:F2} vaso-Bancone {gapX:F2}");
+        Assert.IsTrue(gap < 0.6f || gap >= 0.8f, $"varco ovest ambiguo {gap:F2} m: chiuso (<0.6) o aperto (>=0.8)");
+        var nina = GameRoot.I.Nina;
+        if (gap < 0.6f)
+        {
+            // chiuso davvero: Nina spinta da ovest non entra nella zona
+            Teleport(nina, ban + new Vector3(-3.0f, 0.05f, -0.15f)); yield return null;
+            nina.ScriptedInput = Vector3.right; for (float t = 0; t < 2.5f; t += Time.deltaTime) yield return null; nina.ScriptedInput = Vector3.zero;
+            Assert.Less(nina.transform.position.x - ban.x, -1.2f, "varco ovest dichiarato chiuso ma Nina passa");
+            yield break;
+        }
+        Teleport(nina, ban + new Vector3(-3.0f, 0.05f, (lemon.Value.max.z + stack.Value.min.z) * 0.5f - ban.z)); yield return null;
+        nina.ScriptedInput = Vector3.right; for (float t = 0; t < 4f && nina.transform.position.x < ban.x; t += Time.deltaTime) yield return null; nina.ScriptedInput = Vector3.zero;
+        Assert.Greater(nina.transform.position.x - ban.x, -0.6f, "Nina non entra da ovest: " + nina.transform.position);
     }
 }

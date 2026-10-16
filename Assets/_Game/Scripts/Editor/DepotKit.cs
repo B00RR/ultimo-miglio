@@ -100,18 +100,18 @@ namespace UltimoMiglio.EditorTools
             Place("../Props/prop_parcel_box_cube", _parent, shelfC + new Vector3(1.2f, 0, -1.4f), -25, true);
             Place("../Props/prop_parcel_box_flat", _parent, shelfC + new Vector3(1.2f, 0, -1.4f), 30, false, true);
             // Bancone: limoni e pila ai lati, lavagna e lampione lungo la coda (lato -x, la coda va verso +x)
-            Place("Kit/prop_lemontree_pot", _parent, banPos + new Vector3(-1.75f, 0, -0.9f), 0, true);
+            Place("Kit/prop_lemontree_pot", _parent, banPos + new Vector3(-1.75f, 0, -0.5f), 0, true); // #97: varco ovest chiuso (vaso a 0.18 dalla pila, 0.23 dal Bancone): spostarlo di 0.35 a ovest lasciava 0.58 m
             Place("Kit/prop_parcel_stack_a", _parent, banPos + new Vector3(-1.8f, 0, 0.6f), 25, true);
             Place("Kit/prop_sign_board_aperto", _parent, banPos + new Vector3(-1.2f, 0, -2.4f), 30, true);
             Place("Kit/prop_streetlamp", _parent, banPos + new Vector3(-1.9f, 0, -3.4f), 0, true);
             Place("Kit/prop_plant_pot_round", _parent, banPos + new Vector3(1.6f, 0, 0.7f), 0, true);
             // Concept: pezzo di muro/arco visibile dietro il Bancone (beauty shot)
-            Place("Kit/env_wall_2m_a", _parent, banPos + new Vector3(-0.2f, 0, 1.3f), 0, false, false, true); // #82 opzione A: muro a ridosso, niente sacca
-            Place("Kit/env_wall_2m_b", _parent, banPos + new Vector3(2.0f, 0, 1.3f), 0, false, false, true);
+            Place("Kit/env_wall_2m_a", _parent, banPos + new Vector3(-0.2f, 0, 1.45f), 0, false, false, true); // #82 opzione A: muro a ridosso, niente sacca
+            Place("Kit/env_wall_2m_b", _parent, banPos + new Vector3(2.0f, 0, 1.45f), 0, false, false, true);
             if (AssetDatabase.LoadAssetAtPath<GameObject>(Root + "Kit/env_wall_arch_4m.fbx"))
                 Place("Kit/env_wall_arch_4m", _parent, banPos + new Vector3(3.6f, 0, -0.3f), -90, false, false, true);
-            Place("Kit/prop_sign_vela_figli", _parent, banPos + new Vector3(0.6f, 2.0f, 1.05f), 0, false); DressSignFace();
-            Place("Kit/prop_lantern_wall", _parent, banPos + new Vector3(-1.4f, 1.85f, 1.05f), 0, false);
+            Place("Kit/prop_sign_vela_figli", _parent, banPos + new Vector3(0.6f, 2.0f, 1.2f), 0, false); DressSignFace();
+            Place("Kit/prop_lantern_wall", _parent, banPos + new Vector3(-1.4f, 1.85f, 1.2f), 0, false);
             Debug.Log("[Kit] gameplay dressing: " + _parent.childCount + " pieces");
         }
 

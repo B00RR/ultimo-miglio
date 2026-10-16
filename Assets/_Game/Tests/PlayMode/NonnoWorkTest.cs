@@ -12,6 +12,9 @@ public class NonnoWorkTest
     [UnityTest] public IEnumerator HireNonno_StartsWorkingWithin10Seconds()
     {
         PlayerPrefs.DeleteAll();
+        // instabile da solo: un save_v1.json di un run precedente (NONNO già assunto) dava NonnoLevel 0 invece di -1
+        var save = System.IO.Path.Combine(Application.persistentDataPath, "save_v1.json");
+        if (System.IO.File.Exists(save)) System.IO.File.Delete(save);
         var navMeshErrors = new List<string>();
         Application.LogCallback onLog = (cond, stack, type) =>
         {
