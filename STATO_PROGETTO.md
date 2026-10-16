@@ -1,7 +1,7 @@
 # STATO PROGETTO — Ultimo Miglio
 
 > Punto di ingresso unico per chiunque (persona o agente) lavori su questo repo. Aggiornalo **nella stessa PR** in cui completi qualcosa.
-> Ultimo aggiornamento: 2026-10-16 04:11 (Europe/Rome).
+> Ultimo aggiornamento: 2026-10-16 09:05 (Europe/Rome).
 
 ## 1. Il gioco
 - **Ultimo Miglio**: gioco mobile **Android**, **Unity 6 (6000.3) URP**.
@@ -23,6 +23,7 @@
 - **In pausa**: Game Designer, QA, Sound Designer, Narrative, LiveOps, Concept Artist (i loro documenti restano validi).
 
 ## 4. FATTO
+- **UI #77 + #5 (PR ui/77-tutorial-hud, in revisione)**: fumetto di Nonna Ada compatto (ritratto 36 dp + testo 14 dp, 1–2 righe senza ellissi per testi fino a 70 caratteri, sotto la riga LN/obiettivo); obiettivo spostato a destra della pillola LN nella stessa riga; suggerimenti `onb.*` come pillola terracotta sopra il joystick; freccia ▼ sopra la pillola prezzo dei pad di acquisto (colonna 3D rimossa, ribaltamento se il pad è in alto). Nuovo `UI/USS/TutorialHud.uss` (HudV2.uss non toccato). Testi passi letti per id dalla PR #62. QA anteprima 360/390/412 in `docs/qa/tutorial_hud_77/`. Da verificare in Unity.
 - Scheletro progetto Unity 6 + vertical slice cap. 1 (EconomyCore con test EditMode, gameplay, audio, import dati, script build/cattura).
 - HUD integrato agli eventi core (LN, Mora, giorno, bulloni), font Inter/Roboto (OFL), HUD responsive (1920x1080 / 1366x768 / 960x600).
 - Ramo/build **WebGL** (`webgl-min`, ora su `main`): fix magenta (URP Forward, niente post‑process, shader sempre inclusi), template web a finestra intera, input tastiera unico via FloatingJoystick, camera ortografica 4.5.
@@ -115,6 +116,14 @@ Ogni ruolo lavora solo sulle issue con la propria etichetta `ruolo:*`, sempre co
 
 Voci più recenti in alto. Formato: `AAAA-MM-GG HH:MM` (Europe/Rome) — [commit] — descrizione.
 
+- 2026-10-16 11:15 — Code Reviewer — [a65de18](https://github.com/B00RR/ultimo-miglio/commit/a65de1873055ec905d4b54b02535940313ebf2b3) — unita in squash la [PR #124](https://github.com/B00RR/ultimo-miglio/pull/124) (fix(#65): angolo SO, Nina non compenetra più il lampione).
+- 2026-10-16 11:15 — Code Reviewer — [965e36a](https://github.com/B00RR/ultimo-miglio/commit/965e36a72d586111106b7c6a4e76bbc9ad34cc08) — unita in squash la [PR #121](https://github.com/B00RR/ultimo-miglio/pull/121) (Specifica eventi di log dell'onboarding cap. 1 (playtest QA)).
+- 2026-10-16 11:15 — Code Reviewer — [dc4d728](https://github.com/B00RR/ultimo-miglio/commit/dc4d72869f0239bde76e93ce31da4c1a9b680dc6) — unita in squash la [PR #120](https://github.com/B00RR/ultimo-miglio/pull/120) (QA: checklist Cap.1 aggiornata (C13/P07/Z02) + scheda osservazione playtest).
+- 2026-10-16 11:15 — Code Reviewer — [fdf1675](https://github.com/B00RR/ultimo-miglio/commit/fdf16758c241be2885577189dd1e0082162e35ac) — unita in squash la [PR #98](https://github.com/B00RR/ultimo-miglio/pull/98) (Audio cap.1: passi, SFX onboarding, volumi Impostazioni salvati e applicati).
+- 2026-10-16 11:14 — Code Reviewer — [ba91f85](https://github.com/B00RR/ultimo-miglio/commit/ba91f85a18807c4e6bc83e18626f8697cbe0fdc6) — unita in squash la [PR #80](https://github.com/B00RR/ultimo-miglio/pull/80) (Perf VFX: percorso shader economico _UM_LITE + niente varianti cascade (#79)).
+- 2026-10-16 11:14 — Code Reviewer — [f92e407](https://github.com/B00RR/ultimo-miglio/commit/f92e4079be6277f874694d663e0cfc71e5902825) — unita in squash la [PR #78](https://github.com/B00RR/ultimo-miglio/pull/78) (UI #77/#5: tutorial HUD — fumetto Ada compatto, freccia sul prezzo, CTA terracotta (portrait 360–412)).
+- 2026-10-16 11:14 — Code Reviewer — [e5e1a03](https://github.com/B00RR/ultimo-miglio/commit/e5e1a034babfcfcc6ac5b392dbbdd7435555355a) — unita in squash la [PR #76](https://github.com/B00RR/ultimo-miglio/pull/76) (VFX #4: marker tutorial a terra (anello pulsante + freccia guida)).
+- 2026-10-16 11:04 — Code Reviewer — [75d9124](https://github.com/B00RR/ultimo-miglio/commit/75d912467506908729cf39f7d8ac12608088bcc6) — unita in squash la [PR #106](https://github.com/B00RR/ultimo-miglio/pull/106) (onboarding cap. 1 con HUD minimo, Closes #105): job `test` verde (editmode 36/36, playmode 12/12). Follow-up aperti: feedback tappe del debito (LiveOps) e SFX combo/squillo (Sound). CI di main in coda.
 - 2026-10-16 10:49 — Code Reviewer — [cdfc53f](https://github.com/B00RR/ultimo-miglio/commit/cdfc53ff2152b4752a8ad5b488729ed824000e4a) — unita in squash la PR #119 (Ruoli e responsabilità, solo .md). Review delle PR aperte con commenti; #114 verde su main.
 - 2026-10-16 10:46 — Producer — aggiunta la sezione **Ruoli e responsabilità**: nuovo **Code Reviewer** che unisce tutte le PR; il Tech Lead non fa più merge (aggiornato *Come lavoriamo* punto 5); Build & Release pubblica su Pages solo dopo il VIA del QA; nuove etichette `ruolo:design` e `ruolo:qa`. Assegnate #107 (P0 zone, tech), #103, #101 (tech), #111 (animator), #110, #71 (ui), #65, #70 (3d), #69 (vfx), #91 (design); nuova #118 (Nonna Ada).
 - **2026-10-16 09:35 (Europe/Rome)** — Fix P0 #58 #59 #60 (ramo fix-p0-lorenzo, [a87edf0](https://github.com/B00RR/ultimo-miglio/commit/a87edf0)): BoxCollider su muri/archi/scaffali/bancone/props, Nina clamp x −8.6..7.0, NONNO yaw 0° + sweep AgentMove, spawn sicuro. EditMode 35/35, PlayMode 11/11. LIVE P0 su 8780: `qa/playtest_web_live_p0.md`.
