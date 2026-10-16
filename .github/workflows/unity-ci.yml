@@ -2,7 +2,8 @@
 # - Ogni PR verso main: test EditMode + PlayMode (game-ci) e commento con l'esito sulla PR.
 # - PR verso main e push su main: test EditMode + PlayMode e build WebGL (verifica, artifact).
 # - Deploy su B00RR/ultimo-miglio-web (GitHub Pages) SOLO con avvio manuale (workflow_dispatch): niente deploy automatico al merge.
-# Secret richiesti: UNITY_LICENSE (.ulf Personal), UNITY_EMAIL, UNITY_PASSWORD; PAGES_DEPLOY_KEY (deploy key con scrittura sul repo web).
+# Attivazione game-ci con UNITY_EMAIL/UNITY_PASSWORD (la .ulf in UNITY_LICENSE è legata a un'altra macchina e non si usa).
+# Secret richiesti: UNITY_EMAIL, UNITY_PASSWORD; PAGES_DEPLOY_KEY (deploy key con scrittura sul repo web).
 name: Unity CI (WebGL)
 on:
   pull_request:
@@ -34,7 +35,6 @@ jobs:
           P: ${{ secrets.UNITY_PASSWORD }}
         run: |
           mancano=""
-          [ -n "$L" ] || mancano="$mancano UNITY_LICENSE"
           [ -n "$E" ] || mancano="$mancano UNITY_EMAIL"
           [ -n "$P" ] || mancano="$mancano UNITY_PASSWORD"
           if [ -z "$mancano" ]; then echo "ok=true" >> "$GITHUB_OUTPUT"
@@ -65,7 +65,6 @@ jobs:
           restore-keys: Library-test-
       - uses: game-ci/unity-test-runner@v4
         env:
-          UNITY_LICENSE: ${{ secrets.UNITY_LICENSE }}
           UNITY_EMAIL: ${{ secrets.UNITY_EMAIL }}
           UNITY_PASSWORD: ${{ secrets.UNITY_PASSWORD }}
         with:
@@ -126,12 +125,12 @@ jobs:
           restore-keys: Library-WebGL-
       - uses: game-ci/unity-builder@v4
         env:
-          UNITY_LICENSE: ${{ secrets.UNITY_LICENSE }}
           UNITY_EMAIL: ${{ secrets.UNITY_EMAIL }}
           UNITY_PASSWORD: ${{ secrets.UNITY_PASSWORD }}
         with:
           unityVersion: ${{ env.UNITY_VERSION }}
           targetPlatform: WebGL
+          customImage: unityci/editor:ubuntu-6000.3.26f1-webgl-3
           # Metodo ufficiale del Tech Lead (shader, Look48, HUD, scena): output in Builds/WebGL_min
           buildMethod: UltimoMiglio.EditorTools.WebGLMinBuild.Build
       - name: Controllo build non compressa
