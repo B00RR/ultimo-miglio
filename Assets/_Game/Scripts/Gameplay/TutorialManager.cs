@@ -19,6 +19,14 @@ namespace UltimoMiglio.Gameplay
         public float EndSeconds = 6f;
         [Tooltip("onboarding_testi.json (PR #62): passi per id + suggerimenti onb.*. Facoltativo: senza, valgono Texts/EndText.")]
         public TextAsset TestiJson;
+        [Header("Onboarding graduale (#94)")]
+        [Tooltip("Nuova partita: nasconde all'avvio gli elementi bloccati e li rivela passo per passo (HudReveal). Salvataggi esistenti o tutorial finito: tutto visibile.")]
+        public bool RivelaGraduale = true;
+        public const string PrefGraduale = "um_onb_graduale";
+        [Tooltip("Aiuti a 10/20/40 s di inattività (OnboardingHints). La freccia a bordo schermo parte solo al livello 2.")]
+        public bool AiutiProgressivi = true;
+        [Tooltip("'Salta tutorial' compare dopo questo passo o alla prima combo (NotifyCombo)")]
+        public Step SaltaDopo = Step.Monete;
 
         public Step Current { get; private set; }
         public string CurrentObjectiveText => Current < Step.Fine && (int)Current < Objectives.Length ? Objectives[(int)Current] : (Current == Step.Fine ? "Deposito aperto!" : "");
@@ -36,6 +44,16 @@ namespace UltimoMiglio.Gameplay
             _hud = FindAnyObjectByType<UltimoMiglio.UI.HudController>();
             _edge = FindAnyObjectByType<UltimoMiglio.UI.EdgeArrow>(FindObjectsInactive.Include);
             BuildMarker();
+            if (AiutiProgressivi && !GetComponent<OnboardingHints>()) gameObject.AddComponent<OnboardingHints>();
+            foreach (var nr in FindObjectsByType<NonnoRobot>(FindObjectsSortMode.None)) if (!nr.GetComponent<NonnoRateBadge>()) nr.gameObject.AddComponent<NonnoRateBadge>();
+            RegisterWorldReveals();
+            // Graduale solo per una partita NUOVA (nessun passo salvato) o iniziata già in graduale; salvataggi precedenti = tutto visibile
+            bool nuova = !PlayerPrefs.HasKey(PrefKey);
+            bool escluso = PlayerPrefs.HasKey(PrefGraduale) && PlayerPrefs.GetInt(PrefGraduale) == 0; // test/QA: um_onb_graduale = 0 → tutto visibile subito
+            if (RivelaGraduale && nuova && !escluso) { PlayerPrefs.SetInt(PrefGraduale, 1); PlayerPrefs.Save(); }
+            bool graduale = RivelaGraduale && !escluso && Current < Step.Fine && (nuova || PlayerPrefs.GetInt(PrefGraduale, 0) == 1);
+            if (graduale) UltimoMiglio.UI.HudReveal.HideAll(LockedAtStart);
+            for (var k = Step.Muoviti; k < Current; k++) RevealFor(k); // ripresa da PlayerPrefs: ciò che è già stato rivelato resta visibile
             Enter(Current);
         }
 
@@ -144,6 +162,61 @@ namespace UltimoMiglio.Gameplay
             (_hud.SafeRoot ?? _hud.Root).Add(_hint);
         }
 
+        // ---------------- #94: comparse graduali + Salta tutorial ----------------
+        /// <summary>Sottoinsieme di onboarding.json → lockedAtStart presente nella slice. Per decisione di DevOn (#64/#94) niente telefono,
+        /// niente barra debito (il debito si vede solo a fine giornata e nel fumetto di Ada), combo = ComboPopup nel mondo: nessun id HUD per questi.</summary>
+        public static readonly string[] LockedAtStart = { "hud.pillolaValute", "zona.arrivi", "zona.scaffaleTerracotta", "zona.bancone", "pad.zaino", "pad.assumiNonno", "robot.nonno.attivo" };
+        bool _uiRegistered, _comboSeen; VisualElement _skip;
+
+        static string[] RevealsOf(Step s) => s switch
+        {
+            Step.Arrivi => new[] { "zona.arrivi" }, Step.Scaffali => new[] { "zona.scaffaleTerracotta" }, Step.Bancone => new[] { "zona.bancone" },
+            Step.Monete => new[] { "hud.pillolaValute" }, Step.Nonno => new[] { "pad.assumiNonno", "robot.nonno.attivo" }, Step.Zaino => new[] { "pad.zaino" },
+            _ => System.Array.Empty<string>()
+        };
+        static void RevealFor(Step s) { if (s >= Step.Fine) UltimoMiglio.UI.HudReveal.ShowAll(); else foreach (var id in RevealsOf(s)) UltimoMiglio.UI.HudReveal.Show(id); }
+
+        void RegisterWorldReveals()
+        {
+            void W(string id, Transform t) { if (t) UltimoMiglio.UI.HudReveal.RegisterWorld(id, t.gameObject); }
+            W("zona.arrivi", Arrivi); W("zona.scaffaleTerracotta", Scaffale); W("zona.bancone", Bancone); W("pad.zaino", PadZaino); W("pad.assumiNonno", PadNonno);
+            var nr = FindAnyObjectByType<NonnoRobot>(); if (nr) UltimoMiglio.UI.HudReveal.RegisterWorld("robot.nonno.attivo", nr.gameObject);
+        }
+
+        void EnsureUiReveals()
+        {
+            if (_uiRegistered || !_hud || _hud.Root == null) return;
+            _uiRegistered = true;
+            UltimoMiglio.UI.HudReveal.Register("hud.pillolaValute", _hud.Root.Q("currency-pill"));
+        }
+
+        /// <summary>Soglia del gate combo (onboarding.json: comboReached ≥ 1,2). Il moltiplicatore è interno: non si mostra mai.</summary>
+        public const float ComboGate = 1.2f;
+
+        /// <summary>Cliente servito in combo (Game Designer, #106): a schermo solo "+N" sopra Nina (N = clienti serviti di fila, 1,5 s).
+        /// Il moltiplicatore serve solo per la soglia del passo combo (≥ 1,2 → gate comboReached → "Salta tutorial").</summary>
+        public void NotifyCombo(int clientiDiFila, float moltiplicatore)
+        {
+            if (clientiDiFila >= 2) ComboPopup.Show(clientiDiFila); // il primo cliente non è ancora una combo
+            if (!_comboSeen && moltiplicatore >= ComboGate - 1e-4f) { _comboSeen = true; UltimoMiglio.UI.OnbLog.Write("gate comboReached"); }
+        }
+
+        void EnsureSkip()
+        {
+            if (_skip != null || !_hud || _hud.Root == null) return;
+            var b = new Button(Skip) { name = "skip-tutorial", text = "Salta tutorial" }; b.AddToClassList("skip-tut");
+            _skip = b; (_hud.SafeRoot ?? _hud.Root).Add(_skip);
+        }
+
+        /// <summary>Salta il tutorial: rivela tutto ciò che i passi saltati avrebbero rivelato e chiude il tutorial.</summary>
+        public void Skip()
+        {
+            UltimoMiglio.UI.OnbLog.Write($"skip at step={Current}");
+            UltimoMiglio.UI.HudReveal.ShowAll(); CameraPeek.Cancel();
+            if (_hud) _hud.CompleteAdaNote();
+            Enter(Step.Chiuso);
+        }
+
         public string CurrentText => Current < Step.Fine ? Texts[(int)Current] : Current == Step.Fine ? EndText : null;
 
         void Enter(Step s)
@@ -163,8 +236,10 @@ namespace UltimoMiglio.Gameplay
                 eco.S.Wallet = System.Math.Max(eco.S.Wallet, 4);
             Debug.Log($"[Tutorial] step {(int)s} {s}: {CurrentText}");
             StepChanged?.Invoke(s);
+            RevealFor(s);
             var t = Target();
-            if (_edge) { if (t) _edge.SetTarget(t, s.ToString().ToUpper()); else _edge.Clear(); }
+            // #94: con gli aiuti progressivi la freccia a bordo schermo arriva solo dopo 20 s di inattività (OnboardingHints)
+            if (_edge) { if (t && !OnboardingHints.Active) _edge.SetTarget(t, s.ToString().ToUpper()); else _edge.Clear(); }
             // #4 (VFX): anello pulsante a terra sul bersaglio + freccia a terra davanti a Nina (niente waypoint fluttuante, QA #44)
             if (t) UltimoMiglio.VFX.UM_TutorialMarker.Show(t, GameRoot.I && GameRoot.I.Nina ? GameRoot.I.Nina.transform : null); else UltimoMiglio.VFX.UM_TutorialMarker.Hide();
             if (_marker) _marker.gameObject.SetActive(false); // QA v2: no world waypoint if edge arrow exists
@@ -191,6 +266,14 @@ namespace UltimoMiglio.Gameplay
                 _adaShown = Current; var at = CurrentText;
                 if (Current <= Step.Fine && !string.IsNullOrEmpty(at)) _hud.ShowAdaNote(DisplayNames.Apply(at), sticky: Current < Step.Fine, seconds: EndSeconds);
                 else _hud.CompleteAdaNote();
+            }
+            EnsureUiReveals();
+            EnsureSkip();
+            if (_skip != null)
+            {
+                bool skipOn = Current < Step.Fine && (_comboSeen || Current > SaltaDopo);
+                _skip.EnableInClassList("skip-tut--on", skipOn);
+                _hud.Root.EnableInClassList("hud--skip", skipOn); // stringe la riga obiettivo (Onboarding.uss)
             }
             EnsureHint();
             if (_hint != null) { var h = Current < Step.Fine ? CurrentHint() : null; var joy = _hud.Root.Q("joystick-base"); bool joyOver = joy != null && joy.resolvedStyle.display == DisplayStyle.Flex && joy.resolvedStyle.opacity > 0.05f && joy.worldBound.Overlaps(_hint.worldBound);

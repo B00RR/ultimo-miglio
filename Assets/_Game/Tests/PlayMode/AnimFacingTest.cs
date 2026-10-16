@@ -22,7 +22,7 @@ public class AnimFacingTest
     }
 
     /// <summary>Cancella solo le chiavi di gioco (salvataggio + tutorial), non volumi/zoom delle impostazioni (#36).</summary>
-    internal static void ResetGameKeys() { PlayerPrefs.DeleteKey("um_save_v1" /* GameRoot.SaveKey */); PlayerPrefs.DeleteKey(TutorialManager.PrefKey); PlayerPrefs.Save(); }
+    internal static void ResetGameKeys() { PlayerPrefs.DeleteKey("um_save_v1" /* GameRoot.SaveKey */); PlayerPrefs.DeleteKey(TutorialManager.PrefKey); PlayerPrefs.SetInt(TutorialManager.PrefGraduale, 0) /* #94: test non di onboarding → niente rivelazione graduale */; PlayerPrefs.Save(); }
     static IEnumerator Load()
     {
         ResetGameKeys(); Time.timeScale = 1f;
