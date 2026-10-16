@@ -279,8 +279,18 @@ namespace UltimoMiglio.Gameplay
         void EnsureSkip()
         {
             if (_skip != null || !_hud || _hud.Root == null) return;
-            var b = new Button(Skip) { name = "skip-tutorial", text = "Salta tutorial" }; b.AddToClassList("skip-tut");
-            _skip = b; (_hud.SafeRoot ?? _hud.Root).Add(_skip);
+            // #224: il bottone è figlio di top-bar (Hud.uxml), posizionato in USS rispetto a quella riga.
+            // La safe area è il padding di safe-root: la riga (e quindi la pillola) scende col notch insieme all'ingranaggio.
+            var b = _hud.Root.Q<Button>("skip-tutorial");
+            if (b == null)
+            {
+                b = new Button(Skip) { name = "skip-tutorial", text = "Salta tutorial" };
+                b.AddToClassList("skip-tut");
+                var bar = (_hud.SafeRoot ?? _hud.Root).Q(className: "top-bar");
+                (bar ?? _hud.SafeRoot ?? _hud.Root).Add(b);
+            }
+            else b.RegisterCallback<ClickEvent>(_ => Skip());
+            _skip = b;
         }
 
         /// <summary>Salta il tutorial: rivela tutto ciò che i passi saltati avrebbero rivelato e chiude il tutorial.</summary>

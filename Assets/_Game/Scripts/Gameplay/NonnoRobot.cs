@@ -70,36 +70,44 @@ namespace UltimoMiglio.Gameplay
                     if (StepMove()) { State = WorkState.Loading; _timer = 0; _loadElapsed = 0; }
                     break;
                 case WorkState.Loading:
-                    _loadElapsed += Time.deltaTime;
-                    if ((_timer += Time.deltaTime) >= perParcel)
                     {
-                        _timer = 0;
-                        if (Arrivals.TakeForRobot(out _)) _carry++;
-                    }
-                    bool full = _carry >= CarryMax;
-                    bool stockOut = _carry > 0 && Arrivals.Stock <= 0;
-                    bool timedOut = _loadElapsed >= LoadTimeout;
-                    if (timedOut && _carry == 0 && Arrivals.Stock > 0 && Arrivals.TakeForRobot(out _))
-                        _carry = 1; // force at least one parcel so we leave Arrivi
-                    if (full || stockOut || (timedOut && _carry > 0))
-                    {
-                        _target = Pick();
-                        if (_target != null)
-                            Go(ShelfApproach(_target), WorkState.ToShelf);
-                        else
+                        // #221: si carica solo quanto entra davvero negli scaffali. Prima, con gli scaffali pieni (12/12), NONNO toglieva
+                        // pacchi agli Arrivi e li "scaricava" su uno scaffale pieno (Add limitato a Capacity): pacchi distrutti e giro a vuoto.
+                        int cap = Mathf.Min(CarryMax, _carry + Room());
+                        if (cap <= _carry) { _timer = 0; _loadElapsed = 0; break; } // scaffali pieni: aspetta agli Arrivi senza consumare pacchi
+                        _loadElapsed += Time.deltaTime;
+                        if ((_timer += Time.deltaTime) >= perParcel)
+                        {
+                            _timer = 0;
+                            if (Arrivals.TakeForRobot(out _)) _carry++;
+                        }
+                        bool full = _carry >= cap;
+                        bool stockOut = _carry > 0 && Arrivals.Stock <= 0;
+                        bool timedOut = _loadElapsed >= LoadTimeout;
+                        if (timedOut && _carry == 0 && Arrivals.Stock > 0 && Arrivals.TakeForRobot(out _))
+                            _carry = 1; // force at least one parcel so we leave Arrivi
+                        if (full || stockOut || (timedOut && _carry > 0))
+                        {
+                            _target = Pick();
+                            if (_target != null) Go(ShelfApproach(_target), WorkState.ToShelf);
+                        }
+                        else if (timedOut && _carry == 0)
+                        {
+                            // Arrivi empty — wait for refill via Idle→retry (don't spin forever in Loading)
                             State = WorkState.Idle;
-                    }
-                    else if (timedOut && _carry == 0)
-                    {
-                        // Arrivi empty — wait for refill via Idle→retry (don't spin forever in Loading)
-                        State = WorkState.Idle;
+                        }
                     }
                     break;
                 case WorkState.ToShelf:
                     if (StepMove()) { State = WorkState.Unloading; _timer = 0; }
                     break;
                 case WorkState.Unloading:
-                    if (_target == null) { _carry = 0; State = WorkState.Idle; break; }
+                    if (_target == null || _target.Count >= _target.Capacity)
+                    {   // #221: scaffale pieno (o sparito): mai buttare il carico, si va su un altro scaffale con posto o si aspetta agli Arrivi
+                        _target = Pick();
+                        if (_target != null) Go(ShelfApproach(_target), WorkState.ToShelf); else Go(Arrivals.transform.position, WorkState.ToArrivals);
+                        break;
+                    }
                     if ((_timer += Time.deltaTime) >= 0.22f)
                     {
                         _timer = 0;
@@ -122,11 +130,13 @@ namespace UltimoMiglio.Gameplay
             Shelf best = null;
             foreach (var s in Shelves)
             {
-                if (!s) continue;
+                if (!s || s.Count >= s.Capacity) continue; // #221: uno scaffale pieno non è una meta
                 if (best == null || s.Count < best.Count) best = s;
             }
             return best;
         }
+        /// <summary>#221: posti liberi totali negli scaffali di NONNO.</summary>
+        int Room() { int r = 0; foreach (var s in Shelves) if (s) r += Mathf.Max(0, s.Capacity - s.Count); return r; }
         static Vector3 ShelfApproach(Shelf s)
         {
             // Front of shelf zone (toward Arrivi / +Z side of shelf pickup area)
