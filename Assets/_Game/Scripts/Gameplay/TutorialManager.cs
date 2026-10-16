@@ -31,6 +31,8 @@ namespace UltimoMiglio.Gameplay
         [Tooltip("Nuova partita: nasconde all'avvio gli elementi bloccati e li rivela passo per passo (HudReveal). Salvataggi esistenti o tutorial finito: tutto visibile.")]
         public bool RivelaGraduale = true;
         public const string PrefGraduale = "um_onb_graduale";
+        /// <summary>Test PlayMode del loop completo: niente comparse graduali (pad, zone e NONNO restano attivi per FindObjectsByType).</summary>
+        public static bool TestSenzaComparse;
         [Tooltip("Aiuti a 10/20/40 s di inattività (OnboardingHints). La freccia a bordo schermo parte solo al livello 2.")]
         public bool AiutiProgressivi = true;
         [Tooltip("'Salta tutorial' compare dopo questo passo o alla prima combo (NotifyCombo)")]
@@ -81,6 +83,7 @@ namespace UltimoMiglio.Gameplay
             // #101: nelle nuove partite RivelaGraduale è sempre acceso (anche se la scena serializzava false); i salvataggi esistenti restano come sono
             if (nuova) { RivelaGraduale = true; PlayerPrefs.SetInt(PrefGraduale, 1); PlayerPrefs.Save(); }
             bool graduale = Current < Step.Fine && (nuova ? RivelaGraduale : PlayerPrefs.GetInt(PrefGraduale, 0) == 1);
+            if (TestSenzaComparse) graduale = false;
             if (graduale) UltimoMiglio.UI.HudReveal.HideAll(LockedAtStart);
             for (var k = Step.ColdOpen; k < Current; k++) RevealFor(k); // ripresa da PlayerPrefs: ciò che è già stato rivelato resta visibile
             Enter(Current);
