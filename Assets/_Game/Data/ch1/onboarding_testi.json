@@ -1,35 +1,66 @@
 {
-  "_nota": "Testi definitivi onboarding cap.1. Voce: Nonna Ada, dai suoi biglietti lasciati nel deposito, parla a Nina. Max 70 caratteri.",
+  "_nota": "Testi definitivi onboarding cap.1 (Narrative). Voce: Nonna Ada, dai biglietti lasciati nel deposito, parla a Nina. Max 70 caratteri. SliceSceneBuilder legge speaker, steps[].text IN ORDINE (7 passi, ordine del codice: ... monete, NONNO, Zaino) e fine: non cambiare ordine né chiavi.",
   "speaker": "Nonna Ada",
   "steps": [
     {
-      "id": "muoviti",
-      "text": "Nina, tesoro, sgranchisci le gambe: joystick o WASD."
+      "id": "move",
+      "text": "Nina, sgranchisci le gambe. Il deposito si gira a piedi."
     },
     {
-      "id": "arrivi",
-      "text": "Il furgone ha scaricato! Prendi i pacchi agli Arrivi."
+      "id": "pickup",
+      "text": "È arrivato il furgone! Passa agli Arrivi e prendi i pacchi."
     },
     {
-      "id": "scaffali",
-      "text": "Ogni pacco al suo scaffale, per colore. Ordine, sempre!"
+      "id": "shelve",
+      "text": "Ogni pacco al suo scaffale. L'ordine è mezzo mestiere."
     },
     {
-      "id": "bancone",
-      "text": "C'è gente al Bancone. Servila col sorriso, come facevo io."
+      "id": "serve",
+      "text": "C'è Mamma Rosa al Bancone. Non farla aspettare, eh."
     },
     {
-      "id": "monete",
-      "text": "Cammina sulle monete: ogni lira conta, credimi."
+      "id": "coins",
+      "text": "Raccogli le monete. Una alla volta si fa un anno."
     },
     {
-      "id": "nonno",
-      "text": "Assumi NONNO (10 LN): lui porta i pacchi al posto tuo."
+      "id": "unlock_nonno",
+      "text": "NONNO brontola, ma lavora. Sveglialo dal pad, digli ciao."
     },
     {
-      "id": "zaino",
-      "text": "Poi lo Zaino: più pacchi in un viaggio. Vale ogni lira."
+      "id": "upgrade_zaino",
+      "text": "Sali sul pad ZAINO: più pacchi, meno giri. Fidati."
     }
   ],
-  "fine": "Brava la mia Nina. Vela & Figli è in buone mani adesso."
+  "fine": "Brava, Nina. Il resto lo scopri da te. Io l'ho sempre saputo.",
+  "lettere": {
+    "onb.cold.letterAda": "Nina, tesoro,\nse leggi, la serranda l'hai alzata tu. Bene.\nVela & Figli ora è tuo: pacchi, debiti e quel brontolone di NONNO.\nSul bancone c'è un pacco. Non è per i clienti. Lascialo lì, per ora.\nLui saprà aspettare. Tu no, lo so: comincia dagli Arrivi.\nTi voglio bene.\nNonna Ada",
+    "onb.cold.letterOmni": "OmniFreight S.p.A. · Gentile sig.ra Vela, avete 1 anno per rendere redditizio il deposito. Poi lo acquisiremo. Cordialmente, V. Sale"
+  },
+  "suggerimenti": {
+    "onb.move.card": "Trascina per muovere Nina",
+    "onb.pick.max": "Pila piena! Portala allo scaffale",
+    "onb.deposit.hint": "Stai sullo scaffale: i pacchi si sistemano da soli",
+    "onb.cust.first": "Porta un pacco al Bancone",
+    "onb.coins.walk": "Cammina sulle monete",
+    "onb.zaino.hint": "Zaino più grande, più pacchi per giro",
+    "onb.combo": "Servi di fila: la combo sale!",
+    "onb.nonno.intro": "Quel brontolone che dorme è NONNO. L'ha fatto la nonna.",
+    "onb.nonno.what": "NONNO porta i pacchi dagli Arrivi agli scaffali.",
+    "onb.nonno.cost": "Stai sul pad: con 50 LN NONNO si sveglia.",
+    "onb.nonno.notEnough": "Mancano LN: servi qualche cliente al Bancone.",
+    "onb.nonno.ready": "50 LN in tasca! Torna dal pad di NONNO.",
+    "onb.nonno.reminder": "NONNO ti aspetta sul pad vicino agli Arrivi.",
+    "onb.nonno.hired": "NONNO: «Sveglio. Non per scelta, ma sveglio.»",
+    "onb.nonno.working": "Gli scaffali li riempie lui. Tu pensa ai clienti.",
+    "onb.nonno.bark": "NONNO: «Bzz. Di nuovo al lavoro. Contenta, Ada?»",
+    "onb.civetta.msg1": "Conoscevo tua nonna. Teneva i conti meglio di te. Il pacco sul bancone? Non aprirlo. 🦉",
+    "onb.civetta.reply": "Chi sei?",
+    "onb.civetta.msg2": "Un vecchio socio. Torna al lavoro. 🦉",
+    "onb.orders.special": "Mamma Rosa ha un ordine speciale",
+    "onb.flotta.hint": "Qui vedi i robot. I pad si comprano a terra",
+    "onb.viktor.call1": "Signora Vela. Viktor Sale, OmniFreight.",
+    "onb.viktor.call2": "La prima rata scade il Giorno 24. Non ci deluda.",
+    "onb.debt.pedaggioHint": "Salti la scadenza? OmniFreight prende il 15% di ogni moneta",
+    "onb.wall.goal": "Prossimo obiettivo: abbatti il muro"
+  }
 }
