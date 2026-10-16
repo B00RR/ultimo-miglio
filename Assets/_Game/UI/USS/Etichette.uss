@@ -1,6 +1,8 @@
 /* Etichette #186. Baloo 2 = titoli e valori. Fredoka = testo.
    Pillole: insegna di noce #7A4A2E, crema #F3E3C3, filo oro #F2B53A.
-   Volume: luce in alto nello sprite, ombra portata #9E7873 dietro, contorno testo 1 px.
+   Ombra portata: stessa sagoma, 4 dp più in basso, #9E7873 al 60%.
+   «Muoviti» è crema piena, senza contorno chiaro.
+   Il fumetto di Oma Tilde è carta #F3E3C3, testo #3B2A20, alto quanto le righe.
    Sopra i 32 px il raggio è metà altezza e lo sprite ha lo stesso raggio
    (il 16 fisso della #185 resta solo sulle capsule da 32 px).
    I pannelli 9-slice della #185 non si usano qui. */
@@ -44,11 +46,21 @@
     text-shadow: 0 1px 0 #9E7873;
 }
 
-/* Ombra portata: fratello dietro la capsula. Il contenitore non ha raggio, così non la taglia. */
-.ombra-portata { position: absolute; background-color: #9E7873; border-width: 0; }
-.ombra-portata--32 { left: 1px; right: 1px; top: 4px; height: 32px; border-radius: 16px; }
-.ombra-portata--40 { left: 2px; right: 2px; top: 4px; height: 40px; border-radius: 20px; }
-.ombra-portata--48 { left: 2px; right: 2px; top: 4px; height: 48px; border-radius: 24px; }
+/* Ombra portata: stessa sagoma del genitore, solo 4 dp più in basso. #9E7873 al 60%. */
+.ombra-portata {
+    position: absolute;
+    left: 0;
+    right: 0;
+    top: 0;
+    bottom: 0;
+    translate: 0 4px;
+    background-color: rgba(158, 120, 115, 0.6);
+    border-width: 0;
+}
+.objective-pill .ombra-portata { border-radius: 16px; }
+.currency-slot .ombra-portata { border-radius: 20px; }
+.ada-wrap .ombra-portata { border-radius: 999px; }
+.tut-hint__slot .ombra-portata { border-radius: 16px; }
 
 .currency-slot { position: relative; align-self: flex-start; flex-shrink: 1; min-width: 0; }
 
@@ -73,22 +85,33 @@
 }
 #hud-root #currency-pill .icon-coin { -unity-background-image-tint-color: #F2B53A !important; }
 
-/* Muoviti: nella safe area, a destra, con un vuoto prima dell'ingranaggio (52 px + margini). */
+/* Muoviti: nella safe area, a destra, con un vuoto prima dell'ingranaggio (52 px + margini).
+   La pillola interna, non lo slot, dà la misura all'ombra: stessa sagoma, solo più in basso. */
 #safe-root .objective-slot {
     position: absolute;
     left: auto;
     right: 78px;
     top: 18px;
     flex-direction: row;
+    justify-content: flex-end;
     width: auto;
-    min-width: 108px;
-    height: 32px;
+    min-width: 0;
+    height: auto;
+    overflow: visible;
 }
 .hud--skip #safe-root .objective-slot { right: 220px; }
-#safe-root .objective-slot .tutorial-objective {
+.objective-pill {
     position: relative;
-    left: auto;
-    right: auto;
+    flex-direction: row;
+    flex-shrink: 0;
+    width: auto;
+    height: 32px;
+    overflow: visible;
+}
+#safe-root .objective-slot .tutorial-objective {
+    position: relative !important;
+    left: auto !important;
+    right: auto !important;
     top: auto;
     bottom: auto;
     width: auto;
@@ -110,74 +133,63 @@
     -unity-text-align: middle-center;
     white-space: nowrap;
     text-overflow: clip;
-    -unity-text-outline-width: 1px;
-    -unity-text-outline-color: #E8D3AC;
-    text-shadow: 0 1px 0 #9E7873;
+    -unity-text-outline-width: 0 !important;
+    -unity-text-outline-color: rgba(0, 0, 0, 0) !important;
+    text-shadow: 0 1px 0 rgba(158, 120, 115, 0.6);
     -unity-font-definition: url("project://database/Assets/_Game/UI/Fonts/Fredoka-Medium_SDF.asset") !important;
 }
 
-/* Fumetto: due righe al massimo, niente ellissi. Capsula 48 px, raggio 24. */
+/* Fumetto di Oma Tilde: carta #F3E3C3, testo #3B2A20. Altezza del contenuto (2 righe intere).
+   Niente sprite di luce: il fondo è il colore, ritagliato dal raggio. */
+.ada-wrap { position: relative; width: 100%; overflow: visible; }
 #hud-root .ada-band.ada-band {
     height: auto !important;
-    max-height: 64px !important;
+    max-height: 96px !important;
     overflow: visible !important;
 }
 #hud-root .ada-note.ada-note {
     position: relative;
     width: 100%;
-    height: 48px !important;
-    min-height: 48px !important;
-    max-height: 56px !important;
-    overflow: visible !important;
+    height: auto !important;
+    min-height: 0 !important;
+    max-height: 96px !important;
+    overflow: hidden !important;
     flex-direction: row;
     align-items: center;
-    padding-top: 0 !important;
-    padding-bottom: 0 !important;
+    padding-top: 10px !important;
+    padding-bottom: 10px !important;
     padding-left: 8px !important;
     padding-right: 16px !important;
-    border-width: 0 !important;
-    border-radius: 0 !important;
-    background-color: rgba(0, 0, 0, 0) !important;
+    border-width: 2px !important;
+    border-bottom-width: 2px !important;
+    border-color: #3B2A20 !important;
+    border-radius: 999px !important;
+    background-color: #F3E3C3 !important;
     background-image: none !important;
 }
-.ada-plate {
-    position: absolute;
-    left: 0;
-    right: 0;
-    top: 0;
-    height: 48px;
-    border-width: 0;
-    border-radius: 24px;
-    background-color: rgba(0, 0, 0, 0);
-    background-image: url("project://database/Assets/_Game/UI/Textures/tex_capsula_noce_48.png");
-    -unity-background-scale-mode: stretch-to-fill;
-    -unity-slice-left: 24px;
-    -unity-slice-top: 24px;
-    -unity-slice-right: 24px;
-    -unity-slice-bottom: 24px;
-}
+.ada-plate { display: none !important; background-image: none !important; }
 #hud-root .ada-face.ada-face--portrait { border-color: #F2B53A !important; }
 #hud-root .ada-col {
     flex-grow: 1;
     flex-shrink: 1;
     min-width: 0;
-    height: 48px;
+    height: auto;
     justify-content: center;
 }
 #hud-root .ada-text.ada-text {
     white-space: normal !important;
     text-overflow: clip !important;
-    overflow: hidden !important;
+    overflow: visible !important;
     height: auto !important;
-    max-height: 36px !important;
+    max-height: 64px !important;
     width: 100%;
     font-size: 14px !important;
-    color: #F3E3C3 !important;
+    color: #3B2A20 !important;
     -unity-text-align: middle-left;
     -unity-paragraph-spacing: 0;
-    -unity-text-outline-width: 1px;
-    -unity-text-outline-color: #E8D3AC;
-    text-shadow: 0 1px 0 #9E7873;
+    -unity-text-outline-width: 0 !important;
+    -unity-text-outline-color: rgba(0, 0, 0, 0) !important;
+    text-shadow: none;
     -unity-font-definition: url("project://database/Assets/_Game/UI/Fonts/Fredoka-Medium_SDF.asset") !important;
 }
 
