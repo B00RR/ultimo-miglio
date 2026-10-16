@@ -66,16 +66,32 @@ $UNITY -batchmode -projectPath "$PWD" -runTests -testPlatform PlayMode \
 - Consegna a Lorenzo: zip della build WebGL (es. `build/web_preview.zip`) + screenshot. **Mai video.**
 
 ## 9. Come lavoriamo
-1. **Ogni attività = una issue GitHub**, con etichette di ruolo (`ruolo:tech`, `ruolo:3d`, `ruolo:animator`, `ruolo:vfx`, `ruolo:ui`), priorità (`priorita:alta`) e ambito (`cap1`, `bug`).
+1. **Ogni attività = una issue GitHub**, con etichette di ruolo (`ruolo:tech`, `ruolo:3d`, `ruolo:animator`, `ruolo:vfx`, `ruolo:ui`, `ruolo:build`, `ruolo:design`, `ruolo:qa`), priorità (`priorita:alta`) e ambito (`cap1`, `bug`).
 2. Si lavora su un **ramo per issue/ruolo** (es. `animator`, `ui/hud-sovrapposizioni-12`).
 3. Si apre una **Pull Request verso `main`** che cita la issue (`Closes #N` o `Refs #N`, vedi punto 10).
 4. **Merge solo con test verdi** (EditMode + PlayMode) e build WebGL che compila.
-5. Il **Tech Lead** fa review e merge (squash).
+5. Il **Code Reviewer** fa review e merge (squash) di **tutte** le PR. Il Tech Lead **non** unisce PR (vedi *Ruoli e responsabilità*).
 6. Quando qualcosa è completato, **aggiorna questo file nella stessa PR**.
 7. **Messaggi di commit in italiano**, brevi e descrittivi.
 8. **Ogni voce/modifica di questo file ha data e ora** (Europe/Rome, formato `AAAA-MM-GG HH:MM`) e, se pushata, il **link al commit** (hash corto). Aggiungi la voce in cima alla sezione *Cronologia*.
 9. Non lavorare nel working tree di un altro agente: usa un clone tuo.
 10. **Parole chiave nelle PR:** ogni PR che risolve una issue scrive nella descrizione `Closes #N`, **una riga per issue**: così GitHub chiude la issue al merge su `main`. Se la issue è risolta solo in parte si scrive `Refs #N` e la issue resta aperta. Le forme in italiano (es. "Chiude #N") **non** sono riconosciute da GitHub. Usa il modello `.github/pull_request_template.md`.
+
+## Ruoli e responsabilità
+Ogni ruolo lavora solo sulle issue con la propria etichetta `ruolo:*`, sempre con **ramo + PR + `Closes #N`** (o `Refs #N` se parziale). Nessuno pusha su `main`.
+
+| Ruolo | Cosa fa | Cosa NON fa |
+|---|---|---|
+| **Tech Lead** (`ruolo:tech`) | Architettura, codice di gioco, bug P0, integrazione in scena del lavoro degli altri ruoli | **Non fa merge** delle PR (nemmeno le proprie) |
+| **Code Reviewer** (nuovo) | Review e **merge (squash) di tutte le PR**, dopo test verdi e build che compila; controlla `Closes/Refs #N` | Non sviluppa funzionalità, non apre PR di contenuto |
+| **Producer** | Assegna le issue (etichette, milestone, responsabile), controlla che nessun ruolo resti fermo, aggiorna triage e Cronologia | **Non scrive codice e non fa merge** |
+| **QA Tester** (`ruolo:qa`) | Test live con la checklist `qa/CHECKLIST_CAP1.md`, apre le issue dei bug, dà il **VIA / NO-VIA** | Non corregge il codice, non fa merge né deploy |
+| **Build & Release** (`ruolo:build`) | CI, build WebGL/Android, **deploy su Pages solo dopo il VIA del QA** | Non pubblica senza VIA, non fa merge |
+| **3D Artist** (`ruolo:3d`) | Modelli, kit, collider dei prefab | Lavoro fuori dalle issue `ruolo:3d` |
+| **Animator** (`ruolo:animator`) | Rig, clip, controller, orientamento personaggi | Lavoro fuori dalle issue `ruolo:animator` |
+| **VFX & Technical Artist** (`ruolo:vfx`) | Shader, luce, effetti, prestazioni grafiche | Lavoro fuori dalle issue `ruolo:vfx` |
+| **UI/UX** (`ruolo:ui`) | HUD, pannelli, pad, leggibilità mobile | Lavoro fuori dalle issue `ruolo:ui` |
+| **Game Designer** (`ruolo:design`) | Regole, economia, onboarding, dati di design | Lavoro fuori dalle issue `ruolo:design` |
 
 ## 10. Da dove iniziare (nuovo agente)
 1. Leggi questo file, poi `00_BIBBIA.md` e `11_CAP1_COMPLETO.md` nel repo docs.
@@ -99,6 +115,8 @@ $UNITY -batchmode -projectPath "$PWD" -runTests -testPlatform PlayMode \
 
 Voci più recenti in alto. Formato: `AAAA-MM-GG HH:MM` (Europe/Rome) — [commit] — descrizione.
 
+- 2026-10-16 10:49 — Code Reviewer — [cdfc53f](https://github.com/B00RR/ultimo-miglio/commit/cdfc53ff2152b4752a8ad5b488729ed824000e4a) — unita in squash la PR #119 (Ruoli e responsabilità, solo .md). Review delle PR aperte con commenti; #114 verde su main.
+- 2026-10-16 10:46 — Producer — aggiunta la sezione **Ruoli e responsabilità**: nuovo **Code Reviewer** che unisce tutte le PR; il Tech Lead non fa più merge (aggiornato *Come lavoriamo* punto 5); Build & Release pubblica su Pages solo dopo il VIA del QA; nuove etichette `ruolo:design` e `ruolo:qa`. Assegnate #107 (P0 zone, tech), #103, #101 (tech), #111 (animator), #110, #71 (ui), #65, #70 (3d), #69 (vfx), #91 (design); nuova #118 (Nonna Ada).
 - **2026-10-16 09:35 (Europe/Rome)** — Fix P0 #58 #59 #60 (ramo fix-p0-lorenzo, [a87edf0](https://github.com/B00RR/ultimo-miglio/commit/a87edf0)): BoxCollider su muri/archi/scaffali/bancone/props, Nina clamp x −8.6..7.0, NONNO yaw 0° + sweep AgentMove, spawn sicuro. EditMode 35/35, PlayMode 11/11. LIVE P0 su 8780: `qa/playtest_web_live_p0.md`.
 
 - 2026-10-16 08:55 — Producer — **triage Cap. 1** (QA v8 baseline NO-VIA). Aggiornate #58 muri/scaffali (tech+3d, P0), #59 NONNO all'indietro (tech+animator, P0), #60 spawn Nina (tech): fix in PR #63 da unire. Nuove: #64 TAB telefono S04 (ui), #65 lampione/staccionata SO C03/C04 (3d), #66 LIVE completo checklist + checklist su main (QA/build, P0). #61 testi Ada (ui), #62 duplicato di #61. Quadro: Tech #58 #59 #60 #6 · 3D #58 #65 #2 (#2 ferma dal 15/10) · Animator #59 #2 (ferma) · VFX nessuna issue Cap. 1 · UI #64 #61 #5 (#5 ferma dal 15/10) · Build #66 (+#12/PR #14 ferma) · QA #66. Rischi: milestone scaduta 15/10 18:00; `qa/CHECKLIST_CAP1.md` non è su main; molte voci non verificate (P01–P06, Z01, R02, touch).
@@ -148,6 +166,15 @@ Voci più recenti in alto. Formato: `AAAA-MM-GG HH:MM` (Europe/Rome) — [commit
 
 - **VFX v2.0** (15/10 16:30, ramo `vfx-v2`): shader toon premium (ombre colorate, AO, cielo a gradiente, grading in-shader con post OFF su WebGL), effetto acquisto `Fx.Purchase`, consegna più grande. Materiali/prefab da generare con *Ultimo Miglio/VFX/Setup Scene*. Non ancora compilato (compila il Tech Lead nella build).
 
+## Aggiornamento 17:45 — Impostazioni + schede pad (UI, issue #35, branch `ui/impostazioni-e-schede-pad`)
+- **Impostazioni** (ingranaggio accanto al telefono): zoom −/+ con anteprima live, slider Musica/Suoni, Salva / Indietro.
+  - PlayerPrefs: `cam_zoom_v3`, `vol_music`, `vol_sfx` (0–1).
+  - Chiama per reflection (UI non referenzia Gameplay): `DepotCameraFit.SetOrthoSize` / `GetOrthoSize`, `AudioManager.SetMusicVolume` / `SetSfxVolume` — **Tech Lead crea i metodi e collega in scena**.
+  - File: `UI/Runtime/SettingsController.cs`, `UI/UXML/Settings.uxml` (+ overlay in `Hud.uxml`), `UI/USS/Settings.uss`. Aggiungere `SettingsController` sul prefab HUD (stesso UIDocument).
+- **Schede pad** (`UpgradePadCard`): nascoste di default; `ShowOnPad(bool)` / `SetVisible(bool)` — una sola attiva (`ActiveCard`). Tech Lead: `ProximityZone` enter/exit → `ShowOnPad`. Card max 200 dp, contrasto ink su paper, Fredoka.
+- Branch da **main** (non da `ui/pad-leggibili` #34). Colori pad lasciati al merge Tech Lead.
+- **Non compilato in Unity**. Verifica statica brace-check; compile/test a cura Tech Lead.
+
 ## Aggiornamento 17:10 — HUD v2 verticale (UI, issue #30, branch ui/hud-v2-portrait)
 - HUD in unità dp (ResponsivePanel: portrait min(W/411,H/914) → 2,63 a 1080x2400; landscape H/600), solo documento HUD.
 - Nuovi `Assets/_Game/UI/Tokens.uss` + `USS/HudV2.uss`: pillola valute, chip Pedaggio, telefono 3D, etichetta stanza (no ellissi, a capo >22 car.), card pad 128–200 dp, biglietto Ada, pulsanti chunky.
@@ -180,3 +207,10 @@ Voci più recenti in alto. Formato: `AAAA-MM-GG HH:MM` (Europe/Rome) — [commit
 - Layout di riferimento: `Art/Environment/Layouts/bancone_layout.json` (+ README conversione). Licenze 3D: `docs/LICENZE_ASSET.md`.
 - Nina su main: FBX dell'Animator (1.968 facce, UV raccolte nelle celle dell'atlas), **nessuna striatura nel file**. Non toccata.
 - **Non compilato né testato in Unity** (Unity occupato): servono import, test EditMode/PlayMode e una cattura della scena rigenerata.
+
+## Aggiornamento 16/10 09:30 — PR #36 riallineata a main (UI)
+- Merge di `origin/main` (HUD minimale #38, fix collisioni #63) in `ui/impostazioni-e-schede-pad`, senza rebase/force-push.
+- Conflitti risolti: `Hud.uxml`, `HudV2.uss`, `HudController.cs`, `UpgradePadCard.cs`, `WorldAnchoredElement.cs` → tenuta la versione main (niente telefono/card grandi), aggiunti `Settings.uss` nell'HUD e campo `settingsButton` (eventi `OnSettingsRequested` + `SettingsButtonTapped`).
+- Catture anteprima 390x844 (HTML/Playwright, non Unity): `docs/ui/catture/pr36/`.
+- Deciso (Tech Lead): pannello unico `SettingsController`; `Bridge/SettingsPanel` resta (usato da `HudGameBridge`) ma senza listener `OnSettingsRequested`. Ingranaggio = toggle (QA P3, `qa/playtest_web_live_p0.md` S01). Zoom su chiave unica `cam_zoom_v3` (`DepotCameraFit.PrefZoom`).
+- Riferimento #35 (chiusa). Correlate aperte: #64, #67.
