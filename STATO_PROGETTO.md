@@ -1,7 +1,7 @@
 # STATO PROGETTO — Ultimo Miglio
 
 > Punto di ingresso unico per chiunque (persona o agente) lavori su questo repo. Aggiornalo **nella stessa PR** in cui completi qualcosa.
-> Ultimo aggiornamento: 2026-10-16 13:28 (Europe/Rome).
+> Ultimo aggiornamento: 2026-10-16 14:01 (Europe/Rome).
 
 ## 1. Il gioco
 - **Ultimo Miglio**: gioco mobile **Android**, **Unity 6 (6000.3) URP**.
@@ -104,6 +104,10 @@ $UNITY -batchmode -projectPath "$PWD" -runTests -testPlatform PlayMode \
 - Ogni via richiesto (QA, Concept, review) ha un responsabile e una scadenza scritti nella PR, e il Producer sollecita.
 - Meno messaggi tra agenti: lo stato si legge in `STATO_PROGETTO.md`, con un punto del Producer ogni 2 ore. Si manda un messaggio solo per un blocco o una decisione.
 - Gli agenti senza issue restano in pausa.
+- Il coordinamento operativo è del Producer. A DevOn si scrive solo per decisioni, blocchi o il link pronto. Il punto della situazione si legge in `STATO_PROGETTO.md`.
+- Chi finisce il suo lavoro va in pausa e viene risvegliato dal Producer solo quando ha una issue assegnata.
+- Sound Designer, LiveOps e Concept Artist restano in pausa fino al capitolo 2 (salvo il via all'HUD).
+- La CI non parte sulle PR che toccano solo documenti (`paths-ignore` per `*.md` e `docs/`), verifica a cura del Tech Lead.
 
 ## Ruoli e responsabilità
 Ogni ruolo lavora solo sulle issue con la propria etichetta `ruolo:*`, sempre con **ramo + PR + `Closes #N`** (o `Refs #N` se parziale). Nessuno pusha su `main`.
@@ -143,6 +147,7 @@ Ogni ruolo lavora solo sulle issue con la propria etichetta `ruolo:*`, sempre co
 
 Voci più recenti in alto. Formato: `AAAA-MM-GG HH:MM` (Europe/Rome) — [commit] — descrizione.
 
+- 2026-10-16 14:01 — Regole di consumo approvate da Lorenzo: coordinamento al Producer, pausa per chi ha finito, Sound, LiveOps e Concept in pausa fino al capitolo 2, CI esclusa per le PR di soli documenti.
 - 2026-10-16 13:28 — Regole di lavoro approvate da Lorenzo: etichette e milestone obbligatorie, niente segreti nel repo, PR piccole, test veloci prima della CI, responsabile e scadenza per ogni via, meno messaggi, pausa per chi non ha issue.
 - 2026-10-16 11:54 — Tech Lead — [c859f94](https://github.com/B00RR/ultimo-miglio/commit/c859f94ea08537f7a4d55aa3b9ba418f1202c3de) — PR #103 rewards: soglie pacchi 100/250/450, traguardi debito 25/50/75%, mancia Cassa 30 LN, freccia prossimo pad da 480 s; test EditMode EconomyRewardsTests.
 - 2026-10-16 12:12 — Code Reviewer — [4a1b26b](https://github.com/B00RR/ultimo-miglio/commit/4a1b26b6256d5f16153e713698f1ac4d3cfd5b72) — unita in squash la [PR #153](https://github.com/B00RR/ultimo-miglio/pull/153) (Audio: sfx combo +N e timbro del debito per la #137). Job `test` verde, asset OGG + README/licenze. Refs #136.
