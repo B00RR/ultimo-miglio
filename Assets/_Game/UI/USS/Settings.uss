@@ -24,6 +24,27 @@
     font-size: 17px; color: var(--c-ink); flex-grow: 1;
     -unity-font-definition: url("project://database/Assets/_Game/UI/Fonts/Fredoka-SemiBold.ttf");
 }
+/* #205 sezione Visuale: righe ≥ 44 dp, slider larghi tutta la riga */
+.settings-section {
+    font-size: 15px; color: var(--c-ink); margin-bottom: 4px; -unity-text-align: middle-left;
+    -unity-font-definition: url("project://database/Assets/_Game/UI/Fonts/Fredoka-Bold.ttf");
+}
+.settings-cam-row { flex-direction: column; min-height: 44px; margin-bottom: 6px; }
+.settings-cam-head { flex-direction: row; align-items: center; justify-content: space-between; }
+.settings-cam-value {
+    min-width: 56px; font-size: 16px; color: var(--c-ink); -unity-text-align: middle-right;
+    -unity-font-definition: url("project://database/Assets/_Game/UI/Fonts/Fredoka-Bold.ttf");
+}
+.settings-slider--full { margin-left: 0; width: 100%; min-height: 28px; }
+.settings-btn-reset {
+    height: 44px; margin: 4px 0 12px 0;
+    border-radius: 12px; border-width: var(--bw); border-color: var(--c-ink);
+    background-color: var(--c-sun); color: var(--c-ink);
+    font-size: 16px; -unity-font-definition: url("project://database/Assets/_Game/UI/Fonts/Fredoka-Bold.ttf");
+    -unity-text-align: middle-center;
+}
+.settings-btn-reset:active { translate: 0 2px; background-color: var(--c-lemon); }
+.settings-btn-reset:disabled, .settings-slider--full:disabled { opacity: 0.45; }
 .settings-zoom-group { flex-direction: row; align-items: center; }
 .settings-zoom-btn {
     width: 44px; height: 44px; border-radius: 12px; border-width: var(--bw); border-color: var(--c-ink);

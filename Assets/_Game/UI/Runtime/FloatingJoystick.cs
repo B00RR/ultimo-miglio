@@ -12,6 +12,8 @@ namespace UltimoMiglio.UI
     /// phone and on the 24 dp side gesture strips. Output: <see cref="Value"/> (screen space, normalized) and
     /// <see cref="WorldDirection"/> (rotated by camera yaw, default 45°). Visuals are drawn in the HUD document.
     /// Desktop/WebGL: mouse click-drag uses the same floating-stick path; WASD/arrows feed the same Value (no visuals).
+    /// #205: with two fingers on screen (camera pinch) the stick is suspended until every finger is lifted, so pinching
+    /// never moves Nina. WorldDirection follows the live camera yaw (player rotation −45°..+45°): "up" is always screen-up.
     /// </summary>
     public class FloatingJoystick : MonoBehaviour
     {
@@ -26,6 +28,10 @@ namespace UltimoMiglio.UI
         public event Action Released;
 
         public Vector2 Value { get; private set; }
+        /// <summary>#205: true from the moment a second finger lands until all fingers are lifted (pinch).</summary>
+        public bool Suspended { get; private set; }
+        /// <summary>Tests only: when set, overrides touch/mouse/keyboard input (no allocations: nullable struct).</summary>
+        public Vector2? TestValue;
         public bool IsActive => fingerId != -1 || KeyboardActive;
         public Vector3 WorldDirection
         {
@@ -76,7 +82,8 @@ namespace UltimoMiglio.UI
 
         void OnDown(Finger f)
         {
-            if (fingerId != -1 || Excluded(f.screenPosition)) return; // first touch wins
+            if (ETouch.activeFingers.Count >= 2) { Suspend(); return; } // #205: pinch → no movement
+            if (Suspended || fingerId != -1 || Excluded(f.screenPosition)) return; // first touch wins
             Begin(f.index, f.screenPosition);
         }
 
@@ -96,6 +103,8 @@ namespace UltimoMiglio.UI
 
         void OnUp(Finger f) { if (f.index == fingerId) ForceRelease(); }
 
+        void Suspend() { Suspended = true; ForceRelease(); }
+
         void ForceRelease()
         {
             if (fingerId == -1) return;
@@ -105,7 +114,9 @@ namespace UltimoMiglio.UI
         void Update()
         {
             if (baseEl == null && hud && hud.Root != null) { baseEl = hud.Root.Q("joystick-base"); knobEl = hud.Root.Q("joystick-knob"); }
-            PollDesktop();
+            if (Suspended && ETouch.activeFingers.Count == 0) Suspended = false;
+            if (TestValue.HasValue) { Value = TestValue.Value; KeyboardActive = Value != Vector2.zero; }
+            else PollDesktop();
             if (IsActive) Moved?.Invoke(Value);
             float target = fingerId != -1 ? 1f : 0f; // keyboard has no on-screen stick
             alpha = Mathf.MoveTowards(alpha, target, fadeSeconds > 0 ? Time.unscaledDeltaTime / fadeSeconds : 1f);

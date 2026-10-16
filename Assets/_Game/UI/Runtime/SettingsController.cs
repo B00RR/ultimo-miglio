@@ -6,17 +6,18 @@ using UnityEngine.UIElements;
 namespace UltimoMiglio.UI
 {
     /// <summary>
-    /// Pannello Impostazioni (ingranaggio HUD): zoom con anteprima live, slider Musica/Suoni, Salva/Indietro.
-    /// PlayerPrefs: cam_zoom_v3 (DepotCameraFit.PrefZoom), vol_music, vol_sfx (0–1).
+    /// Pannello Impostazioni (ingranaggio HUD): sezione "Visuale" (#205: slider Zoom/Rotazione/Inclinazione con anteprima
+    /// dal vivo e "Ripristina vista"), slider Musica/Suoni, Salva/Indietro.
+    /// PlayerPrefs: cam_zoom, cam_rot, cam_tilt, cam_ver (CameraView, salvate al rilascio dello slider), vol_music, vol_sfx (0–1).
+    /// Durante il tutorial gli slider Rotazione e Inclinazione sono disabilitati e lo zoom resta in 0,85–1,2.
     /// Chiama per nome (reflection, UI non referenzia Gameplay):
-    ///   DepotCameraFit.SetOrthoSize(float) / GetOrthoSize()
     ///   AudioManager.SetMusicVolume(float) / SetSfxVolume(float)
     /// Il Tech Lead crea/collega quei metodi in scena.
     /// </summary>
     [RequireComponent(typeof(UIDocument))]
     public class SettingsController : MonoBehaviour
     {
-        public const string PrefCamZoom = "cam_zoom_v3"; // = DepotCameraFit.PrefZoom (asmdef UI non referenzia Gameplay)
+        public const string PrefCamZoom = CameraView.PrefZoom;
         public const string PrefVolMusic = "vol_music";
         public const string PrefVolSfx = "vol_sfx";
 
@@ -24,15 +25,12 @@ namespace UltimoMiglio.UI
 
         public bool IsOpen { get; private set; }
 
-        [SerializeField] float zoomStep = 0.5f;
-        [SerializeField] float zoomMin = 5.5f;
-        [SerializeField] float zoomMax = 28f;
-        [SerializeField] float defaultZoom = 12f;
-
         VisualElement root, settingsRoot, scrim;
-        Label zoomValue;
+        Label camZoomValue, camRotValue, camTiltValue;
+        Slider camZoom, camRot, camTilt;
+        Button camReset;
+        bool camDirty; int camRev = -1; bool camLockShown;
         Slider musicSlider, sfxSlider;
-        float draftZoom, savedZoom;
         float draftMusic, savedMusic;
         float draftSfx, savedSfx;
         bool bound;
@@ -47,11 +45,9 @@ namespace UltimoMiglio.UI
         void ApplySavedOnBoot()
         {
             // Applica i preferiti salvati all'avvio (anteprima = valore salvato).
-            savedZoom = PlayerPrefs.GetFloat(PrefCamZoom, defaultZoom);
             savedMusic = PlayerPrefs.GetFloat(PrefVolMusic, 0.6f);
             savedSfx = PlayerPrefs.GetFloat(PrefVolSfx, 1f);
-            draftZoom = savedZoom; draftMusic = savedMusic; draftSfx = savedSfx;
-            ApplyZoomLive(savedZoom);
+            draftMusic = savedMusic; draftSfx = savedSfx;
             ApplyAudioLive(savedMusic, savedSfx);
         }
 
@@ -72,12 +68,16 @@ namespace UltimoMiglio.UI
             if (settingsRoot == null) return false;
 
             scrim = root.Q("settings-scrim") ?? settingsRoot;
-            zoomValue = root.Q<Label>("zoom-value");
+            camZoom = root.Q<Slider>("slider-cam-zoom"); camRot = root.Q<Slider>("slider-cam-rot"); camTilt = root.Q<Slider>("slider-cam-tilt");
+            camZoomValue = root.Q<Label>("cam-zoom-value"); camRotValue = root.Q<Label>("cam-rot-value"); camTiltValue = root.Q<Label>("cam-tilt-value");
+            camReset = root.Q<Button>("cam-reset");
             musicSlider = root.Q<Slider>("slider-music");
             sfxSlider = root.Q<Slider>("slider-sfx");
 
-            root.Q<Button>("zoom-minus")?.RegisterCallback<ClickEvent>(_ => ChangeZoom(-zoomStep));
-            root.Q<Button>("zoom-plus")?.RegisterCallback<ClickEvent>(_ => ChangeZoom(+zoomStep));
+            camZoom?.RegisterValueChangedCallback(e => { CameraView.SetZoom(e.newValue); camDirty = true; RefreshCam(); });
+            camRot?.RegisterValueChangedCallback(e => { CameraView.SetRot(e.newValue); camDirty = true; RefreshCam(); });
+            camTilt?.RegisterValueChangedCallback(e => { CameraView.SetTilt(e.newValue); camDirty = true; RefreshCam(); });
+            camReset?.RegisterCallback<ClickEvent>(_ => { CameraView.ResetView(); camDirty = false; RefreshCam(); });
             musicSlider?.RegisterValueChangedCallback(e => { draftMusic = e.newValue; ApplyAudioLive(draftMusic, draftSfx); });
             sfxSlider?.RegisterValueChangedCallback(e => { draftSfx = e.newValue; ApplyAudioLive(draftMusic, draftSfx); });
             root.Q<Button>("settings-save")?.RegisterCallback<ClickEvent>(_ => Save());
@@ -100,7 +100,7 @@ namespace UltimoMiglio.UI
             else gear?.RegisterCallback<ClickEvent>(_ => Toggle());
 
             SetOpen(false);
-            RefreshZoomLabel();
+            RefreshCam();
             if (musicSlider != null) musicSlider.SetValueWithoutNotify(savedMusic);
             if (sfxSlider != null) sfxSlider.SetValueWithoutNotify(savedSfx);
             bound = true;
@@ -110,21 +110,37 @@ namespace UltimoMiglio.UI
         void Update()
         {
             if (!bound) TryBind();
+            if (!bound) return;
+            if (IsOpen && (camRev != CameraView.Revision || camLockShown != CameraView.RotTiltLocked)) RefreshCam();
+            // #205: salvataggio al rilascio dello slider, non a ogni frame
+            if (camDirty) { var ptr = UnityEngine.InputSystem.Pointer.current; if (ptr == null || !ptr.press.isPressed) FlushCam(); }
+        }
+
+        void FlushCam() { if (!camDirty) return; camDirty = false; CameraView.Save(); }
+
+        /// <summary>Allinea slider ed etichette della sezione Visuale a CameraView (con i blocchi del tutorial).</summary>
+        void RefreshCam()
+        {
+            camRev = CameraView.Revision; bool locked = CameraView.RotTiltLocked; camLockShown = locked;
+            float z = CameraView.EffectiveZoom, r = CameraView.EffectiveRot, t = CameraView.EffectiveTilt;
+            if (camZoom != null) { camZoom.lowValue = CameraView.ActiveZoomMin; camZoom.highValue = CameraView.ActiveZoomMax; camZoom.SetValueWithoutNotify(z); }
+            if (camRot != null) { camRot.SetValueWithoutNotify(r); camRot.SetEnabled(!locked); }
+            if (camTilt != null) { camTilt.SetValueWithoutNotify(t); camTilt.SetEnabled(!locked); }
+            if (camZoomValue != null) camZoomValue.text = z.ToString("0.00").Replace('.', ',') + "×";
+            if (camRotValue != null) camRotValue.text = (r > 0.5f ? "+" : "") + Mathf.RoundToInt(r) + "°";
+            if (camTiltValue != null) camTiltValue.text = Mathf.RoundToInt(t) + "°";
         }
 
         public void Open()
         {
             if (!TryBind()) return;
             // snapshot pre-Salva
-            savedZoom = PlayerPrefs.GetFloat(PrefCamZoom, GetOrthoOrDefault());
             savedMusic = PlayerPrefs.GetFloat(PrefVolMusic, 0.6f);
             savedSfx = PlayerPrefs.GetFloat(PrefVolSfx, 1f);
-            draftZoom = GetOrthoOrDefault();
-            if (Mathf.Approximately(draftZoom, 0f)) draftZoom = savedZoom;
             draftMusic = savedMusic; draftSfx = savedSfx;
             if (musicSlider != null) musicSlider.SetValueWithoutNotify(draftMusic);
             if (sfxSlider != null) sfxSlider.SetValueWithoutNotify(draftSfx);
-            RefreshZoomLabel();
+            RefreshCam();
             SetOpen(true);
             Opened?.Invoke();
         }
@@ -136,7 +152,8 @@ namespace UltimoMiglio.UI
 
         void SetOpen(bool on)
         {
-            IsOpen = on;
+            IsOpen = on; CameraView.UiOpen = on;
+            if (!on) FlushCam();
             if (settingsRoot != null)
             {
                 // se settings-root è il layer dedicato
@@ -146,45 +163,23 @@ namespace UltimoMiglio.UI
             }
         }
 
-        void ChangeZoom(float delta)
-        {
-            draftZoom = Mathf.Clamp(draftZoom + delta, zoomMin, zoomMax);
-            RefreshZoomLabel();
-            ApplyZoomLive(draftZoom);
-        }
-
-        void RefreshZoomLabel()
-        {
-            if (zoomValue != null) zoomValue.text = draftZoom.ToString("0.0");
-        }
-
         void Save()
         {
-            savedZoom = draftZoom; savedMusic = draftMusic; savedSfx = draftSfx;
-            PlayerPrefs.SetFloat(PrefCamZoom, savedZoom);
+            savedMusic = draftMusic; savedSfx = draftSfx;
             PlayerPrefs.SetFloat(PrefVolMusic, savedMusic);
             PlayerPrefs.SetFloat(PrefVolSfx, savedSfx);
             PlayerPrefs.Save();
-            ApplyZoomLive(savedZoom);
             ApplyAudioLive(savedMusic, savedSfx);
             Close();
         }
 
+        /// <summary>Indietro: annulla solo i volumi; la visuale è già salvata al rilascio degli slider (#205).</summary>
         void CancelAndClose()
         {
-            draftZoom = savedZoom; draftMusic = savedMusic; draftSfx = savedSfx;
-            ApplyZoomLive(savedZoom);
+            draftMusic = savedMusic; draftSfx = savedSfx;
             ApplyAudioLive(savedMusic, savedSfx);
             Close();
         }
-
-        float GetOrthoOrDefault()
-        {
-            float v = InvokeFloat("DepotCameraFit", "GetOrthoSize", defaultZoom);
-            return v > 0.01f ? v : defaultZoom;
-        }
-
-        void ApplyZoomLive(float ortho) => InvokeVoid("DepotCameraFit", "SetOrthoSize", ortho);
 
         void ApplyAudioLive(float music, float sfx)
         {
@@ -200,16 +195,6 @@ namespace UltimoMiglio.UI
             if (m == null) return;
             if (m.IsStatic) m.Invoke(null, new object[] { arg });
             else m.Invoke(mb, new object[] { arg });
-        }
-
-        static float InvokeFloat(string typeName, string method, float fallback)
-        {
-            var mb = FindByTypeName(typeName);
-            if (mb == null) return fallback;
-            var m = mb.GetType().GetMethod(method, BindingFlags.Instance | BindingFlags.Public | BindingFlags.Static);
-            if (m == null) return fallback;
-            object r = m.IsStatic ? m.Invoke(null, null) : m.Invoke(mb, null);
-            return r is float f ? f : fallback;
         }
 
         static MonoBehaviour FindByTypeName(string typeName)
