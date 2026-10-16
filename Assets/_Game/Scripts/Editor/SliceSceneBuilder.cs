@@ -446,7 +446,7 @@ namespace UltimoMiglio.EditorTools
             am.UiTap = R("sfx_ui_tap", 2); am.TutorialArrow = C("sfx_ui_arrow_appear"); am.TutorialStep = C("sfx_ui_step_complete");
             am.StackMax = C("sfx_stack_max"); am.Bell = C("sfx_customer_bell"); am.Served = C("sfx_customer_served");
             am.UpgradeLoop = C("sfx_upgrade_tick_loop"); am.UpgradeComplete = C("sfx_upgrade_complete");
-            am.ComboX15 = C("sfx_combo_x1_5"); am.ComboX2 = C("sfx_combo_x2"); am.NonnoStart = C("sfx_nonno_start");
+            am.DebtStamp = R("sfx_debt_stamp", 3); am.ComboX15 = C("sfx_combo_x1_5"); am.ComboX2 = C("sfx_combo_x2"); am.NonnoStart = C("sfx_nonno_start");
         }
     }
 
