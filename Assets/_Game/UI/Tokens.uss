@@ -18,30 +18,33 @@
 
 /* #49: superfici cartone su HUD minimo (LN/giorno, obiettivo, Ada 1 riga).
    Tokens carica prima di HudV2: !important batte le regole normali di HudV2 senza toccare quel file.
-   Telefono NON montato qui (HUD minimo Lorenzo). CTA pollice omessa (contraddice HUD minimo). */
+   Telefono NON montato qui (HUD minimo Lorenzo). CTA pollice omessa (contraddice HUD minimo).
+   #185: il 9-slice ha gli angoli trasparenti (raggio 16 px, stesso bordo dello sprite).
+   Un background-color opaco restava un quadrato sotto lo slice e gli angoli pieni si vedevano bianchi.
+   Il raggio USS è 16 px, allineato al bordo: così la curva del PNG e il bordo coincidono. */
 #currency-pill {
     border-width: var(--bw) !important;
     border-color: var(--c-outline) !important;
-    background-color: var(--c-paper) !important;
+    background-color: rgba(0, 0, 0, 0) !important;
     background-image: url("project://database/Assets/_Game/UI/Textures/tex_cardboard_panel.png") !important;
     -unity-background-scale-mode: stretch-to-fill !important;
     -unity-slice-left: 16px;
     -unity-slice-top: 16px;
     -unity-slice-right: 16px;
     -unity-slice-bottom: 16px;
-    border-radius: var(--r-pill) !important;
+    border-radius: 16px !important;
 }
 .tutorial-objective {
     border-width: var(--bw) !important;
     border-color: var(--c-outline) !important;
-    background-color: var(--c-paper) !important;
+    background-color: rgba(0, 0, 0, 0) !important;
     background-image: url("project://database/Assets/_Game/UI/Textures/tex_cardboard_panel.png") !important;
     -unity-background-scale-mode: stretch-to-fill !important;
     -unity-slice-left: 16px;
     -unity-slice-top: 16px;
     -unity-slice-right: 16px;
     -unity-slice-bottom: 16px;
-    border-radius: var(--r-toon) !important;
+    border-radius: 16px !important;
     -unity-font-definition: url("project://database/Assets/_Game/UI/Fonts/Fredoka-SemiBold.ttf") !important;
     color: var(--c-ink) !important;
 }
@@ -49,14 +52,19 @@
     border-width: var(--bw) !important;
     border-bottom-width: var(--bw-thick) !important;
     border-color: var(--c-outline) !important;
-    background-color: var(--c-paper) !important;
+    background-color: rgba(0, 0, 0, 0) !important;
     background-image: url("project://database/Assets/_Game/UI/Textures/tex_cardboard_panel.png") !important;
     -unity-background-scale-mode: stretch-to-fill !important;
     -unity-slice-left: 16px;
     -unity-slice-top: 16px;
     -unity-slice-right: 16px;
     -unity-slice-bottom: 16px;
-    border-radius: var(--r-note) !important;
+    border-radius: 16px !important;
+}
+/* #185: il tema dei Button dipinge uno sprite 9-slice bianco. Senza questo, Salta tutorial
+   e gli altri pulsanti tengono gli angoli quadrati bianchi sopra il nostro colore. */
+.unity-button {
+    background-image: none !important;
 }
 .day-value,
 .currency-value {
