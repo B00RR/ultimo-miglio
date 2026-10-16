@@ -31,17 +31,17 @@
       {
         "level": 5,
         "stackCapacity": 10,
-        "costLn": 640
+        "costLn": 560
       },
       {
         "level": 6,
         "stackCapacity": 12,
-        "costLn": 1280
+        "costLn": 960
       },
       {
         "level": 7,
         "stackCapacity": 14,
-        "costLn": 2560
+        "costLn": 1700
       },
       {
         "level": 8,
@@ -78,7 +78,8 @@
         "stackCapacity": 30,
         "costLn": 327680
       }
-    ]
+    ],
+    "costNote": "16/10 GD: livelli 5-7 a x1,7 (560/960/1700) invece di x2 per spezzare la pianura 8-20 min (proposta LiveOps 1). Dal livello 8 resta la serie x2 originale."
   },
   "scarpe": {
     "levels": [
