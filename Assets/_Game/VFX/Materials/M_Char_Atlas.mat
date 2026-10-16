@@ -43,9 +43,9 @@ Material:
     - _RampSoftness: 0.06
     - _RimPower: 3.5
     - _RimStrength: 0.35
-    - _ShadowCool: 0.12
+    - _ShadowCool: 0.2
     - _ShadowSoft: 0.35
-    - _ShadowStrength: 0.6
+    - _ShadowStrength: 0.72
     - _TileSize: 1
     - _TileVar: 0
     - _TopLight: 0.05
@@ -59,6 +59,6 @@ Material:
     - _FloorTintC: {r: 1, g: 1, b: 1, a: 1}
     - _OutlineColor: {r: 0.231, g: 0.184, b: 0.165, a: 1}
     - _RimColor: {r: 1, g: 0.957, b: 0.839, a: 1}
-    - _ShadowTint: {r: 0.55, g: 0.5, b: 0.72, a: 1}
+    - _ShadowTint: {r: 0.56078434, g: 0.47843137, b: 0.4627451, a: 1}
   m_BuildTextureStacks: []
   m_AllowLocking: 1
