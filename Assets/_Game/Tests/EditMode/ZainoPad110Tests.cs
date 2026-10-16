@@ -67,7 +67,9 @@ public class ZainoPad110Tests
         var go = new GameObject("Pad_Zaino");
         try
         {
+            go.AddComponent<BoxCollider>(); // ProximityZone richiede un Collider
             var pad = go.AddComponent<UpgradePad>();
+            Assert.IsNotNull(pad);
             var ip = go.AddComponent<InteractionPoint>();
             ip.Kind = PoiKind.Acquisto;
             ip.HasCard = true; // scena: la scheda spegne la pillola quando Nina è vicina
