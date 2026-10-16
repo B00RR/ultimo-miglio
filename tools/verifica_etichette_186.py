@@ -1,6 +1,5 @@
 #!/usr/bin/env python3
 """Controlli veloci #186, senza Unity. Esce 0 se tutto torna."""
-import subprocess
 import sys
 from pathlib import Path
 
@@ -66,7 +65,14 @@ def main():
         ok(needle in uss, "USS " + needle)
     up = uss.upper()
     ok("#FFFFFF" not in up and "#FFF " not in up and "#FFF;" not in up, "niente bianco puro nel foglio")
-    ok("-unity-slice" not in uss and "tex_wood_panel" not in uss and "tex_cardboard_panel" not in uss, "niente 9-slice della #185")
+    ok("tex_wood_panel" not in uss and "tex_cardboard_panel" not in uss, "le etichette non riusano i pannelli #185")
+    ok("white-space: normal !important" in uss and "ellipsis" not in uss, "fumetto a capo, senza ellissi")
+    ok("border-radius: 20px" in uss and "border-radius: 24px" in uss, "raggio = metà altezza sopra i 32 px")
+    ok("right: 78px" in uss and "#9E7873" in uss, "vuoto prima dell'ingranaggio e ombra portata")
+    hud = text("Assets/_Game/UI/USS/HudV2.uss")
+    ok("white-space: nowrap !important" not in hud, "HudV2 non forza più la riga unica")
+    tokens = text("Assets/_Game/UI/Tokens.uss")
+    ok("rgba(0, 0, 0, 0)" in tokens and "tex_cardboard_panel.png" in tokens, "il fix #185 sui pannelli è ancora in Tokens")
     pad = text("Assets/_Game/UI/USS/PadTag.uss").upper()
     ok("#FFFFFF" not in pad and "#5E7F86" not in pad and "#3E5A61" not in pad, "cartellino pad senza bianco né teal")
 
@@ -86,16 +92,29 @@ def main():
             freddi += 1
     ok(bianchi == 0 and freddi == 0, "texture insegna senza bianco, blu o viola")
 
-    diff = subprocess.check_output(["git", "diff", "--name-only", "70118057864710977b3951be5b7ad2fc57e60b4e"], cwd=ROOT, text=True)
-    vietati = [
-        "Assets/_Game/UI/Textures/tex_wood_panel.png",
-        "Assets/_Game/UI/Textures/tex_cardboard_panel.png",
-        "Assets/_Game/UI/Tokens.uss",
-        "Assets/_Game/UI/USS/TutorialHud.uss",
-        "Assets/_Game/UI/USS/LegnoCartone.uss",
-    ]
-    toccati = [v for v in vietati if v in diff.splitlines()]
-    ok(not toccati, "file 9-slice della #185 intatti" + ("" if not toccati else " " + ",".join(toccati)))
+    for name, altezza in (
+        ("tex_capsula_noce_32.png", 32),
+        ("tex_capsula_noce_40.png", 40),
+        ("tex_capsula_noce_48.png", 48),
+        ("tex_capsula_terracotta_32.png", 32),
+    ):
+        im = Image.open(ROOT / "Assets/_Game/UI/Textures" / name).convert("RGBA")
+        raggio = altezza // 2
+        meta = text(f"Assets/_Game/UI/Textures/{name}.meta")
+        ok(im.size[1] == altezza and f"spriteBorder: {{x: {raggio}, y: {raggio}, z: {raggio}, w: {raggio}}}" in meta, f"capsula {name} raggio {raggio}")
+        angoli = [im.getpixel((0, 0)), im.getpixel((im.width - 1, 0)), im.getpixel((0, im.height - 1)), im.getpixel((im.width - 1, im.height - 1))]
+        ok(all(p[3] < 40 for p in angoli) and im.getpixel((im.width // 2, im.height // 2))[3] > 240, f"angoli vuoti {name}")
+        bianchi = freddi = 0
+        raw = im.tobytes()
+        for i in range(0, len(raw), 4):
+            r, g, b, a = raw[i], raw[i + 1], raw[i + 2], raw[i + 3]
+            if a < 20:
+                continue
+            if r >= 250 and g >= 250 and b >= 250:
+                bianchi += 1
+            if (b > r + 18 and b > g + 8 and b > 90) or (r > 140 and b > 140 and b > g + 30 and r > g + 25):
+                freddi += 1
+        ok(bianchi == 0 and freddi == 0, f"colori caldi {name}")
 
     if FAIL:
         print(f"\n{len(FAIL)} controlli falliti")

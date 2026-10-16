@@ -1,6 +1,9 @@
 /* Etichette #186. Baloo 2 = titoli e valori. Fredoka = testo.
-   Insegna di noce (texture originale, niente 9-slice). Ombra #9E7873, contorno #3B2A20.
-   Crema #F3E3C3 al posto del bianco. Oro #F2B53A solo come accento. */
+   Pillole: insegna di noce #7A4A2E, crema #F3E3C3, filo oro #F2B53A.
+   Volume: luce in alto nello sprite, ombra portata #9E7873 dietro, contorno testo 1 px.
+   Sopra i 32 px il raggio è metà altezza e lo sprite ha lo stesso raggio
+   (il 16 fisso della #185 resta solo sulle capsule da 32 px).
+   I pannelli 9-slice della #185 non si usano qui. */
 
 .insegna-noce {
     background-color: #7A4A2E;
@@ -37,7 +40,166 @@
     -unity-font-style: normal;
     -unity-font-definition: url("project://database/Assets/_Game/UI/Fonts/Baloo2-Bold_SDF.asset");
     -unity-text-outline-width: 1px;
-    -unity-text-outline-color: #3B2A20;
+    -unity-text-outline-color: #E8D3AC;
+    text-shadow: 0 1px 0 #9E7873;
+}
+
+/* Ombra portata: fratello dietro la capsula. Il contenitore non ha raggio, così non la taglia. */
+.ombra-portata { position: absolute; background-color: #9E7873; border-width: 0; }
+.ombra-portata--32 { left: 1px; right: 1px; top: 4px; height: 32px; border-radius: 16px; }
+.ombra-portata--40 { left: 2px; right: 2px; top: 4px; height: 40px; border-radius: 20px; }
+.ombra-portata--48 { left: 2px; right: 2px; top: 4px; height: 48px; border-radius: 24px; }
+
+.currency-slot { position: relative; align-self: flex-start; flex-shrink: 1; min-width: 0; }
+
+#hud-root #currency-pill {
+    height: 40px !important;
+    border-width: 0 !important;
+    border-radius: 20px !important;
+    background-color: rgba(0, 0, 0, 0) !important;
+    background-image: url("project://database/Assets/_Game/UI/Textures/tex_capsula_noce_40.png") !important;
+    -unity-background-scale-mode: stretch-to-fill !important;
+    -unity-slice-left: 20px !important;
+    -unity-slice-top: 20px !important;
+    -unity-slice-right: 20px !important;
+    -unity-slice-bottom: 20px !important;
+}
+#hud-root #currency-pill .currency-value,
+#hud-root #currency-pill .day-value {
+    color: #F3E3C3 !important;
+    -unity-text-outline-width: 1px !important;
+    -unity-text-outline-color: #F2B53A !important;
+    text-shadow: 0 1px 0 #9E7873;
+}
+#hud-root #currency-pill .icon-coin { -unity-background-image-tint-color: #F2B53A !important; }
+
+/* Muoviti: nella safe area, a destra, con un vuoto prima dell'ingranaggio (52 px + margini). */
+#safe-root .objective-slot {
+    position: absolute;
+    left: auto;
+    right: 78px;
+    top: 18px;
+    flex-direction: row;
+    width: auto;
+    min-width: 108px;
+    height: 32px;
+}
+.hud--skip #safe-root .objective-slot { right: 220px; }
+#safe-root .objective-slot .tutorial-objective {
+    position: relative;
+    left: auto;
+    right: auto;
+    top: auto;
+    bottom: auto;
+    width: auto;
+    height: 32px !important;
+    max-height: 32px !important;
+    margin: 0;
+    padding: 0 16px;
+    border-width: 0 !important;
+    border-radius: 16px !important;
+    background-color: rgba(0, 0, 0, 0) !important;
+    background-image: url("project://database/Assets/_Game/UI/Textures/tex_capsula_noce_32.png") !important;
+    -unity-background-scale-mode: stretch-to-fill !important;
+    -unity-slice-left: 16px !important;
+    -unity-slice-top: 16px !important;
+    -unity-slice-right: 16px !important;
+    -unity-slice-bottom: 16px !important;
+    color: #F3E3C3 !important;
+    font-size: 13px;
+    -unity-text-align: middle-center;
+    white-space: nowrap;
+    text-overflow: clip;
+    -unity-text-outline-width: 1px;
+    -unity-text-outline-color: #E8D3AC;
+    text-shadow: 0 1px 0 #9E7873;
+    -unity-font-definition: url("project://database/Assets/_Game/UI/Fonts/Fredoka-Medium_SDF.asset") !important;
+}
+
+/* Fumetto: due righe al massimo, niente ellissi. Capsula 48 px, raggio 24. */
+#hud-root .ada-band.ada-band {
+    height: auto !important;
+    max-height: 64px !important;
+    overflow: visible !important;
+}
+#hud-root .ada-note.ada-note {
+    position: relative;
+    width: 100%;
+    height: 48px !important;
+    min-height: 48px !important;
+    max-height: 56px !important;
+    overflow: visible !important;
+    flex-direction: row;
+    align-items: center;
+    padding-top: 0 !important;
+    padding-bottom: 0 !important;
+    padding-left: 8px !important;
+    padding-right: 16px !important;
+    border-width: 0 !important;
+    border-radius: 0 !important;
+    background-color: rgba(0, 0, 0, 0) !important;
+    background-image: none !important;
+}
+.ada-plate {
+    position: absolute;
+    left: 0;
+    right: 0;
+    top: 0;
+    height: 48px;
+    border-width: 0;
+    border-radius: 24px;
+    background-color: rgba(0, 0, 0, 0);
+    background-image: url("project://database/Assets/_Game/UI/Textures/tex_capsula_noce_48.png");
+    -unity-background-scale-mode: stretch-to-fill;
+    -unity-slice-left: 24px;
+    -unity-slice-top: 24px;
+    -unity-slice-right: 24px;
+    -unity-slice-bottom: 24px;
+}
+#hud-root .ada-face.ada-face--portrait { border-color: #F2B53A !important; }
+#hud-root .ada-col {
+    flex-grow: 1;
+    flex-shrink: 1;
+    min-width: 0;
+    height: 48px;
+    justify-content: center;
+}
+#hud-root .ada-text.ada-text {
+    white-space: normal !important;
+    text-overflow: clip !important;
+    overflow: hidden !important;
+    height: auto !important;
+    max-height: 36px !important;
+    width: 100%;
+    font-size: 14px !important;
+    color: #F3E3C3 !important;
+    -unity-text-align: middle-left;
+    -unity-paragraph-spacing: 0;
+    -unity-text-outline-width: 1px;
+    -unity-text-outline-color: #E8D3AC;
+    text-shadow: 0 1px 0 #9E7873;
+    -unity-font-definition: url("project://database/Assets/_Game/UI/Fonts/Fredoka-Medium_SDF.asset") !important;
+}
+
+#hud-root .tut-hint { height: auto; min-height: 36px; overflow: visible; }
+#hud-root .tut-hint__slot { position: relative; }
+#hud-root .tut-hint__pill {
+    height: 32px;
+    padding: 0 12px 0 4px;
+    border-width: 0;
+    border-radius: 16px;
+    background-color: rgba(0, 0, 0, 0);
+    background-image: url("project://database/Assets/_Game/UI/Textures/tex_capsula_terracotta_32.png");
+    -unity-background-scale-mode: stretch-to-fill;
+    -unity-slice-left: 16px;
+    -unity-slice-top: 16px;
+    -unity-slice-right: 16px;
+    -unity-slice-bottom: 16px;
+}
+#hud-root .tut-hint__text {
+    color: #F3E3C3;
+    -unity-text-outline-width: 1px;
+    -unity-text-outline-color: #E8D3AC;
     text-shadow: 0 1px 0 #9E7873;
 }
 

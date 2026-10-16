@@ -113,6 +113,29 @@ namespace UltimoMiglio.UI
             EnsureAda(); MirrorTutorialBanner();
             if (Screen.safeArea != lastSafeArea || lastScreen.x != Screen.width || lastScreen.y != Screen.height)
                 RefreshSafeArea(false);
+            PlaceObjective();
+        }
+
+        /// <summary>#186: «Muoviti» sta nella safe area e lascia 10 dp prima dell'ingranaggio
+        /// (52 dp + margine 8 + padding della barra 8 = 68, più 10 di vuoto → right 78).
+        /// Con «Salta tutorial» (right 78, largo ~130) il vuoto sale a 220.</summary>
+        void PlaceObjective()
+        {
+            var slot = SafeRoot != null ? SafeRoot.Q("objective-slot") : null;
+            if (slot == null || SafeRoot == null) return;
+            bool skip = Root != null && Root.ClassListContains("hud--skip");
+            float padT = SafeRoot.resolvedStyle.paddingTop;
+            float padR = SafeRoot.resolvedStyle.paddingRight;
+            if (float.IsNaN(padT)) padT = 0f;
+            if (float.IsNaN(padR)) padR = 0f;
+            slot.style.top = padT + 18f;
+            slot.style.right = padR + (skip ? 220f : 78f);
+            var skipBtn = SafeRoot.Q("skip-tutorial");
+            if (skipBtn != null)
+            {
+                skipBtn.style.top = padT + 21f;
+                skipBtn.style.right = padR + 78f;
+            }
         }
 
         void RefreshSafeArea(bool force)

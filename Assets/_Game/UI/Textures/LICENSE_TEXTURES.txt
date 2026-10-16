@@ -1,6 +1,8 @@
 Texture UI Diorama Solare — originale progetto Ultimo Miglio (procedurali).
 - tex_wood_panel.png — legno noce/legno (#74503A / #7A4A2E), fill 9-slice RGBA, angoli trasparenti raggio 16 (#185)
 - tex_cardboard_panel.png — cartone/crema (#F3E3C3 / #E8D3AC), fill 9-slice RGBA, angoli trasparenti raggio 16 (#185)
+- tex_capsula_noce_32/40/48.png — capsula di noce #7A4A2E, luce in alto, filo oro #F2B53A, angoli trasparenti con raggio = metà altezza (#186)
+- tex_capsula_terracotta_32.png — capsula terracotta #C8633B, stessa luce e stesso raggio (#186)
 - tex_ada_portrait.png — ritratto circolare da docs/concept/img/sheet_nonna_ada_v01.jpg
   (Concept Artist, tavola v01); ritaglio busto alto-destra per dialogo HUD (#41)
 

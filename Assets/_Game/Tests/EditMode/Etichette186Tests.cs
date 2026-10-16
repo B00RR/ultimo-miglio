@@ -49,9 +49,15 @@ public class Etichette186Tests
         StringAssert.Contains("#3B2A20", uss);
         StringAssert.Contains("#9E7873", uss);
         StringAssert.Contains("text-shadow", uss);
+        StringAssert.Contains("white-space: normal !important", uss);
+        StringAssert.Contains("text-overflow: clip", uss);
+        StringAssert.Contains("border-radius: 20px", uss);
+        StringAssert.Contains("border-radius: 24px", uss);
+        StringAssert.Contains("tex_capsula_noce_40.png", uss);
+        StringAssert.Contains("tex_capsula_noce_48.png", uss);
+        StringAssert.DoesNotContain("ellipsis", uss);
         StringAssert.DoesNotContain("#FFFFFF", uss.ToUpperInvariant());
         StringAssert.DoesNotContain("#FFF ", uss.ToUpperInvariant());
-        StringAssert.DoesNotContain("-unity-slice", uss);
         StringAssert.DoesNotContain("tex_wood_panel", uss);
         StringAssert.DoesNotContain("tex_cardboard_panel", uss);
         string pad = File.ReadAllText(Data("_Game/UI/USS/PadTag.uss"));
@@ -88,6 +94,54 @@ public class Etichette186Tests
         Assert.AreEqual(0, bianchi, "pixel bianchi nell'insegna");
         Assert.AreEqual(0, freddi, "pixel blu o viola nell'insegna");
         Object.DestroyImmediate(tex);
+    }
+
+    [Test]
+    public void Capsule_RaggioMetaAltezza_E_AngoliVuoti()
+    {
+        // altezza dello sprite = 2 * raggio: la capsula resta capsula, non un rettangolo con raggio 16.
+        ControllaCapsula("_Game/UI/Textures/tex_capsula_noce_32.png", 32);
+        ControllaCapsula("_Game/UI/Textures/tex_capsula_noce_40.png", 40);
+        ControllaCapsula("_Game/UI/Textures/tex_capsula_noce_48.png", 48);
+        ControllaCapsula("_Game/UI/Textures/tex_capsula_terracotta_32.png", 32);
+        string hud = File.ReadAllText(Data("_Game/UI/USS/HudV2.uss"));
+        StringAssert.DoesNotContain("white-space: nowrap !important", hud);
+        string ctrl = File.ReadAllText(Data("_Game/UI/Runtime/HudController.cs"));
+        StringAssert.Contains("padT + 18f", ctrl);
+        StringAssert.Contains("78f", ctrl);
+    }
+
+    static void ControllaCapsula(string rel, int altezza)
+    {
+        int raggio = altezza / 2;
+        string meta = File.ReadAllText(Data(rel + ".meta"));
+        StringAssert.Contains($"spriteBorder: {{x: {raggio}, y: {raggio}, z: {raggio}, w: {raggio}}}", meta);
+        StringAssert.Contains("spriteMeshType: 0", meta);
+        StringAssert.Contains("alphaIsTransparency: 1", meta);
+        var bytes = File.ReadAllBytes(Data(rel));
+        var tex = new Texture2D(2, 2, TextureFormat.RGBA32, false);
+        try
+        {
+            Assert.IsTrue(tex.LoadImage(bytes), rel);
+            Assert.AreEqual(altezza, tex.height, rel);
+            Assert.Less(tex.GetPixel(0, tex.height - 1).a, 0.15f, rel + " angolo opaco");
+            Assert.Less(tex.GetPixel(tex.width - 1, 0).a, 0.15f, rel + " angolo opaco");
+            Assert.Greater(tex.GetPixel(tex.width / 2, tex.height / 2).a, 0.95f, rel + " centro bucato");
+            Assert.Greater(tex.GetPixel(tex.width / 2, tex.height - 2).a, 0.95f, rel + " bordo bucato");
+            var px = tex.GetPixels32();
+            int bianchi = 0, freddi = 0;
+            foreach (var c in px)
+            {
+                if (c.a < 20) continue;
+                if (c.r >= 250 && c.g >= 250 && c.b >= 250) bianchi++;
+                bool blu = c.b > c.r + 18 && c.b > c.g + 8 && c.b > 90;
+                bool viola = c.r > 140 && c.b > 140 && c.b > c.g + 30 && c.r > c.g + 25;
+                if (blu || viola) freddi++;
+            }
+            Assert.AreEqual(0, bianchi, rel + " pixel bianchi");
+            Assert.AreEqual(0, freddi, rel + " pixel freddi");
+        }
+        finally { Object.DestroyImmediate(tex); }
     }
 
     static void AssertOfl(string rel, string copyright)

@@ -1,7 +1,7 @@
 # STATO PROGETTO — Ultimo Miglio
 
 > Punto di ingresso unico per chiunque (persona o agente) lavori su questo repo. Aggiornalo **nella stessa PR** in cui completi qualcosa.
-> Ultimo aggiornamento: 2026-10-16 17:18 (Europe/Rome).
+> Ultimo aggiornamento: 2026-10-16 17:26 (Europe/Rome).
 
 ## 1. Il gioco
 - **Ultimo Miglio**: gioco mobile **Android**, **Unity 6 (6000.3) URP**.
@@ -157,6 +157,7 @@ Ogni ruolo lavora solo sulle issue con la propria etichetta `ruolo:*`, sempre co
 
 Voci più recenti in alto. Formato: `AAAA-MM-GG HH:MM` (Europe/Rome) — [commit] — descrizione.
 
+- 2026-10-16 17:26 — UI/UX — #186 sulle catture della build `075f0f6` (390×844): «Muoviti» lascia 10 dp prima dell'ingranaggio e segue la safe area; il fumetto di Oma Tilde va a capo (2 righe, niente ellissi); le pillole hanno luce in alto, ombra portata #9E7873 e contorno leggero; sopra i 32 px il raggio è metà altezza, con sprite capsula dello stesso raggio. I pannelli #185 restano quelli di main.
 - 2026-10-16 17:18 — UI/UX — merge di `origin/main` nel ramo `ui/186-font-etichette` (niente rebase): entra il fix #185 (angoli 9-slice RGBA) e le zone #187. Il prezzo dei pad resta sull'insegna (#186), senza il font dinamico.
 - 2026-10-16 16:28 — UI/UX — etichette #186: Baloo 2 (titoli e valori) e Fredoka Medium (testo), OFL, Font Asset TextCore; cartellino prezzo su insegna di noce, ombra e contorno bruni, crema al posto del bianco.
 - 2026-10-16 16:25 — UI/UX — [aa5f033](https://github.com/B00RR/ultimo-miglio/commit/aa5f033c699f420dfd939519cc67dc485bc3b2af) — fix #185 (ramo `ui/185-angoli-9slice`): gli angoli bianchi dei riquadri arrotondati venivano dal 9-slice di `tex_cardboard_panel.png` e `tex_wood_panel.png`, PNG RGB senza alpha (angoli opachi) più il bordo sprite a 0 e, sui Button, lo sprite bianco del tema. Ora i pannelli sono RGBA con angoli trasparenti, mesh Full Rect, RGBA32 su WebGL; test EditMode `UiTextureAlpha185Tests`.
