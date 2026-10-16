@@ -123,18 +123,20 @@ Stato verificato il 15/10 su `wt/vfx/Assets/_Game/VFX/README.md`, `wt_vfx_progre
 ### UI/UX
 Stato verificato il 15/10 alle 16:15 su `webgl-min` (HUD v2 del TL: `Tokens.uss`, `HudV2.uss`, font Fredoka) e `wt/ui`. Spec applicabile: `UI_SPEC_BIGLIETTI.md`. **Direttiva di Lorenzo:** niente mockup né immagini per lui; conta solo la build giocabile. Priorità: biglietti di Nonna Ada chiari e HUD senza sovrapposizioni.
 
+**HUD minimo del Cap. 1 (decisione di Lorenzo):** a schermo solo LN, giorno, riga obiettivo, joystick e pad. Niente telefono: rimandato a 'Gioco completo' (issue #64, decisione di DevOn). Combo: solo '+N' sopra Nina (clienti serviti di fila), sparisce in 1,5 s; il moltiplicatore x1,2 non si mostra. Debito: solo nella schermata di fine giornata e nel fumetto di Ada quando lo spiega. Colori dei pad: ritiro teal `#5E7F86`, consegna menta `#8FC9A8`, acquisto sole `#F4C430`, potenziamento `#F7E26B`.
+
 | Voce | Stato | Criteri di accettazione | gp |
 |---|---|---|---|
-| HUD responsive WebGL (ResponsivePanel, layout flex, telefono 9:16, TAB/ESC, WASD/mouse) | ✅ nel ramo | Nessuna sovrapposizione a 1920x1080, 1366x768, 960x600 e in portrait (checklist §2 della spec); pulsante telefono sempre visibile | 0 |
+| HUD responsive WebGL (ResponsivePanel, layout flex, TAB/ESC, WASD/mouse) | ✅ nel ramo, 🟡 da ridurre all'HUD minimo | Nessuna sovrapposizione a 1920x1080, 1366x768, 960x600 e in portrait (checklist §2 della spec); a schermo solo LN, giorno, riga obiettivo, joystick e pad; nessun pulsante telefono (#64) | 0 |
 | HUD v2 (pillole compatte, pulsanti 3D, token) | 🟡 TL | Solo variabili di `Tokens.uss`; contrasto testo ≥ 4,5:1; target ≥ 48 dp | 0,5 |
 | **Biglietti di Nonna Ada** (onboarding 7 passi + fine, testi in `onboarding_testi.json`) | 🟡 logica TL fatta, layout da correggere | Una nota alla volta con coda; banda medio-alta sotto la safe area, mai negli angoli HUD né nella metà bassa (joystick); corpo ≥ 16 dp, titolo ≥ 20 dp; ≤ 90 caratteri e 2 righe; minimo 1,5 s a schermo, sticky fino al completamento; nome con `--c-terracotta-dk` (7,2:1). Componente `AdaNoteView` nella spec | 0,5 |
-| Game feel HUD: monete sull'icona LN, conteggio e pulse, clamp schede fuori dai rettangoli HUD | 🟡 base TL fatta (monete verso la pillola, clamp nel pannello) | Moneta atterra sull'icona LN; numero conta all'arrivo, non al credito; schede Cassa/pad mai sopra pillole, telefono, biglietto. `HudFeel` nella spec | 0,5 |
-| Pad di upgrade in-world (anello, costo, riempimento) | 🟡 | Anello 0→1 morbido; prezzo pagato/totale dai dati; scheda visibile solo vicino a Nina | 0,5 |
+| Game feel HUD: monete sull'icona LN, conteggio e pulse, clamp schede fuori dai rettangoli HUD | 🟡 base TL fatta (monete verso la pillola, clamp nel pannello) | Moneta atterra sull'icona LN; numero conta all'arrivo, non al credito; schede Cassa/pad mai sopra pillole, riga obiettivo, biglietto; combo solo '+N' sopra Nina, sparisce in 1,5 s, nessun x1,2 a schermo. `HudFeel` nella spec | 0,5 |
+| Pad in-world (ritiro, consegna, acquisto, upgrade: anello, costo, riempimento) | 🟡 | Colori: ritiro `#5E7F86`, consegna `#8FC9A8`, acquisto `#F4C430`, potenziamento `#F7E26B`; anello 0→1 morbido; prezzo pagato/totale dai dati; scheda visibile solo vicino a Nina | 0,5 |
 | Freccia obiettivo a bordo schermo | ✅ | Clamp alla safe area con margine 24 dp; diventa marker quando il bersaglio è in camera | 0 |
-| Telefono di Nina (Home, Ordini, Messaggi, Flotta in sola lettura) | 🟡 struttura pronta, contenuti da cablare | Back stack app → home → chiuso; gioco mai in pausa; nessun acquisto dal telefono | 1 |
+| ~~Telefono di Nina (Home, Ordini, Messaggi, Flotta)~~ | ➡️ Gioco completo (#64) | Fuori dal Cap. 1: la struttura già fatta resta nel ramo ma non va nell'HUD | 0 |
 | Splash/caricamento WebGL | ⬜ | Logo + barra terracotta→sole, avvio < 5 s su laptop medio | 0,5 |
-| Schermata fine capitolo (versamento tranche, prossimo capitolo) | ⬜ | Nessuna modale bloccante oltre 3 s; un solo CTA | 1 |
-| **Totale** | | | **5** |
+| Schermata fine giornata / fine capitolo (debito, versamento tranche, prossimo capitolo) | ⬜ | Unico punto dell'HUD con il debito (oltre al fumetto di Ada che lo spiega); nessuna modale bloccante oltre 3 s; un solo CTA | 1 |
+| **Totale** | | | **4** |
 
 ### Sound Designer
 | Voce | Stato | gp |
@@ -143,10 +145,11 @@ Stato verificato il 15/10 alle 16:15 su `webgl-min` (HUD v2 del TL: `Tokens.uss`
 | Musica giorno "Vela & Figli" a 4 stem (base/perc/mel/full, 76,8 s, sample-aligned) | ✅ file, 🟡 qualità | 0 |
 | Cablaggio e verifica in gioco di passi (per superficie), deposito, NONNO, pitch della pila | 🟡 | 1 |
 | Seconda passata timbrica sulla musica (strumenti più ricchi, campioni CC0 rielaborati) e SFX NONNO meno sintetici | ⬜ | 1 |
-| SFX clienti per tipologia (4-5 voci grammelot + barks), UI telefono/onboarding (tap, swipe, notifica, freccia obiettivo) | ⬜ | 1,5 |
+| SFX clienti per tipologia (4-5 voci grammelot + barks), UI onboarding (tap, freccia obiettivo) | ⬜ | 1,5 |
+| ➡️ Gioco completo (#64): SFX UI telefono (swipe, notifica) | rimandato, da rivedere col Sound Designer | 0 |
 | Ambiente Borgo Gradoni (gabbiani lontani, vicolo, bottega, Faro Spento lontano) a 2 layer giorno/tramonto | ⬜ | 1 |
 | Tramonto e "chiusura bottega": stinger + variante musicale; stinger tranche del debito e fine capitolo | ⬜ | 1 |
-| Mix finale: AudioMixer (Musica/SFX/UI/Ambiente), snapshot giorno/tramonto, ducking, cap voci, test speaker telefono, sblocco audio WebGL al primo input | ⬜ | 1 |
+| Mix finale: AudioMixer (Musica/SFX/UI/Ambiente), snapshot giorno/tramonto, ducking, cap voci, test su speaker di smartphone (WebGL mobile), sblocco audio WebGL al primo input | ⬜ | 1 |
 | **Totale** | | **6,5** |
 
 ### QA
@@ -172,7 +175,7 @@ Stato verificato il 15/10 alle 16:15 su `webgl-min` (HUD v2 del TL: `Tokens.uss`
 | Pipeline build sotto 16 GB (build serializzate, una istanza Unity per volta) | 🟡 | 1 |
 | **Totale** | | **12** |
 
-**Totale complessivo: ≈ 65,5 giorni-persona** (≈ 67,5 se si vuole la notte giocabile nel cap. 1; la UI/UX scende da 9 a 5 gp perché HUD responsive, freccia e logica onboarding sono già nel ramo).
+**Totale complessivo: ≈ 64,5 giorni-persona** (≈ 66,5 se si vuole la notte giocabile nel cap. 1; la UI/UX scende da 9 a 4 gp perché HUD responsive, freccia e logica onboarding sono già nel ramo e il telefono è rimandato a Gioco completo, #64).
 
 ## 2. Dipendenze e percorso critico
 - Concept pianta set dressing → 3D piazzamento kit → VFX luci/ciclo giorno sul deposito vero → Concept review.
@@ -201,7 +204,7 @@ Consegna a Lorenzo solo dopo la milestone M5 (vedi sotto).
 - **M1 – Sprint GAME FEEL (gg 1-3):** merge VFX v1.4 + fix post; pickup/delivery juice, monete→HUD, anello pad, combo; squash pacchi; cablaggio SFX passi/deposito; musica a stem attiva. Uscita: loop minimo che "si sente bene" (review interna Concept + GD).
 - **M2 – Deposito vero (gg 3-6):** set dressing completo Arrivi/scaffali/Bancone/Cassa/Cassaforte/pad + esterno Borgo Gradoni; fix UV Nina; luci sul deposito reale. Uscita: screenshot approvati dal Concept, fedeli a conceptA.
 - **M3 – Vita nel deposito (gg 5-9):** clienti 4-5 tipologie animate con voci; NONNO che lavora (animazioni, VFX, suoni); DayCycle runtime con tramonto e lanterne.
-- **M4 – Onboarding e HUD finale (gg 7-11):** onboarding primi 5 minuti, freccia obiettivo, barra debito, telefono minimo, splash, fine capitolo; testi Narrative.
+- **M4 – Onboarding e HUD finale (gg 7-11):** onboarding primi 5 minuti, freccia obiettivo, HUD minimo (LN, giorno, riga obiettivo, joystick, pad), debito solo a fine giornata, splash, fine capitolo; testi Narrative.
 - **M5 – Rifinitura e QA (gg 11-13):** run completo cap. 1 vs playthrough_expected, performance, mix audio, regressioni, review stile finale. **Solo allora build a Lorenzo.**
 
 ## 5. Le 5 voci più a rischio
