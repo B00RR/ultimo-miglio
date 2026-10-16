@@ -1,11 +1,11 @@
-# Render di review #2: Nonna Ada (fronte, 3/4, retro, iso 3/4 dall'alto) + lineup con i clienti v02. blender -b -P render_review_2.py -- <dir_fbx_ada> <dir_clienti> <out>
+# Render di review #2: lineup dei 6 clienti (iso 3/4 e fronte). blender -b -P render_review_2.py -- <dir_clienti> <out>
 import bpy,sys,math,os
 from mathutils import Vector
-a=sys.argv[sys.argv.index("--")+1:]; ADA,CLI,OUT=a; os.makedirs(OUT,exist_ok=True)
+a=sys.argv[sys.argv.index("--")+1:]; CLI,OUT=a; os.makedirs(OUT,exist_ok=True)
 bpy.ops.wm.read_factory_settings(use_empty=True); sc=bpy.context.scene
-sc.render.engine='BLENDER_EEVEE_NEXT'; sc.render.film_transparent=False
+sc.render.engine='CYCLES'; sc.cycles.samples=32; sc.render.film_transparent=False
 w=bpy.data.worlds.new("w"); w.use_nodes=True; w.node_tree.nodes["Background"].inputs[0].default_value=(0.95,0.89,0.78,1); w.node_tree.nodes["Background"].inputs[1].default_value=0.45; sc.world=w
-sc.view_settings.view_transform='Standard'; sc.eevee.taa_render_samples=16
+sc.view_settings.view_transform='Standard'
 AT=bpy.data.images.load(os.environ['UM_ATLAS']+'.png')
 def atl(o):
     m=bpy.data.materials.new('M_Diorama_Atlas'); m.use_nodes=True; t=m.node_tree.nodes.new('ShaderNodeTexImage'); t.image=AT; t.interpolation='Closest'
@@ -21,8 +21,6 @@ def shot(name,target,dist_dir,scale,res=(900,1200)):
     cam.location=Vector(target)+Vector(dist_dir).normalized()*10; cam.data.ortho_scale=scale
     cam.rotation_euler=(Vector(target)-cam.location).to_track_quat('-Z','Y').to_euler()
     sc.render.filepath=os.path.join(OUT,name); bpy.ops.render.render(write_still=True)
-ada=imp(os.path.join(ADA,"chr_nonna_ada.fbx"),0)
-for n,d in (("ada_fronte",(0,-1,0.15)),("ada_3q",(0.8,-1,0.2)),("ada_retro",(0,1,0.15)),("ada_iso34",(1,-1,1.25))): shot(n+".png",(0,0,0.9),d,2.3)
 names=["base","residente","rider","anziana","turista","vip"]
-for i,n in enumerate(names): imp(os.path.join(CLI,"chr_cliente_%s.fbx"%n),(i+1)*0.9)
-shot("lineup_iso34.png",(3.15,0,0.9),(0.6,-1,1.0),6.8,(1800,1000)); shot("lineup_fronte.png",(3.15,0,0.9),(0,-1,0.1),6.6,(1800,900))
+for i,n in enumerate(names): imp(os.path.join(CLI,"chr_cliente_%s.fbx"%n),i*0.9)
+shot("lineup_iso34.png",(2.25,0,0.9),(0.6,-1,1.0),6.8,(1800,1000)); shot("lineup_fronte.png",(2.25,0,0.9),(0,-1,0.1),6.6,(1800,900))
