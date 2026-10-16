@@ -12,7 +12,7 @@
 ## 2. Vincoli fissi di Lorenzo (non negoziabili)
 1. Tutto in **italiano** (testi di gioco, documenti, commit, issue, PR).
 2. Lorenzo testa **solo tramite build WebGL nel browser** (zip/preview). **Niente video** a lui.
-3. Asset **gratuiti CC0 / licenza commerciale**, sempre **adattati** allo stile (registro in `ultimo-miglio-docs/LICENZE_ASSET.md`).
+3. Asset **gratuiti CC0 / licenza commerciale**, sempre **adattati** allo stile (registro in `docs/LICENZE_ASSET.md`; repo docs archiviato, tutto in B00RR/ultimo-miglio).
 4. **Originali**: Nina, Nonno, robot, logo e tema non devono copiare altri giochi.
 5. **Profondità gestionale**: energia/corrente, contratti, rotte, officina, OmniFreight (rivale).
 6. **Longevità lunga**: progressione a capitoli + post‑game.
@@ -49,7 +49,7 @@
 - Build Android (APK/AAB) firmata quando il gameplay è stabile.
 
 ## 7. Dove trovare la documentazione
-Repo **[B00RR/ultimo-miglio-docs](https://github.com/B00RR/ultimo-miglio-docs)**:
+Il repo **[B00RR/ultimo-miglio-docs](https://github.com/B00RR/ultimo-miglio-docs)** è **archiviato (sola lettura)**. Tutta la documentazione vive solo in **[B00RR/ultimo-miglio](https://github.com/B00RR/ultimo-miglio)** (cartella `docs/` e file di progetto):
 `00_BIBBIA.md`, `01_CORE_LOOP.md`, `02_TECH.md`, `04_UI.md`, `08_RETENTION.md`, `09_SPRINT1.md`, `10_GESTIONALE.md`, `11_CAP1_COMPLETO.md`, `11_LONGEVITA.md`, `UNITY_PROTOCOLLO.md`, `LICENZE_ASSET.md`, `UI_SPEC_BIGLIETTI.md`, cartelle `3d/`, `art/`, `audio/`, `data/`, `qa/`.
 
 ## 8. Build WebGL e test
@@ -80,6 +80,16 @@ $UNITY -batchmode -projectPath "$PWD" -runTests -testPlatform PlayMode \
 9. Non lavorare nel working tree di un altro agente: usa un clone tuo.
 10. **Parole chiave nelle PR:** ogni PR che risolve una issue scrive nella descrizione `Closes #N`, **una riga per issue**: così GitHub chiude la issue al merge su `main`. Se la issue è risolta solo in parte si scrive `Refs #N` e la issue resta aperta. Le forme in italiano (es. "Chiude #N") **non** sono riconosciute da GitHub. Usa il modello `.github/pull_request_template.md`.
 
+
+## Regole del computer
+- Massimo **1 processo Unity** alla volta sul box, sempre con `flock /tmp/unity-box.lock`; la coda la gestisce il Tech Lead.
+- **Build e test solo su GitHub Actions**; in locale è permessa solo la build per il QA.
+- Massimo **1 server http di test** alla volta, sempre chiuso a fine lavoro.
+- Nessun processo in background dimenticato: lo chiude chi lo apre.
+- Prima di qualsiasi lavoro pesante si controlla `uptime`: se il load supera **16** si aspetta.
+- Niente clone o build duplicati: ognuno lavora solo nella propria cartella in `/tmp`.
+- I ruoli senza una issue attiva restano fermi finché il Producer non li riattiva.
+
 ## Ruoli e responsabilità
 Ogni ruolo lavora solo sulle issue con la propria etichetta `ruolo:*`, sempre con **ramo + PR + `Closes #N`** (o `Refs #N` se parziale). Nessuno pusha su `main`.
 
@@ -97,7 +107,7 @@ Ogni ruolo lavora solo sulle issue con la propria etichetta `ruolo:*`, sempre co
 | **Game Designer** (`ruolo:design`) | Regole, economia, onboarding, dati di design | Lavoro fuori dalle issue `ruolo:design` |
 
 ## 10. Da dove iniziare (nuovo agente)
-1. Leggi questo file, poi `00_BIBBIA.md` e `11_CAP1_COMPLETO.md` nel repo docs.
+1. Leggi questo file, poi `00_BIBBIA.md` e `11_CAP1_COMPLETO.md` in questo repo (B00RR/ultimo-miglio; il repo docs è archiviato, sola lettura).
 2. Guarda le issue aperte: `gh issue list -R B00RR/ultimo-miglio` e scegli quelle del tuo ruolo con `priorita:alta`.
 3. Clona in una cartella tua, crea il ramo, lavora, lancia i test, apri la PR.
 4. Rispetta i vincoli della sezione 2 (italiano, WebGL, niente video, asset liberi adattati).
@@ -118,6 +128,7 @@ Ogni ruolo lavora solo sulle issue con la propria etichetta `ruolo:*`, sempre co
 
 Voci più recenti in alto. Formato: `AAAA-MM-GG HH:MM` (Europe/Rome) — [commit] — descrizione.
 
+- 2026-10-16 11:48 — Regole del computer decise da DevOn su richiesta di Lorenzo (carico box 158/8 core); repo docs archiviato.
 - 2026-10-16 11:29 — Code Reviewer — [2f2f61f](https://github.com/B00RR/ultimo-miglio/commit/2f2f61f2d5d4946d01c8b7f65fc192d715cc0e51) — unita in squash la [PR #85](https://github.com/B00RR/ultimo-miglio/pull/85) (clienti v03-uv: rider cappello limone, 3 toni pelle; Ada già su main via #93). Job `test` verde. Refs #2.
 - 2026-10-16 11:29 — Code Reviewer — [8ed4422](https://github.com/B00RR/ultimo-miglio/commit/8ed4422972dd7c6d3a80a45769034ec6b6c3d270) — unita in squash la [PR #135](https://github.com/B00RR/ultimo-miglio/pull/135) (Zaino 8 = 3.000 LN; combo HUD solo +N). Job `test` verde. Closes #134.
 - 2026-10-16 11:29 — Code Reviewer — [3a3864c](https://github.com/B00RR/ultimo-miglio/commit/3a3864c134075e713eef85346639d11b7b581e12) — unita in squash la [PR #113](https://github.com/B00RR/ultimo-miglio/pull/113) (testi HUD minimo cap. 1 / rinviati_cap2). Job `test` verde. Closes #105.
