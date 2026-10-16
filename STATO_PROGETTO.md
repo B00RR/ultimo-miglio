@@ -80,6 +80,7 @@ $UNITY -batchmode -projectPath "$PWD" -runTests -testPlatform PlayMode \
 8. **Ogni voce/modifica di questo file ha data e ora** (Europe/Rome, formato `AAAA-MM-GG HH:MM`) e, se pushata, il **link al commit** (hash corto). Aggiungi la voce in cima alla sezione *Cronologia*.
 9. Non lavorare nel working tree di un altro agente: usa un clone tuo.
 10. **Parole chiave nelle PR:** ogni PR che risolve una issue scrive nella descrizione `Closes #N`, **una riga per issue**: così GitHub chiude la issue al merge su `main`. Se la issue è risolta solo in parte si scrive `Refs #N` e la issue resta aperta. Le forme in italiano (es. "Chiude #N") **non** sono riconosciute da GitHub. Usa il modello `.github/pull_request_template.md`.
+11. **Unity sul box (DevOn, 2026-10-16 11:48):** sul box gira **al massimo 1 processo Unity alla volta** (anche batchmode). Ogni avvio passa da `flock /tmp/unity-box.lock <comando>`. Prima di lanciare controlla `uptime`: se il load è sopra 16, aspetta. I test delle PR girano su GitHub Actions; il runner self-hosted resta spento finché non usa lo stesso lock con un job alla volta. Si chiudono solo i propri processi.
 
 ## Ruoli e responsabilità
 Ogni ruolo lavora solo sulle issue con la propria etichetta `ruolo:*`, sempre con **ramo + PR + `Closes #N`** (o `Refs #N` se parziale). Nessuno pusha su `main`.
@@ -119,6 +120,7 @@ Ogni ruolo lavora solo sulle issue con la propria etichetta `ruolo:*`, sempre co
 
 Voci più recenti in alto. Formato: `AAAA-MM-GG HH:MM` (Europe/Rome) — [commit] — descrizione.
 
+- 2026-10-16 11:50 — Tech Lead — regola §10.11 "1 solo Unity sul box" con `flock /tmp/unity-box.lock` e soglia di load 16, dopo il blocco del box (load 200) delle 11:45. Il runner self-hosted è spento per oggi.
 - 2026-10-16 11:47 — Code Reviewer — [d039bd8](https://github.com/B00RR/ultimo-miglio/commit/d039bd8aaa9dfe52606eca05ccaae874dace65ea) — unita in squash la [PR #87](https://github.com/B00RR/ultimo-miglio/pull/87) (fix(#59): NONNO non va più in retromarcia + test PlayMode verso di marcia). Job `test` verde. Refs #59.
 - 2026-10-16 11:29 — Code Reviewer — [2f2f61f](https://github.com/B00RR/ultimo-miglio/commit/2f2f61f2d5d4946d01c8b7f65fc192d715cc0e51) — unita in squash la [PR #85](https://github.com/B00RR/ultimo-miglio/pull/85) (clienti v03-uv: rider cappello limone, 3 toni pelle; Ada già su main via #93). Job `test` verde. Refs #2.
 - 2026-10-16 11:29 — Code Reviewer — [8ed4422](https://github.com/B00RR/ultimo-miglio/commit/8ed4422972dd7c6d3a80a45769034ec6b6c3d270) — unita in squash la [PR #135](https://github.com/B00RR/ultimo-miglio/pull/135) (Zaino 8 = 3.000 LN; combo HUD solo +N). Job `test` verde. Closes #134.
