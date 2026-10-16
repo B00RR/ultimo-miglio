@@ -134,8 +134,7 @@
       "label": "ASSUMI NONNO · 50 LN",
       "completeWhen": "nonnoHired",
       "textKeys": [
-        "onb.nonno.cost",
-        "onb.nonno.bark"
+        "onb.nonno.cost"
       ],
       "unlocks": [
         "phoneApp:Flotta"
@@ -183,7 +182,12 @@
         "onb.nonno.hired",
         "onb.nonno.working"
       ],
-      "note": "NONNO si sveglia, prende i pacchi agli Arrivi e li porta sullo scaffale; contatore '+1' sopra lo scaffale a ogni pacco. Badge 'NONNO: 6 pacchi/min' per 4 s."
+      "note": "NONNO si sveglia, prende i pacchi agli Arrivi e li porta sullo scaffale; contatore '+1' sopra lo scaffale a ogni pacco. Badge 'NONNO: 6 pacchi/min' per 4 s.",
+      "recurringBark": {
+        "textKey": "onb.nonno.bark",
+        "startAfter": "nonnoConfirmDone",
+        "note": "solo bark ricorrente di NONNO, mai insieme a onb.nonno.hired"
+      }
     },
     {
       "id": "phone",
