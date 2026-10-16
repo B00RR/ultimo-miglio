@@ -35,6 +35,7 @@
 /* --- 6. Salta tutorial: riga alta, a sinistra dell'ingranaggio, 26 dp, discreto (crema 85 %, bordo 2 px). Fuori dalla zona pollice. --- */
 .skip-tut { position: absolute; top: 15px; right: 44px; height: 26px; margin: 0; padding: 0 6px; display: none;
     border-radius: 13px; border-width: 2px; border-color: #3B2A20; background-color: rgba(243, 227, 195, 0.85);
+    background-image: none; /* #185: niente sprite bianco del tema Button */
     font-size: 11px; color: #3B2A20; -unity-font-definition: url("project://database/Assets/_Game/UI/Fonts/Fredoka-SemiBold.ttf"); -unity-text-align: middle-center; }
 .skip-tut--on { display: flex; }
 .skip-tut:active { scale: 0.96 0.96; }
