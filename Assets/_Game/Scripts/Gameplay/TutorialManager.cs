@@ -192,7 +192,8 @@ namespace UltimoMiglio.Gameplay
             }
             EnsureHint();
             if (_hint != null) { var h = Current < Step.Fine ? CurrentHint() : null; var joy = _hud.Root.Q("joystick-base"); bool joyOver = joy != null && joy.resolvedStyle.display == DisplayStyle.Flex && joy.resolvedStyle.opacity > 0.05f && joy.worldBound.Overlaps(_hint.worldBound);
-                _hint.EnableInClassList("tut-hint--on", !string.IsNullOrEmpty(h) && !joyOver); // mai sotto il pollice/joystick flottante if (_hintText != null && h != null) _hintText.text = h; }
+                _hint.EnableInClassList("tut-hint--on", !string.IsNullOrEmpty(h) && !joyOver); // mai sotto il pollice/joystick flottante
+                if (_hintText != null && h != null) _hintText.text = h; }
             // B4 P2: testi Ada nel fumetto HUD (non solo console)
             if (_banner != null)
             {
