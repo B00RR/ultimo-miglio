@@ -227,19 +227,13 @@ namespace UltimoMiglio.UI
         /// mirror its text into the v2 note (upper band). No Gameplay file changes needed.</summary>
         void MirrorTutorialBanner()
         {
-            if (legacyBanner == null) legacyBanner = Root.Q("tutorial-banner");
-            if (legacyBanner == null) { adaNote?.Tick(responsive ? responsive.Scale : 1f); return; }
-            bool on = legacyBanner.resolvedStyle.display != DisplayStyle.None && legacyBanner.style.display != DisplayStyle.None;
-            string txt = null;
-            if (on) { var labels = legacyBanner.Query<Label>().ToList(); if (labels.Count > 0) txt = labels[labels.Count - 1].text; }
-            legacyBanner.style.visibility = Visibility.Hidden;
-            if (tutorialObjective != null)
+            if (legacyBanner == null && Root != null) legacyBanner = Root.Q("tutorial-banner");
+            if (legacyBanner != null)
             {
-                bool show = !string.IsNullOrEmpty(txt);
-                tutorialObjective.text = txt ?? "";
-                tutorialObjective.style.display = show ? DisplayStyle.Flex : DisplayStyle.None;
+                legacyBanner.style.visibility = Visibility.Hidden;
+                legacyBanner.style.display = DisplayStyle.None;
             }
-            if (txt != lastAdaText) lastAdaText = txt;
+            // tutorial-objective is owned by TutorialManager — do not blank it here (QA v2 live bug)
             adaNote?.Tick(responsive ? responsive.Scale : 1f);
         }
 

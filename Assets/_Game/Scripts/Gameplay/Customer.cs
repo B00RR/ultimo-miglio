@@ -8,7 +8,7 @@ namespace UltimoMiglio.Gameplay
     {
         public ParcelColor Wants; public float Speed = 2.2f;
         public Vector3 Target; public bool Leaving; public float Waited;
-        public bool AtCounter => !Leaving && (transform.position - Target).sqrMagnitude < 0.04f;
+        public bool AtCounter => !Leaving && (transform.position - Target).sqrMagnitude < 0.36f; // 0.6m — WebGL was stuck at Bancone with 0.2m
         public CustomerQueue Owner;
         static readonly int SpeedId = Animator.StringToHash("Speed"), PatienceId = Animator.StringToHash("Patience"), PayId = Animator.StringToHash("Pay"), AngryId = Animator.StringToHash("Angry");
         Animator _an;

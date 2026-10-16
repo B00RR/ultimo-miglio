@@ -5,7 +5,7 @@
 :root {
     --terracotta: #C8633B; --sun: #F4C430; --mint: #8FC9A8; --lemon: #F7E26B;
     --cream: #F3E3C3; --cream-hi: #FFF9EE; --panel-a: #FBF1DC; --panel-b: #F1DFBE;
-    --brown: #3B2A20; --teal: #5E7F86; --plum: #5B3A5E; --tomato: #D9472B; --amber: #FFB347;
+    --brown: #3B2A20; --outline: #3B2F2A; --wood: #74503A; --walnut: #7A4A2E; --teal: #5E7F86; --plum: #5B3A5E; --tomato: #D9472B; --amber: #FFB347;
     --phone-shell: #2E2621; --phone-a: #4A3428; --phone-b: #2B2230;
     --border: 4px;
     /* Font: Inter SDF with Roboto fallback is set on the Theme/PanelSettings text settings (see README_HUD.md). */
@@ -27,10 +27,10 @@
 /* ---------- panels ---------- */
 .panel {
     background-color: var(--panel-a);
-    border-width: var(--border); border-color: var(--brown);
+    border-width: var(--border); border-color: var(--outline);
     border-radius: 48px;
 }
-.pill { border-radius: 999px; padding: 10px 28px; border-width: var(--border); border-color: var(--brown); background-color: var(--panel-a); flex-direction: row; align-items: center; }
+.pill { border-radius: 999px; padding: 10px 28px; border-width: var(--border); border-color: var(--outline); background-color: var(--panel-a); flex-direction: row; align-items: center; }
 .shadow { /* solid brown drop shadow: a sibling ".shadow-plate" offset 6px is used where needed */ }
 
 /* ---------- currency pill ---------- */

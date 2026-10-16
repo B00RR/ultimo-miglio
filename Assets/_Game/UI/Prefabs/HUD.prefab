@@ -313,4 +313,4 @@ MonoBehaviour:
   nina: {fileID: 0}
   marginDp: 64
   markerHeight: 2.2
-  showMarkerWhenVisible: 1
+  showMarkerWhenVisible: 0
