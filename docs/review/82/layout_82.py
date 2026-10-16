@@ -59,7 +59,10 @@ for ax,new in zip(axs,(False,True)):
         if sh[0]=="c": ax.add_patch(Circle(sh[1],sh[2],color="#7A4A2E",alpha=0.5))
         else: ax.add_patch(Rectangle((sh[1][0]-sh[2]/2,sh[1][1]-sh[3]/2),sh[2],sh[3],color="#CDAE82",alpha=0.8))
     for z in Z:
-        ax.add_patch(Rectangle((z["pos"][0]-z["trig"][0]/2,z["pos"][1]-z["trig"][1]/2),*z["trig"],fill=False,ls="--",ec="#3B2A20",lw=0.8))
+        if new and z["name"].startswith("Pad_"):  # #214: trigger tondo dei pad = cerchio - raggio di Kaia (0,3)
+            ax.add_patch(Circle(z["pos"],max(0.1,z["rv"]-0.3),fill=False,ls="--",ec="#3B2A20",lw=0.8))
+        else:
+            ax.add_patch(Rectangle((z["pos"][0]-z["trig"][0]/2,z["pos"][1]-z["trig"][1]/2),*z["trig"],fill=False,ls="--",ec="#3B2A20",lw=0.8))
         ax.add_patch(Circle(z["pos"],z["rv"],color=COL[z["kind"]],alpha=0.75)); ax.text(z["pos"][0],z["pos"][1],z["name"].replace("Zona_","").replace("Pad_",""),fontsize=7,ha="center",va="center")
     bad={a for a,b,g in iss}|{b for a,b,g in iss}
     for z in Z:
