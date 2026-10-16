@@ -39,7 +39,6 @@ public class NonnoWorkTest
 
             var bot = Object.FindAnyObjectByType<NonnoRobot>();
             Assert.IsNotNull(bot, "NonnoRobot missing");
-            // Prefer B: no NavMeshAgent component at runtime
             var leftover = bot.GetComponent("NavMeshAgent");
             Assert.IsNull(leftover, "NavMeshAgent must not exist on NONNO (Transform-only)");
 
@@ -60,5 +59,64 @@ public class NonnoWorkTest
         {
             Application.logMessageReceived -= onLog;
         }
+    }
+
+    /// <summary>P0 QA v3: after hire, NONNO must leave Arrivi and increase shelf stock within 20 s (Transform-only).</summary>
+    [UnityTest, Timeout(120000)]
+    public IEnumerator HireNonno_RestocksShelfWithin20Seconds()
+    {
+        PlayerPrefs.DeleteAll();
+        var save = System.IO.Path.Combine(Application.persistentDataPath, "save_v1.json");
+        if (System.IO.File.Exists(save)) System.IO.File.Delete(save);
+
+        yield return SceneManager.LoadSceneAsync("Ch1_Deposito");
+        for (int i = 0; i < 60 && !GameRoot.Ready; i++) yield return null;
+        Assert.IsTrue(GameRoot.Ready);
+
+        var eco = GameRoot.I.Eco;
+        eco.S.Wallet = 100;
+        bool hired = false;
+        for (int i = 0; i < 500 && !hired; i++)
+            hired = eco.PadTick(UpgradeKind.NonnoHire, 0.2);
+        Assert.IsTrue(hired);
+        Assert.AreEqual(0, eco.S.NonnoLevel);
+
+        var bot = Object.FindAnyObjectByType<NonnoRobot>();
+        Assert.IsNotNull(bot);
+        Assert.IsNull(bot.GetComponent("NavMeshAgent"), "Transform-only");
+        Assert.IsNotNull(bot.Arrivals);
+        Assert.IsNotNull(bot.Shelves);
+        Assert.Greater(bot.Shelves.Length, 0);
+
+        bot.Arrivals.Stock = 30;
+        // Zero shelves so any Add from NONNO is visible (Bancone self-serve is slow)
+        foreach (var s in bot.Shelves) if (s) { while (s.Count > 0) s.Take(); }
+        int shelfBefore = 0;
+        foreach (var s in bot.Shelves) if (s) shelfBefore += s.Count;
+        Assert.AreEqual(0, shelfBefore, "shelves should start empty for restock assert");
+
+        float t = 0f;
+        int shelfAfter = shelfBefore;
+        bool leftLoading = false;
+        bool delivered = false;
+        while (t < 20f)
+        {
+            t += Time.deltaTime;
+            yield return null;
+            if (bot.State == NonnoRobot.WorkState.ToShelf || bot.State == NonnoRobot.WorkState.Unloading || bot.State == NonnoRobot.WorkState.Idle && bot.CarryCount == 0 && t > 2f)
+                leftLoading = true;
+            if (bot.State == NonnoRobot.WorkState.ToShelf || bot.State == NonnoRobot.WorkState.Unloading)
+                leftLoading = true;
+
+            int sum = 0;
+            foreach (var s in bot.Shelves) if (s) sum += s.Count;
+            shelfAfter = sum;
+            if (shelfAfter > shelfBefore) { delivered = true; break; }
+        }
+
+        Assert.IsTrue(leftLoading || bot.State != NonnoRobot.WorkState.Loading,
+            $"NONNO stuck Loading after {t:F1}s carry={bot.CarryCount} stock={bot.Arrivals.Stock} state={bot.State}");
+        Assert.IsTrue(delivered || shelfAfter > shelfBefore,
+            $"Shelf stock did not increase via NONNO within 20s. before={shelfBefore} after={shelfAfter} state={bot.State} carry={bot.CarryCount} loadStock={bot.Arrivals.Stock}");
     }
 }
