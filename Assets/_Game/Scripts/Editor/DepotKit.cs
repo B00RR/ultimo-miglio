@@ -17,50 +17,51 @@ namespace UltimoMiglio.EditorTools
             // floor 18x22: 2x2 tiles
             for (int x = 0; x < 9; x++) for (int z = 0; z < 11; z++)
                 Place((x + z) % 2 == 0 ? "Kit/env_floor_2x2_a" : "Kit/env_floor_2x2_b", _parent, new Vector3(-8 + x * 2, -0.02f, -10 + z * 2), 0, false, false, 2f);
-            // back walls (far from the camera: N and E), low plinth on the near sides (S, W) so they never hide Nina
+            // back walls N/E avvicinati all'area di gioco (Concept: set #47 in camera con ortho ~6.5); bounds collisione restano a 11.15
             // #47: archi in tufo sul muro N (x -5 e +5) e sul muro E (z -1); se env_wall_arch_4m manca, muri pieni come prima
             bool arch = AssetDatabase.LoadAssetAtPath<GameObject>(Root + "Kit/env_wall_arch_4m.fbx");
             for (int i = 0; i < 9; i++)
             {
-                if (arch && (i == 1 || i == 2 || i == 6 || i == 7)) { if (i == 1 || i == 6) Place("Kit/env_wall_arch_4m", _parent, new Vector3(-8 + i * 2 + 1, 0, 11.15f), 0, false, false, 4f, true); continue; }
-                Place(i == 4 ? "Kit/env_wall_2m_b" : "Kit/env_wall_2m_a", _parent, new Vector3(-8 + i * 2, 0, 11.15f), 0, false, false, 2f, true);
+                if (arch && (i == 1 || i == 2 || i == 6 || i == 7)) { if (i == 1 || i == 6) Place("Kit/env_wall_arch_4m", _parent, new Vector3(-8 + i * 2 + 1, 0, 8.35f), 0, false, false, 4f, true); continue; }
+                Place(i == 4 ? "Kit/env_wall_2m_b" : "Kit/env_wall_2m_a", _parent, new Vector3(-8 + i * 2, 0, 8.35f), 0, false, false, 2f, true);
             }
             for (int i = 0; i < 11; i++)
             {
-                if (arch && (i == 4 || i == 5)) { if (i == 4) Place("Kit/env_wall_arch_4m", _parent, new Vector3(9.15f, 0, -10 + i * 2 + 1), 90, false, false, 4f, true); continue; }
-                Place(i % 3 == 1 ? "Kit/env_wall_2m_b" : "Kit/env_wall_2m_a", _parent, new Vector3(9.15f, 0, -10 + i * 2), 90, false, false, 2f, true);
+                // Concept PR#55: muro E più vicino all'area di gioco (camera ortho ~6.5)
+                if (arch && (i == 4 || i == 5)) { if (i == 4) Place("Kit/env_wall_arch_4m", _parent, new Vector3(7.6f, 0, -10 + i * 2 + 1), 90, false, false, 4f, true); continue; }
+                Place(i % 3 == 1 ? "Kit/env_wall_2m_b" : "Kit/env_wall_2m_a", _parent, new Vector3(7.6f, 0, -10 + i * 2), 90, false, false, 2f, true);
             }
-            Place("Kit/env_wall_corner", _parent, new Vector3(9.15f, 0, 11.15f), 0, false);
+            Place("Kit/env_wall_corner", _parent, new Vector3(7.6f, 0, 8.35f), 0, false);
             for (int i = 0; i < 9; i++) Place("Kit/env_plinth_edge_2m", _parent, new Vector3(-8 + i * 2, 0, -11.15f), 0, false, false, 2f, true);
             for (int i = 0; i < 11; i++) Place("Kit/env_plinth_edge_2m", _parent, new Vector3(-9.15f, 0, -10 + i * 2), 90, false, false, 2f, true);
             // wall dressing (N wall), sign and lanterns
-            Place("Kit/prop_sign_vela_figli", _parent, new Vector3(0, 2.3f, 10.88f), 0, false); // #47: insegna v03 col faro
-            foreach (var x in new[] { -6f, 3f, 7f }) Place("Kit/prop_lantern_wall", _parent, new Vector3(x, 1.9f, 10.9f), 0, false);
-            Place("Kit/prop_wallshelf", _parent, new Vector3(-2.5f, 1.4f, 10.85f), 0, false);
-            Place("Kit/prop_books", _parent, new Vector3(-2.5f, 1.55f, 10.85f), 0, false, true);
+            Place("Kit/prop_sign_vela_figli", _parent, new Vector3(0, 2.3f, 8.08f), 0, false); // #47: insegna v03 col faro
+            foreach (var x in new[] { -6f, 3f, 7f }) Place("Kit/prop_lantern_wall", _parent, new Vector3(x, 1.9f, 8.1f), 0, false);
+            Place("Kit/prop_wallshelf", _parent, new Vector3(-2.5f, 1.4f, 8.05f), 0, false);
+            Place("Kit/prop_books", _parent, new Vector3(-2.5f, 1.55f, 8.05f), 0, false, true);
             // props along the edges (solid)
-            Place("Kit/prop_lemontree_pot", _parent, new Vector3(8.2f, 0, 10.2f), 0, true);
-            Place("Kit/prop_plant_small", _parent, new Vector3(-8.3f, 0, 10.3f), 0, true);
-            Place("Kit/prop_safe", _parent, new Vector3(8.3f, 0, 4.5f), -90, true);
+            Place("Kit/prop_lemontree_pot", _parent, new Vector3(6.9f, 0, 7.4f), 0, true);
+            Place("Kit/prop_plant_small", _parent, new Vector3(-7.6f, 0, 7.5f), 0, true);
+            Place("Kit/prop_safe", _parent, new Vector3(6.9f, 0, 4.5f), -90, true);
             // #47: Carico 0 ora sta sul Bancone (SliceSceneBuilder), non più nell'angolo
             // #47: pacchi v03 (fallback ai vecchi prop_box se mancano), vasi di limoni dentro il deposito
             if (!Place("../Props/prop_parcel_box", _parent, new Vector3(-8.2f, 0, 8.6f), 15, true)) Place("Kit/prop_box_m", _parent, new Vector3(-8.2f, 0, 8.6f), 15, true);
             if (!Place("../Props/prop_parcel_box_flat", _parent, new Vector3(-8.2f, 0, 8.6f), -20, false, true)) Place("Kit/prop_box_s", _parent, new Vector3(-7.6f, 0, 9.4f), -10, true);
-            if (!Place("Kit/prop_parcel_stack_a", _parent, new Vector3(-3.0f, 0, 10.2f), 5, true)) Place("Kit/prop_box_m", _parent, new Vector3(-3.0f, 0, 10.2f), 5, true);
-            Place("Kit/prop_lemontree_pot", _parent, new Vector3(-6.9f, 0, 10.1f), 0, true);
-            Place("Kit/prop_lemontree_pot", _parent, new Vector3(-3.1f, 0, 10.1f) + new Vector3(1.4f, 0, 0), 0, true);
-            Place("Kit/prop_lemontree_pot", _parent, new Vector3(8.2f, 0, -3.3f), 0, true);
-            Place("Kit/prop_lemontree_pot", _parent, new Vector3(8.2f, 0, 1.3f), 0, true);
-            Place("Kit/prop_plant_pot_tall", _parent, new Vector3(3.1f, 0, 10.2f), 0, true);
-            Place("Kit/prop_plant_pot_round", _parent, new Vector3(6.9f, 0, 10.2f), 0, true);
-            Place("Kit/prop_planter_box", _parent, new Vector3(0, 0, 10.5f), 0, true);
-            Place("Kit/prop_sign_hanging_parcel", _parent, new Vector3(8.95f, 2.4f, -3.1f), -90, false);
+            if (!Place("Kit/prop_parcel_stack_a", _parent, new Vector3(-3.0f, 0, 7.5f), 5, true)) Place("Kit/prop_box_m", _parent, new Vector3(-3.0f, 0, 7.5f), 5, true);
+            Place("Kit/prop_lemontree_pot", _parent, new Vector3(-6.9f, 0, 7.4f), 0, true);
+            Place("Kit/prop_lemontree_pot", _parent, new Vector3(-3.1f, 0, 7.4f) + new Vector3(1.4f, 0, 0), 0, true);
+            Place("Kit/prop_lemontree_pot", _parent, new Vector3(6.9f, 0, -3.3f), 0, true);
+            Place("Kit/prop_lemontree_pot", _parent, new Vector3(6.9f, 0, 1.3f), 0, true);
+            Place("Kit/prop_plant_pot_tall", _parent, new Vector3(3.1f, 0, 7.5f), 0, true);
+            Place("Kit/prop_plant_pot_round", _parent, new Vector3(5.4f, 0, 7.5f), 0, true);
+            Place("Kit/prop_planter_box", _parent, new Vector3(0, 0, 7.7f), 0, true);
+            Place("Kit/prop_sign_hanging_parcel", _parent, new Vector3(7.4f, 2.4f, -3.1f), -90, false);
             Place("Kit/prop_streetlamp", _parent, new Vector3(-8.4f, 0, -10.2f), 45, true);
             Place("ThirdParty/Props/prop_tp_crate_open", _parent, new Vector3(-8.2f, 0, 6.8f), 0, true);
-            Place("ThirdParty/Props/prop_tp_barrel", _parent, new Vector3(5.5f, 0, 10.3f), 0, true);
-            Place("ThirdParty/Props/prop_tp_bench", _parent, new Vector3(8.3f, 0, -4f), 90, true);
-            Place("ThirdParty/Props/prop_tp_plant_potted", _parent, new Vector3(8.3f, 0, -7.5f), 0, true);
-            Place("ThirdParty/Props/prop_tp_lamp_wall", _parent, new Vector3(8.9f, 1.9f, 0f), -90, false);
+            Place("ThirdParty/Props/prop_tp_barrel", _parent, new Vector3(5.5f, 0, 7.5f), 0, true);
+            Place("ThirdParty/Props/prop_tp_bench", _parent, new Vector3(6.9f, 0, -4f), 90, true);
+            Place("ThirdParty/Props/prop_tp_plant_potted", _parent, new Vector3(6.9f, 0, -7.5f), 0, true);
+            Place("ThirdParty/Props/prop_tp_lamp_wall", _parent, new Vector3(7.4f, 1.9f, 0f), -90, false);
             Place("ThirdParty/Props/prop_tp_basket", _parent, new Vector3(-8.2f, 0, -6f), 0, true);
             Place("ThirdParty/Props/prop_tp_bucket", _parent, new Vector3(-8.3f, 0, -8.5f), 0, true);
             // Solara houses as backdrop behind N and E walls (no colliders: outside the boundary)
@@ -104,6 +105,13 @@ namespace UltimoMiglio.EditorTools
             Place("Kit/prop_sign_board_aperto", _parent, banPos + new Vector3(-1.2f, 0, -2.4f), 30, true);
             Place("Kit/prop_streetlamp", _parent, banPos + new Vector3(-1.9f, 0, -3.4f), 0, true);
             Place("Kit/prop_plant_pot_round", _parent, banPos + new Vector3(1.6f, 0, 0.7f), 0, true);
+            // Concept: pezzo di muro/arco visibile dietro il Bancone (beauty shot)
+            Place("Kit/env_wall_2m_a", _parent, banPos + new Vector3(-0.2f, 0, 2.8f), 0, false, false, 2f, true);
+            Place("Kit/env_wall_2m_b", _parent, banPos + new Vector3(1.8f, 0, 2.8f), 0, false, false, 2f, true);
+            if (AssetDatabase.LoadAssetAtPath<GameObject>(Root + "Kit/env_wall_arch_4m.fbx"))
+                Place("Kit/env_wall_arch_4m", _parent, banPos + new Vector3(3.6f, 0, 1.2f), -90, false, false, 4f, true);
+            Place("Kit/prop_sign_vela_figli", _parent, banPos + new Vector3(0.6f, 2.35f, 2.55f), 0, false);
+            Place("Kit/prop_lantern_wall", _parent, banPos + new Vector3(-1.4f, 1.85f, 2.55f), 0, false);
             Debug.Log("[Kit] gameplay dressing: " + _parent.childCount + " pieces");
         }
 
