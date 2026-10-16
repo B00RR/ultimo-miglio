@@ -274,7 +274,7 @@ namespace UltimoMiglio.EditorTools
             bridge.Hud = hud; bridge.Phone = hudGo.GetComponentInChildren<UltimoMiglio.UI.PhoneController>(true); bridge.Joystick = joy;
             bridge.StackCounter = sc; bridge.CassaCard = cc; bridge.EdgeArrow = arrow; bridge.Cassa = cassa;
         }
-        static string PadTitle(UpgradeKind k) => k switch { UpgradeKind.NonnoHire => "ASSUMI NONNO", UpgradeKind.NonnoLevel => "NONNO +1", UpgradeKind.Zaino => "ZAINO", UpgradeKind.Scarpe => "SCARPE", _ => "INSEGNA" };
+        static string PadTitle(UpgradeKind k) => k switch { UpgradeKind.NonnoHire => "ASSUMI OLDO", UpgradeKind.NonnoLevel => "OLDO +1", UpgradeKind.Zaino => "ZAINO", UpgradeKind.Scarpe => "SCARPE", _ => "INSEGNA" };
         static T World<T>(GameObject host, UltimoMiglio.UI.HudController hud, Camera cam, string uxml, Vector3 offset) where T : UltimoMiglio.UI.World.WorldAnchoredElement
         {
             var c = host.AddComponent<T>(); var so = new SerializedObject(c);
