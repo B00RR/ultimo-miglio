@@ -1,3 +1,4 @@
+#phone-button, #phone-key-hint, #phone-badge { display: none !important; }
 /* HUD v2 + minimale (issue #38). Units = dp; values from Tokens.uss. */
 .top-bar { padding: var(--sp-2) var(--sp-2) 0 var(--sp-2); flex-direction: row; align-items: flex-start; }
 .top-left { max-width: 55%; }
@@ -22,8 +23,8 @@
 #phone-button .icon { width: 20px; height: 20px; -unity-background-image-tint-color: var(--c-paper); }
 .badge { top: -4px; right: -4px; min-width: 14px; height: 14px; border-radius: 7px; border-width: 1px; border-color: var(--c-ink); background-color: var(--c-sun); color: var(--c-ink); font-size: 9px; padding: 0 2px; -unity-font-definition: url("project://database/Assets/_Game/UI/Fonts/Fredoka-Bold.ttf"); }
 .key-hint { bottom: -14px; left: -8px; right: -8px; font-size: 9px; -unity-text-outline-width: 1px; }
-#settings-button, .settings-btn { width: 40px; height: 40px; border-radius: 12px; background-color: var(--c-sun); border-width: 2px; border-color: var(--c-ink); align-items: center; justify-content: center; margin-right: 6px; }
-#settings-button .icon, .settings-btn .icon { width: 20px; height: 20px; }
+#settings-button, .settings-btn { width: 32px; height: 32px; border-radius: 10px; background-color: #7A4A2E; border-width: 2px; border-color: #3B2A20; align-items: center; justify-content: center; margin-right: 4px; opacity: 0.9; }
+#settings-button .icon, .settings-btn .icon { width: 16px; height: 16px; -unity-background-image-tint-color: #F3E3C3; }
 .icon-gear { background-image: url("project://database/Assets/_Game/UI/Icons/ic_gear.png"); -unity-background-image-tint-color: var(--c-ink); }
 .tutorial-objective { position: absolute; left: 8px; right: 96px; top: 48px; height: 28px; max-height: 28px; padding: 2px 10px; display: flex;
     border-radius: 12px; border-width: 2px; border-color: var(--c-ink); background-color: var(--c-paper);

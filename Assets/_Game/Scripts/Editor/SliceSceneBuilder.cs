@@ -125,7 +125,8 @@ namespace UltimoMiglio.EditorTools
                 body.AddComponent<NavMeshObstacle>().carving = true;
                 // B5 P3: mesh decorativa — niente collider solido (Nina si incastrava)
                 foreach (var col in body.GetComponentsInChildren<Collider>()) Object.DestroyImmediate(col);
-                if (kitOk && DepotKit.Place("Kit/prop_shelf_2m", null, body.transform.position - new Vector3(0, 0.9f, 0), 0, false)) body.GetComponent<Renderer>().enabled = false;
+                // #47: scaffale caricato se presente
+                if (kitOk && DepotKit.Place(AssetDatabase.LoadAssetAtPath<GameObject>("Assets/_Game/Art/Environment/Kit/prop_shelf_2m_loaded.fbx") ? "Kit/prop_shelf_2m_loaded" : "Kit/prop_shelf_2m", null, body.transform.position - new Vector3(0, 0.9f, 0), 0, false)) body.GetComponent<Renderer>().enabled = false;
                 Box("Code", body.transform, new Vector3(0, 0.55f, 0.52f), new Vector3(0.9f, 0.08f, 0.1f), world, cols[i]);
                 shelves[i] = Zone<Shelf>($"Zona_Scaffale_{(char)('A' + i)}", p + new Vector3(0, 0, 0.6f), new Vector3(1.8f, 1, 1.2f), cols[i], props);
                 shelves[i].Color = (ParcelColor)i; shelves[i].Count = 4;
@@ -133,9 +134,11 @@ namespace UltimoMiglio.EditorTools
             }
             var shelfC = arrPos + new Vector3(0, 0, -dArr);
             var banPos = shelfC + new Vector3(dBan * 0.8f, 0, -dBan * 0.6f); // 9.4 m
+            if (kitOk) DepotKit.DressGameplay(arrPos, shelfC, banPos); // #47 set dressing denso
             var banMesh = Box("Bancone_Mesh", null, banPos + new Vector3(0, 0.5f, -0.9f), new Vector3(2.4f, 1f, 0.7f), world, UM_Palette.Terracotta); banMesh.AddComponent<NavMeshObstacle>().carving = true;
             foreach (var col in banMesh.GetComponentsInChildren<Collider>()) Object.DestroyImmediate(col); // B5: no solid mesh collider
-            if (kitOk && DepotKit.Place("Kit/prop_counter_2m", null, banPos + new Vector3(0, 0, -0.9f), 0, false)) { banMesh.GetComponent<Renderer>().enabled = false; DepotKit.Place("Kit/prop_register", null, banPos + new Vector3(0.6f, 1.0f, -0.9f), 0, false, true); DepotKit.Place("ThirdParty/Props/prop_tp_lemon", null, banPos + new Vector3(-0.5f, 1.0f, -0.9f), 0, false, true); }
+            // #47: counter + Carico0 + rug
+            if (kitOk && DepotKit.Place("Kit/prop_counter_2m", null, banPos + new Vector3(0, 0, -0.9f), 0, false)) { banMesh.GetComponent<Renderer>().enabled = false; DepotKit.Place("Kit/prop_register", null, banPos + new Vector3(0.6f, 1.0f, -0.9f), 0, false, true); DepotKit.Place("Kit/prop_carico0", null, banPos + new Vector3(-0.15f, 1.0f, -0.9f), 8, false, true); DepotKit.Place("ThirdParty/Props/prop_tp_lemon", null, banPos + new Vector3(-0.8f, 1.0f, -0.9f), 0, false, true); DepotKit.Place("Kit/prop_rug_bancone", null, banPos + new Vector3(0, 0.005f, 0.2f), 0, false); }
             var bancone = Zone<Bancone>("Zona_Bancone", banPos, new Vector3(2.4f, 1, 1.2f), UM_Palette.Terracotta, props);
             var coins = new GameObject("Coins").AddComponent<CoinSpawner>(); coins.CoinPrefab = coin; bancone.Coins = coins;
             var queue = new GameObject("CustomerQueue").AddComponent<CustomerQueue>(); queue.Prefab = cust;
@@ -160,6 +163,7 @@ namespace UltimoMiglio.EditorTools
             // No NavMeshAgent: WebGL bake is missing at runtime ("Failed to create agent..."). NONNO walks with Transform.
             var bot = nonno.AddComponent<NonnoRobot>(); bot.Arrivals = arrivals; bot.Shelves = shelves; bot.Bancone = bancone; bot.Queue = queue; bot.Animator = nonnoAnim;
             NonnoRobot.StripNavMeshAgents(nonno); // editor+runtime: mai NavMeshAgent su NONNO
+            if (shadowPf) { var nsh = (GameObject)PrefabUtility.InstantiatePrefab(shadowPf); nsh.transform.SetParent(nonno.transform, false); nsh.transform.localPosition = new Vector3(0, 0.02f, 0); nsh.transform.localScale = Vector3.one * 1.1f; }
 
             // --- NavMesh
             var surf = floor.AddComponent<NavMeshSurface>(); surf.collectObjects = CollectObjects.All; surf.useGeometry = NavMeshCollectGeometry.PhysicsColliders;
@@ -255,7 +259,7 @@ namespace UltimoMiglio.EditorTools
                 quad.name = "Ring"; quad.transform.SetParent(z.transform, false); quad.transform.localPosition = new Vector3(0, 0.03f, 0);
                 quad.transform.localRotation = Quaternion.Euler(90, 0, 0); var bc = z.GetComponent<BoxCollider>(); quad.transform.localScale = new Vector3(bc.size.x, bc.size.z, 1);
                 quad.GetComponent<Renderer>().sharedMaterial = ringMat;
-                var ring = quad.AddComponent<UltimoMiglio.UI.ZoneFillRing>(); Set(ring, "ringRenderer", quad.GetComponent<Renderer>()); z.Ring = ring;
+                var ring = quad.AddComponent<UltimoMiglio.UI.ZoneFillRing>(); Set(ring, "ringRenderer", quad.GetComponent<Renderer>()); ring.SetFill(0.35f); z.Ring = ring;
                 // demo: niente UpgradePadCard
             }
             var bridge = hudGo.AddComponent<UltimoMiglio.UI.Bridge.HudGameBridge>();

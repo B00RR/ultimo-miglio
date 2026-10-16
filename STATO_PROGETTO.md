@@ -100,10 +100,11 @@ $UNITY -batchmode -projectPath "$PWD" -runTests -testPlatform PlayMode \
 ## 11. Cronologia
 Voci più recenti in alto. Formato: `AAAA-MM-GG HH:MM` (Europe/Rome) — [commit] — descrizione.
 
-- 2026-10-16 02:15 — [6081d67](https://github.com/B00RR/ultimo-miglio/commit/6081d67) — merge #49 LegnoCartone/Ada portrait in fix-qa; EditMode 35/35 PlayMode 6/6; Closes #49 sulla PR #45. #52/#47 ancora in coda.
-
-- 2026-10-16 02:10 — [0f01a85](https://github.com/B00RR/ultimo-miglio/commit/0f01a85) — Tech Lead (PR #45 / fix-qa): Bancone→LN immediato (CollectActive+Burst), obiettivo top, strip NavMeshAgent, strip Hidden shader WebGL (console 0 errori Shader/NavMesh/last-child); EditMode 35/35 + PlayMode 6/6; Closes #41–#44. In coda: #53 UI → #52 VFX → #47 art.
-- 2026-10-16 01:55 — ramo `ui/49-hud` — UI: #49 superfici legno/cartone (Tokens + texture 9-slice + LegnoCartone.uss), Phone.uss per schermata futura (non montata in HUD), ritratto Ada texture per #41; **non** toccati Hud.uxml / HudV2.uss / HudController; CTA pollice omessa (HUD minimo); Unity non avviato.
+- 2026-10-16 03:05 — ramo `night-art` — Tech Lead: merge #52 (vfx/48-luce) + #47 (art/47-deposito) + fix NONNO timeout; build WebGL_next :8778.
+- 2026-10-16 04:00 — branch art/47-deposito — 3D Artist: deposito fedele alla guida (#47): lastre 0,25 m, archi in tufo, parapetti in tufo e legno, insegna col faro, banco in noce con Carico 0 emissivo, kit premium, DressGameplay, Borgo Gradoni su gradoni.
+- 2026-10-16 02:15 — [6081d67](https://github.com/B00RR/ultimo-miglio/commit/6081d67) — merge #49 LegnoCartone/Ada portrait in fix-qa; EditMode 35/35 PlayMode 6/6; Closes #49 sulla PR #45.
+- 2026-10-16 02:10 — [0f01a85](https://github.com/B00RR/ultimo-miglio/commit/0f01a85) — Tech Lead (PR #45 / fix-qa): Bancone→LN immediato, strip NavMesh/Hidden shader; Closes #41–#44.
+- 2026-10-16 01:55 — ramo `ui/49-hud` — UI: #49 superfici legno/cartone, ritratto Ada; Unity non avviato.
 - 2026-10-15 16:35 — PR producer/regola-closes — Producer: regola `Closes #N` / `Refs #N` in *Come lavoriamo*, modello di PR `.github/pull_request_template.md`, corretti gli orari di due voci; aggiunte le parole chiave alle PR #11 e #14.
 - 2026-10-15 16:25 — [8e4e272](https://github.com/B00RR/ultimo-miglio/commit/8e4e272) — Producer: aggiornata la Cronologia.
 - 2026-10-15 16:26 — Producer: create 13 issue della milestone *Gioco completo* divise per ruolo (#13, #15–#26), etichetta `ruolo:build` creata; #7 e #12 assegnate a *Gioco completo*; commento di piano su #7.
@@ -160,3 +161,14 @@ Voci più recenti in alto. Formato: `AAAA-MM-GG HH:MM` (Europe/Rome) — [commit
 - File: `Hud.uxml` (`hud--minimal`, `day-value`, `tutorial-objective`), `HudV2.uss`, `Tokens.uss`, `PadTag.uss`, `CassaCard.uxml`; binding in `HudController`/`HudGameBridge`/`AdaNoteView`/`PadTag`.
 - **Tech Lead @1080×2400:** LN+G leggibili, icone non bloccano, Ada non invade, una scheda pad alla volta.
 - **Conflitti attesi con PR #36** (ancora aperta): `Hud.uxml`, `HudV2.uss`, `STATO_PROGETTO.md`. Partiti da `main`.
+
+## Aggiornamento 16/10 04:00 — Deposito fedele alla guida (3D Artist, issue #47, branch art/47-deposito)
+- **D1 pavimento:** `env_floor_2x2_a/b` rifatti con lastre da 0,25 m (8x8 per modulo), crema/tufo con lieve variazione e smusso sulle fughe (652 tri a modulo).
+- **D2 muri/insegna/vasi:** archi in tufo `env_wall_arch_4m` aperti sul muro N (x ±5) e sul muro E; muretti in mattoni sostituiti da `env_plinth_edge_2m` v03 (parapetto basso in tufo + corrimano in noce, 548 tri); `prop_sign_vela_figli` v03 col **faro** (lanterna emissiva); 4 vasi di limoni dentro il deposito più altri vicino a scaffali e Bancone.
+- **D3 Bancone:** `prop_counter_2m` v03 in noce con pannelli e **cucitura ambra emissiva** (slot `M_Diorama_Atlas_Emissive`); **Carico 0** (emissivo) ora sul banco.
+- Kit premium portato su main: muri con zoccolo e cornice, scaffale carico `prop_shelf_2m_loaded`, 4 pacchi (`prop_parcel_box*`), pila, vasi, fioriera, lampione, insegne, tappeto.
+- `DepotKit.DressGameplay()` (set dressing vicino ad Arrivi/scaffali/Bancone) chiamato da `SliceSceneBuilder`. Tutto null-safe: se manca un FBX resta il comportamento di prima.
+- **Borgo Gradoni:** case di Solara alternate su gradone in tufo con scalinate.
+- Layout di riferimento: `Art/Environment/Layouts/bancone_layout.json` (+ README conversione). Licenze 3D: `docs/LICENZE_ASSET.md`.
+- Nina su main: FBX dell'Animator (1.968 facce, UV raccolte nelle celle dell'atlas), **nessuna striatura nel file**. Non toccata.
+- **Non compilato né testato in Unity** (Unity occupato): servono import, test EditMode/PlayMode e una cattura della scena rigenerata.

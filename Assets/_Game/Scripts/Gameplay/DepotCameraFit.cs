@@ -1,17 +1,18 @@
 using System.Collections.Generic;
 using Unity.Cinemachine;
 using UnityEngine;
+using UltimoMiglio.VFX;
 
 namespace UltimoMiglio.Gameplay
 {
-    /// <summary>Iso camera: frames the depot, soft-follows Nina inside those bounds, and exposes OrthoSize for Impostazioni.
-    /// Default zoom in portrait is ~13–14 so Nina is readable and the depot is still nearly full.</summary>
+    /// <summary>Iso camera: soft-follows Nina. Portrait default ~6.5 ortho so Nina ≈100 px su 844 (Concept PR #55).</summary>
     public sealed class DepotCameraFit : MonoBehaviour
     {
-        public const string PrefZoom = "cam_zoom";
+        public const string PrefZoom = "cam_zoom_v3"; // nuovo key: ignora zoom stale da build lontane
         public CinemachineCamera Cm; public Transform Nina;
-        public float Margin = 1.2f, TopHud = 0.22f, BottomHud = 0.08f, MinOrtho = 8f, MaxOrtho = 28f; // B3: più banda alto per Ada/obiettivo
-        public float FollowSmooth = 6f, DefaultPortraitOrtho = 13.5f;
+        public float Margin = 1.0f, TopHud = 0.20f, BottomHud = 0.08f, MinOrtho = 4.2f, MaxOrtho = 18f;
+        public float FollowSmooth = 6f, DefaultPortraitOrtho = 4.5f, DefaultLandscapeOrtho = 4.8f;
+        public float CameraDistance = UM_QualityTier.CameraDistance; // 20 m — ombre dense
         readonly List<Vector3> _pts = new();
         int _w, _h; float _ortho, _fullOrtho; Vector3 _centreWorld; Quaternion _rot; Vector2 _mn, _mx;
 
@@ -25,9 +26,9 @@ namespace UltimoMiglio.Gameplay
             RecomputeBounds();
             float saved = PlayerPrefs.GetFloat(PrefZoom, 0f);
             bool portrait = Screen.height > Screen.width;
-            // Portrait default 13.5: ignore stale high zooms from the old full-depot fit (~20)
-            if (portrait) _ortho = (saved >= 9f && saved <= 16f) ? saved : DefaultPortraitOrtho;
-            else _ortho = saved >= 8f ? saved : Mathf.Min(_fullOrtho > 0 ? _fullOrtho : 11f, 11f);
+            // Accetta solo zoom nel range stretto del nuovo default (5.5–9); altrimenti default Concept
+            if (portrait) _ortho = (saved >= 4.2f && saved <= 6.5f) ? saved : DefaultPortraitOrtho;
+            else _ortho = (saved >= 5f && saved <= 10f) ? saved : DefaultLandscapeOrtho;
             _ortho = Mathf.Clamp(_ortho, MinOrtho, MaxOrtho);
             Apply(true);
         }
@@ -73,16 +74,15 @@ namespace UltimoMiglio.Gameplay
             var inv = Quaternion.Inverse(_rot);
             Vector3 target = Nina ? Nina.position : _centreWorld;
             var local = inv * target;
-            // keep Nina in view with a soft dead-zone, never leave the depot bounds
             float halfH = _ortho * (1f - TopHud - BottomHud), halfW = _ortho * aspect;
             float cx = Mathf.Clamp(local.x, _mn.x + halfW, _mx.x - halfW);
             float cy = Mathf.Clamp(local.y, _mn.y + halfH, _mx.y - halfH);
-            // bias for HUD bands
             cy += _ortho * (TopHud - BottomHud) * 0.5f;
-            var want = _rot * new Vector3(cx, cy, 0) - Cm.transform.forward * 40f;
+            float dist = CameraDistance > 1f ? CameraDistance : UM_QualityTier.CameraDistance;
+            var want = _rot * new Vector3(cx, cy, 0) - Cm.transform.forward * dist;
             Cm.transform.position = snap ? want : Vector3.Lerp(Cm.transform.position, want, 1f - Mathf.Exp(-FollowSmooth * Time.unscaledDeltaTime));
             var lens = Cm.Lens; lens.OrthographicSize = _ortho; Cm.Lens = lens;
-            var pc = Cm.GetComponent<CinemachinePositionComposer>(); if (pc) pc.CameraDistance = 40f;
+            var pc = Cm.GetComponent<CinemachinePositionComposer>(); if (pc) pc.CameraDistance = dist;
             var cam = Camera.main; if (cam) cam.orthographicSize = _ortho;
         }
 
