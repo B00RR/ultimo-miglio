@@ -20,6 +20,15 @@ namespace UltimoMiglio.EditorTools
             foreach (var z in Object.FindObjectsByType<ProximityZone>(FindObjectsSortMode.None))
                 if (z.Ring) { var r = z.Ring.GetComponent<Renderer>(); if (r) r.enabled = false; }
             foreach (var zr in Object.FindObjectsByType<UltimoMiglio.UI.ZoneFillRing>(FindObjectsInactive.Include, FindObjectsSortMode.None)) { var r = zr.GetComponent<Renderer>(); if (r) r.enabled = false; }
+            // #187: elenco dei GameObject con script mancanti (diagnosi del NullReference in ProximityZone.NotifyCard)
+            foreach (var t in Object.FindObjectsByType<Transform>(FindObjectsInactive.Include, FindObjectsSortMode.None))
+            {
+                int n = GameObjectUtility.GetMonoBehavioursWithMissingScriptCount(t.gameObject);
+                if (n == 0) continue;
+                var comps = t.GetComponents<Component>(); var names = new System.Text.StringBuilder();
+                foreach (var c in comps) names.Append(c ? c.GetType().Name : "<MANCANTE>").Append(' ');
+                Debug.Log($"[#187-missing] {n} script mancanti su '{UnityEditor.Search.SearchUtils.GetHierarchyPath(t.gameObject, false)}' | {names}");
+            }
             var cam = Camera.main;
             cam.orthographic = true;
             // 1) dall'alto, tutto il deposito

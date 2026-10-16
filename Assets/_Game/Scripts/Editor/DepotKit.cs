@@ -106,7 +106,7 @@ namespace UltimoMiglio.EditorTools
             Place("Kit/prop_parcel_stack_a", _parent, banPos + new Vector3(-1.8f, 0, 0.6f), 25, true);
             Place("Kit/prop_sign_board_aperto", _parent, banPos + new Vector3(-1.2f, 0, -2.4f), 30, true);
             Place("Kit/prop_streetlamp", _parent, banPos + new Vector3(-1.9f, 0, -3.4f), 0, true);
-            Place("Kit/prop_plant_pot_round", _parent, banPos + new Vector3(1.25f, 0, 0.75f), 0, true); // #187: spazio per la Cassa
+            Place("Kit/prop_plant_pot_round", _parent, banPos + new Vector3(-2.4f, 0, 1.6f), 0, true); // #187: spostato a ovest, fra Bancone e Cassa non c'era spazio con anello = trigger
             // Concept: pezzo di muro/arco visibile dietro il Bancone (beauty shot)
             Place("Kit/env_wall_2m_a", _parent, banPos + new Vector3(-0.2f, 0, 2.8f), 0, false, false, 2f, true);
             Place("Kit/env_wall_2m_b", _parent, banPos + new Vector3(1.8f, 0, 2.8f), 0, false, false, 2f, true);

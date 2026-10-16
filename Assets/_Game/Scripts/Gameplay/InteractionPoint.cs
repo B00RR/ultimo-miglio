@@ -27,8 +27,8 @@ namespace UltimoMiglio.Gameplay
         public static readonly int BaseColorId = Shader.PropertyToID("_BaseColor"), ColorId = Shader.PropertyToID("_Color");
         MaterialPropertyBlock _mpb, _beaconMpb; Color _col; Transform _fill;
         public Transform RingVisual => _ring;
-        /// <summary>Raggio visivo (bordo esterno dell'anello) rispetto a Radius: lo stesso 1,075 usato dal vecchio POI_Rim.</summary>
-        public const float VisualScale = 1.075f;
+        /// <summary>#187 (Game Designer): il bordo esterno dell'anello coincide con Radius = metà del lato minore del trigger.</summary>
+        public const float VisualScale = 1f;
 
         /// <summary>Chiamato SOLO in edit time dallo scene builder: collega anello e faro già creati e salvati in scena.</summary>
         public void BindVisuals(Transform ring, Transform beacon)
@@ -139,13 +139,15 @@ namespace UltimoMiglio.Gameplay
             bool beaconOn = _active && Kind != PoiKind.Acquisto && _beacon; // la colonna 3D attraversava la pillola prezzo: niente faro sui pad acquisto
             if (_beacon && _beacon.gameObject.activeSelf != beaconOn) _beacon.gameObject.SetActive(beaconOn);
             float t = Time.time * (_active ? 4.5f : 2.2f) + _phase, k = 0.5f + 0.5f * Mathf.Sin(t);
-            float big = _active ? 1.12f : 1f, amp = HintPulse ? 0.16f : _active ? 0.07f : 0.04f; // #94: pulsazione forte all'aiuto 10 s
-            float d = Radius * 2f * VisualScale * big * (1f + amp * k); // mesh Ø 1 m a scala 1
-            _ring.localScale = new Vector3(d, 1f, d);
+            // #187 (Game Designer): l'anello resta esattamente grande quanto il trigger, niente scala in pulsazione;
+            // il pulse (anche quello forte dell'aiuto 10 s, #94) passa solo dalla tinta del disco.
+            float amp = HintPulse ? 0.45f : _active ? 0.22f : 0.08f;
+            float d = Radius * 2f * VisualScale; // mesh Ø 1 m a scala 1
+            if (_ring.localScale.x != d) _ring.localScale = new Vector3(d, 1f, d);
             if (_ringR)
             {
                 float baseA = Kind == PoiKind.Acquisto ? 0.92f : 0.78f;
-                var fill = Color.Lerp(_col, Crema, (_active ? 0.22f : 0.08f) * k);
+                var fill = Color.Lerp(_col, Crema, amp * k);
                 fill.a = baseA * (0.88f + 0.12f * k); // pulse leggibile
                 _ringR.GetPropertyBlock(_mpb, FillSubmesh); _mpb.SetColor(BaseColorId, fill); _mpb.SetColor(ColorId, fill); _ringR.SetPropertyBlock(_mpb, FillSubmesh);
             }

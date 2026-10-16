@@ -136,7 +136,7 @@ namespace UltimoMiglio.EditorTools
                 // #47: scaffale caricato se presente
                 if (kitOk && DepotKit.Place(AssetDatabase.LoadAssetAtPath<GameObject>("Assets/_Game/Art/Environment/Kit/prop_shelf_2m_loaded.fbx") ? "Kit/prop_shelf_2m_loaded" : "Kit/prop_shelf_2m", null, body.transform.position - new Vector3(0, 0.9f, 0), 0, false)) body.GetComponent<Renderer>().enabled = false;
                 Box("Code", body.transform, new Vector3(0, 0.55f, 0.52f), new Vector3(0.9f, 0.08f, 0.1f), world, cols[i]);
-                shelves[i] = Zone<Shelf>($"Zona_Scaffale_{(char)('A' + i)}", p + new Vector3(0, 0, 0.6f), new Vector3(1.8f, 1, 1.2f), cols[i], props);
+                shelves[i] = Zone<Shelf>($"Zona_Scaffale_{(char)('A' + i)}", p + new Vector3(0, 0, 0.65f), new Vector3(1.8f, 1, 1.2f), cols[i], props);
                 shelves[i].Color = (ParcelColor)i; shelves[i].Count = 4;
                 var pick = Zone<ShelfPickup>($"Zona_Prendi_{(char)('A' + i)}", p + new Vector3(0, 0, 2.0f), new Vector3(1.8f, 1, 0.7f), UM_Palette.Crema, props); pick.Shelf = shelves[i];
             }
@@ -147,20 +147,20 @@ namespace UltimoMiglio.EditorTools
            // #58: BoxCollider solido
             // #47: counter + Carico0 + rug
             if (kitOk && DepotKit.Place("Kit/prop_counter_2m", null, banPos + new Vector3(0, 0, -0.9f), 0, false)) { banMesh.GetComponent<Renderer>().enabled = false; DepotKit.Place("Kit/prop_register", null, banPos + new Vector3(0.6f, 1.0f, -0.9f), 0, false, true); DepotKit.Place("Kit/prop_carico0", null, banPos + new Vector3(-0.15f, 1.0f, -0.9f), 8, false, true); DepotKit.Place("ThirdParty/Props/prop_tp_lemon", null, banPos + new Vector3(-0.8f, 1.0f, -0.9f), 0, false, true); DepotKit.Place("Kit/prop_rug_bancone", null, banPos + new Vector3(0, 0.005f, 0.2f), 0, false); }
-            var bancone = Zone<Bancone>("Zona_Bancone", banPos + new Vector3(0, 0, 0.4f), new Vector3(2.4f, 1, 1.2f), UM_Palette.Terracotta, props);
+            var bancone = Zone<Bancone>("Zona_Bancone", banPos + new Vector3(0, 0, 0.45f), new Vector3(2.4f, 1, 1.2f), UM_Palette.Terracotta, props);
             var coins = new GameObject("Coins").AddComponent<CoinSpawner>(); coins.CoinPrefab = coin; bancone.Coins = coins;
             var queue = new GameObject("CustomerQueue").AddComponent<CustomerQueue>(); queue.Prefab = cust; queue.Variants = custVariants.ToArray();
             queue.CounterSlot = new GameObject("CounterSlot").transform; queue.CounterSlot.position = banPos + new Vector3(0, 0, -1.8f);
             queue.Door = new GameObject("Door").transform; queue.Door.position = new Vector3(8.5f, 0, -10.5f); queue.LineStep = new Vector3(0.7f, 0, -0.7f);
             bancone.Queue = queue;
-            var cassa = Zone<CassaZone>("Zona_Cassa", banPos + new Vector3(2.4f, 0, 1.6f), new Vector3(1.2f, 1, 1.2f), UM_Palette.TealOmni, props); cassa.Coins = coins;
+            var cassa = Zone<CassaZone>("Zona_Cassa", banPos + new Vector3(2.35f, 0, 1.55f), new Vector3(1.2f, 1, 1.2f), UM_Palette.TealOmni, props); cassa.Coins = coins;
 
             // --- pads (near the Cassa, 01 §3)
             var padRow = banPos + new Vector3(-0.9f, 0, 4.5f);
             Pad("Pad_Zaino", UpgradeKind.Zaino, padRow, 0, props);
             // #101: passo padNuovi (onboarding.json: gate padPurchasedAny su scarpe/insegna). Senza questi pad il tutorial si bloccava al passo 11.
-            Pad("Pad_Scarpe", UpgradeKind.Scarpe, padRow + new Vector3(1.8f, 0, 0), 0, props);
-            Pad("Pad_Insegna", UpgradeKind.Insegna, padRow + new Vector3(3.6f, 0, 0), 0, props);
+            Pad("Pad_Scarpe", UpgradeKind.Scarpe, padRow + new Vector3(1.85f, 0, 0), 0, props);
+            Pad("Pad_Insegna", UpgradeKind.Insegna, padRow + new Vector3(3.7f, 0, 0), 0, props);
             Pad("Pad_AssumiNonno", UpgradeKind.NonnoHire, arrPos + new Vector3(3.2f, 0, -0.3f), 0, props); // onboarding: last step (#187: fuori dal vaso di limoni)
 
             // --- NONNO
@@ -218,7 +218,7 @@ namespace UltimoMiglio.EditorTools
                 foreach (var z in Object.FindObjectsByType<ProximityZone>(FindObjectsSortMode.None))
                 {
                     var ip = z.gameObject.AddComponent<InteractionPoint>(); ip.LabelFont = font;
-                    var bc = z.GetComponent<BoxCollider>(); ip.Radius = bc ? Mathf.Clamp(Mathf.Min(bc.size.x, bc.size.z) * 0.5f - 0.1f, 0.4f, 0.8f) : 0.6f; // #187: visuale 0,1 m più piccola del trigger, max 0,8 m
+                    var bc = z.GetComponent<BoxCollider>(); ip.Radius = bc ? Mathf.Min(bc.size.x, bc.size.z) * 0.5f : 0.6f; // #187 (Game Designer): anello = trigger, diametro esterno = lato minore del BoxCollider
                     switch (z)
                     {
                         case ArrivalsZone _: ip.Kind = PoiKind.Prendi; ip.Label = "Pacchi"; ip.Icon = I("ic_box"); break;
@@ -227,7 +227,7 @@ namespace UltimoMiglio.EditorTools
                         case Bancone _: ip.Kind = PoiKind.Consegna; ip.Label = "Bancone"; ip.Icon = I("ic_customer"); break;
                         case CassaZone _: ip.Kind = PoiKind.Prendi; ip.Label = "Monete"; ip.Icon = I("ic_coin"); ip.HasCard = true; break;
                         case UpgradePad up:
-                            ip.Kind = PoiKind.Acquisto; ip.Label = "0"; ip.Icon = I("ic_coin"); ip.HasCard = true; ip.Pad = up; ip.Radius = 0.6f; // #187: era 0,95 (cerchi da 2 m che si toccavano)
+                            ip.Kind = PoiKind.Acquisto; ip.Label = "0"; ip.Icon = I("ic_coin"); ip.HasCard = true; ip.Pad = up; ip.Radius = bc ? Mathf.Min(bc.size.x, bc.size.z) * 0.5f : 0.7f; // #187: anello = trigger 1,4 m (era 0,95 → cerchi da 2 m che si toccavano)
                             if (ringPf) { var rg = (GameObject)PrefabUtility.InstantiatePrefab(ringPf); rg.transform.SetParent(up.transform, false); rg.transform.localPosition = new Vector3(0, 0.1f, 0); up.FillRing = rg.GetComponent<UltimoMiglio.VFX.UM_PadFillRing>(); }
                             break;
                         default: ip.Kind = PoiKind.Prendi; ip.Label = z.name.Replace("Zona_", ""); break;

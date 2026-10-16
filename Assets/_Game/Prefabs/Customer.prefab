@@ -10,7 +10,7 @@ GameObject:
   m_Component:
   - component: {fileID: 9010631806393480904}
   - component: {fileID: 432683468285671360}
-  - component: {fileID: 1866137974779329785}
+  - component: {fileID: 445100512643461340}
   m_Layer: 0
   m_Name: Customer
   m_TagString: Untagged
@@ -57,7 +57,7 @@ CapsuleCollider:
   m_Height: 1.6
   m_Direction: 1
   m_Center: {x: 0, y: 0.8, z: 0}
---- !u!114 &1866137974779329785
+--- !u!114 &445100512643461340
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
