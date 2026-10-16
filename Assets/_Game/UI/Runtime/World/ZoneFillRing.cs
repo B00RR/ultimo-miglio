@@ -14,7 +14,7 @@ namespace UltimoMiglio.UI
         static readonly int PulseId = Shader.PropertyToID("_Pulse");
 
         [SerializeField] Renderer ringRenderer;
-        [SerializeField] Color color = new Color32(0xF4, 0xC4, 0x30, 0xFF); // sun yellow
+        [SerializeField] Color color = new Color(0.957f, 0.769f, 0.188f, 0.55f); // soft sun pad fill
         [SerializeField] float drainSeconds = 0.3f;
 
         MaterialPropertyBlock mpb;

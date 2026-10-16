@@ -1,7 +1,7 @@
 # STATO PROGETTO — Ultimo Miglio
 
 > Punto di ingresso unico per chiunque (persona o agente) lavori su questo repo. Aggiornalo **nella stessa PR** in cui completi qualcosa.
-> Ultimo aggiornamento: 2026-10-15 16:25 (Europe/Rome).
+> Ultimo aggiornamento: 2026-10-16 04:11 (Europe/Rome).
 
 ## 1. Il gioco
 - **Ultimo Miglio**: gioco mobile **Android**, **Unity 6 (6000.3) URP**.
@@ -33,13 +33,12 @@
 - Ramo `animator` (non ancora su main): Nina rig Humanoid 24 ossa + clip (camminata nel verso giusto, Carry, Cheer), NONNO v03 (rig Generic), TICO v02, 6 clienti con rig di Nina e controller `chr_cliente`, verifica anti‑compenetrazione.
 - Documentazione di design: bibbia, core loop, tech, UI, retention, sprint 1, gestionale, longevità, cap. 1 completo, protocollo Unity.
 
-## 5. IN CORSO (oggi 15/10)
-- **Consegna cap. 1 giocabile in WebGL entro le 17:45–18:00.**
-- Rifinitura tutorial Nonna Ada (7 passi) e game feel.
+## 5. IN CORSO (oggi 16/10)
+- **main @ 7dd1767** — QA live **v5 VIA** (PR #55: #47 deposito + #48 luce/camera). Build QA su `build/WebGL` :8777; art night su `build/WebGL_next` :8778 (non toccare).
+- P2 aperti da QA v5: camera follow (Nina esce/coperta), pillola prezzo LN sotto riga obiettivo.
 - **Merge del ramo `animator`** (fix camminata): conflitto su `chr_nina_vela.fbx` e `bot_nonno.fbx`.
 - I **clienti sono ancora capsule** → sostituire con i personaggi del ramo animator.
-- **Costo NONNO troppo alto** → da abbassare.
-- Controllo sovrapposizioni HUD.
+- Rifinitura tutorial Nonna Ada e game feel; resto cap. 1.
 
 ## 6. DA FARE
 - Resto del gioco in **3–4 giorni**: capitoli 2+ con **un sistema gestionale per capitolo** (energia/corrente, contratti, rotte, officina, OmniFreight).
@@ -84,9 +83,34 @@ $UNITY -batchmode -projectPath "$PWD" -runTests -testPlatform PlayMode \
 3. Clona in una cartella tua, crea il ramo, lavora, lancia i test, apri la PR.
 4. Rispetta i vincoli della sezione 2 (italiano, WebGL, niente video, asset liberi adattati).
 
+
+## Aggiornamento 01:55 (16/10) — HUD superfici concept (UI, issue #49, branch ui/49-hud)
+- Token: `--c-wood` `#74503A`, `--c-walnut` `#7A4A2E`, `--c-paper-hi` `#E8D3AC`, `--c-outline` `#3B2F2A`, `--bw` 3px / `--bw-thick` 4px, radius toon.
+- Texture originali (procedurali / ritaglio concept): `UI/Textures/tex_wood_panel.png`, `tex_cardboard_panel.png`, `tex_ada_portrait.png` + `LICENSE_TEXTURES.txt`.
+- Applicato all'HUD minimo via `Tokens.uss` (`!important`): pillola LN/giorno, riga obiettivo, Ada note 1 riga — bordo outline 3–4 px, fill cartone.
+- `USS/LegnoCartone.uss` classi `.surface-wood` / `.surface-cardboard` / `.cta-terracotta` / `.ada-face--portrait` per wiring TL post `fix-qa`.
+- `USS/Phone.uss` + import in `Phone.uxml`: chrome legno/cartone per schermata telefono **futura** (non nell'HUD di gioco).
+- **Omesso:** telefono in HUD (alto o basso); CTA terracotta zona pollice (contraddice HUD minimo Lorenzo = solo LN, giorno, obiettivo, joystick, pad).
+- **Non toccati:** `Hud.uxml`, `HudV2.uss`, `HudController.cs`.
+- Rebase su `origin/fix-qa` abortito (conflitti add/add su gameplay/HudV2); i file di questa PR non si sovrappongono a HudV2 — TL allinea dopo merge fix-qa.
+- **Tech Lead verifica** a 1170×2532 / 1080×2400; **Unity non avviato** in questa PR.
+
 ## 11. Cronologia
+
 Voci più recenti in alto. Formato: `AAAA-MM-GG HH:MM` (Europe/Rome) — [commit] — descrizione.
 
+- **2026-10-16 09:35 (Europe/Rome)** — Fix P0 #58 #59 #60 (ramo fix-p0-lorenzo, [a87edf0](https://github.com/B00RR/ultimo-miglio/commit/a87edf0)): BoxCollider su muri/archi/scaffali/bancone/props, Nina clamp x −8.6..7.0, NONNO yaw 0° + sweep AgentMove, spawn sicuro. EditMode 35/35, PlayMode 11/11. LIVE P0 su 8780: `qa/playtest_web_live_p0.md`.
+
+- 2026-10-16 04:11 — [7dd1767](https://github.com/B00RR/ultimo-miglio/commit/7dd1767) — merge [PR #55](https://github.com/B00RR/ultimo-miglio/pull/55): deposito #47 + luce/camera #48; Concept VIA; **QA live v5 VIA**.
+- 2026-10-16 03:18 — [1b5b7be](https://github.com/B00RR/ultimo-miglio/commit/1b5b7be) — merge [PR #45](https://github.com/B00RR/ultimo-miglio/pull/45): fix QA v1–v3 (#41–#44, #49); **QA live v4 VIA**.
+- 2026-10-16 01:51 — [ba25f62](https://github.com/B00RR/ultimo-miglio/commit/ba25f62) — merge [PR #51](https://github.com/B00RR/ultimo-miglio/pull/51): guida visiva — tavola Nonna Ada v01 e decisione ombre/saturazione.
+- 2026-10-16 01:49 — [29534d3](https://github.com/B00RR/ultimo-miglio/commit/29534d3) — merge [PR #50](https://github.com/B00RR/ultimo-miglio/pull/50): guida visiva capitolo 1 + confronto build (Concept Artist).
+
+- 2026-10-16 03:05 — ramo `night-art` — Tech Lead: merge #52 (vfx/48-luce) + #47 (art/47-deposito) + fix NONNO timeout; build WebGL_next :8778.
+- 2026-10-16 04:00 — branch art/47-deposito — 3D Artist: deposito fedele alla guida (#47): lastre 0,25 m, archi in tufo, parapetti in tufo e legno, insegna col faro, banco in noce con Carico 0 emissivo, kit premium, DressGameplay, Borgo Gradoni su gradoni.
+- 2026-10-16 02:15 — [6081d67](https://github.com/B00RR/ultimo-miglio/commit/6081d67) — merge #49 LegnoCartone/Ada portrait in fix-qa; EditMode 35/35 PlayMode 6/6; Closes #49 sulla PR #45.
+- 2026-10-16 02:10 — [0f01a85](https://github.com/B00RR/ultimo-miglio/commit/0f01a85) — Tech Lead (PR #45 / fix-qa): Bancone→LN immediato, strip NavMesh/Hidden shader; Closes #41–#44.
+- 2026-10-16 01:55 — ramo `ui/49-hud` — UI: #49 superfici legno/cartone, ritratto Ada; Unity non avviato.
 - 2026-10-15 16:35 — PR producer/regola-closes — Producer: regola `Closes #N` / `Refs #N` in *Come lavoriamo*, modello di PR `.github/pull_request_template.md`, corretti gli orari di due voci; aggiunte le parole chiave alle PR #11 e #14.
 - 2026-10-15 16:25 — [8e4e272](https://github.com/B00RR/ultimo-miglio/commit/8e4e272) — Producer: aggiornata la Cronologia.
 - 2026-10-15 16:26 — Producer: create 13 issue della milestone *Gioco completo* divise per ruolo (#13, #15–#26), etichetta `ruolo:build` creata; #7 e #12 assegnate a *Gioco completo*; commento di piano su #7.
@@ -138,3 +162,28 @@ Voci più recenti in alto. Formato: `AAAA-MM-GG HH:MM` (Europe/Rome) — [commit
 - Etichette pad clampate nella safe area (margine 8 dp) con flip vicino ai bordi.
 - Font Fredoka (SIL OFL 1.1, Google Fonts) in `UI/Fonts` — licenza in `LICENSE_Fredoka_OFL.txt`; da registrare in LICENZE_ASSET.md.
 - **Non compilato in Unity** (solo check dotnet sui DLL UnityEngine). Da verificare dal Tech Lead.
+
+## Aggiornamento 17:35 — Pad leggibili (UI, issue #33, branch ui/pad-leggibili)
+- Nuovo `PadTag
+- Icone pad bianche 128px per VFX (`ic_pad_*_white.png`): pickup/buy/deliver/upgrade (Lucide ISC + coin CC0).` (UI/Runtime/World) + `UXML/PadTag.uxml` + `USS/PadTag.uss`: cartellino sopra ogni pad con icona, etichetta corta (max 12 car.) e prezzo grande sui pad di acquisto (26 dp vs 16 dp).
+- Enum `PadKind` da Inspector (Pacco/Moneta/Cliente), default dedotto in Reset (UpgradePad/CassaZone → Moneta, nome "banc/client/consegn" → Cliente, altrimenti Pacco).
+- Colori: pacco teal #5E7F86/#3E5A61, moneta sun #F4C430 + ink, cliente terracotta #C8633B/#8E3F22; ZoneFillRing ricolorato con lo stesso colore. Font Fredoka. Icone già presenti (ic_box, ic_coin, ic_customer, Lucide ISC): nessuna nuova risorsa.
+- **Non compilato in Unity** (dotnet non disponibile sulla macchina dell'agente). Da agganciare ai pad in scena dal Tech Lead.
+
+## Aggiornamento 18:15 — HUD minimale (UI, issue #38, branch ui/hud-minimale)
+- In vista: **LN + giorno**, obiettivo tutorial 1 riga, Ada **1 riga ≤40 dp**, joystick, telefono/settings **≤40 dp**.
+- Nascosti: room label, chip Pedaggio, badge, bulloni; PadTag solo sul pad; pad/cassa card ≤140 dp.
+- File: `Hud.uxml` (`hud--minimal`, `day-value`, `tutorial-objective`), `HudV2.uss`, `Tokens.uss`, `PadTag.uss`, `CassaCard.uxml`; binding in `HudController`/`HudGameBridge`/`AdaNoteView`/`PadTag`.
+- **Tech Lead @1080×2400:** LN+G leggibili, icone non bloccano, Ada non invade, una scheda pad alla volta.
+- **Conflitti attesi con PR #36** (ancora aperta): `Hud.uxml`, `HudV2.uss`, `STATO_PROGETTO.md`. Partiti da `main`.
+
+## Aggiornamento 16/10 04:00 — Deposito fedele alla guida (3D Artist, issue #47, branch art/47-deposito)
+- **D1 pavimento:** `env_floor_2x2_a/b` rifatti con lastre da 0,25 m (8x8 per modulo), crema/tufo con lieve variazione e smusso sulle fughe (652 tri a modulo).
+- **D2 muri/insegna/vasi:** archi in tufo `env_wall_arch_4m` aperti sul muro N (x ±5) e sul muro E; muretti in mattoni sostituiti da `env_plinth_edge_2m` v03 (parapetto basso in tufo + corrimano in noce, 548 tri); `prop_sign_vela_figli` v03 col **faro** (lanterna emissiva); 4 vasi di limoni dentro il deposito più altri vicino a scaffali e Bancone.
+- **D3 Bancone:** `prop_counter_2m` v03 in noce con pannelli e **cucitura ambra emissiva** (slot `M_Diorama_Atlas_Emissive`); **Carico 0** (emissivo) ora sul banco.
+- Kit premium portato su main: muri con zoccolo e cornice, scaffale carico `prop_shelf_2m_loaded`, 4 pacchi (`prop_parcel_box*`), pila, vasi, fioriera, lampione, insegne, tappeto.
+- `DepotKit.DressGameplay()` (set dressing vicino ad Arrivi/scaffali/Bancone) chiamato da `SliceSceneBuilder`. Tutto null-safe: se manca un FBX resta il comportamento di prima.
+- **Borgo Gradoni:** case di Solara alternate su gradone in tufo con scalinate.
+- Layout di riferimento: `Art/Environment/Layouts/bancone_layout.json` (+ README conversione). Licenze 3D: `docs/LICENZE_ASSET.md`.
+- Nina su main: FBX dell'Animator (1.968 facce, UV raccolte nelle celle dell'atlas), **nessuna striatura nel file**. Non toccata.
+- **Non compilato né testato in Unity** (Unity occupato): servono import, test EditMode/PlayMode e una cattura della scena rigenerata.

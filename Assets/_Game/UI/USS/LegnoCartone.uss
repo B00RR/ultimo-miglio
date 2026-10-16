@@ -1,0 +1,78 @@
+/* Superfici legno/cartone Diorama Solare — issue #49.
+   Importare DOPO HudV2.uss quando il TL allinea fix-qa (non toccare Hud.uxml in questa PR).
+   Regole canoniche; Tokens.uss applica già le stesse superfici all'HUD minimo via !important. */
+.surface-cardboard,
+.panel--cardboard {
+    background-color: #F3E3C3;
+    background-image: url("project://database/Assets/_Game/UI/Textures/tex_cardboard_panel.png");
+    -unity-background-scale-mode: stretch-to-fill;
+    -unity-slice-left: 16px;
+    -unity-slice-top: 16px;
+    -unity-slice-right: 16px;
+    -unity-slice-bottom: 16px;
+    border-width: 3px;
+    border-color: #3B2F2A;
+    border-radius: 16px;
+}
+.surface-wood,
+.panel--wood {
+    background-color: #74503A;
+    background-image: url("project://database/Assets/_Game/UI/Textures/tex_wood_panel.png");
+    -unity-background-scale-mode: stretch-to-fill;
+    -unity-slice-left: 16px;
+    -unity-slice-top: 16px;
+    -unity-slice-right: 16px;
+    -unity-slice-bottom: 16px;
+    border-width: 4px;
+    border-color: #3B2F2A;
+    border-radius: 16px;
+}
+.title-insegna {
+    -unity-font-definition: url("project://database/Assets/_Game/UI/Fonts/Fredoka-Bold.ttf");
+    color: #3B2A20;
+}
+.cta-terracotta {
+    height: 48px;
+    border-radius: 14px;
+    border-width: 3px;
+    border-bottom-width: 6px;
+    border-color: #3B2F2A;
+    background-color: #C8633B;
+    color: #FFF9EE;
+    font-size: 16px;
+    -unity-font-definition: url("project://database/Assets/_Game/UI/Fonts/Fredoka-Bold.ttf");
+    -unity-text-align: middle-center;
+}
+.cta-terracotta:active {
+    translate: 0 3px;
+    border-bottom-width: 3px;
+}
+/* Ritratto Ada (per #41): texture pronta; wiring UXML quando .ada-face non è più display:none */
+.ada-face--portrait {
+    width: 32px;
+    height: 32px;
+    border-radius: 16px;
+    border-width: 2px;
+    border-color: #3B2F2A;
+    background-image: url("project://database/Assets/_Game/UI/Textures/tex_ada_portrait.png");
+    -unity-background-scale-mode: scale-and-crop;
+    flex-shrink: 0;
+    margin-right: 8px;
+}
+
+/* #41+#49: ritratto Ada 32dp visibile (batte HudV2 .ada-face { display:none !important }) */
+.ada-face.ada-face--portrait {
+    display: flex !important;
+    width: 32px !important;
+    height: 32px !important;
+    min-width: 32px !important;
+    min-height: 32px !important;
+    margin-right: 8px !important;
+    padding: 0 !important;
+    border-radius: 16px !important;
+    border-width: 2px !important;
+    border-color: #3B2F2A !important;
+    background-image: url("project://database/Assets/_Game/UI/Textures/tex_ada_portrait.png") !important;
+    -unity-background-scale-mode: scale-and-crop !important;
+    flex-shrink: 0 !important;
+}
