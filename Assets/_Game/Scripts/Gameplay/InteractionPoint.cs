@@ -142,9 +142,15 @@ namespace UltimoMiglio.Gameplay
             _chip.style.display = show ? DisplayStyle.Flex : DisplayStyle.None;
             if (!show || _chip.panel == null) return;
             var p = UltimoMiglio.UI.SafeAreaUtil.ScreenToPanel(_chip.panel, sp);
-            // QA v5 P2: non sotto la riga obiettivo (tutorial-objective top≈48 h≈28) né sotto le pillole LN/giorno
+            // QA v5 P2: non sotto la riga obiettivo; QA v6 P3: non tagliata sui bordi SX/DX
             const float hudTopReserve = 92f;
             if (p.y < hudTopReserve) p.y = hudTopReserve;
+            float panelW = _chip.panel.visualTree.worldBound.width;
+            if (panelW < 1f) panelW = Screen.width;
+            float halfChip = 70f; // pillola ~140px, anchor al centro (translate -50%)
+            const float edgePad = 10f;
+            if (p.x < halfChip + edgePad) p.x = halfChip + edgePad;
+            if (p.x > panelW - halfChip - edgePad) p.x = panelW - halfChip - edgePad;
             _chip.style.left = p.x; _chip.style.top = p.y;
             _chip.style.scale = new Scale(Vector3.one * (_active ? 1.12f : 1f));
             // Chip sopra il world-layer ma sotto i controlli: porta in cima al world-layer
