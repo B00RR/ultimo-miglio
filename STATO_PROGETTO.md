@@ -148,6 +148,15 @@ Voci più recenti in alto. Formato: `AAAA-MM-GG HH:MM` (Europe/Rome) — [commit
 
 - **VFX v2.0** (15/10 16:30, ramo `vfx-v2`): shader toon premium (ombre colorate, AO, cielo a gradiente, grading in-shader con post OFF su WebGL), effetto acquisto `Fx.Purchase`, consegna più grande. Materiali/prefab da generare con *Ultimo Miglio/VFX/Setup Scene*. Non ancora compilato (compila il Tech Lead nella build).
 
+## Aggiornamento 17:45 — Impostazioni + schede pad (UI, issue #35, branch `ui/impostazioni-e-schede-pad`)
+- **Impostazioni** (ingranaggio accanto al telefono): zoom −/+ con anteprima live, slider Musica/Suoni, Salva / Indietro.
+  - PlayerPrefs: `cam_zoom_v3`, `vol_music`, `vol_sfx` (0–1).
+  - Chiama per reflection (UI non referenzia Gameplay): `DepotCameraFit.SetOrthoSize` / `GetOrthoSize`, `AudioManager.SetMusicVolume` / `SetSfxVolume` — **Tech Lead crea i metodi e collega in scena**.
+  - File: `UI/Runtime/SettingsController.cs`, `UI/UXML/Settings.uxml` (+ overlay in `Hud.uxml`), `UI/USS/Settings.uss`. Aggiungere `SettingsController` sul prefab HUD (stesso UIDocument).
+- **Schede pad** (`UpgradePadCard`): nascoste di default; `ShowOnPad(bool)` / `SetVisible(bool)` — una sola attiva (`ActiveCard`). Tech Lead: `ProximityZone` enter/exit → `ShowOnPad`. Card max 200 dp, contrasto ink su paper, Fredoka.
+- Branch da **main** (non da `ui/pad-leggibili` #34). Colori pad lasciati al merge Tech Lead.
+- **Non compilato in Unity**. Verifica statica brace-check; compile/test a cura Tech Lead.
+
 ## Aggiornamento 17:10 — HUD v2 verticale (UI, issue #30, branch ui/hud-v2-portrait)
 - HUD in unità dp (ResponsivePanel: portrait min(W/411,H/914) → 2,63 a 1080x2400; landscape H/600), solo documento HUD.
 - Nuovi `Assets/_Game/UI/Tokens.uss` + `USS/HudV2.uss`: pillola valute, chip Pedaggio, telefono 3D, etichetta stanza (no ellissi, a capo >22 car.), card pad 128–200 dp, biglietto Ada, pulsanti chunky.
@@ -180,3 +189,10 @@ Voci più recenti in alto. Formato: `AAAA-MM-GG HH:MM` (Europe/Rome) — [commit
 - Layout di riferimento: `Art/Environment/Layouts/bancone_layout.json` (+ README conversione). Licenze 3D: `docs/LICENZE_ASSET.md`.
 - Nina su main: FBX dell'Animator (1.968 facce, UV raccolte nelle celle dell'atlas), **nessuna striatura nel file**. Non toccata.
 - **Non compilato né testato in Unity** (Unity occupato): servono import, test EditMode/PlayMode e una cattura della scena rigenerata.
+
+## Aggiornamento 16/10 09:30 — PR #36 riallineata a main (UI)
+- Merge di `origin/main` (HUD minimale #38, fix collisioni #63) in `ui/impostazioni-e-schede-pad`, senza rebase/force-push.
+- Conflitti risolti: `Hud.uxml`, `HudV2.uss`, `HudController.cs`, `UpgradePadCard.cs`, `WorldAnchoredElement.cs` → tenuta la versione main (niente telefono/card grandi), aggiunti `Settings.uss` nell'HUD e campo `settingsButton` (eventi `OnSettingsRequested` + `SettingsButtonTapped`).
+- Catture anteprima 390x844 (HTML/Playwright, non Unity): `docs/ui/catture/pr36/`.
+- Deciso (Tech Lead): pannello unico `SettingsController`; `Bridge/SettingsPanel` resta (usato da `HudGameBridge`) ma senza listener `OnSettingsRequested`. Ingranaggio = toggle (QA P3, `qa/playtest_web_live_p0.md` S01). Zoom su chiave unica `cam_zoom_v3` (`DepotCameraFit.PrefZoom`).
+- Riferimento #35 (chiusa). Correlate aperte: #64, #67.
