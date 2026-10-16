@@ -21,9 +21,11 @@ public class AnimFacingTest
         public static float Avg(List<float> l) => l.Count == 0 ? float.NaN : l.Average();
     }
 
+    /// <summary>Cancella solo le chiavi di gioco (salvataggio + tutorial), non volumi/zoom delle impostazioni (#36).</summary>
+    internal static void ResetGameKeys() { PlayerPrefs.DeleteKey("um_save_v1" /* GameRoot.SaveKey */); PlayerPrefs.DeleteKey(TutorialManager.PrefKey); PlayerPrefs.Save(); }
     static IEnumerator Load()
     {
-        PlayerPrefs.DeleteAll(); Time.timeScale = 1f;
+        ResetGameKeys(); Time.timeScale = 1f;
         yield return SceneManager.LoadSceneAsync("Ch1_Deposito");
         for (int i = 0; i < 60 && !GameRoot.Ready; i++) yield return null;
         Assert.IsTrue(GameRoot.Ready, "GameRoot non pronto");
