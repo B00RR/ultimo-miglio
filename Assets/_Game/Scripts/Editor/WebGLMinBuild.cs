@@ -74,6 +74,15 @@ namespace UltimoMiglio.EditorTools
             AssetDatabase.SaveAssets();
             { var t = System.AppDomain.CurrentDomain.GetAssemblies().Select(a => a.GetType("UltimoMiglio.UI.EditorTools.HudSetup")).FirstOrDefault(x => x != null); t?.GetMethod("BuildAll")?.Invoke(null, null); Debug.Log("[WebGLMin] HudSetup ran=" + (t != null)); }
             SliceSceneBuilder.Build();
+            try
+            {
+                var look = System.AppDomain.CurrentDomain.GetAssemblies()
+                    .Select(a => a.GetType("UltimoMiglio.VFX.EditorTools.UM_Look48Setup")).FirstOrDefault(x => x != null);
+                look?.GetMethod("Apply")?.Invoke(null, null);
+                UnityEditor.SceneManagement.EditorSceneManager.SaveOpenScenes();
+                Debug.Log("[WebGLMin] UM_Look48Setup.Apply ran=" + (look != null));
+            }
+            catch (System.Exception e) { Debug.LogWarning("[WebGLMin] Look48: " + e.Message); }
             EditorUserBuildSettings.SwitchActiveBuildTarget(BuildTargetGroup.WebGL, BuildTarget.WebGL);
             EditorUserBuildSettings.development = false;
             PlayerSettings.WebGL.compressionFormat = WebGLCompressionFormat.Disabled;
