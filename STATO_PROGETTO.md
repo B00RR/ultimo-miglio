@@ -1,7 +1,7 @@
 # STATO PROGETTO — Ultimo Miglio
 
 > Punto di ingresso unico per chiunque (persona o agente) lavori su questo repo. Aggiornalo **nella stessa PR** in cui completi qualcosa.
-> Ultimo aggiornamento: 2026-10-16 11:15 (Europe/Rome).
+> Ultimo aggiornamento: 2026-10-16 11:47 (Europe/Rome).
 
 ## 1. Il gioco
 - **Ultimo Miglio**: gioco mobile **Android**, **Unity 6 (6000.3) URP**.
@@ -23,6 +23,7 @@
 - **In pausa**: Game Designer, QA, Sound Designer, Narrative, LiveOps, Concept Artist (i loro documenti restano validi).
 
 ## 4. FATTO
+- **UI #142 anteprime `tutorial_hud_77` (PR ui/142-anteprime-nonno, in revisione)**: anteprime 360/390/412 rigenerate con il costo reale del pad NONNO (50 LN, non 10) e LN in tasca reali; solo documentazione QA, nessun C#.
 - **UI #77 + #5 (PR ui/77-tutorial-hud, in revisione)**: fumetto di Nonna Ada compatto (ritratto 36 dp + testo 14 dp, 1–2 righe senza ellissi per testi fino a 70 caratteri, sotto la riga LN/obiettivo); obiettivo spostato a destra della pillola LN nella stessa riga; suggerimenti `onb.*` come pillola terracotta sopra il joystick; freccia ▼ sopra la pillola prezzo dei pad di acquisto (colonna 3D rimossa, ribaltamento se il pad è in alto). Nuovo `UI/USS/TutorialHud.uss` (HudV2.uss non toccato). Testi passi letti per id dalla PR #62. QA anteprima 360/390/412 in `docs/qa/tutorial_hud_77/`. Da verificare in Unity.
 - Scheletro progetto Unity 6 + vertical slice cap. 1 (EconomyCore con test EditMode, gameplay, audio, import dati, script build/cattura).
 - HUD integrato agli eventi core (LN, Mora, giorno, bulloni), font Inter/Roboto (OFL), HUD responsive (1920x1080 / 1366x768 / 960x600).
@@ -40,6 +41,8 @@
 - **Merge del ramo `animator`** (fix camminata): conflitto su `chr_nina_vela.fbx` e `bot_nonno.fbx`.
 - I **clienti sono ancora capsule** → sostituire con i personaggi del ramo animator.
 - Rifinitura tutorial Nonna Ada e game feel; resto cap. 1.
+
+- **#59 NONNO all'indietro (Animator, PR anim-59-nonno-verso)**: causa doppia. (1) `Rig(nonno,"bot_nonno")` usava yaw 180° ma il modello ha le forche su +Z come Nina → forche dietro rispetto alla marcia (misurato in Play Mode: dot(forche, velocità) = -0,97, ora +0,97). (2) Ruote di Drive in retromarcia (`um_bind_bot.py` x=-a) e Drive mai in riproduzione: Lift (bool tenuto per tutto il trasporto) e Happy sostituivano la Locomotion → NONNO scivolava a ruote ferme. Nuovo `bot_nonno.controller` a 2 layer (Base Idle/Drive + Happy interrompibile; layer «Forche» con maschera mast+forks per Lift/Drop). Scena rigenerata: il riferimento `CustomerQueue.Prefab` era rotto nella scena di main (0 clienti in gioco). Test PlayMode `AnimFacingTest` (Nina 4 direzioni, clienti, NONNO: forward, posa visiva, piede d'appoggio, verso ruote). Checklist A01/A03/A05: VIA in Play Mode.
 
 ## 6. DA FARE
 - Resto del gioco in **3–4 giorni**: capitoli 2+ con **un sistema gestionale per capitolo** (energia/corrente, contratti, rotte, officina, OmniFreight).
@@ -116,6 +119,11 @@ Ogni ruolo lavora solo sulle issue con la propria etichetta `ruolo:*`, sempre co
 
 Voci più recenti in alto. Formato: `AAAA-MM-GG HH:MM` (Europe/Rome) — [commit] — descrizione.
 
+- 2026-10-16 11:47 — Code Reviewer — [d039bd8](https://github.com/B00RR/ultimo-miglio/commit/d039bd8aaa9dfe52606eca05ccaae874dace65ea) — unita in squash la [PR #87](https://github.com/B00RR/ultimo-miglio/pull/87) (fix(#59): NONNO non va più in retromarcia + test PlayMode verso di marcia). Job `test` verde. Refs #59.
+- 2026-10-16 11:29 — Code Reviewer — [2f2f61f](https://github.com/B00RR/ultimo-miglio/commit/2f2f61f2d5d4946d01c8b7f65fc192d715cc0e51) — unita in squash la [PR #85](https://github.com/B00RR/ultimo-miglio/pull/85) (clienti v03-uv: rider cappello limone, 3 toni pelle; Ada già su main via #93). Job `test` verde. Refs #2.
+- 2026-10-16 11:29 — Code Reviewer — [8ed4422](https://github.com/B00RR/ultimo-miglio/commit/8ed4422972dd7c6d3a80a45769034ec6b6c3d270) — unita in squash la [PR #135](https://github.com/B00RR/ultimo-miglio/pull/135) (Zaino 8 = 3.000 LN; combo HUD solo +N). Job `test` verde. Closes #134.
+- 2026-10-16 11:29 — Code Reviewer — [3a3864c](https://github.com/B00RR/ultimo-miglio/commit/3a3864c134075e713eef85346639d11b7b581e12) — unita in squash la [PR #113](https://github.com/B00RR/ultimo-miglio/pull/113) (testi HUD minimo cap. 1 / rinviati_cap2). Job `test` verde. Closes #105.
+- 2026-10-16 11:17 — Code Reviewer — [ad8a98b](https://github.com/B00RR/ultimo-miglio/commit/ad8a98be83087673dcdede2ca108c4cf706d4a5d) — unita in squash la [PR #93](https://github.com/B00RR/ultimo-miglio/pull/93) (anim: Nonna Ada riggata — Idle/Walk/Talk, controller, prefab scala 0,88; Refs #118 / #2). Job `test` verde. #85 resta aperta per clienti v03 (togliere file Ada).
 - 2026-10-16 11:15 — Code Reviewer — [a65de18](https://github.com/B00RR/ultimo-miglio/commit/a65de1873055ec905d4b54b02535940313ebf2b3) — unita in squash la [PR #124](https://github.com/B00RR/ultimo-miglio/pull/124) (fix(#65): angolo SO, Nina non compenetra più il lampione).
 - 2026-10-16 11:15 — Code Reviewer — [965e36a](https://github.com/B00RR/ultimo-miglio/commit/965e36a72d586111106b7c6a4e76bbc9ad34cc08) — unita in squash la [PR #121](https://github.com/B00RR/ultimo-miglio/pull/121) (Specifica eventi di log dell'onboarding cap. 1 (playtest QA)).
 - 2026-10-16 11:15 — Code Reviewer — [dc4d728](https://github.com/B00RR/ultimo-miglio/commit/dc4d72869f0239bde76e93ce31da4c1a9b680dc6) — unita in squash la [PR #120](https://github.com/B00RR/ultimo-miglio/pull/120) (QA: checklist Cap.1 aggiornata (C13/P07/Z02) + scheda osservazione playtest).
@@ -223,6 +231,7 @@ Voci più recenti in alto. Formato: `AAAA-MM-GG HH:MM` (Europe/Rome) — [commit
 - Catture anteprima 390x844 (HTML/Playwright, non Unity): `docs/ui/catture/pr36/`.
 - Deciso (Tech Lead): pannello unico `SettingsController`; `Bridge/SettingsPanel` resta (usato da `HudGameBridge`) ma senza listener `OnSettingsRequested`. Ingranaggio = toggle (QA P3, `qa/playtest_web_live_p0.md` S01). Zoom su chiave unica `cam_zoom_v3` (`DepotCameraFit.PrefZoom`).
 - Riferimento #35 (chiusa). Correlate aperte: #64, #67.
+- 2026-10-16 — PR #85 (3D Artist, Refs #2): solo clienti v03-uv in `3d/export/chr/` (rider cappello limone, 3 toni pelle; residente/rider/turista/vip, vertici invariati) + review docs/review/2. Nonna Ada tolta: la consegna l'Animator (#93).
 
 ## Aggiornamento 16/10 11:15 — 11_CAP1_COMPLETO allineato all'HUD minimo (UI, issue #138, branch ui/138-cap1-hud-minimo)
 - Copia di riferimento: `docs/design/11_CAP1_COMPLETO.md` (decisione del Producer); quella in `ultimo-miglio-docs` diventa un rimando (docs#2/#3).
