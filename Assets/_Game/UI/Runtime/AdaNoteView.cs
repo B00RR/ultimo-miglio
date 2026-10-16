@@ -12,7 +12,7 @@ namespace UltimoMiglio.UI
     public sealed class AdaNoteView
     {
         public const int MaxChars = 70; // testi Narrative (PR #62): max 70 caratteri, mai ellissi
-        public const float MinVisibleSec = 1.5f, FadeSec = 0.25f, MinBodyDp = 14f, MinTitleDp = 12f, MaxHeightDp = 96f, TopDp = 68f;
+        public const float MinVisibleSec = 1.5f, FadeSec = 0.25f, MinBodyDp = 14f, MinTitleDp = 12f, TopDp = 68f;
 
         struct Item { public string text; public float seconds; public bool sticky; }
         readonly Queue<Item> queue = new Queue<Item>();
@@ -29,13 +29,16 @@ namespace UltimoMiglio.UI
             note = new VisualElement { name = "ada-note", pickingMode = PickingMode.Ignore }; note.AddToClassList("ada-note");
             var shadow = new VisualElement { name = "ada-shadow", pickingMode = PickingMode.Ignore };
             shadow.AddToClassList("ombra-portata");
+            var carta = new VisualElement { name = "ada-carta", pickingMode = PickingMode.Ignore };
+            carta.AddToClassList("ada-carta");
             var face = new VisualElement { name = "ada-face", pickingMode = PickingMode.Ignore };
             face.AddToClassList("ada-face"); face.AddToClassList("ada-face--portrait"); // ritratto tex_ada_portrait.png via USS
             var col = new VisualElement { pickingMode = PickingMode.Ignore }; col.AddToClassList("ada-col");
             who = new Label(UltimoMiglio.Core.DisplayNames.Apply(speaker)) { pickingMode = PickingMode.Ignore }; who.AddToClassList("ada-name");
             body = new Label { pickingMode = PickingMode.Ignore }; body.AddToClassList("ada-text");
             who.style.display = DisplayStyle.None;
-            note.Add(face); col.Add(body); note.Add(col); wrap.Add(shadow); wrap.Add(note); band.Add(wrap);
+            // Ombra e carta sono figlie del fumetto: left/right 0 = la sua sagoma, non quella del wrap.
+            note.Add(shadow); note.Add(carta); note.Add(face); col.Add(body); note.Add(col); wrap.Add(note); band.Add(wrap);
             band.style.display = DisplayStyle.None;
             root.Add(band);
         }
@@ -84,14 +87,22 @@ namespace UltimoMiglio.UI
 
         void Next() { if (queue.Count > 0) Present(queue.Dequeue()); }
 
-        /// <summary>Fumetto sotto la riga alta (safe area + 68 dp). Carta crema, alto quanto le due righe. Stili in Etichette.uss.</summary>
+        /// <summary>Fumetto sotto la riga alta (safe area + 68 dp). Carta crema, alto quanto le righe, senza tetto. Stili in Etichette.uss.</summary>
         void Layout(float scale)
         {
             var safe = root.Q("safe-root");
             float safeTop = safe != null ? safe.resolvedStyle.paddingTop : 0f;
             band.style.position = Position.Absolute;
             band.style.left = 12; band.style.right = 12; band.style.top = safeTop + TopDp;
-            band.style.maxHeight = MaxHeightDp; band.style.overflow = Overflow.Visible;
+            band.style.height = StyleKeyword.Auto;
+            band.style.maxHeight = StyleKeyword.None;
+            band.style.overflow = Overflow.Visible;
+            note.style.height = StyleKeyword.Auto;
+            note.style.maxHeight = StyleKeyword.None;
+            note.style.overflow = Overflow.Visible;
+            body.style.height = StyleKeyword.Auto;
+            body.style.maxHeight = StyleKeyword.None;
+            body.style.overflow = Overflow.Visible;
             if (who != null) who.style.display = DisplayStyle.None;
         }
     }

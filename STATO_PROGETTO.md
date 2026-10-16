@@ -1,7 +1,7 @@
 # STATO PROGETTO — Ultimo Miglio
 
 > Punto di ingresso unico per chiunque (persona o agente) lavori su questo repo. Aggiornalo **nella stessa PR** in cui completi qualcosa.
-> Ultimo aggiornamento: 2026-10-16 17:50 (Europe/Rome).
+> Ultimo aggiornamento: 2026-10-16 18:18 (Europe/Rome).
 
 ## 1. Il gioco
 - **Ultimo Miglio**: gioco mobile **Android**, **Unity 6 (6000.3) URP**.
@@ -157,6 +157,7 @@ Ogni ruolo lavora solo sulle issue con la propria etichetta `ruolo:*`, sempre co
 
 Voci più recenti in alto. Formato: `AAAA-MM-GG HH:MM` (Europe/Rome) — [commit] — descrizione.
 
+- 2026-10-16 18:18 — UI/UX — #186 sulla cattura di `9063e83` (390×844): l'ombra del fumetto è figlia del fumetto (`left`/`right` 0, `top` 4 px, `bottom` -4 px, #9E7873 al 60%), così non sporge più a destra; stessa misura per «Muoviti». Il testo non ha più un tetto: `max-height: none`, overflow visibile, `text-overflow: clip`, padding sotto 16 dp. USS non ha `line-height`: l'interlinea resta quella di Fredoka. Unity non rieseguito.
 - 2026-10-16 17:50 — UI/UX — #186 sulle catture della build `24b9bfc` (390×844): il fumetto di Oma Tilde è carta #F3E3C3 con testo #3B2A20, alto quanto le due righe, senza sprite di luce; l'ombra portata ha la stessa sagoma della pillola e del fumetto e scende di 4 dp (#9E7873 al 60%); «Muoviti» è crema #F3E3C3, senza contorno chiaro. L'insegna di noce tiene un alpha usato, così il test #185 non la scarta. Unity non rieseguito: non è la via finché non c'è una cattura nuova.
 - 2026-10-16 17:26 — UI/UX — #186 sulle catture della build `075f0f6` (390×844): «Muoviti» lascia 10 dp prima dell'ingranaggio e segue la safe area; il fumetto di Oma Tilde va a capo (2 righe, niente ellissi); le pillole hanno luce in alto, ombra portata #9E7873 e contorno leggero; sopra i 32 px il raggio è metà altezza, con sprite capsula dello stesso raggio. I pannelli #185 restano quelli di main.
 - 2026-10-16 17:18 — UI/UX — merge di `origin/main` nel ramo `ui/186-font-etichette` (niente rebase): entra il fix #185 (angoli 9-slice RGBA) e le zone #187. Il prezzo dei pad resta sull'insegna (#186), senza il font dinamico.

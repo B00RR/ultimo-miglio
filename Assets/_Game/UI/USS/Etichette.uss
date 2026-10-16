@@ -46,23 +46,38 @@
     text-shadow: 0 1px 0 #9E7873;
 }
 
-/* Ombra portata: stessa sagoma del genitore, solo 4 dp più in basso. #9E7873 al 60%. */
+/* Ombra portata: figlio del pezzo, stessi left/right del genitore, solo 4 dp più in basso.
+   #9E7873 al 60%. Niente translate: top/bottom tengono la stessa altezza. */
 .ombra-portata {
     position: absolute;
     left: 0;
     right: 0;
-    top: 0;
-    bottom: 0;
-    translate: 0 4px;
+    top: 4px;
+    bottom: -4px;
+    margin: 0;
     background-color: rgba(158, 120, 115, 0.6);
     border-width: 0;
+    translate: 0 0;
 }
-.objective-pill .ombra-portata { border-radius: 16px; }
+.objective-pill .ombra-portata {
+    left: 0 !important;
+    right: 0 !important;
+    top: 4px !important;
+    bottom: -4px !important;
+    border-radius: 16px;
+}
 .currency-slot .ombra-portata { border-radius: 20px; }
-.ada-wrap .ombra-portata { border-radius: 999px; }
+#hud-root .ada-note .ombra-portata {
+    left: 0 !important;
+    right: 0 !important;
+    top: 4px !important;
+    bottom: -4px !important;
+    width: auto;
+    border-radius: 999px;
+}
 .tut-hint__slot .ombra-portata { border-radius: 16px; }
 
-.currency-slot { position: relative; align-self: flex-start; flex-shrink: 1; min-width: 0; }
+.currency-slot { position: relative; align-self: flex-start; flex-shrink: 1; min-width: 0; overflow: visible; }
 
 #hud-root #currency-pill {
     height: 40px !important;
@@ -139,31 +154,44 @@
     -unity-font-definition: url("project://database/Assets/_Game/UI/Fonts/Fredoka-Medium_SDF.asset") !important;
 }
 
-/* Fumetto di Oma Tilde: carta #F3E3C3, testo #3B2A20. Altezza del contenuto (2 righe intere).
-   Niente sprite di luce: il fondo è il colore, ritagliato dal raggio. */
+/* Fumetto di Oma Tilde: carta #F3E3C3, testo #3B2A20.
+   L'ombra è figlia del fumetto (left/right 0): non può essere più larga.
+   Niente altezza fissa: la discesa della «p» resta sopra il bordo.
+   USS non ha line-height: l'interlinea è quella del Font Asset Fredoka
+   (108.9 su 90, la discesa è già nel rigo). text-overflow resta clip. */
 .ada-wrap { position: relative; width: 100%; overflow: visible; }
 #hud-root .ada-band.ada-band {
     height: auto !important;
-    max-height: 96px !important;
+    max-height: none !important;
     overflow: visible !important;
 }
 #hud-root .ada-note.ada-note {
     position: relative;
-    width: 100%;
+    width: 100% !important;
+    max-width: none !important;
     height: auto !important;
     min-height: 0 !important;
-    max-height: 96px !important;
-    overflow: hidden !important;
+    max-height: none !important;
+    overflow: visible !important;
     flex-direction: row;
     align-items: center;
-    padding-top: 10px !important;
-    padding-bottom: 10px !important;
+    padding-top: 12px !important;
+    padding-bottom: 16px !important;
     padding-left: 8px !important;
     padding-right: 16px !important;
-    border-width: 2px !important;
-    border-bottom-width: 2px !important;
-    border-color: #3B2A20 !important;
-    border-radius: 999px !important;
+    border-width: 0 !important;
+    background-color: rgba(0, 0, 0, 0) !important;
+    background-image: none !important;
+}
+#hud-root .ada-carta {
+    position: absolute;
+    left: 0;
+    right: 0;
+    top: 0;
+    bottom: 0;
+    border-radius: 999px;
+    border-width: 2px;
+    border-color: #3B2A20;
     background-color: #F3E3C3 !important;
     background-image: none !important;
 }
@@ -174,18 +202,23 @@
     flex-shrink: 1;
     min-width: 0;
     height: auto;
+    max-height: none;
     justify-content: center;
 }
 #hud-root .ada-text.ada-text {
     white-space: normal !important;
     text-overflow: clip !important;
+    -unity-overflow-clip-box: padding-box;
     overflow: visible !important;
     height: auto !important;
-    max-height: 64px !important;
+    min-height: 0 !important;
+    max-height: none !important;
     width: 100%;
+    margin: 0;
+    padding: 0;
     font-size: 14px !important;
     color: #3B2A20 !important;
-    -unity-text-align: middle-left;
+    -unity-text-align: upper-left;
     -unity-paragraph-spacing: 0;
     -unity-text-outline-width: 0 !important;
     -unity-text-outline-color: rgba(0, 0, 0, 0) !important;

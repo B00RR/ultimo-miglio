@@ -56,11 +56,15 @@ public class Etichette186Tests
         StringAssert.Contains("background-color: #F3E3C3 !important", uss);
         StringAssert.Contains("color: #3B2A20 !important", uss);
         StringAssert.Contains("rgba(158, 120, 115, 0.6)", uss);
-        StringAssert.Contains("translate: 0 4px", uss);
+        StringAssert.Contains("left: 0 !important", uss);
+        StringAssert.Contains("right: 0 !important", uss);
+        StringAssert.Contains("top: 4px !important", uss);
+        StringAssert.Contains("bottom: -4px !important", uss);
         StringAssert.Contains("height: auto !important", uss);
+        StringAssert.Contains("max-height: none !important", uss);
         StringAssert.Contains("-unity-text-outline-width: 0 !important", uss);
-        StringAssert.Contains("padding-top: 10px !important", uss);
-        StringAssert.Contains("padding-bottom: 10px !important", uss);
+        StringAssert.Contains("padding-bottom: 16px !important", uss);
+        StringAssert.Contains("text-overflow: clip !important", uss);
         StringAssert.DoesNotContain("tex_capsula_noce_48.png", uss);
         StringAssert.DoesNotContain("ellipsis", uss);
         StringAssert.DoesNotContain("#FFFFFF", uss.ToUpperInvariant());
