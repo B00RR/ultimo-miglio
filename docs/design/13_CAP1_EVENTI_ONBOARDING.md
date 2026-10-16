@@ -10,18 +10,20 @@ Scopo: il QA legge dalla console del browser (build WebGL) ogni sblocco di passo
 - `id` = `steps[].id` di `onboarding.json` (es. `hireNonno`), **non** etichette tipo "9b". `n` = indice 0-based del passo (0-15).
 - `t` = tempo di gioco attivo dall'avvio della scena, in secondi, **1 decimale, punto decimale** (es. `t=131.2`). Non scorre in pausa/menu.
 - Una riga per evento, emessa nello stesso frame in cui l'evento avviene. Livello di log: `Debug.Log` (info), sempre attivo anche in build release finché c'è l'onboarding.
-- Regex di validazione (per il test EditMode): `^\[ONB\] (start|gate|hint|softgate|nolnp|skip|end) id=[A-Za-z]+ n=\d{1,2} t=\d+\.\d( [a-zA-Z]+=[^ ]+)*$`
+- Regex di validazione (per il test EditMode): `^\[ONB\] (start|gate|hint|softgate|nolnp|skip|end) id=[A-Za-z]+ n=\d{1,2} t=\d+\.\d( [a-zA-Z]+=[^ ]+)*$`; in più, campi obbligatori per tipo: `start` → `ln=\d+`; `gate`/`end` → `ln=\d+` e `spent=\d+`; `nolnp` → `need=\d+` e `have=\d+`.
 
 ## 2. Tipi di evento
+**Campi economici (rev. 16/10):** `ln` = LN nel portafoglio (intero, arrotondato per difetto) su `start`, `gate`, `end`; `spent` = LN spese in totale dall'avvio (pad e assunzioni; **esclusi** i versamenti alla Cassaforte) su `gate` ed `end`; `nolnp` usa `need` (costo del pad) e `have` (LN in tasca). Tutti interi, senza separatore delle migliaia. Quindi LN guadagnate fino a quel momento = `ln + spent + versato`.
+
 | Tipo | Quando si emette | Campi extra | Esempio |
 |---|---|---|---|
-| `start` | il passo diventa attivo (reveal dei suoi elementi) | `reveals=<n elementi>` | `[ONB] start id=hireNonno n=9 t=130.0 reveals=1` |
-| `gate` | l'evento di completamento del passo avviene (§3) | `event=<nome gate>` `dur=<s dal start, 1 dec.>` | `[ONB] gate id=hireNonno n=9 t=131.2 event=nonnoHired dur=1.2` |
+| `start` | il passo diventa attivo (reveal dei suoi elementi) | `reveals=<n elementi>` `ln=<LN in tasca>` | `[ONB] start id=hireNonno n=9 t=130.0 reveals=1 ln=211` |
+| `gate` | l'evento di completamento del passo avviene (§3) | `event=<nome gate>` `dur=<s dal start, 1 dec.>` `ln=<LN in tasca>` `spent=<LN spesi totali>` | `[ONB] gate id=hireNonno n=9 t=131.2 event=nonnoHired dur=1.2 ln=121 spent=90` |
 | `hint` | scatta un livello di aiuto per inattività sul passo | `lvl=1\|2\|3` (10/20/40 s) `idle=<s>` `kind=<tipo aiuto>` | `[ONB] hint id=move n=1 t=36.0 lvl=2 idle=20.0 kind=manoFantasma` |
 | `softgate` | solo `combo`: avanza dopo 40 s senza x1,2 | `idle=40.0` | `[ONB] softgate id=combo n=7 t=140.0 idle=40.0` |
-| `nolnp` | il giocatore è sul pad del passo ma non ha LN sufficienti | `pad=<id>` `wallet=<LN>` `cost=<LN>` | `[ONB] nolnp id=hireNonno n=9 t=129.5 pad=assumiNonno wallet=32 cost=50` |
+| `nolnp` | il giocatore è sul pad del passo ma non ha LN sufficienti | `pad=<id>` `need=<costo LN>` `have=<LN in tasca>` | `[ONB] nolnp id=hireNonno n=9 t=129.5 pad=assumiNonno need=50 have=32` |
 | `skip` | tocco su "Salta tutorial" (disponibile dopo `combo`) | `from=<idPasso>` | `[ONB] skip id=nonnoIntro n=8 t=120.4 from=nonnoIntro` |
-| `end` | inizio di `freePlay` (o dopo skip) | `total=<s>` `hints=<n>` `lvl3=<n>` | `[ONB] end id=freePlay n=15 t=301.0 total=301.0 hints=2 lvl3=0` |
+| `end` | inizio di `freePlay` (o dopo skip) | `total=<s>` `hints=<n>` `lvl3=<n>` `ln=<LN in tasca>` `spent=<LN spesi totali>` | `[ONB] end id=freePlay n=15 t=301.0 total=301.0 hints=2 lvl3=0 ln=…` `spent=…` |
 
 Regole:
 - **Inattività** = nessun progresso verso il gate del passo (nessun movimento utile verso il bersaglio e nessun evento di gioco del passo). Il conteggio riparte da 0 a ogni progresso; ogni livello si emette **una volta** per periodo di inattività. Se l'escalation si ripete (es. promemoria NONNO ogni 20 s), si riemette `hint` con lo stesso `lvl`.
@@ -50,6 +52,12 @@ Regole:
 | 15 | `freePlay` | `— (terminale)` | — |
 
 ## 4. Come lo usa il QA
+- **Controlli economici (golden path, eff 1,0, toll. ±10%):**
+  - `gate id=zainoPad` a t≈83: `spent=40`, `ln` residuo ≈ 1 (41 LN guadagnati − 40 di Zaino 1), quindi `ln+spent` ≈ 41;
+  - `gate id=hireNonno` a t≈130: `ln+spent` ≈ 211 (LN cumulate a 2:10; spesi Zaino 1 + NONNO 50 + Zaino 2 80 se comprato nello stesso secondo);
+  - `start id=debtCard` a t≈240: `ln+spent` ≈ 771 (prima del primo versamento tutte le LN restano nel portafoglio);
+  - `gate id=debtCard`: `ln` scende al 40% del portafoglio precedente ±1 LN (versato il 60%);
+  - `nolnp`: sempre `have < need`.
 - Durata passo = `dur` del `gate`; aiuto massimo = `lvl` più alto tra gli `hint` del passo; "blocco >10 s" = almeno un `hint lvl=1`.
 - PT-03: conta di `hint lvl=3` in tutto l'onboarding (anche nel campo `lvl3` di `end`) ≤ 1.
 - PT-05: 16 `gate` (o 15 `gate` + `softgate` per `combo`) nell'ordine della tabella, ciascuno una volta.
