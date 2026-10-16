@@ -30,11 +30,9 @@ Material:
         m_Offset: {x: 0, y: 0}
     m_Ints: []
     m_Floats:
-    - _ShadowCool: 0.12
-    - _ShadowSoft: 0.35
+    - _Bands: 3
     - _FloorBaseMix: 0
     - _GroutDark: 0
-    - _Bands: 3
     - _HeightDark: 0.18
     - _HeightRange: 2.5
     - _NoiseScale: 0.35
@@ -45,6 +43,8 @@ Material:
     - _RampSoftness: 0.06
     - _RimPower: 3.5
     - _RimStrength: 0.4
+    - _ShadowCool: 0.12
+    - _ShadowSoft: 0.35
     - _ShadowStrength: 0.6
     - _TileSize: 1
     - _TileVar: 0
@@ -52,14 +52,14 @@ Material:
     - _WallAO: 0.3
     - _WallAOHeight: 0.5
     m_Colors:
-    - _FloorTintB: {r: 1, g: 1, b: 1, a: 1}
-    - _FloorTintC: {r: 1, g: 1, b: 1, a: 1}
     - _BaseColor: {r: 1, g: 1, b: 1, a: 1}
     - _EmissionColor: {r: 0, g: 0, b: 0, a: 1}
     - _FloorTint: {r: 1, g: 1, b: 1, a: 1}
+    - _FloorTintB: {r: 1, g: 1, b: 1, a: 1}
+    - _FloorTintC: {r: 1, g: 1, b: 1, a: 1}
     - _OutlineColor: {r: 0.231, g: 0.184, b: 0.165, a: 1}
     - _RimColor: {r: 1, g: 0.957, b: 0.839, a: 1}
-    - _ShadowTint: {r: 0.6196, g: 0.4706, b: 0.4510, a: 1}
+    - _ShadowTint: {r: 0.61960787, g: 0.47058824, b: 0.4509804, a: 1}
   m_BuildTextureStacks: []
   m_AllowLocking: 1
 --- !u!114 &3711774564077833257
