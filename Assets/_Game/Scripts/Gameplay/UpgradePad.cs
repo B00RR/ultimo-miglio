@@ -40,8 +40,13 @@ namespace UltimoMiglio.Gameplay
         protected override bool PerDistanza => true;
         protected override bool DentroPerDistanza(NinaController n)
         {
+            return FeetOnDisc(n.transform.position);
+        }
+        /// <summary>#171/#240: unica condizione dentro/fuori: piedi (pivot) entro il disco. La usano attivazione, _waitExit (#110) e il ritorno attivo del pad spento.</summary>
+        public bool FeetOnDisc(Vector3 p)
+        {
             if (!_col || !_col.enabled) return false; // pad non disponibile (costo infinito / non sbloccato): mai dentro
-            var c = DiscCenter; var p = n.transform.position; float dx = p.x - c.x, dz = p.z - c.z;
+            var c = DiscCenter; float dx = p.x - c.x, dz = p.z - c.z;
             float r = DiscRadius; return dx * dx + dz * dz <= r * r;
         }
         InteractionPoint _ip; bool _ipCercato; Transform _disc;
@@ -94,7 +99,8 @@ namespace UltimoMiglio.Gameplay
         }
         /// Solo test: simula l'acquisto completato (done) e l'uscita di Kaia senza GameRoot.
         public void TestCompletePurchase() => SetWaitExit(true);
-        public void TestExit() => OnZoneExit();
+        /// Solo test: piedi di Kaia in p. Fuori dal disco = uscita (come ProximityZone.Update con PerDistanza), dentro = nessun cambio.
+        public void TestFeetAt(Vector3 p) { if (!FeetOnDisc(p)) OnZoneExit(); }
         void StopLoop() { if (_paying) { _paying = false; AudioManager.I?.StopUpgradeLoop(); } }
     }
 }

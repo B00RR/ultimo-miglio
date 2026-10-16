@@ -45,8 +45,15 @@ public class PadSpento240Test
         for (int i = 0; i < 50; i++) _ring.TickPop(0.1f);
         Assert.IsTrue(_pad.IsArmedOff); Assert.IsTrue(_ring.IsOff); Assert.AreEqual(0f, _ring.GlowIntensity, 1e-6);
 
+        // #249: piedi ancora sul disco (anche vicino al bordo) = nessuna uscita, il pad resta spento
+        float r = _pad.DiscRadius; Vector3 c = _pad.DiscCenter;
+        Assert.IsTrue(_pad.FeetOnDisc(c)); Assert.IsTrue(_pad.FeetOnDisc(c + Vector3.right * r * 0.95f));
+        _pad.TestFeetAt(c + Vector3.right * r * 0.95f);
+        Assert.IsTrue(_pad.IsArmedOff, "piedi sul disco: _waitExit resta"); Assert.IsTrue(_ring.IsOff);
+
         Vector3 s0 = _ring.transform.localScale;
-        _pad.TestExit(); // Kaia esce dal raggio
+        Assert.IsFalse(_pad.FeetOnDisc(c + Vector3.right * r * 1.05f));
+        _pad.TestFeetAt(c + Vector3.right * r * 1.05f); // #249: piedi fuori dal disco = uscita
         Assert.IsFalse(_pad.IsArmedOff, "uscita: _waitExit sbloccato");
         Assert.IsFalse(_ring.IsOff); Assert.IsTrue(_ring.IsPopping);
         Assert.IsFalse(_ip.PadOff);
