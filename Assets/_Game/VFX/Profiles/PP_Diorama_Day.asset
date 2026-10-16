@@ -1,74 +1,6 @@
 %YAML 1.1
 %TAG !u! tag:unity3d.com,2011:
---- !u!114 &-7901996884947236659
-MonoBehaviour:
-  m_ObjectHideFlags: 3
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 0}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 0b2db86121404754db890f4c8dfe81b2, type: 3}
-  m_Name: Bloom
-  m_EditorClassIdentifier: Unity.RenderPipelines.Universal.Runtime::UnityEngine.Rendering.Universal.Bloom
-  active: 1
-  skipIterations:
-    m_OverrideState: 1
-    m_Value: 1
-  threshold:
-    m_OverrideState: 1
-    m_Value: 0.92
-  intensity:
-    m_OverrideState: 1
-    m_Value: 0.25
-  scatter:
-    m_OverrideState: 1
-    m_Value: 0.55
-  clamp:
-    m_OverrideState: 1
-    m_Value: 65472
-  tint:
-    m_OverrideState: 1
-    m_Value: {r: 1, g: 0.95686275, b: 0.8392157, a: 1}
-  highQualityFiltering:
-    m_OverrideState: 1
-    m_Value: 0
-  filter:
-    m_OverrideState: 1
-    m_Value: 0
-  downscale:
-    m_OverrideState: 1
-    m_Value: 1
-  maxIterations:
-    m_OverrideState: 1
-    m_Value: 3
-  dirtTexture:
-    m_OverrideState: 1
-    m_Value: {fileID: 0}
-    dimension: 1
-  dirtIntensity:
-    m_OverrideState: 1
-    m_Value: 0
---- !u!114 &11400000
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 0}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: d7fd9488000d3734a9e00ee676215985, type: 3}
-  m_Name: PP_Diorama_Day
-  m_EditorClassIdentifier: Unity.RenderPipelines.Core.Runtime::UnityEngine.Rendering.VolumeProfile
-  components:
-  - {fileID: 5565250026620869509}
-  - {fileID: -7901996884947236659}
-  - {fileID: 3888373239742486539}
-  - {fileID: 5364962808733269807}
-  - {fileID: 5255400838745533656}
---- !u!114 &3888373239742486539
+--- !u!114 &-8601196616325363386
 MonoBehaviour:
   m_ObjectHideFlags: 3
   m_CorrespondingSourceObject: {fileID: 0}
@@ -96,54 +28,7 @@ MonoBehaviour:
   saturation:
     m_OverrideState: 1
     m_Value: 4
---- !u!114 &5255400838745533656
-MonoBehaviour:
-  m_ObjectHideFlags: 3
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 0}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 899c54efeace73346a0a16faa3afe726, type: 3}
-  m_Name: Vignette
-  m_EditorClassIdentifier: Unity.RenderPipelines.Universal.Runtime::UnityEngine.Rendering.Universal.Vignette
-  active: 1
-  color:
-    m_OverrideState: 1
-    m_Value: {r: 0.23137255, g: 0.18431373, b: 0.16470589, a: 1}
-  center:
-    m_OverrideState: 1
-    m_Value: {x: 0.5, y: 0.5}
-  intensity:
-    m_OverrideState: 1
-    m_Value: 0.2
-  smoothness:
-    m_OverrideState: 1
-    m_Value: 0.45
-  rounded:
-    m_OverrideState: 1
-    m_Value: 0
---- !u!114 &5364962808733269807
-MonoBehaviour:
-  m_ObjectHideFlags: 3
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 0}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 221518ef91623a7438a71fef23660601, type: 3}
-  m_Name: WhiteBalance
-  m_EditorClassIdentifier: Unity.RenderPipelines.Universal.Runtime::UnityEngine.Rendering.Universal.WhiteBalance
-  active: 1
-  temperature:
-    m_OverrideState: 1
-    m_Value: 4
-  tint:
-    m_OverrideState: 1
-    m_Value: 0
---- !u!114 &5565250026620869509
+--- !u!114 &-7801941654949957314
 MonoBehaviour:
   m_ObjectHideFlags: 3
   m_CorrespondingSourceObject: {fileID: 0}
@@ -183,3 +68,118 @@ MonoBehaviour:
   maxNits:
     m_OverrideState: 1
     m_Value: 1000
+--- !u!114 &-7305466140321102899
+MonoBehaviour:
+  m_ObjectHideFlags: 3
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 221518ef91623a7438a71fef23660601, type: 3}
+  m_Name: WhiteBalance
+  m_EditorClassIdentifier: Unity.RenderPipelines.Universal.Runtime::UnityEngine.Rendering.Universal.WhiteBalance
+  active: 1
+  temperature:
+    m_OverrideState: 1
+    m_Value: 4
+  tint:
+    m_OverrideState: 1
+    m_Value: 0
+--- !u!114 &-5158992984553373836
+MonoBehaviour:
+  m_ObjectHideFlags: 3
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 899c54efeace73346a0a16faa3afe726, type: 3}
+  m_Name: Vignette
+  m_EditorClassIdentifier: Unity.RenderPipelines.Universal.Runtime::UnityEngine.Rendering.Universal.Vignette
+  active: 1
+  color:
+    m_OverrideState: 1
+    m_Value: {r: 0.23137255, g: 0.18431373, b: 0.16470589, a: 1}
+  center:
+    m_OverrideState: 1
+    m_Value: {x: 0.5, y: 0.5}
+  intensity:
+    m_OverrideState: 1
+    m_Value: 0.2
+  smoothness:
+    m_OverrideState: 1
+    m_Value: 0.45
+  rounded:
+    m_OverrideState: 1
+    m_Value: 0
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d7fd9488000d3734a9e00ee676215985, type: 3}
+  m_Name: PP_Diorama_Day
+  m_EditorClassIdentifier: Unity.RenderPipelines.Core.Runtime::UnityEngine.Rendering.VolumeProfile
+  components:
+  - {fileID: -7801941654949957314}
+  - {fileID: 5324345326462324136}
+  - {fileID: -8601196616325363386}
+  - {fileID: -7305466140321102899}
+  - {fileID: -5158992984553373836}
+--- !u!114 &5324345326462324136
+MonoBehaviour:
+  m_ObjectHideFlags: 3
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 0b2db86121404754db890f4c8dfe81b2, type: 3}
+  m_Name: Bloom
+  m_EditorClassIdentifier: Unity.RenderPipelines.Universal.Runtime::UnityEngine.Rendering.Universal.Bloom
+  active: 1
+  skipIterations:
+    m_OverrideState: 1
+    m_Value: 1
+  threshold:
+    m_OverrideState: 1
+    m_Value: 0.92
+  intensity:
+    m_OverrideState: 1
+    m_Value: 0.25
+  scatter:
+    m_OverrideState: 1
+    m_Value: 0.55
+  clamp:
+    m_OverrideState: 1
+    m_Value: 65472
+  tint:
+    m_OverrideState: 1
+    m_Value: {r: 0.9529412, g: 0.8901961, b: 0.7647059, a: 1}
+  highQualityFiltering:
+    m_OverrideState: 1
+    m_Value: 0
+  filter:
+    m_OverrideState: 1
+    m_Value: 0
+  downscale:
+    m_OverrideState: 1
+    m_Value: 1
+  maxIterations:
+    m_OverrideState: 1
+    m_Value: 3
+  dirtTexture:
+    m_OverrideState: 1
+    m_Value: {fileID: 0}
+    dimension: 1
+  dirtIntensity:
+    m_OverrideState: 1
+    m_Value: 0
