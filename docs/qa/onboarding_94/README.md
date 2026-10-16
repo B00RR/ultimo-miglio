@@ -7,14 +7,15 @@ Anteprima HTML (`anteprima/index.html`, stessa base della #78) con le classi di 
 | `onb_*_01_avvio` | avvio: pillola LN nascosta, nessun pad; restano obiettivo, Ada, suggerimento, joystick |
 | `onb_*_02_comparsa_LN` | pillola LN a metà comparsa (scala 0,85, opacità 0,55; animazione 0,6→1 in 250 ms) |
 | `onb_*_03_pad_barra` | pad obiettivo: freccia ▼ (#78) → barra LN "32/50" → pillola "18 LN" |
-| `onb_*_04_aiuto20_freccia` | aiuto 20 s: freccia a bordo schermo (bersaglio fuori camera) |
-| `onb_*_05_aiuto40_mano` | aiuto 40 s: mano fantasma nella zona joystick, il suggerimento testuale si nasconde |
+| `onb_*_04_aiuto20_freccia_fuori_camera` | aiuto 20 s, bersaglio fuori camera: freccia a bordo schermo |
+| `onb_*_05_aiuto20_mano_bersaglio_a_schermo` | aiuto 20 s, bersaglio già a schermo: mano fantasma nella zona joystick, il suggerimento testuale si nasconde (40 s = camera breve ≤ 1,5 s, non catturabile in HTML) |
 | `onb_*_06_badge_nonno` | badge NONNO "6 pacchi/min" (22 dp) |
+| `onb_*_08_combo_popup` | combo: "x1,2" sopra Nina (sale 40 dp, sparisce in 1,5 s), nessun contatore HUD |
 | `onb_*_07_salta` | "Salta tutorial" a sinistra dell'ingranaggio, riga obiettivo stretta |
 
-## Esito (21 catture)
+## Esito (24 catture)
 | controllo | 360 | 390 | 412 |
 |---|---|---|---|
 | HUD alto entro la fascia libera (350/2532) | 103/111 ✅ | 103/117 ✅ | 103/126 ✅ |
-| Sovrapposizioni fra LN, obiettivo, ingranaggio, Salta, Ada, suggerimento, joystick, mano, freccia, barra, prezzo, badge | nessuna ✅ | nessuna ✅ | nessuna ✅ |
+| Sovrapposizioni fra LN, obiettivo, ingranaggio, Salta, Ada, suggerimento, joystick, mano, freccia, barra, prezzo, badge, combo | nessuna ✅ | nessuna ✅ | nessuna ✅ |
 | Obiettivo senza ellissi con "Salta tutorial" visibile ("Assumi NONNO") | ✅ | ✅ | ✅ |

@@ -57,6 +57,7 @@ html,body{width:100%;height:100%;overflow:hidden;font-family:Fredoka;color:#3B2A
 #edge-arrow-head{width:36px;height:36px;border-radius:18px;border:2px solid #3B2A20;background:#C8633B;display:flex;align-items:center;justify-content:center}
 #edge-arrow-head i{width:20px;height:20px;background:url(ic_arrow_cream.png) center/contain no-repeat}
 #edge-arrow-label{margin-top:4px;padding:2px 8px;font:600 12px Fredoka;border:2px solid #3B2A20;border-radius:12px;background:#F3E3C3;max-width:120px;white-space:nowrap}
+.combo-popup{position:absolute;transform:translate(-50%,-100%);font:700 16px Fredoka;color:#F4C430;-webkit-text-stroke:1px #3B2A20;text-shadow:0 0 2px #3B2A20;white-space:nowrap}
 </style>
 <body><div id="hud-root">
  <div class="pad" id="pad"></div>
@@ -95,5 +96,6 @@ if(sc==='pad'){document.getElementById('bar').classList.remove('hiddenx');barfil
 if(sc==='aiuto20'){hide('poi');hide('pad');const e=document.getElementById('edge-arrow');e.classList.remove('hiddenx');e.style.left=(W-34)+'px';e.style.top=(H*0.42)+'px';eai.style.transform='rotate(-20deg)';}
 if(sc==='aiuto40'){hide('poi');hide('pad');hide('joystick-base');const h=document.getElementById('hand');h.classList.remove('hiddenx');h.style.transform='translate(30px,-46px)';R.classList.add('onb-hand');}
 if(sc==='nonno'){hide('poi');hide('pad');const n=document.getElementById('nb');n.classList.remove('hiddenx');n.style.left=(W*0.38)+'px';n.style.top=(H*0.47)+'px';}
+if(sc==='combo'){hide('poi');hide('pad');const c=document.createElement('div');c.className='combo-popup';c.id='combo';c.textContent='x1,2';c.style.left=(W*0.115)+'px';c.style.top=(H*0.5-36)+'px';R.appendChild(c);}
 if(sc==='salta'){R.classList.add('hud--skip');document.getElementById('skip').classList.remove('hiddenx');hide('poi');hide('pad');}
 </script></body></html>

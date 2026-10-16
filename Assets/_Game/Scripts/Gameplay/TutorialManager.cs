@@ -20,8 +20,9 @@ namespace UltimoMiglio.Gameplay
         [Tooltip("onboarding_testi.json (PR #62): passi per id + suggerimenti onb.*. Facoltativo: senza, valgono Texts/EndText.")]
         public TextAsset TestiJson;
         [Header("Onboarding graduale (#94)")]
-        [Tooltip("Nasconde all'avvio gli elementi bloccati e li rivela passo per passo (HudReveal). Spento = comportamento attuale.")]
-        public bool RivelaGraduale = false;
+        [Tooltip("Nuova partita: nasconde all'avvio gli elementi bloccati e li rivela passo per passo (HudReveal). Salvataggi esistenti o tutorial finito: tutto visibile.")]
+        public bool RivelaGraduale = true;
+        public const string PrefGraduale = "um_onb_graduale";
         [Tooltip("Aiuti a 10/20/40 s di inattività (OnboardingHints). La freccia a bordo schermo parte solo al livello 2.")]
         public bool AiutiProgressivi = true;
         [Tooltip("'Salta tutorial' compare dopo questo passo o alla prima combo (NotifyCombo)")]
@@ -46,7 +47,11 @@ namespace UltimoMiglio.Gameplay
             if (AiutiProgressivi && !GetComponent<OnboardingHints>()) gameObject.AddComponent<OnboardingHints>();
             foreach (var nr in FindObjectsByType<NonnoRobot>(FindObjectsSortMode.None)) if (!nr.GetComponent<NonnoRateBadge>()) nr.gameObject.AddComponent<NonnoRateBadge>();
             RegisterWorldReveals();
-            if (RivelaGraduale && Current < Step.Fine) UltimoMiglio.UI.HudReveal.HideAll(LockedAtStart);
+            // Graduale solo per una partita NUOVA (nessun passo salvato) o iniziata già in graduale; salvataggi precedenti = tutto visibile
+            bool nuova = !PlayerPrefs.HasKey(PrefKey);
+            if (RivelaGraduale && nuova) { PlayerPrefs.SetInt(PrefGraduale, 1); PlayerPrefs.Save(); }
+            bool graduale = RivelaGraduale && Current < Step.Fine && (nuova || PlayerPrefs.GetInt(PrefGraduale, 0) == 1);
+            if (graduale) UltimoMiglio.UI.HudReveal.HideAll(LockedAtStart);
             for (var k = Step.Muoviti; k < Current; k++) RevealFor(k); // ripresa da PlayerPrefs: ciò che è già stato rivelato resta visibile
             Enter(Current);
         }
@@ -157,7 +162,8 @@ namespace UltimoMiglio.Gameplay
         }
 
         // ---------------- #94: comparse graduali + Salta tutorial ----------------
-        /// <summary>Sottoinsieme di onboarding.json → lockedAtStart che esiste nella slice attuale (HUD minimo: niente telefono/debito/combo).</summary>
+        /// <summary>Sottoinsieme di onboarding.json → lockedAtStart presente nella slice. Per decisione di DevOn (#64/#94) niente telefono,
+        /// niente barra debito (il debito si vede solo a fine giornata e nel fumetto di Ada), combo = ComboPopup nel mondo: nessun id HUD per questi.</summary>
         public static readonly string[] LockedAtStart = { "hud.pillolaValute", "zona.arrivi", "zona.scaffaleTerracotta", "zona.bancone", "pad.zaino", "pad.assumiNonno", "robot.nonno.attivo" };
         bool _uiRegistered, _comboSeen; VisualElement _skip;
 
@@ -184,7 +190,14 @@ namespace UltimoMiglio.Gameplay
         }
 
         /// <summary>Da chiamare quando il moltiplicatore combo supera la soglia del passo combo (onboarding.json: comboReached ≥ 1,2).</summary>
-        public void NotifyCombo() { if (!_comboSeen) { _comboSeen = true; Debug.Log("[Onb] gate comboReached"); } }
+        public void NotifyCombo() => NotifyCombo(0f);
+
+        /// <summary>Combo raggiunta (moltiplicatore, es. 1.2): popup "x1,2" sopra Nina (1,5 s) e, la prima volta, gate comboReached → "Salta tutorial".</summary>
+        public void NotifyCombo(float multiplier)
+        {
+            ComboPopup.Show(multiplier > 0f ? "x" + multiplier.ToString("0.0", System.Globalization.CultureInfo.GetCultureInfo("it-IT")) : "Combo!");
+            if (!_comboSeen) { _comboSeen = true; Debug.Log("[Onb] gate comboReached"); }
+        }
 
         void EnsureSkip()
         {

@@ -41,3 +41,7 @@
 /* con il tasto visibile la riga obiettivo si stringe fra pillola LN e tasto */
 .hud--skip #safe-root .top-left { max-width: 104px; }
 .hud--skip #safe-root .tutorial-objective { left: 112px; right: 134px; }
+
+/* --- Combo (decisione DevOn): niente contatore HUD; "+N" / "x1,2" sopra Nina (2,3 m), sale 40 dp, sparisce in 1,5 s --- */
+.combo-popup { position: absolute; translate: -50% -100%; font-size: 16px; color: #F4C430; -unity-text-outline-width: 2px; -unity-text-outline-color: #3B2A20;
+    -unity-font-definition: url("project://database/Assets/_Game/UI/Fonts/Fredoka-Bold.ttf"); margin: 0; padding: 0; white-space: nowrap; }
