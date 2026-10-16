@@ -118,6 +118,7 @@ Ogni ruolo lavora solo sulle issue con la propria etichetta `ruolo:*`, sempre co
 
 Voci più recenti in alto. Formato: `AAAA-MM-GG HH:MM` (Europe/Rome) — [commit] — descrizione.
 
+- 2026-10-16 11:54 — Tech Lead — [c859f94](https://github.com/B00RR/ultimo-miglio/commit/c859f94ea08537f7a4d55aa3b9ba418f1202c3de) — PR #103 rewards: soglie pacchi 100/250/450, traguardi debito 25/50/75%, mancia Cassa 30 LN, freccia prossimo pad da 480 s; test EditMode EconomyRewardsTests.
 - 2026-10-16 11:47 — Code Reviewer — [d039bd8](https://github.com/B00RR/ultimo-miglio/commit/d039bd8aaa9dfe52606eca05ccaae874dace65ea) — unita in squash la [PR #87](https://github.com/B00RR/ultimo-miglio/pull/87) (fix(#59): NONNO non va più in retromarcia + test PlayMode verso di marcia). Job `test` verde. Refs #59.
 - 2026-10-16 11:29 — Code Reviewer — [2f2f61f](https://github.com/B00RR/ultimo-miglio/commit/2f2f61f2d5d4946d01c8b7f65fc192d715cc0e51) — unita in squash la [PR #85](https://github.com/B00RR/ultimo-miglio/pull/85) (clienti v03-uv: rider cappello limone, 3 toni pelle; Ada già su main via #93). Job `test` verde. Refs #2.
 - 2026-10-16 11:29 — Code Reviewer — [8ed4422](https://github.com/B00RR/ultimo-miglio/commit/8ed4422972dd7c6d3a80a45769034ec6b6c3d270) — unita in squash la [PR #135](https://github.com/B00RR/ultimo-miglio/pull/135) (Zaino 8 = 3.000 LN; combo HUD solo +N). Job `test` verde. Closes #134.
