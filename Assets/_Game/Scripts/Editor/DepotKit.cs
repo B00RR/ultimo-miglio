@@ -56,7 +56,9 @@ namespace UltimoMiglio.EditorTools
             Place("Kit/prop_plant_pot_round", _parent, new Vector3(5.4f, 0, 7.5f), 0, true);
             Place("Kit/prop_planter_box", _parent, new Vector3(0, 0, 7.7f), 0, true);
             Place("Kit/prop_sign_hanging_parcel", _parent, new Vector3(7.4f, 2.4f, -3.1f), -90, false);
-            Place("Kit/prop_streetlamp", _parent, new Vector3(-8.4f, 0, -10.2f), 45, true);
+            // #65: angolo SO. Con yaw 45 il BoxCollider di Place usciva sottile (dimensioni AABB ruotate) e Nina passava dentro il palo.
+            // Ora il palo sta a ridosso dell'angolo (fessura palo-staccionata < diametro di Nina) e ha un collider proprio, allineato alla mesh.
+            if (Place("Kit/prop_streetlamp", _parent, new Vector3(-8.4f, 0, -10.2f), 45, false)) PoleCollider(_parent.GetChild(_parent.childCount - 1), new Vector3(-8.62f, 0, -10.62f));
             Place("ThirdParty/Props/prop_tp_crate_open", _parent, new Vector3(-8.2f, 0, 6.8f), 0, true);
             Place("ThirdParty/Props/prop_tp_barrel", _parent, new Vector3(5.5f, 0, 7.5f), 0, true);
             Place("ThirdParty/Props/prop_tp_bench", _parent, new Vector3(6.9f, 0, -4f), 90, true);
@@ -134,6 +136,20 @@ namespace UltimoMiglio.EditorTools
             if (!solid && (wall || (!onTop && b.min.y < 0.3f && b.size.y > 0.25f && Mathf.Max(b.size.x, b.size.z) < 6f))) solid = true;
             if (solid) { var bc = go.AddComponent<BoxCollider>(); bc.center = go.transform.InverseTransformPoint(b.center); var ls = go.transform.lossyScale; var sz = Quaternion.Inverse(go.transform.rotation) * b.size; bc.size = new Vector3(Mathf.Abs(sz.x / ls.x), Mathf.Abs(sz.y / ls.y), Mathf.Abs(sz.z / ls.z)); }
             return true;
+        }
+
+        /// <summary>#65: lampione. Il pivot dell'FBX è alla base del palo (mesh: palo r 0.146 all'origine, braccio +X 0.62 a 2.3-2.6 m).
+        /// Sposta il pivot del palo su polePos (XZ) e mette un BoxCollider solido sul solo palo (0.36x2.6x0.36, assi mondo): sotto il braccio non c'è niente da urtare.</summary>
+        static void PoleCollider(Transform lamp, Vector3 polePos)
+        {
+            if (!lamp || !lamp.name.Contains("streetlamp")) return;
+            foreach (var c in lamp.GetComponentsInChildren<Collider>()) Object.DestroyImmediate(c);
+            lamp.position = new Vector3(polePos.x, lamp.position.y, polePos.z);
+            var col = new GameObject("prop_streetlamp_col");
+            col.transform.SetParent(_parent, false);
+            col.transform.position = new Vector3(polePos.x, lamp.position.y + 1.3f, polePos.z);
+            col.isStatic = true;
+            col.AddComponent<BoxCollider>().size = new Vector3(0.36f, 2.6f, 0.36f);
         }
 
         // Concept: insegna con faro + "Vela & Figli" (texture generata, Fredoka).
