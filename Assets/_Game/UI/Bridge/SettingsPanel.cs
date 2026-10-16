@@ -5,7 +5,7 @@ using UltimoMiglio.UI;
 
 namespace UltimoMiglio.UI.Bridge
 {
-    /// <summary>Impostazioni: zoom −/+, slider Musica/Suoni, SALVA → PlayerPrefs (cam_zoom, vol_music, vol_sfx).
+    /// <summary>Impostazioni: zoom −/+, slider Musica/Suoni, SALVA → PlayerPrefs (cam_zoom_v3, vol_music, vol_sfx).
     /// Pausa il gioco (timeScale=0) mentre è aperto. Aperto dal bottone ingranaggio dell'HUD.</summary>
     public sealed class SettingsPanel : MonoBehaviour
     {
