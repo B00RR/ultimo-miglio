@@ -5,10 +5,10 @@ Fonte: `01_CORE_LOOP.md` v3.3; verifica in `qa/econ_sim_v3.py`. Validazione: `py
 
 | File | ScriptableObject | Contenuto |
 |---|---|---|
-| economy.json | `EconomyConfig` | valore pacco, clienti/min, pazienza, combo, Nina base |
+| economy.json | `EconomyConfig` | valore pacco, clienti/min, pazienza, combo, Kaia base |
 | debt.json | `DebtConfig` | tranche, finestra, Proroga, mora/Pedaggio, Assist |
 | upgrades.json | `UpgradeTrackConfig` ×3 | Zaino, Scarpe, Insegna (livelli, costi, effetti) |
-| robots.json | `RobotConfig` | NONNO: pad 50 LN a 130 s, restock e banco, livelli |
+| robots.json | `RobotConfig` | OLDO: pad 50 LN a 130 s, restock e banco, livelli |
 | customers.json | `CustomerTypesConfig` | 4 tipi di cliente |
 | onboarding.json | `OnboardingConfig` | 15 passi dell'onboarding |
 | zones.json | `ZoneConfig` | distanze, tempi per zona, pad |

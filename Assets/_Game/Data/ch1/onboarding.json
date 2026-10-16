@@ -26,7 +26,7 @@
     "20s": "freccia a bordo schermo / mano fantasma",
     "40s": "camera breve sul bersaglio (≤1,5 s, input attivo)"
   },
-  "keyLegend": "step:<id> = biglietto di Nonna Ada in onboarding_testi.json steps[]; tutte le chiavi onb.* sono in onboarding_testi.json (PR #62 e #92)",
+  "keyLegend": "step:<id> = biglietto di Oma Tilde in onboarding_testi.json steps[]; tutte le chiavi onb.* sono in onboarding_testi.json (PR #62 e #92)",
   "skipTutorial": {
     "availableAfterStep": "combo",
     "effect": "sblocca tutto ciò che i passi saltati avrebbero rivelato"
@@ -119,7 +119,7 @@
         "20s": "freccia verso lo scaffale",
         "40s": "camera sullo scaffale + ripete onb.deposit.hint"
       },
-      "revealWhen": "stack>=5 oppure Nina lascia gli Arrivi con ≥1 pacco"
+      "revealWhen": "stack>=5 oppure Kaia lascia gli Arrivi con ≥1 pacco"
     },
     {
       "id": "serve",
@@ -140,8 +140,8 @@
         "onb.cust.first"
       ],
       "hintEscalation": {
-        "10s": "Mamma Rosa saluta (bark) e la stella pulsa",
-        "20s": "freccia sul Bancone; se Nina ha 0 pacchi la freccia va prima allo scaffale",
+        "10s": "Auntie Lulu saluta (bark) e la stella pulsa",
+        "20s": "freccia sul Bancone; se Kaia ha 0 pacchi la freccia va prima allo scaffale",
         "40s": "camera sul Bancone + ripete onb.cust.first"
       }
     },
@@ -166,7 +166,7 @@
       "hintEscalation": {
         "10s": "monete brillano",
         "20s": "freccia sulle monete",
-        "40s": "le monete saltellano verso Nina (raggio +0,5 m)"
+        "40s": "le monete saltellano verso Kaia (raggio +0,5 m)"
       }
     },
     {
@@ -199,14 +199,14 @@
           "onb.zaino.notEnough"
         ]
       },
-      "note": "il gate prova che il giocatore sa comprare: serve per NONNO"
+      "note": "il gate prova che il giocatore sa comprare: serve per OLDO"
     },
     {
       "id": "combo",
       "tSec": 100,
       "toleranceSec": 15,
       "maxSec": 125,
-      "mechanic": "combo: servire clienti di fila (feedback '+N' sopra Nina)",
+      "mechanic": "combo: servire clienti di fila (feedback '+N' sopra Kaia)",
       "reveals": [
         "clienti.normali",
         "feedback.comboPlusN"
@@ -219,7 +219,7 @@
         "onb.combo"
       ],
       "hintEscalation": {
-        "10s": "il '+N' sopra Nina diventa più grande per un istante",
+        "10s": "il '+N' sopra Kaia diventa più grande per un istante",
         "20s": "freccia sul Bancone quando c'è coda",
         "40s": "ripete onb.combo; dopo 40 s il gate si considera passato (combo non bloccante)"
       },
@@ -244,7 +244,7 @@
       "tSec": 127,
       "toleranceSec": 5,
       "maxSec": 132,
-      "mechanic": "conoscere NONNO (solo guardare)",
+      "mechanic": "conoscere OLDO (solo guardare)",
       "reveals": [
         "robot.nonno.dorme"
       ],
@@ -301,7 +301,7 @@
       "tSec": 131,
       "toleranceSec": 5,
       "maxSec": 150,
-      "mechanic": "vedere NONNO lavorare",
+      "mechanic": "vedere OLDO lavorare",
       "reveals": [
         "robot.nonno.attivo"
       ],
@@ -376,7 +376,7 @@
       "tSec": 240,
       "toleranceSec": 10,
       "maxSec": 280,
-      "mechanic": "debito: versare alla Cassaforte (spiegato da Nonna Ada)",
+      "mechanic": "debito: versare alla Cassaforte (spiegato da Oma Tilde)",
       "reveals": [
         "zona.cassaforte"
       ],
@@ -392,7 +392,7 @@
       "hintEscalation": {
         "10s": "Cassaforte pulsa",
         "20s": "freccia sulla Cassaforte",
-        "40s": "camera sulla Cassaforte + Nonna Ada ripete onb.debt.adaExplain"
+        "40s": "camera sulla Cassaforte + Oma Tilde ripete onb.debt.adaExplain"
       },
       "note": "primo versamento = 60% del portafoglio; nessuna barra del debito nell'HUD",
       "delivery": {
@@ -400,7 +400,7 @@
           "onb.debt.adaExplain",
           "onb.debt.pedaggioHint"
         ],
-        "lettera": "lettera OmniFreight sulla Cassaforte: onb.viktor.call1 + onb.viktor.call2 (non più telefonata)"
+        "lettera": "lettera GrayBox sulla Cassaforte: onb.viktor.call1 + onb.viktor.call2 (non più telefonata)"
       },
       "endOfDayScreen": {
         "showsDebtProgress": true,
@@ -452,13 +452,13 @@
       "maxSecNote": "0 = passo terminale senza limite di tempo e senza escalation: l'onboarding finisce al reveal di freePlay; la sessione di playtest si chiude qui o a 10 min di gioco"
     }
   ],
-  "hudPolicy": "HUD minimo (decisione DevOn 16/10): nel cap 1 non c'è il telefono; la combo è solo un '+N' sopra Nina che sparisce in 1,5 s; il debito si vede solo nella schermata di fine giornata e nel fumetto di Nonna Ada quando lo spiega (nessuna barra persistente).",
+  "hudPolicy": "HUD minimo (decisione DevOn 16/10): nel cap 1 non c'è il telefono; la combo è solo un '+N' sopra Kaia che sparisce in 1,5 s; il debito si vede solo nella schermata di fine giornata e nel fumetto di Oma Tilde quando lo spiega (nessuna barra persistente).",
   "postponed": {
     "toChapter": 2,
     "reason": "nel cap 1 non c'è il telefono",
     "items": [
       {
-        "was": "phone (Civetta)",
+        "was": "phone (Madame Moth)",
         "keys": [
           "onb.civetta.msg1",
           "onb.civetta.reply",

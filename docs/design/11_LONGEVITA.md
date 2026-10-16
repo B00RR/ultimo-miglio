@@ -1,6 +1,6 @@
 # 11 - LONGEVITÀ v1.2 (Game Designer) - CHIUSO
 **v1.2 (15/10/2026), decisioni finali del Director:**
-1. Per chi ignora il gestionale: **NONNO capocantiere dal cap 8** (10 v1.3).
+1. Per chi ignora il gestionale: **OLDO capocantiere dal cap 8** (10 v1.3).
 2. Classifiche: Cloud Function minima per Play Integrity **prima del lancio**, fuori dallo sprint corrente.
 3. **Solara infinita si sblocca subito dopo il finale**, con un seed di partenza facile.
 
@@ -40,24 +40,24 @@ Regole anti-grind:
 | Cap | Target min | Novità di sistema (10) | Contratti / quartieri | Eventi e trama (min fissi) |
 |---|---|---|---|---|
 | 1 | 30 | - (Sprint 1 invariato) | - | - |
-| 2 | 45 | Bacheca: 1 contratto guidato | Mamma Rosa, Borgo Gradoni | Riapertura ufficiale (5) |
-| 3 | 55 | Corrente base, colonnina, bolletta | 2 contratti, primi droni | Prova del tetto con PIPPA (8) |
-| 4 | 70 | Rotte & quartieri (furgone, 4 quartieri), fasce di prezzo | Terrazze Alte, Limoneti | Arriva TICO, prima consegna in furgone (10) |
-| 5 | 80 | Officina & usura, pannelli, affitto Garage | contratti fragili | Samir e il Garage (10) |
-| 6 | 90 | Batterie, luci notturne | contratti notturni (Civetta) | Prima notte al Molo Basso (12) |
-| 7 | 100 | Fronte OmniFreight (settimanale) | difesa del primo quartiere | Guerra dei prezzi, Viktor (12) |
-| 8 | 105 | Refrigerati + frigo, pesanti | 5 quartieri | BRACCIO, Cortile (12) |
+| 2 | 45 | Bacheca: 1 contratto guidato | Auntie Lulu, Borgo Gradoni | Riapertura ufficiale (5) |
+| 3 | 55 | Corrente base, colonnina, bolletta | 2 contratti, primi droni | Prova del tetto con FIZZ (8) |
+| 4 | 70 | Rotte & quartieri (furgone, 4 quartieri), fasce di prezzo | Terrazze Alte, Limoneti | Arriva TIKTAK, prima consegna in furgone (10) |
+| 5 | 80 | Officina & usura, pannelli, affitto Garage | contratti fragili | Kenzo e il Garage (10) |
+| 6 | 90 | Batterie, luci notturne | contratti notturni (Madame Moth) | Prima notte al Molo Basso (12) |
+| 7 | 100 | Fronte GrayBox (settimanale) | difesa del primo quartiere | Guerra dei prezzi, Maxim (12) |
+| 8 | 105 | Refrigerati + frigo, pesanti | 5 quartieri | HUGO, Cortile (12) |
 | 9 | 110 | Blackout con priorità, meteo variabile | contratti multi-tappa | Il furto (14) |
-| 10 | 115 | 6 quartieri; ECO, ordini nascosti | contratti ECO | Carico 0 (14) |
+| 10 | 115 | 6 quartieri; NULO, ordini nascosti | contratti NULO | Carico 0 (14) |
 | 11 | 120 | Attacchi doppi | alleanze di quartiere | Sabotaggio al quadro (14) |
 | 12 | 120 | Evento co-op (antenna) | contratti di rete | Evento cooperativo (14) |
 | 13 | 125 | Cantiere del razzo: picco di consumo | contratti "cantiere" | Atto IV (15) |
-| 14 | 125 | Tutti i sistemi, settimana perfetta | quartieri in difesa | Viktor all'angolo (15) |
+| 14 | 125 | Tutti i sistemi, settimana perfetta | quartieri in difesa | Maxim all'angolo (15) |
 | 15 | 130 | Lancio: la rampa del Faro va alimentata | ultima consegna | Finale (18) |
 
 ## 3. Verifica in sim v1.1 (`qa/longevita_plan.py`, `qa/econ_sim_long.py`, `qa/gest_model.py` v1.2; 4×5, senza ad)
 **Metodo:**
-- Le **decisioni costano tempo**: per ogni capitolo il reddito di Nina è × (1 − 0,5 × quota decisioni). Le quote sono 5% al cap 1, poi 17-49%.
+- Le **decisioni costano tempo**: per ogni capitolo il reddito di Kaia è × (1 − 0,5 × quota decisioni). Le quote sono 5% al cap 1, poi 17-49%.
 - Le tranche sono calibrate su **good eff 1,0**. Target per capitolo (curva appiattita rispetto alla v1, per lasciare spazio allo scarto del 21%): **30 / 50 / 65 / 80 / 90 / 95 / 100 / 105 / 108 / 110 / 110 / 110 / 112 / 114 / 116 min** (trama inclusa).
 - Le scadenze sono il 125% dei minuti di loop, **escluso il cap 1** (40 min).
 - (c) è modellata come ipotesi QA: il naive diventa average dal cap 6 dopo l'avviso in bolletta. (b): l'Assist parte dal capitolo successivo alla 1ª mora, alla 2ª proroga o al primo capitolo oltre 135 min.
@@ -132,9 +132,9 @@ Il cap 1 è identico allo Sprint 1: 8.400 LN, 40 min, giorno 24, 4,2583 gg/ciclo
 | Terrazze Alte | Ascensore a fune con potenza limitata: ogni salita costa corrente | Corrente |
 | Quartiere dei Limoneti | Solo fragili e refrigerati, scadenze strette | Contratti |
 | Promontorio del Faro | Vento: droni a terra con la raffica, consegne orbitali simboliche | Meteo + Officina |
-| Borgo Nuovo (OmniFreight ex hub) | Ogni settimana una zona torna a Viktor se non è difesa | Fronte |
+| Borgo Nuovo (GrayBox ex hub) | Ogni settimana una zona torna a Maxim se non è difesa | Fronte |
 | Rione Lanterne | Botteghe e lanterne: dal tramonto apre il mercato serale, la domanda raddoppia ma solo per 1 ciclo serale; le lanterne vanno accese (pad) per attirare clienti | Contratti + Corrente |
-| Colle delle Antenne | Quartiere alto di antenne e uffici, roccaforte OmniFreight: consegne in orario d'ufficio, quote contese ogni giorno, salita ripida per il furgone | Fronte + Rotte |
+| Colle delle Antenne | Quartiere alto di antenne e uffici, roccaforte GrayBox: consegne in orario d'ufficio, quote contese ogni giorno, salita ripida per il furgone | Fronte + Rotte |
 
 **Identità visiva dei distretti 5 e 6** (mappa, bandierine, UI; colore + motivo + icona per i daltonici):
 - **Rione Lanterne:** rosa `#C9719E`, motivo a quadretti, icona lanterna.
@@ -144,14 +144,14 @@ Il cap 1 è identico allo Sprint 1: 8.400 LN, 40 min, giorno 24, 4,2583 gg/ciclo
 - **Livello 1 "Cooperativa":**
   - il distretto riparte da Zaino, Scarpe e Insegna al livello 1;
   - +1 Stella della Rete (+10% valore pacco, tetto 10, come 08 §2.2).
-- **Livello 2 "Consorzio"** (dopo 5 Stelle): un **modificatore di regola** scelto da Nina alla Cassaforte, per esempio "Solo solare" o "Niente furgone".
+- **Livello 2 "Consorzio"** (dopo 5 Stelle): un **modificatore di regola** scelto da Kaia alla Cassaforte, per esempio "Solo solare" o "Niente furgone".
   - Ogni Rifondazione con modificatore dà **Medaglie di Rete**.
   - Le Medaglie comprano progetti di qualità della vita (colonnina rapida, bacheca a 4 cartellini), arredi e titoli.
 - **Livello 3 "Rete libera"** (10 Stelle): sblocca Solara infinita (§4.3) a difficoltà crescente.
 - Stelle e Medaglie **non si comprano mai**. Il secondo giro dura circa il 60% del primo (08).
 
 ### 4.3 Modalità "Solara infinita"
-- Distretti procedurali con un seed settimanale (lo stesso per tutti): pianta del deposito, quartieri, meteo, contratti e attacchi OmniFreight generati.
+- Distretti procedurali con un seed settimanale (lo stesso per tutti): pianta del deposito, quartieri, meteo, contratti e attacchi GrayBox generati.
 - **Sblocco (v1.2):** subito dopo il finale, partendo dal Livello di Rete 1 con un seed facile.
 - Scaling: **Livello di Rete N**. Ogni distretto completato alza la domanda del 5% e la difficoltà dei contratti, e aggiunge un "modificatore" ogni 5 livelli: blackout più frequenti, robot più fragili, marea, quartieri in sciopero.
 - **Specifiche tecniche (v1.1, da 12_REVIEW §4):**
@@ -164,21 +164,21 @@ Il cap 1 è identico allo Sprint 1: 8.400 LN, 40 min, giorno 24, 4,2583 gg/ciclo
 - L'obiettivo è **il punteggio di gestione**: netto della settimana, contratti puntuali, quartieri difesi, zero blackout. Non conta il grind delle LN.
 
 ### 4.4 Eventi e stagioni (allineate a 03 §3, 08 §2.4 e alla Risposta LiveOps in 10 §8)
-- **Stagioni "Segnali di ECO" S1-S4** (28 giorni): ogni stagione dà il tema al Fronte settimanale:
+- **Stagioni "Segnali di NULO" S1-S4** (28 giorni): ogni stagione dà il tema al Fronte settimanale:
   - S1: manifesti;
   - S2: Promontorio del Faro;
   - S3: ronde al Molo Basso;
   - S4: cantiere.
-  Nel post-game le stagioni aprono un **distretto temporaneo** con regola unica. Prima del cap 10 non si nomina ECO.
+  Nel post-game le stagioni aprono un **distretto temporaneo** con regola unica. Prima del cap 10 non si nomina NULO.
 - **Weekend del Segnale** (72 h): mini-diorama con economia propria.
-- **Settimanale:** Fronte OmniFreight (+1 contributo all'antenna co-op per quartiere difeso, missioni del pass) e quest di Mamma Rosa.
+- **Settimanale:** Fronte GrayBox (+1 contributo all'antenna co-op per quartiere difeso, missioni del pass) e quest di Auntie Lulu.
 - **Mensile:** antenna co-op (dal cap 12).
 - **Eventi di città** (riferimento: il Crane Lock Day di SSS2037): "Festa dei Limoni", "Sciopero dei traghetti". Durano 1-2 giorni, la domanda di un quartiere va ×3 e si preparano in anticipo con scorte e corrente.
 
 ### 4.5 Collezione
 - Album di Solara (08 §3), a cui si aggiungono:
   - **le cartoline dei quartieri** (una per contratto speciale);
-  - **il quaderno di Nonna Ada** (pagine di lore trovate nei distretti);
+  - **il quaderno di Oma Tilde** (pagine di lore trovate nei distretti);
   - **i robot minori**;
   - le livree di furgone e colonnine.
 - Tutto si ottiene giocando. A pagamento ci sono solo varianti di colore.
@@ -186,7 +186,7 @@ Il cap 1 è identico allo Sprint 1: 8.400 LN, 40 min, giorno 24, 4,2583 gg/ciclo
 ### 4.6 Classifiche asincrone (Google Play Games)
 - **Seed settimanale di Solara infinita:** punteggio di gestione, con leghe da 50 come i Weekend.
 - **Settimana perfetta:** classifica a soglie (badge), non competitiva.
-- **Corse di Samir:** come già previsto.
+- **Corse di Kenzo:** come già previsto.
 - Nessun backend proprio: si usano le classifiche di Play Games, con la difesa anti-cheat lato client e i limiti di 08 §5.
 - **Anti-cheat (v1.1, da 12_REVIEW §5), tutto sul client prima dell'invio, più moderazione:**
   1. **tetto del punteggio** calcolato dalle tabelle dati (massimo teorico good per distretto e livello); sopra il tetto non si invia e parte `lb_reject`;
@@ -201,7 +201,7 @@ Il cap 1 è identico allo Sprint 1: 8.400 LN, 40 min, giorno 24, 4,2583 gg/ciclo
 - 10 Stelle.
 - Consorzio con tutti i modificatori.
 - Livello di Rete 50 in Solara infinita.
-- Album e quaderno di Ada completi.
+- Album e quaderno di Tilde completi.
 - Le 4 stagioni.
 - Lega Oro.
 - Circa 60 achievement di Play.
@@ -212,7 +212,7 @@ Il cap 1 è identico allo Sprint 1: 8.400 LN, 40 min, giorno 24, 4,2583 gg/ciclo
 |---|---|---|
 | Settimana 1 | Cap 1-4: tutorial, primi contratti, corrente, furgone | Atto I in 4-6 giorni (03), D7 |
 | Settimane 2-3 | Cap 5-8: officina, notte, Fronte, refrigerati | Il primo quartiere difeso, la bolletta in attivo |
-| Settimane 4-6 | Cap 9-12: blackout, ECO, antenna co-op | Trama del Carico 0, la stagione in corso |
+| Settimane 4-6 | Cap 9-12: blackout, NULO, antenna co-op | Trama del Carico 0, la stagione in corso |
 | Settimane 7-8 | Cap 13-15 e finale (~24 h totali in ~60 giorni) | Epilogo "Puntuale" |
 | Mese 3 | 1-2 distretti post-game, prima Rifondazione | Stelle, distretto di stagione |
 
@@ -241,7 +241,7 @@ Il cap 1 è identico allo Sprint 1: 8.400 LN, 40 min, giorno 24, 4,2583 gg/ciclo
 **QA**
 1. Sim indipendente di `longevita_plan.py`: verificate le tranche v-long e il **rischio mora per il naive** (§3) e testate le soluzioni (a), (b) e (c).
 2. Misurare in playtest la quota decisioni/attesa (oggi è stimata): servono gli eventi di telemetria che separano routine, decisione e attesa.
-3. Il cap 1 è identico allo Sprint 1? Regression con tranche 8.400 e NONNO a 2:10.
+3. Il cap 1 è identico allo Sprint 1? Regression con tranche 8.400 e OLDO a 2:10.
 4. Solara infinita: seed deterministico (stesso seed = stesso distretto su tutti i dispositivi), scaling al Livello di Rete 50-100 senza overflow delle LN (servono long/double).
 5. Le classifiche di Play Games: controlli di plausibilità sul punteggio e sul tempo minimo per distretto.
 
