@@ -1,0 +1,162 @@
+using UnityEngine;
+using UnityEngine.UIElements;
+using UltimoMiglio.Core;
+
+namespace UltimoMiglio.Gameplay
+{
+    public enum PoiKind { Prendi, Consegna, Acquisto }
+
+    /// <summary>My Little Universe-style interaction point: raised rounded ground pad with a thick ink rim that pulses
+    /// (scale + emission), coloured by kind (prendi = blu, consegna = verde, acquisto = giallo), plus a floating billboard
+    /// chip (icon + max 2 words, Fredoka) drawn in the HUD world layer. The current tutorial target gets a bigger,
+    /// brighter pad and a vertical beacon; the others stay calm. Purely visual: gameplay stays in ProximityZone.</summary>
+    public sealed class InteractionPoint : MonoBehaviour
+    {
+        public PoiKind Kind; public string Label; public Texture2D Icon; public Font LabelFont;
+        public float Radius = 1.1f; public bool HasCard; public UpgradePad Pad; public UltimoMiglio.VFX.UM_PadFillRing Ring; public UltimoMiglio.VFX.UM_PadIcon PadIcon;
+        // Concept: Purchase = #F4C430, Pickup = teal, Delivery = menta; bordo bruno #3B2A20
+        public static readonly Color Blu = new(0.369f, 0.498f, 0.525f), Verde = new(0.561f, 0.788f, 0.659f), Giallo = new(0.957f, 0.769f, 0.188f), Ink = new(0.231f, 0.165f, 0.125f);
+
+        Transform _rim, _fill, _beacon; Material _fillMat, _beaconMat; Color _col;
+        VisualElement _chip; Label _text; UltimoMiglio.UI.HudController _hud; Camera _cam; TutorialManager _tut;
+        bool _active; float _phase;
+
+
+        void HideFloatingChips()
+        {
+            // QA #41: no floating Prendi/Scaffale/Pacchi chips — ground pads only
+            if (PadIcon) PadIcon.SetVisible(false);
+            var pt = GetComponent<UltimoMiglio.UI.World.PadTag>();
+            if (pt) { pt.enabled = false; Destroy(pt); }
+            for (int i = 0; i < transform.childCount; i++)
+            {
+                var c = transform.GetChild(i);
+                if (c.name == "PadTag" || c.name.StartsWith("PadIcon")) c.gameObject.SetActive(false);
+            }
+        }
+
+        public Color KindColor => Kind == PoiKind.Prendi ? Blu : Kind == PoiKind.Consegna ? Verde : Giallo;
+
+        void Start()
+        {
+            HideFloatingChips();
+            _col = KindColor; _phase = Random.value * 6f;
+            var sh = Shader.Find("Universal Render Pipeline/Unlit");
+            Material M(Color c) { var m = new Material(sh); m.SetColor("_BaseColor", c); if (m.HasProperty("_Color")) m.SetColor("_Color", c); return m; }
+            // Bordo bruno sottile (non disco pieno scuro)
+            _rim = Disc("POI_Rim", M(Ink), new Vector3(Radius * 2.15f, 0.06f, Radius * 2.15f), 0.035f);
+            _fillMat = M(_col);
+            // Riempimento saturo leggibile (Purchase = sole pieno; pickup/consegna teal/menta)
+            float fillA = Kind == PoiKind.Acquisto ? 0.92f : 0.78f;
+            _fillMat.color = new Color(_col.r, _col.g, _col.b, fillA);
+            _fill = Disc("POI_Fill", _fillMat, new Vector3(Radius * 1.95f, 0.08f, Radius * 1.95f), 0.05f);
+            _beaconMat = M(Color.Lerp(_col, Color.white, 0.35f));
+            _beacon = Disc("POI_Beacon", _beaconMat, new Vector3(0.14f, 1.6f, 0.14f), 1.6f);
+            _beacon.gameObject.SetActive(false);
+            _tut = FindAnyObjectByType<TutorialManager>();
+            if (PadIcon) PadIcon.SetVisible(false);
+            var pt = GetComponent<UltimoMiglio.UI.World.PadTag>(); if (pt) pt.enabled = false;
+        }
+
+        static Color Saturate(Color c, float k)
+        {
+            Color.RGBToHSV(c, out float h, out float sat, out float v);
+            return Color.HSVToRGB(h, Mathf.Clamp01(sat * k), Mathf.Clamp01(v * 1.05f));
+        }
+
+        Transform Disc(string n, Material m, Vector3 s, float y)
+        {
+            var g = GameObject.CreatePrimitive(PrimitiveType.Cylinder); g.name = n; Destroy(g.GetComponent<Collider>());
+            g.transform.SetParent(transform, false); g.transform.localPosition = new Vector3(0, y, 0); g.transform.localScale = s;
+            var r = g.GetComponent<Renderer>(); r.sharedMaterial = m; r.shadowCastingMode = UnityEngine.Rendering.ShadowCastingMode.Off;
+            return g.transform;
+        }
+
+        bool Available() => !Pad || (GameRoot.Ready && !double.IsInfinity(GameRoot.I.Eco.Cost(Pad.Kind)) && GameRoot.I.ActiveTime >= Pad.UnlockAtActiveSec);
+
+        void EnsureChip()
+        {
+            if (_chip != null) return;
+            var hideTag = GetComponent<UltimoMiglio.UI.World.PadTag>(); if (hideTag) hideTag.enabled = false;
+            // B2 P2: solo pad acquisto mostrano il costo in LN (chip); zone Prendi/Consegna restano senza chip
+            if (Kind != PoiKind.Acquisto || !Pad) return;
+            if (!_hud) _hud = FindFirstObjectByType<UltimoMiglio.UI.HudController>();
+            if (!_hud || _hud.Root == null) return;
+            _cam = Camera.main;
+            var layer = _hud.Root.Q("world-layer") ?? _hud.Root;
+            _chip = new VisualElement { name = "poi-chip", pickingMode = PickingMode.Ignore };
+            var s = _chip.style; s.position = Position.Absolute; s.flexDirection = FlexDirection.Row; s.alignItems = Align.Center;
+            s.translate = new Translate(Length.Percent(-50), Length.Percent(-100));
+            s.paddingLeft = 8; s.paddingRight = 12; s.paddingTop = 4; s.paddingBottom = 4;
+            s.backgroundColor = Kind == PoiKind.Acquisto ? Giallo : new Color(1f, 0.976f, 0.933f);
+            s.borderTopLeftRadius = s.borderTopRightRadius = s.borderBottomLeftRadius = s.borderBottomRightRadius = 999;
+            s.borderLeftWidth = s.borderRightWidth = s.borderTopWidth = s.borderBottomWidth = 6;
+            s.borderLeftColor = s.borderRightColor = s.borderTopColor = s.borderBottomColor = Ink;
+            var ic = new VisualElement { pickingMode = PickingMode.Ignore };
+            var i = ic.style; i.width = 28; i.height = 28; i.borderTopLeftRadius = i.borderTopRightRadius = i.borderBottomLeftRadius = i.borderBottomRightRadius = 36;
+            i.backgroundColor = Kind == PoiKind.Acquisto ? Ink : _col; i.alignItems = Align.Center; i.justifyContent = Justify.Center; i.marginRight = 12;
+            var img = new VisualElement { pickingMode = PickingMode.Ignore }; img.style.width = 18; img.style.height = 18;
+            if (Icon) { img.style.backgroundImage = Icon; img.style.unityBackgroundImageTintColor = new Color(1f, 0.976f, 0.933f); }
+            ic.Add(img);
+            _text = new Label(Label) { pickingMode = PickingMode.Ignore };
+            var t = _text.style; t.fontSize = Kind == PoiKind.Acquisto ? 18 : 16; t.color = Ink; t.unityFontStyleAndWeight = FontStyle.Bold; t.whiteSpace = WhiteSpace.NoWrap;
+            if (LabelFont) t.unityFontDefinition = FontDefinition.FromFont(LabelFont);
+            _chip.Add(ic); _chip.Add(_text); layer.Add(_chip);
+            var arrow = _hud.Root.Q("edge-arrow"); arrow?.BringToFront(); // the off-screen arrow is never under a chip/card
+        }
+
+        void LateUpdate()
+        {
+            if (!_fill) return;
+            bool avail = Available();
+            if (_rim.gameObject.activeSelf != avail) { _rim.gameObject.SetActive(avail); _fill.gameObject.SetActive(avail); }
+            var target = _tut ? _tut.CurrentTarget : null;
+            _active = avail && target && (target.position - transform.position).sqrMagnitude < 9f;
+            _beacon.gameObject.SetActive(_active);
+            float t = Time.time * (_active ? 4.5f : 2.2f) + _phase, k = 0.5f + 0.5f * Mathf.Sin(t);
+            float big = _active ? 1.12f : 1f, amp = _active ? 0.07f : 0.04f;
+            float sc = big * (1f + amp * k);
+            _rim.localScale = new Vector3(Radius * 2.15f * sc, 0.06f, Radius * 2.15f * sc);
+            _fill.localScale = new Vector3(Radius * 1.95f * sc, 0.08f, Radius * 1.95f * sc);
+            float baseA = Kind == PoiKind.Acquisto ? 0.92f : 0.78f;
+            var fill = Color.Lerp(_col, Color.white, (_active ? 0.22f : 0.08f) * k);
+            fill.a = baseA * (0.88f + 0.12f * k); // pulse leggibile
+            _fillMat.SetColor("_BaseColor", fill); if (_fillMat.HasProperty("_Color")) _fillMat.SetColor("_Color", fill);
+            if (_active) { _beacon.localScale = new Vector3(0.18f, 2.2f + 0.3f * k, 0.18f); _beaconMat.SetColor("_BaseColor", Color.Lerp(_col, Color.white, 0.3f + 0.4f * k)); }
+
+            EnsureChip();
+            if (_chip == null || !_cam) return;
+            if (Pad && GameRoot.Ready && Kind == PoiKind.Acquisto && _text != null) { var eco = GameRoot.I.Eco; double left = eco.Cost(Pad.Kind) - eco.S.PadPaid[(int)Pad.Kind]; if (!double.IsInfinity(left)) _text.text = Mathf.CeilToInt((float)Mathf.Max(0, (float)left)) + " LN"; }
+            var nina = GameRoot.I ? GameRoot.I.Nina : null;
+            bool near = nina && (nina.transform.position - transform.position).sqrMagnitude < 9f;
+            if (Ring && !Pad) Ring.SetProgress(near ? 1f : 0f);
+            if (PadIcon) { PadIcon.SetVisible(false); PadIcon.SetPlayerNear(near); }
+            var tag = GetComponent<UltimoMiglio.UI.World.PadTag>(); if (tag) tag.enabled = false;
+            // Offset mondo: più basso se il pad è in alto nello schermo, così la pillola non finisce sotto l'obiettivo
+            float bob = 0.12f * Mathf.Sin(Time.time * 2.4f + _phase);
+            Vector3 world = transform.position + Vector3.up * (1.55f + bob);
+            Vector3 sp = _cam.WorldToScreenPoint(world);
+            if (sp.z > 0 && sp.y > Screen.height * 0.72f)
+                sp = _cam.WorldToScreenPoint(transform.position + Vector3.up * (1.05f + bob * 0.5f));
+            bool show = avail && !(HasCard && near) && sp.z > 0 && sp.x > 0 && sp.x < Screen.width && sp.y > 0 && sp.y < Screen.height;
+            _chip.style.display = show ? DisplayStyle.Flex : DisplayStyle.None;
+            if (!show || _chip.panel == null) return;
+            var p = UltimoMiglio.UI.SafeAreaUtil.ScreenToPanel(_chip.panel, sp);
+            // QA v5 P2: non sotto la riga obiettivo; QA v6 P3: non tagliata sui bordi SX/DX
+            const float hudTopReserve = 92f;
+            if (p.y < hudTopReserve) p.y = hudTopReserve;
+            float panelW = _chip.panel.visualTree.worldBound.width;
+            if (panelW < 1f) panelW = Screen.width;
+            float halfChip = 70f; // pillola ~140px, anchor al centro (translate -50%)
+            const float edgePad = 10f;
+            if (p.x < halfChip + edgePad) p.x = halfChip + edgePad;
+            if (p.x > panelW - halfChip - edgePad) p.x = panelW - halfChip - edgePad;
+            _chip.style.left = p.x; _chip.style.top = p.y;
+            _chip.style.scale = new Scale(Vector3.one * (_active ? 1.12f : 1f));
+            // Chip sopra il world-layer ma sotto i controlli: porta in cima al world-layer
+            _chip.BringToFront();
+        }
+
+        void OnDestroy() { _chip?.RemoveFromHierarchy(); }
+    }
+}

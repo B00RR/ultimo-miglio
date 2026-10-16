@@ -13,15 +13,30 @@ Shader "UltimoMiglio/ToonDiorama"
         [IntRange] _Bands ("Bands", Range(2,3)) = 3
         _RampSoftness ("Band Softness", Range(0.001,0.3)) = 0.06
         _RampOffset ("Terminator Offset", Range(-0.5,0.5)) = 0.0
-        _ShadowTint ("Shadow Tint (Scuro caldo)", Color) = (0.62,0.47,0.45,1)
-        _ShadowStrength ("Shadow Strength", Range(0,1)) = 0.55
+        _ShadowTint ("Shadow Tint (#9E7873 caldo, guida §9)", Color) = (0.62,0.471,0.451,1)
+        _ShadowStrength ("Shadow Strength", Range(0,1)) = 0.6
+        _ShadowCool ("Shadow Cool Hint (lieve, mai blu/viola)", Range(0,0.3)) = 0.12
+        _ShadowSoft ("Shadow Edge Softness (PCF, anti-scalettatura)", Range(0.05,0.5)) = 0.35
         [Header(Rim)]
         _RimColor ("Rim Color (Crema)", Color) = (1,0.957,0.839,1)
         _RimPower ("Rim Power", Range(0.5,8)) = 3.5
-        _RimStrength ("Rim Strength", Range(0,1)) = 0.25
+        _RimStrength ("Rim Strength", Range(0,1)) = 0.3
         [Header(Variazione mondo)]
         _NoiseStrength ("Floor/Wall Tint Variation (0=off)", Range(0,0.2)) = 0
         _NoiseScale ("Variation Scale (1/m)", Range(0.05,2)) = 0.35
+        _TileVar ("Floor Tile Variation", Range(0,0.3)) = 0
+        _TileSize ("Floor Tile Size (m)", Range(0.25,4)) = 1
+        _FloorTint ("Floor Warm Tint / Lastra A (#F3E3C3)", Color) = (1,1,1,1)
+        _FloorTintB ("Lastra B (#E8D3AC)", Color) = (1,1,1,1)
+        _FloorTintC ("Lastra C (#E9D2A8)", Color) = (1,1,1,1)
+        _FloorBaseMix ("Floor Base Override (0=albedo, 1=lastre crema)", Range(0,1)) = 0
+        _GroutDark ("Floor Grout Darkening", Range(0,0.3)) = 0
+        [Header(Profondita v2.0)]
+        _HeightDark ("Height Gradient (base darker)", Range(0,0.5)) = 0.18
+        _HeightRange ("Height Range (m)", Range(0.5,6)) = 2.5
+        _WallAO ("Wall Base AO", Range(0,0.6)) = 0.3
+        _WallAOHeight ("Wall AO Height (m)", Range(0.05,1.5)) = 0.5
+        _TopLight ("Top Face Highlight", Range(0,0.4)) = 0.1
         [Header(Emission)]
         _EmissionColor ("Emission (night lamps)", Color) = (0,0,0,1)
         [Header(Outline)]
@@ -43,9 +58,15 @@ Shader "UltimoMiglio/ToonDiorama"
             half4 _ShadowTint; half _ShadowStrength;
             half4 _RimColor; half _RimPower; half _RimStrength;
             half4 _EmissionColor; half _NoiseStrength; half _NoiseScale;
+            half _TileVar; half _TileSize; half4 _FloorTint;
+            half4 _FloorTintB; half4 _FloorTintC; half _FloorBaseMix; half _GroutDark; half _ShadowCool; half _ShadowSoft;
+            half _HeightDark; half _HeightRange; half _WallAO; half _WallAOHeight; half _TopLight;
             half4 _OutlineColor; half _OutlineWidth; half _OutlineOn;
         CBUFFER_END
         TEXTURE2D(_BaseMap); SAMPLER(sampler_BaseMap);
+        // Globali v2.0 (UM_LookSettings): grading in-shader (post OFF su WebGL) + vignetta a terra in world-space
+        half _UM_Grade; half _UM_Exposure; half _UM_Contrast; half _UM_Saturation; half _UM_Glow; half4 _UM_Lift;
+        float4 _UM_Focus; half _UM_VignetteRange; half _UM_VignetteDark; half4 _UM_VignetteColor;
         ENDHLSL
 
         Pass
@@ -64,11 +85,11 @@ Shader "UltimoMiglio/ToonDiorama"
             #pragma multi_compile_instancing
             #include "Packages/com.unity.render-pipelines.universal/ShaderLibrary/Lighting.hlsl"
 
-            struct Attributes { float4 positionOS:POSITION; float3 normalOS:NORMAL; float2 uv:TEXCOORD0; float2 uvLM:TEXCOORD1; UNITY_VERTEX_INPUT_INSTANCE_ID };
+            struct Attributes { float4 positionOS:POSITION; float3 normalOS:NORMAL; float2 uv:TEXCOORD0; float2 uvLM:TEXCOORD1; half4 color:COLOR; UNITY_VERTEX_INPUT_INSTANCE_ID };
             struct Varyings {
                 float4 positionCS:SV_POSITION; float2 uv:TEXCOORD0; float3 positionWS:TEXCOORD1;
                 half3 normalWS:TEXCOORD2; half4 fogAndVL:TEXCOORD3; // xyz vertex add. lights, w fog
-                DECLARE_LIGHTMAP_OR_SH(uvLM, sh, 4);
+                DECLARE_LIGHTMAP_OR_SH(uvLM, sh, 4); half vao:TEXCOORD5;
                 UNITY_VERTEX_INPUT_INSTANCE_ID };
 
             Varyings vert(Attributes i)
@@ -78,7 +99,7 @@ Shader "UltimoMiglio/ToonDiorama"
                 VertexPositionInputs p = GetVertexPositionInputs(i.positionOS.xyz);
                 o.positionCS = p.positionCS; o.positionWS = p.positionWS;
                 o.normalWS = TransformObjectToWorldNormal(i.normalOS);
-                o.uv = TRANSFORM_TEX(i.uv, _BaseMap);
+                o.uv = TRANSFORM_TEX(i.uv, _BaseMap); o.vao = i.color.a; // AO di vertice (alpha), 1 = nessuna
                 OUTPUT_LIGHTMAP_UV(i.uvLM, unity_LightmapST, o.uvLM);
                 OUTPUT_SH(o.normalWS, o.sh);
                 half3 vl = 0;
@@ -107,6 +128,20 @@ Shader "UltimoMiglio/ToonDiorama"
                 return saturate((f + t) / steps);
             }
 
+            // Tonemap morbido + contrasto + saturazione + lift viola + "fake bloom" (solo ALU)
+            half3 Grade(half3 c)
+            {
+                c *= _UM_Exposure;
+                half lum = dot(c, half3(0.299h, 0.587h, 0.114h));
+                c += c * smoothstep(0.65h, 1.1h, lum) * _UM_Glow * 0.35h;
+                c = c / (1.0h + c * 0.18h) * 1.18h;
+                c = saturate((c - 0.5h) * _UM_Contrast + 0.5h);
+                lum = dot(c, half3(0.299h, 0.587h, 0.114h));
+                c = lerp(lum.xxx, c, _UM_Saturation);
+                c = c + _UM_Lift.rgb * (1.0h - c) * 0.35h * (1.0h - lum);
+                return saturate(c);
+            }
+
             half4 frag(Varyings i) : SV_Target
             {
                 UNITY_SETUP_INSTANCE_ID(i);
@@ -119,15 +154,43 @@ Shader "UltimoMiglio/ToonDiorama"
                     albedo.rgb *= 1.0h + (nv - 0.5h) * 2.0h * _NoiseStrength;
                 }
                 half3 n = normalize(i.normalWS);
+                half up = saturate(n.y);
+                half isFloor = step(0.9h, up) * (1.0h - step(0.25h, (half)i.positionWS.y));
+                half2 fw = (half2)fwidth(i.positionWS.xz / _TileSize) * 1.5h + 0.02h; // derivate fuori dal branch; fuga stabile in pixel
+                if ((_TileVar > 0.001h || _FloorBaseMix > 0.001h) && isFloor > 0.5h)
+                {
+                    // v2.1 (#48): lastre piccole (~0,25 m) crema/tufo: 3 toni della guida per cella + fuga sottile. Solo ALU.
+                    float2 tuv = i.positionWS.xz / _TileSize;
+                    float2 cell = floor(tuv);
+                    half h = (half)Hash21(cell);
+                    half3 slab = h < 0.5h ? lerp(_FloorTint.rgb, _FloorTintB.rgb, h * 2.0h) : lerp(_FloorTintB.rgb, _FloorTintC.rgb, h * 2.0h - 1.0h);
+                    albedo.rgb = lerp(albedo.rgb * _FloorTint.rgb, slab, _FloorBaseMix);
+                    albedo.rgb *= 1.0h + ((half)Hash21(cell + 7.1) - 0.5h) * 2.0h * _TileVar;
+                    // Concept: togli 1 fuga ogni 2 + fuga #E8D3AC ~30% (fw clampato: niente rete densa in camera)
+                    float2 tuv2 = tuv * 0.5;
+                    half2 fw2 = min(fw * 0.5h, half2(0.045h, 0.045h));
+                    half2 e = (half2)abs(frac(tuv2) - 0.5);
+                    half grout = max(smoothstep(0.5h - fw2.x, 0.5h, e.x), smoothstep(0.5h - fw2.y, 0.5h, e.y));
+                    half3 groutCol = half3(0.910h, 0.827h, 0.675h); // #E8D3AC
+                    half ga = grout * 0.30h; // opacita ~30% come da Concept
+                    albedo.rgb = lerp(albedo.rgb, groutCol, ga);
+                }
                 float4 sc = TransformWorldToShadowCoord(i.positionWS);
                 Light L = GetMainLight(sc);
                 half ramp = Ramp(dot(n, L.direction));
-                half shadow = smoothstep(0.3h, 0.7h, L.shadowAttenuation); // toon edge, but keeps PCF filtering (no stair-stepping)
+                half shadow = smoothstep(0.5h - _ShadowSoft, 0.5h + _ShadowSoft, L.shadowAttenuation); // toon edge, but keeps PCF filtering (no stair-stepping)
                 half lit = min(ramp, shadow);
-                half3 shadowCol = lerp(1.0h.xxx, _ShadowTint.rgb, _ShadowStrength);
-                half3 direct = lerp(shadowCol, 1.0h.xxx, lit) * L.color * 0.82h; // headroom: lit albedo stays ~palette hex in LDR
-                half3 ambient = SAMPLE_GI(i.uvLM, i.sh, n) * 0.25h;
-                half3 col = albedo.rgb * (direct + ambient);
+                half3 sTint = lerp(_ShadowTint.rgb, _ShadowTint.rgb * half3(0.94h, 0.98h, 1.06h), _ShadowCool); // tinta lieve piu fresca, resta calda
+                half3 shadowCol = lerp(1.0h.xxx, sTint, _ShadowStrength);
+                half3 direct = lerp(shadowCol, L.color, lit); // v2.0: ombre colorate (tinta fredda) contro luce calda
+                half3 ambient = SAMPLE_GI(i.uvLM, i.sh, n) * 0.3h;
+                half3 col = albedo.rgb * (direct * 0.85h + ambient);
+                float3 pw = i.positionWS;
+                half hgt = saturate((half)pw.y / _HeightRange);
+                col *= lerp(1.0h - _HeightDark, 1.0h, hgt);
+                half vertical = 1.0h - up;
+                col *= (1.0h - _WallAO * vertical * (1.0h - smoothstep(0.0h, _WallAOHeight, (half)pw.y))) * lerp(0.55h, 1.0h, i.vao);
+                col *= 1.0h + _TopLight * smoothstep(0.7h, 0.95h, n.y) * saturate((half)pw.y * 2.0h) * lit;
                 #ifdef _ADDITIONAL_LIGHTS
                     uint cnt = GetAdditionalLightsCount();
                     for (uint li = 0u; li < cnt; ++li) {
@@ -138,9 +201,17 @@ Shader "UltimoMiglio/ToonDiorama"
                 #endif
                 col += albedo.rgb * i.fogAndVL.xyz;
                 half3 v = SafeNormalize(GetWorldSpaceViewDir(i.positionWS));
-                half rim = pow(1.0h - saturate(dot(n, v)), _RimPower) * lit;
-                col += _RimColor.rgb * smoothstep(0.4h, 0.6h, rim) * _RimStrength;
+                half fr = pow(1.0h - saturate(dot(n, v)), _RimPower);
+                fr = smoothstep(0.25h, 0.7h, fr) * _RimStrength * (1.0h - isFloor);
+                col += fr * lerp(unity_AmbientSky.rgb * 0.5h, _RimColor.rgb, lit);
                 col += _EmissionColor.rgb;
+                if (_UM_VignetteDark > 0.001h)
+                {
+                    half dist = (half)distance(pw.xz, _UM_Focus.xz);
+                    half vg = smoothstep((half)_UM_Focus.w, (half)_UM_Focus.w + _UM_VignetteRange, dist) * _UM_VignetteDark;
+                    col = lerp(col, col * _UM_VignetteColor.rgb, vg);
+                }
+                if (_UM_Grade > 0.5h) col = Grade(col);
                 col = MixFog(col, i.fogAndVL.w);
                 return half4(col, 1);
             }

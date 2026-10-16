@@ -1,0 +1,97 @@
+#phone-button, #phone-key-hint, #phone-badge { display: none !important; }
+/* HUD v2 + minimale (issue #38). Units = dp; values from Tokens.uss. */
+.top-bar { padding: var(--sp-2) var(--sp-2) 0 var(--sp-2); flex-direction: row; align-items: flex-start; }
+.top-left { max-width: 55%; }
+#currency-pill { height: 40px; min-width: 96px; max-width: 100%; padding: 0 10px; border-radius: 20px; border-width: 2px;
+    border-color: var(--c-ink); background-color: var(--c-paper); flex-wrap: nowrap; align-items: center; }
+.currency { margin-right: var(--sp-2); }
+.day-group { margin-right: 0; }
+.currency .icon, #currency-pill .icon { width: 22px; height: 22px; }
+.currency-value { font-size: 18px; -unity-font-definition: url("project://database/Assets/_Game/UI/Fonts/Fredoka-Bold.ttf"); -unity-font-style: normal; letter-spacing: 0; margin-left: 4px; color: var(--c-ink); }
+.day-value { font-size: 14px; -unity-font-definition: url("project://database/Assets/_Game/UI/Fonts/Fredoka-SemiBold.ttf"); color: var(--c-ink); margin: 0; padding: 0; white-space: nowrap; }
+.icon-coin { -unity-background-image-tint-color: var(--c-terracotta); }
+.icon-bolt { -unity-background-image-tint-color: var(--c-teal); }
+#toll-chip { height: 28px; margin-top: var(--sp-1); padding: 0 var(--sp-2); border-radius: 14px; border-width: 2px; border-color: var(--c-ink); background-color: var(--c-teal); }
+#toll-chip .icon { width: 16px; height: 16px; }
+#toll-value { font-size: 13px; -unity-font-definition: url("project://database/Assets/_Game/UI/Fonts/Fredoka-Bold.ttf"); color: var(--c-paper); margin-left: var(--sp-1); }
+.toll-tag { font-size: 11px; padding: 0 4px; border-width: 2px; background-color: var(--c-teal); color: var(--c-paper); }
+#toast { height: 28px; margin-top: var(--sp-1); padding: 0 var(--sp-2); border-width: 0; border-radius: 14px; background-color: var(--c-ink); }
+#toast-text { font-size: 13px; color: var(--c-paper); -unity-font-definition: url("project://database/Assets/_Game/UI/Fonts/Fredoka-SemiBold.ttf"); }
+#phone-button { width: 40px; height: 40px; margin-left: var(--sp-2); border-radius: 12px; border-width: 2px; border-bottom-width: 4px;
+    border-color: var(--c-ink); background-color: var(--c-terracotta); transition-property: scale, translate, border-bottom-width; transition-duration: 0.08s; }
+#phone-button:active { translate: 0 2px; border-bottom-width: 2px; }
+#phone-button .icon { width: 20px; height: 20px; -unity-background-image-tint-color: var(--c-paper); }
+.badge { top: -4px; right: -4px; min-width: 14px; height: 14px; border-radius: 7px; border-width: 1px; border-color: var(--c-ink); background-color: var(--c-sun); color: var(--c-ink); font-size: 9px; padding: 0 2px; -unity-font-definition: url("project://database/Assets/_Game/UI/Fonts/Fredoka-Bold.ttf"); }
+.key-hint { bottom: -14px; left: -8px; right: -8px; font-size: 9px; -unity-text-outline-width: 1px; }
+#settings-button, .settings-btn { width: 32px; height: 32px; border-radius: 10px; background-color: #7A4A2E; border-width: 2px; border-color: #3B2A20; align-items: center; justify-content: center; margin-right: 4px; opacity: 0.9; }
+#settings-button .icon, .settings-btn .icon { width: 16px; height: 16px; -unity-background-image-tint-color: #F3E3C3; }
+.icon-gear { background-image: url("project://database/Assets/_Game/UI/Icons/ic_gear.png"); -unity-background-image-tint-color: var(--c-ink); }
+.tutorial-objective { position: absolute; left: 8px; right: 96px; top: 48px; height: 28px; max-height: 28px; padding: 2px 10px; display: flex;
+    border-radius: 12px; border-width: 2px; border-color: var(--c-ink); background-color: var(--c-paper);
+    font-size: 13px; -unity-font-definition: url("project://database/Assets/_Game/UI/Fonts/Fredoka-SemiBold.ttf"); color: var(--c-ink);
+    white-space: nowrap; text-overflow: ellipsis; overflow: hidden; -unity-text-align: middle-left; }
+.top-center { top: 76px; }
+.um-portrait .top-center { top: 76px; }
+#room-pill { min-height: 28px; min-width: 100px; max-width: 70%; padding: 2px var(--sp-2); border-radius: 14px; border-width: 2px; border-color: var(--c-ink); background-color: var(--c-paper); justify-content: center; }
+#room-pill .icon { width: 14px; height: 14px; }
+#room-name { font-size: 13px; -unity-font-definition: url("project://database/Assets/_Game/UI/Fonts/Fredoka-Bold.ttf"); white-space: nowrap; text-overflow: ellipsis; overflow: hidden; -unity-text-align: middle-center; margin-left: 4px; letter-spacing: 0; }
+.ada-band { position: absolute; left: 0; right: 0; flex-direction: row; justify-content: center; }
+.ada-note { width: 86%; max-width: 360px; height: 40px; max-height: 40px; overflow: hidden; flex-direction: row; align-items: center;
+    padding: 0 10px; border-radius: 12px; border-width: 2px; border-bottom-width: 3px; border-color: var(--c-ink); background-color: var(--c-paper);
+    transition-property: opacity, translate, scale; transition-duration: 0.2s, 0.2s, 0.12s; }
+.ada-note--in, .ada-note--out { opacity: 0; translate: 0 -6px; }
+.ada-note--nudge { scale: 1.02 1.02; }
+.ada-face { display: none; width: 0; height: 0; margin: 0; padding: 0; }
+.ada-col { flex-shrink: 1; flex-grow: 1; min-width: 0; flex-direction: row; align-items: center; }
+.ada-name { display: none; height: 0; margin: 0; padding: 0; font-size: 0; }
+.ada-text { font-size: 13px; color: var(--c-ink); white-space: nowrap; text-overflow: ellipsis; overflow: hidden; max-height: 28px; height: 28px; -unity-paragraph-spacing: 0; -unity-text-align: middle-left; margin: 0; padding: 0; }
+.cta, .chunky { height: 48px; border-radius: var(--r-btn); border-width: var(--bw); border-bottom-width: 6px; border-color: var(--c-ink); background-color: var(--c-terracotta);
+    color: #FFF9EE; font-size: 16px; -unity-font-definition: url("project://database/Assets/_Game/UI/Fonts/Fredoka-Bold.ttf"); -unity-text-align: middle-center; }
+.cta:active, .chunky:active { translate: 0 3px; border-bottom-width: 3px; }
+.pad-card { min-width: 96px; max-width: 140px; max-height: 120px; padding: 6px 8px; border-radius: 10px; border-width: 2px; border-color: var(--c-ink); background-color: var(--c-paper); overflow: hidden; }
+#pad-title { font-size: 12px; -unity-font-definition: url("project://database/Assets/_Game/UI/Fonts/Fredoka-Bold.ttf"); white-space: nowrap; text-overflow: ellipsis; overflow: hidden; -unity-text-align: middle-center; letter-spacing: 0; max-width: 120px; max-height: 16px; }
+#pad-price { font-size: 14px; -unity-font-definition: url("project://database/Assets/_Game/UI/Fonts/Fredoka-Bold.ttf"); letter-spacing: 0; }
+#pad-lock { font-size: 11px; }
+.pad-card .progress { width: 100%; min-width: 80px; height: 6px; margin-top: 4px; border-width: 1px; border-radius: 3px; }
+.pad-card .icon { width: 16px; height: 16px; }
+.world-anchored--flipped { translate: -50% 0; }
+.cassa-card { padding: 4px 8px; border-radius: 10px; border-width: 2px; max-width: 140px; max-height: 80px; overflow: hidden; }
+#cassa-amount { font-size: 14px; -unity-font-definition: url("project://database/Assets/_Game/UI/Fonts/Fredoka-Bold.ttf"); }
+#cassa-state { font-size: 10px; white-space: nowrap; text-overflow: ellipsis; overflow: hidden; max-width: 120px; }
+#cassa-x2 { font-size: 11px; margin-top: 2px; padding: 1px 6px; display: none; }
+.stack-pill { font-size: 14px; padding: 2px 8px; border-width: 2px; -unity-font-definition: url("project://database/Assets/_Game/UI/Fonts/Fredoka-Bold.ttf"); }
+#buff-chip { padding: 2px 6px; }
+.collect-amount { font-size: 16px; -unity-font-definition: url("project://database/Assets/_Game/UI/Fonts/Fredoka-Bold.ttf"); -unity-text-outline-width: 1.5px; }
+.bottom-dock { bottom: 24px; }
+#safe-card { width: 92%; max-width: 420px; padding: 14px 16px; border-radius: 18px; border-width: var(--bw); }
+#safe-toll { padding: 4px 8px; margin-bottom: 8px; margin-right: 28px; border-radius: 10px; }
+#safe-toll-text { font-size: 12px; }
+#safe-title { font-size: 20px; -unity-font-definition: url("project://database/Assets/_Game/UI/Fonts/Fredoka-Bold.ttf"); }
+#safe-day { font-size: 13px; }
+#safe-installment { font-size: 15px; margin-top: 4px; }
+.progress { height: 10px; border-radius: 5px; border-width: 2px; margin-top: 6px; }
+#safe-progress-text { font-size: 13px; }
+#safe-close { top: 6px; right: 8px; width: 32px; height: 32px; font-size: 22px; }
+#safe-card .icon { width: 22px; height: 22px; }
+#joystick-base { width: 112px; height: 112px; border-radius: 56px; border-width: 2px; background-color: var(--c-paper-glass); border-color: var(--c-ink-glass); }
+#joystick-knob { width: 54px; height: 54px; border-radius: 27px; border-width: var(--bw); background-color: var(--c-terracotta); border-color: var(--c-ink); }
+#edge-arrow-head { width: 36px; height: 36px; border-radius: 18px; border-width: 2px; }
+#edge-arrow-head .icon { width: 20px; height: 20px; }
+#edge-arrow-label { margin-top: 4px; padding: 2px 8px; font-size: 12px; border-width: 2px; }
+#target-marker { width: 18px; height: 18px; border-radius: 9px; border-width: 2px; }
+.hud--minimal #toll-chip,
+.hud--minimal #room-pill,
+.hud--minimal .bolt-group,
+.hud--minimal #phone-badge,
+.hud--minimal #phone-key-hint,
+.hud--minimal #cassa-x2 { display: none; }
+.hud--minimal .top-center { display: none; }
+
+/* QA #41: Ada max 36dp one line */
+.ada-band { top: 48px !important; height: 36px !important; max-height: 36px !important; overflow: hidden; }
+.ada-note { height: 36px !important; max-height: 36px !important; padding: 2px 10px !important; overflow: hidden; }
+.ada-text { font-size: 14px !important; white-space: nowrap !important; max-height: 36px !important; }
+.ada-face, .ada-name { display: none !important; }
+.pad-tag, .pad-card, .cassa-card { display: none !important; }
+#target-marker { display: none !important; }
+#edge-arrow-label { font-size: 12px; max-width: 120px; }

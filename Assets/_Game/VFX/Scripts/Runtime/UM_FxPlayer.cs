@@ -8,9 +8,9 @@ namespace UltimoMiglio.VFX
 {
     public class UM_FxPlayer : MonoBehaviour
     {
-        public enum Fx { PackagePop, Coins, Upgrade, PackagePickup, PackageDeliver, UpgradeComplete, Dust }
+        public enum Fx { PackagePop, Coins, Upgrade, PackagePickup, PackageDeliver, UpgradeComplete, Dust, Purchase }
         [Header("Prefab (Assets/_Game/VFX/Prefabs)")]
-        public GameObject packagePop, coins, upgrade, packagePickup, packageDeliver, upgradeComplete;
+        public GameObject packagePop, coins, upgrade, packagePickup, packageDeliver, upgradeComplete, purchase;
         public GameObject coinFlyer;
         [Range(1, 8)] public int poolSize = 4;
         [Range(4, 24)] public int coinFlyerPool = 12;
@@ -26,7 +26,7 @@ namespace UltimoMiglio.VFX
         {
             _i = this;
             Fill(Fx.PackagePop, packagePop); Fill(Fx.Coins, coins); Fill(Fx.Upgrade, upgrade);
-            Fill(Fx.PackagePickup, packagePickup); Fill(Fx.PackageDeliver, packageDeliver); Fill(Fx.UpgradeComplete, upgradeComplete);
+            Fill(Fx.PackagePickup, packagePickup); Fill(Fx.PackageDeliver, packageDeliver); Fill(Fx.UpgradeComplete, upgradeComplete); Fill(Fx.Purchase, purchase);
             if (coinFlyer)
             {
                 int n = Mathf.Max(4, Mathf.RoundToInt(coinFlyerPool * UM_QualityTier.ParticleScale));

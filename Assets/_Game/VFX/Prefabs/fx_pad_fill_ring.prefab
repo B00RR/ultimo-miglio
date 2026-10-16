@@ -136,6 +136,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: UltimoMiglio.VFX::UltimoMiglio.VFX.UM_PadFillRing
   ring: {fileID: 6466952396971395500}
+  kind: 0
   followSpeed: 8
   pulseSpeed: 2.2
   flashTime: 0.45
