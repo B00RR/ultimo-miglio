@@ -21,8 +21,25 @@ namespace UltimoMiglio.Gameplay
             {
                 var o = Over[i]; if (o == self || o.transform.IsChildOf(t) || !IsAgent(o)) continue;
                 if (Physics.ComputePenetration(self, self.transform.position, self.transform.rotation, o, o.transform.position, o.transform.rotation, out var dir, out var dist))
-                { dir.y = 0; if (dir.sqrMagnitude > 1e-6f) t.position += dir.normalized * Mathf.Min(dist, 0.03f); }
+                { dir.y = 0; if (dir.sqrMagnitude > 1e-6f) { var mv = dir.normalized * Mathf.Min(dist, 0.03f); if (!StaticAhead(t, self, mv)) t.position += mv; } } // mai spinto dentro un muro
             }
+        }
+
+        static readonly RaycastHit[] SepHits = new RaycastHit[8];
+        static bool StaticAhead(Transform t, Collider self, Vector3 mv)
+        {
+            var c = self.bounds.center; float r = Mathf.Max(self.bounds.extents.x, self.bounds.extents.z);
+            int n = Physics.SphereCastNonAlloc(c, r, mv.normalized, SepHits, mv.magnitude + 0.02f, ~0, QueryTriggerInteraction.Ignore);
+            for (int i = 0; i < n; i++) { var h = SepHits[i].collider; if (h == self || h.transform.IsChildOf(t) || IsAgent(h) || h.attachedRigidbody) continue; if (SepHits[i].distance > 0f) return true; }
+            return false;
+        }
+
+        /// <summary>#111: aggiramento di un solido statico: prova uno spostamento laterale (sinistra, poi destra) con Slide, quindi sempre con collisioni.</summary>
+        public static Vector3 Sidestep(Transform t, Vector3 step, float radius)
+        {
+            step.y = 0; var side = new Vector3(-step.z, 0, step.x);
+            var a = Slide(t, side, radius); if (a.sqrMagnitude > 1e-10f) return a;
+            return Slide(t, -side, radius);
         }
 
         /// <summary>Muove t di step (piano XZ) senza attraversare collider solidi; ritorna lo spostamento applicato.</summary>

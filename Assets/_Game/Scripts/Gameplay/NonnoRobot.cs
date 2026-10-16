@@ -142,10 +142,10 @@ namespace UltimoMiglio.Gameplay
             if (AgentMove.LastBlockedByAgent) { _stuckT = 0; _lastPos = transform.position; _curSpeed = 0f; if (d.sqrMagnitude < 2.25f) return true; return false; } // #111: Nina sulla meta: carica/scarica da vicino, mai attraverso
             AgentMove.Face(transform, applied.sqrMagnitude > 1e-8f ? applied : d, Time.deltaTime); // #59
             _curSpeed = Time.deltaTime > 0 ? applied.magnitude / Time.deltaTime : 0f;
-            // Anti-stallo #111: incastrato su un solido statico per 2 s avanza dritto a velocità normale (niente teletrasporto alla meta)
+            // Anti-stallo #111: incastrato su un solido statico per 2 s aggira di lato con collisioni (niente teletrasporto, mai attraverso i solidi)
             if ((transform.position - _lastPos).sqrMagnitude < 1e-5f) _stuckT += Time.deltaTime;
             else if (applied.sqrMagnitude > 1e-8f) _stuckT = 0;
-            if (_stuckT > 2f) { var step = Vector3.ClampMagnitude(d.normalized * WalkSpeed * Time.deltaTime, d.magnitude); transform.position += step; _curSpeed = WalkSpeed; }
+            if (_stuckT > 2f) { var step = Vector3.ClampMagnitude(d.normalized * WalkSpeed * Time.deltaTime, d.magnitude); var sd = AgentMove.Sidestep(transform, step, BodyRadius); if (sd.sqrMagnitude > 1e-10f) { _stuckT = 0; _curSpeed = sd.magnitude / Mathf.Max(Time.deltaTime, 1e-5f); } }
             _lastPos = transform.position;
             return false;
         }

@@ -28,8 +28,8 @@ namespace UltimoMiglio.Gameplay
                 var step = Vector3.ClampMagnitude(d.normalized * Speed * Time.deltaTime, d.magnitude);
                 var ap = AgentMove.Slide(transform, step, BodyRadius);
                 // #111: niente più teletrasporto al Target. Fermo davanti a un personaggio: si aspetta in fila.
-                // Incastrato su un solido statico da più di 1,5 s: avanza dritto a velocità normale (nessun salto).
-                if (ap.sqrMagnitude < 1e-10f && !AgentMove.LastBlockedByAgent) { _stuck += Time.deltaTime; if (_stuck > 1.5f) { transform.position += step; ap = step; } }
+                // Incastrato su un solido statico da più di 1,5 s: prova ad aggirarlo di lato, sempre con collisioni (mai attraverso muri/scaffali).
+                if (ap.sqrMagnitude < 1e-10f && !AgentMove.LastBlockedByAgent) { _stuck += Time.deltaTime; if (_stuck > 1.5f) ap = AgentMove.Sidestep(transform, step, BodyRadius); }
                 else if (ap.sqrMagnitude > 1e-10f) _stuck = 0;
                 AgentMove.Face(transform, ap.sqrMagnitude > 1e-8f ? ap : d, Time.deltaTime); cur = Time.deltaTime > 0 ? ap.magnitude / Time.deltaTime : 0f;
             }
