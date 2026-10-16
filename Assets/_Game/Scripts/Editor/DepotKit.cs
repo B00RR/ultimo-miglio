@@ -129,7 +129,10 @@ namespace UltimoMiglio.EditorTools
             go.isStatic = true;
             if (_mat) foreach (var r in go.GetComponentsInChildren<Renderer>()) r.sharedMaterials = System.Array.ConvertAll(r.sharedMaterials, m => m && m.name.Contains("Emissive") && _emi ? _emi : _mat);
             foreach (var c in go.GetComponentsInChildren<Collider>()) Object.DestroyImmediate(c);
-            if (solid) { b = Bounds(go); var bc = go.AddComponent<BoxCollider>(); bc.center = go.transform.InverseTransformPoint(b.center); var ls = go.transform.lossyScale; var sz = Quaternion.Inverse(go.transform.rotation) * b.size; bc.size = new Vector3(Mathf.Abs(sz.x / ls.x), Mathf.Abs(sz.y / ls.y), Mathf.Abs(sz.z / ls.z)); }
+            b = Bounds(go);
+            // #58: muri/archi sempre solidi; prop a terra alti >25cm (vasi, casse, set) solidi; tappeti/decal no
+            if (!solid && (wall || (!onTop && b.min.y < 0.3f && b.size.y > 0.25f && Mathf.Max(b.size.x, b.size.z) < 6f))) solid = true;
+            if (solid) { var bc = go.AddComponent<BoxCollider>(); bc.center = go.transform.InverseTransformPoint(b.center); var ls = go.transform.lossyScale; var sz = Quaternion.Inverse(go.transform.rotation) * b.size; bc.size = new Vector3(Mathf.Abs(sz.x / ls.x), Mathf.Abs(sz.y / ls.y), Mathf.Abs(sz.z / ls.z)); }
             return true;
         }
 
