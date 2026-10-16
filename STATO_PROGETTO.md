@@ -1,7 +1,7 @@
 # STATO PROGETTO — Ultimo Miglio
 
 > Punto di ingresso unico per chiunque (persona o agente) lavori su questo repo. Aggiornalo **nella stessa PR** in cui completi qualcosa.
-> Ultimo aggiornamento: 2026-10-16 16:28 (Europe/Rome).
+> Ultimo aggiornamento: 2026-10-16 17:18 (Europe/Rome).
 
 ## 1. Il gioco
 - **Ultimo Miglio**: gioco mobile **Android**, **Unity 6 (6000.3) URP**.
@@ -41,6 +41,12 @@
 - Documentazione di design: bibbia, core loop, tech, UI, retention, sprint 1, gestionale, longevità, cap. 1 completo, protocollo Unity.
 
 ## 5. IN CORSO (oggi 16/10)
+- **Fix cap. 1 dal test di Lorenzo (build 7011805), obiettivo: tutto su main entro le 19:30, build entro le 20:00**:
+  - Tech Lead: PR della CI veloce (circa 17:00), #188 vendite fantasma (17:45), #189 frecce del tutorial (18:45), #170 da verificare (19:00).
+  - UI/UX: #185 angoli bianchi (PR entro le 17:00), #186 font e cartellini (PR entro le 18:45), #171 da verificare (19:00).
+  - 3D Artist: #187 zone a terra (18:15). VFX: #191 scatti (PR entro le 18:45). Narrative: PR #192 testi (19:00), poi in pausa.
+  - Build & Release: #184 cap DPR (19:00), build unica (19:30), #179 dopo.
+  - Dopo la build: #125, #168, #165, #97. La #175 resta fuori. La #190 è chiusa (Kaia è giusto).
 - **main @ 7dd1767** — QA live **v5 VIA** (PR #55: #47 deposito + #48 luce/camera). Build QA su `build/WebGL` :8777; art night su `build/WebGL_next` :8778 (non toccare).
 - P2 aperti da QA v5: camera follow (Nina esce/coperta), pillola prezzo LN sotto riga obiettivo.
 - **Merge del ramo `animator`** (fix camminata): conflitto su `chr_nina_vela.fbx` e `bot_nonno.fbx`.
@@ -151,7 +157,10 @@ Ogni ruolo lavora solo sulle issue con la propria etichetta `ruolo:*`, sempre co
 
 Voci più recenti in alto. Formato: `AAAA-MM-GG HH:MM` (Europe/Rome) — [commit] — descrizione.
 
-- 2026-10-16 16:28 — UI/UX — etichette #186: Baloo 2 (titoli e valori) e Fredoka Medium (testo), OFL, Font Asset TextCore; cartellino prezzo su insegna di noce, ombra e contorno bruni, crema al posto del bianco. I 9-slice della #185 non sono toccati.
+- 2026-10-16 17:18 — UI/UX — merge di `origin/main` nel ramo `ui/186-font-etichette` (niente rebase): entra il fix #185 (angoli 9-slice RGBA) e le zone #187. Il prezzo dei pad resta sull'insegna (#186), senza il font dinamico.
+- 2026-10-16 16:28 — UI/UX — etichette #186: Baloo 2 (titoli e valori) e Fredoka Medium (testo), OFL, Font Asset TextCore; cartellino prezzo su insegna di noce, ombra e contorno bruni, crema al posto del bianco.
+- 2026-10-16 16:25 — UI/UX — [aa5f033](https://github.com/B00RR/ultimo-miglio/commit/aa5f033c699f420dfd939519cc67dc485bc3b2af) — fix #185 (ramo `ui/185-angoli-9slice`): gli angoli bianchi dei riquadri arrotondati venivano dal 9-slice di `tex_cardboard_panel.png` e `tex_wood_panel.png`, PNG RGB senza alpha (angoli opachi) più il bordo sprite a 0 e, sui Button, lo sprite bianco del tema. Ora i pannelli sono RGBA con angoli trasparenti, mesh Full Rect, RGBA32 su WebGL; test EditMode `UiTextureAlpha185Tests`.
+- 2026-10-16 16:15 — Producer — Responsabili e scadenze per #185-#191, #170, #171, #179, #192, #168, #165, #125, #97. Assignee su GitHub non usabili (un solo account B00RR): il responsabile è scritto in un commento su ogni issue.
 - 2026-10-16 15:22 — Producer — Regola di Lorenzo (vincolo 8): merge su main solo Code Reviewer, DevOn, Lorenzo; main protetto. Avvisati tutti.
 - 2026-10-16 15:20 — Producer — Regola nuova di Lorenzo sull'autore dei commit (vincolo 7): ruolo + `@bokobay.invalid`, avvisati tutti gli agenti attivi.
 - 2026-10-16 15:12 — Producer — #174 unita (`61054bc`, chiude #110). Per la build manca solo **#157**: Zaino fermo al liv. 7, IdToStep con i 16 id (testi Narrative in `proposte/ONB16_TESTI_TILDE.md`), CI verde. QA in pausa: il test lo fa Lorenzo sul link.
