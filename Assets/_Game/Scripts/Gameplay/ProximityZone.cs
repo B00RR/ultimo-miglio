@@ -18,6 +18,14 @@ namespace UltimoMiglio.Gameplay
         protected virtual void Reset() { GetComponent<Collider>().isTrigger = true; }
         void OnTriggerEnter(Collider o) { var n = o.GetComponent<NinaController>(); if (n) { Nina = n; Dwell = 0; _acc = 0; _started = false; if (!_active || _active.Priority < Priority) _active = this; } }
         void OnTriggerExit(Collider o) { if (o.GetComponent<NinaController>()) { Nina = null; if (_active == this) _active = null; OnZoneExit(); } }
+        /// <summary>#104: un collider disattivato (o la zona disabilitata) non manda OnTriggerExit. Senza questo Nina restava
+        /// "dentro" il pad di NONNO appena assunto e la _active statica bloccava Arrivi, Scaffali e Bancone fino al reload.</summary>
+        protected void ReleaseNina()
+        {
+            if (Nina) { Nina = null; OnZoneExit(); }
+            if (_active == this) _active = null;
+        }
+        protected virtual void OnDisable() { ReleaseNina(); }
 
         void Update()
         {
