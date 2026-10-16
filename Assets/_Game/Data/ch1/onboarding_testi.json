@@ -1,7 +1,11 @@
 {
-  "_nota": "steps[]: biglietti di Tilde per id, gli id sono quelli di TutorialManager.StepIds (l'ordine nel file non conta). Nel cap. 1 coldOpen ha le lettere e freePlay ha \"fine\"; tutti gli altri passi hanno un biglietto e un suggerimento onb.*. Le battute nuove di Ada e onb.debt.milestone1-3 arrivano in una PR separata dopo la #157.",
+  "_nota": "steps[]: biglietti di Oma Tilde per i 16 passi, id = TutorialManager.StepIds (collegati per id con IdToStep, l'ordine nel file non conta). coldOpen ha anche le lettere, freePlay anche \"fine\"; gli altri passi hanno un biglietto e un suggerimento onb.*. onb.debt.milestone1-3: traguardi della rata.",
   "speaker": "Oma Tilde",
   "steps": [
+    {
+      "id": "coldOpen",
+      "text": "Kaia, il Sunn Depot ora è tuo. Un anno per salvarlo. Coraggio."
+    },
     {
       "id": "move",
       "text": "Kaia, sgranchisci le gambe. Il deposito si gira a piedi."
@@ -57,6 +61,10 @@
     {
       "id": "wallPad",
       "text": "Vedi quel muro? Dietro c'è spazio. Il Sunn Depot può crescere."
+    },
+    {
+      "id": "freePlay",
+      "text": "Brava, Kaia. Il resto lo scopri da te. Io l'ho sempre saputo."
     }
   ],
   "fine": "Brava, Kaia. Il resto lo scopri da te. Io l'ho sempre saputo.",
@@ -88,7 +96,10 @@
     "onb.zaino.notEnough": "Per lo Zaino servono 40 LN. Ancora qualche cliente!",
     "onb.pads.new": "Pad nuovi! Scarpe per correre, Insegna per clienti più ricchi.",
     "onb.cassa.tip": "Passa sulla Cassa: c'è una mancia di 30 LN per te.",
-    "onb.debt.adaExplain": "La rata si versa qui, alla Cassaforte. Entro il Giorno 24, Kaia."
+    "onb.debt.adaExplain": "La rata si versa qui, alla Cassaforte. Entro il Giorno 24, Kaia.",
+    "onb.debt.milestone1": "Un quarto della rata! Ecco il timbro: siamo sulla buona strada.",
+    "onb.debt.milestone2": "Metà rata versata. Il quartiere ci ha notati: +1 Reputazione.",
+    "onb.debt.milestone3": "Tre quarti! Ti lascio una mia foto, per farti coraggio."
   },
   "rinviati_cap2": {
     "onb.civetta.msg1": "Conoscevo tua nonna. Il pacco sul bancone? Non aprirlo. 🦉",
