@@ -76,36 +76,44 @@ namespace UltimoMiglio.Gameplay
                     if (StepMove()) { State = WorkState.Loading; _timer = 0; _loadElapsed = 0; }
                     break;
                 case WorkState.Loading:
-                    _loadElapsed += Time.deltaTime;
-                    if ((_timer += Time.deltaTime) >= perParcel)
                     {
-                        _timer = 0;
-                        if (Arrivals.TakeForRobot(out _)) _carry++;
-                    }
-                    bool full = _carry >= CarryMax;
-                    bool stockOut = _carry > 0 && Arrivals.Stock <= 0;
-                    bool timedOut = _loadElapsed >= LoadTimeout;
-                    if (timedOut && _carry == 0 && Arrivals.Stock > 0 && Arrivals.TakeForRobot(out _))
-                        _carry = 1; // force at least one parcel so we leave Arrivi
-                    if (full || stockOut || (timedOut && _carry > 0))
-                    {
-                        _target = Pick();
-                        if (_target != null)
-                            Go(ShelfApproach(_target), WorkState.ToShelf);
-                        else
+                        // #221: si carica solo quanto entra davvero negli scaffali. Prima, con gli scaffali pieni (12/12), NONNO toglieva
+                        // pacchi agli Arrivi e li "scaricava" su uno scaffale pieno (Add limitato a Capacity): pacchi distrutti e giro a vuoto.
+                        int cap = Mathf.Min(CarryMax, _carry + Room());
+                        if (cap <= _carry) { _timer = 0; _loadElapsed = 0; break; } // scaffali pieni: aspetta agli Arrivi senza consumare pacchi
+                        _loadElapsed += Time.deltaTime;
+                        if ((_timer += Time.deltaTime) >= perParcel)
+                        {
+                            _timer = 0;
+                            if (Arrivals.TakeForRobot(out _)) _carry++;
+                        }
+                        bool full = _carry >= cap;
+                        bool stockOut = _carry > 0 && Arrivals.Stock <= 0;
+                        bool timedOut = _loadElapsed >= LoadTimeout;
+                        if (timedOut && _carry == 0 && Arrivals.Stock > 0 && Arrivals.TakeForRobot(out _))
+                            _carry = 1; // force at least one parcel so we leave Arrivi
+                        if (full || stockOut || (timedOut && _carry > 0))
+                        {
+                            _target = Pick();
+                            if (_target != null) Go(ShelfApproach(_target), WorkState.ToShelf);
+                        }
+                        else if (timedOut && _carry == 0)
+                        {
+                            // Arrivi empty — wait for refill via Idle→retry (don't spin forever in Loading)
                             State = WorkState.Idle;
-                    }
-                    else if (timedOut && _carry == 0)
-                    {
-                        // Arrivi empty — wait for refill via Idle→retry (don't spin forever in Loading)
-                        State = WorkState.Idle;
+                        }
                     }
                     break;
                 case WorkState.ToShelf:
                     if (StepMove()) { State = WorkState.Unloading; _timer = 0; }
                     break;
                 case WorkState.Unloading:
-                    if (_target == null) { _carry = 0; State = WorkState.Idle; break; }
+                    if (_target == null || _target.Count >= _target.Capacity)
+                    {   // #221: scaffale pieno (o sparito): mai buttare il carico, si va su un altro scaffale con posto o si aspetta agli Arrivi
+                        _target = Pick();
+                        if (_target != null) Go(ShelfApproach(_target), WorkState.ToShelf); else Go(Arrivals.transform.position, WorkState.ToArrivals);
+                        break;
+                    }
                     if ((_timer += Time.deltaTime) >= 0.22f)
                     {
                         _timer = 0;
@@ -136,11 +144,13 @@ namespace UltimoMiglio.Gameplay
             Shelf best = null;
             foreach (var s in Shelves)
             {
-                if (!s) continue;
+                if (!s || s.Count >= s.Capacity) continue; // #221: uno scaffale pieno non è una meta
                 if (best == null || s.Count < best.Count) best = s;
             }
             return best;
         }
+        /// <summary>#221: posti liberi totali negli scaffali di NONNO.</summary>
+        int Room() { int r = 0; foreach (var s in Shelves) if (s) r += Mathf.Max(0, s.Capacity - s.Count); return r; }
         static Vector3 ShelfApproach(Shelf s)
         {
             // Front of shelf zone (toward Arrivi / +Z side of shelf pickup area)
@@ -152,7 +162,12 @@ namespace UltimoMiglio.Gameplay
         {
             var d = _dest - transform.position; d.y = 0;
             if (d.sqrMagnitude < 0.35f) { _stuckT = 0; return true; }
-            var applied = AgentMove.Slide(transform, Vector3.ClampMagnitude(d.normalized * WalkSpeed * Time.deltaTime, d.magnitude), BodyRadius);
+            var want = Vector3.ClampMagnitude(d.normalized * WalkSpeed * Time.deltaTime, d.magnitude);
+            // #226: distanza di rispetto da Nina. Lo sweep si ferma a 2 cm dal contatto e con Nina che si muove (o riposizionata) NONNO
+            // finiva a filo della somma dei raggi (0,69 < 0,70). Ora non avanza mai verso Nina entro somma raggi + NinaMargin:
+            // la componente radiale verso Nina viene tolta (può solo girarle attorno o allontanarsi).
+            if (KeepFromNina(ref want, out bool ringOnDest) && ringOnDest && d.sqrMagnitude < 2.25f) { _stuckT = 0; _lastPos = transform.position; _curSpeed = 0f; return true; } // Nina sulla meta: carica/scarica dal bordo del margine
+            var applied = AgentMove.Slide(transform, want, BodyRadius);
             if (AgentMove.LastBlockedByAgent) { _stuckT = 0; _lastPos = transform.position; _curSpeed = 0f; if (d.sqrMagnitude < 2.25f) return true; return false; } // #111: Nina sulla meta: carica/scarica da vicino, mai attraverso
             AgentMove.Face(transform, applied.sqrMagnitude > 1e-8f ? applied : d, Time.deltaTime); // #59
             _curSpeed = Time.deltaTime > 0 ? applied.magnitude / Time.deltaTime : 0f;
@@ -163,6 +178,25 @@ namespace UltimoMiglio.Gameplay
             if (_stuckT > 2f) { var step = Vector3.ClampMagnitude(d.normalized * WalkSpeed * Time.deltaTime, d.magnitude); var sd = AgentMove.Sidestep(transform, step, BodyRadius); if (sd.sqrMagnitude > 1e-10f) { _stuckT = 0; _curSpeed = sd.magnitude / Mathf.Max(Time.deltaTime, 1e-5f); } }
             _lastPos = transform.position;
             return false;
+        }
+
+        /// <summary>#226: margine extra (m) oltre la somma dei raggi NONNO+Nina, entro cui NONNO non si avvicina a Nina.</summary>
+        public const float NinaMargin = 0.2f;
+        /// <summary>#226: limita il passo perché NONNO non entri nell'anello di rispetto attorno a Nina. True se il passo è stato limitato;
+        /// ringOnDest = la meta è dentro l'anello (Nina ferma sulla meta), quindi NONNO è già arrivato il più vicino possibile.</summary>
+        bool KeepFromNina(ref Vector3 step, out bool ringOnDest)
+        {
+            ringOnDest = false;
+            var n = GameRoot.I ? GameRoot.I.Nina : null; if (!n) return false;
+            var cc = n.GetComponent<CharacterController>(); float keep = (cc ? cc.radius : 0.3f) + BodyRadius + NinaMargin;
+            var away = transform.position - n.transform.position; away.y = 0;
+            var next = away + step; if (next.magnitude >= keep) return false;
+            var dn = _dest - n.transform.position; dn.y = 0; ringOnDest = dn.magnitude < keep + 0.1f;
+            float dist = away.magnitude; if (dist < 1e-4f) return false; // sovrapposti esatti: ci pensa la separazione di AgentMove
+            var r = away / dist; float radial = Vector3.Dot(step, r);
+            if (radial < 0f) step -= radial * r; // via la componente verso Nina, resta quella tangenziale
+            if (dist < keep && Vector3.Dot(step, r) <= 0f) step = Vector3.zero; // già dentro l'anello: niente passi che non allontanino
+            return true;
         }
 
         /// <summary>Remove any NavMeshAgent on this hierarchy. Never enable AI pathfinding on WebGL.</summary>

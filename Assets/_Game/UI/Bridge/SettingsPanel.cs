@@ -5,7 +5,7 @@ using UltimoMiglio.UI;
 
 namespace UltimoMiglio.UI.Bridge
 {
-    /// <summary>Impostazioni: zoom −/+, slider Musica/Suoni, SALVA → PlayerPrefs (cam_zoom_v3, vol_music, vol_sfx).
+    /// <summary>Impostazioni: zoom −/+, slider Musica/Suoni, SALVA → PlayerPrefs (CameraView: cam_zoom/cam_rot/cam_tilt/cam_ver, vol_music, vol_sfx). Pannello di riserva: quello aperto dall'ingranaggio è SettingsController (#205: sezione Visuale).
     /// Pausa il gioco (timeScale=0) mentre è aperto. Aperto dal bottone ingranaggio dell'HUD.</summary>
     public sealed class SettingsPanel : MonoBehaviour
     {
@@ -30,8 +30,8 @@ namespace UltimoMiglio.UI.Bridge
 
             _panel.Add(Lab("Zoom", 18, true));
             var row = new VisualElement { style = { flexDirection = FlexDirection.Row, justifyContent = Justify.Center, alignItems = Align.Center, marginBottom = 18 } };
-            var minus = Btn("−", () => Zoom(-1.5f)); var plus = Btn("+", () => Zoom(1.5f));
-            _zoomL = Lab("7.0", 22, true); _zoomL.style.minWidth = 80; _zoomL.style.unityTextAlign = TextAnchor.MiddleCenter; _zoomL.style.marginLeft = 12; _zoomL.style.marginRight = 12;
+            var minus = Btn("−", () => Zoom(-CameraView.ZoomStep * 2f)); var plus = Btn("+", () => Zoom(CameraView.ZoomStep * 2f));
+            _zoomL = Lab("1,00", 22, true); _zoomL.style.minWidth = 80; _zoomL.style.unityTextAlign = TextAnchor.MiddleCenter; _zoomL.style.marginLeft = 12; _zoomL.style.marginRight = 12;
             row.Add(minus); row.Add(_zoomL); row.Add(plus); _panel.Add(row);
 
             _panel.Add(Lab("Musica", 18, true));
@@ -64,13 +64,12 @@ namespace UltimoMiglio.UI.Bridge
         }
         void SaveAndClose()
         {
-            var cam = Object.FindFirstObjectByType<DepotCameraFit>();
-            if (cam) cam.SaveZoom();
+            CameraView.Save();
             PlayerPrefs.SetFloat(PrefMusic, _music.value); PlayerPrefs.SetFloat(PrefSfx, _sfx.value); PlayerPrefs.Save();
             _root.style.display = DisplayStyle.None; _open = false; Time.timeScale = _prevScale <= 0 ? 1f : _prevScale;
         }
-        void Zoom(float d) { var cam = Object.FindFirstObjectByType<DepotCameraFit>(); if (cam) { cam.ZoomBy(d); RefreshZoomLabel(); } }
-        void RefreshZoomLabel() { var cam = Object.FindFirstObjectByType<DepotCameraFit>(); if (cam && _zoomL != null) _zoomL.text = cam.OrthoSize.ToString("0.0"); }
+        void Zoom(float d) { CameraView.SetZoom(CameraView.Zoom + d); RefreshZoomLabel(); }
+        void RefreshZoomLabel() { if (_zoomL != null) _zoomL.text = CameraView.EffectiveZoom.ToString("0.00").Replace('.', ','); }
         void SetMusic(float v) { var a = AudioManager.I; if (a) a.SetMusicVolume(v); }
         void SetSfx(float v) { var a = AudioManager.I; if (a) a.SetSfxVolume(v); }
         void ApplySavedVolumes() { SetMusic(PlayerPrefs.GetFloat(PrefMusic, 0.6f)); SetSfx(PlayerPrefs.GetFloat(PrefSfx, 1f)); }

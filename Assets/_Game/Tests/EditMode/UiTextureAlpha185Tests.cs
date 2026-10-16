@@ -8,6 +8,7 @@ using UnityEngine;
 public class UiTextureAlpha185Tests
 {
     const int RaggioSlice = 16;
+    const int Margine = 2; // #185: margine trasparente con alpha bleeding contro il bilineare mobile
 
     static readonly string[] Pannelli9Slice =
     {
@@ -46,10 +47,10 @@ public class UiTextureAlpha185Tests
             var imp = AssetImporter.GetAtPath(path) as TextureImporter;
             Assert.IsNotNull(imp, path);
             var bordo = imp.spriteBorder;
-            Assert.GreaterOrEqual(bordo.x, RaggioSlice, path + " bordo sinistro");
-            Assert.GreaterOrEqual(bordo.y, RaggioSlice, path + " bordo inferiore");
-            Assert.GreaterOrEqual(bordo.z, RaggioSlice, path + " bordo destro");
-            Assert.GreaterOrEqual(bordo.w, RaggioSlice, path + " bordo superiore");
+            Assert.GreaterOrEqual(bordo.x, RaggioSlice + Margine, path + " bordo sinistro");
+            Assert.GreaterOrEqual(bordo.y, RaggioSlice + Margine, path + " bordo inferiore");
+            Assert.GreaterOrEqual(bordo.z, RaggioSlice + Margine, path + " bordo destro");
+            Assert.GreaterOrEqual(bordo.w, RaggioSlice + Margine, path + " bordo superiore");
 
             var set = new TextureImporterSettings();
             imp.ReadTextureSettings(set);
@@ -71,7 +72,11 @@ public class UiTextureAlpha185Tests
                 Assert.Less(tex.GetPixel(tex.width - 1, 0).a, 0.15f, path + " angolo basso-destra opaco");
                 Assert.Greater(tex.GetPixel(tex.width / 2, tex.height / 2).a, 0.95f, path + " centro bucato");
                 // il lato, fuori dall'angolo, resta opaco: lo slice non deve aprire un buco sul bordo
-                Assert.Greater(tex.GetPixel(tex.width / 2, tex.height - 2).a, 0.95f, path + " bordo superiore bucato");
+                Assert.Greater(tex.GetPixel(tex.width / 2, tex.height - 2 - Margine).a, 0.95f, path + " bordo superiore bucato");
+                // il margine è trasparente e non bianco: il bilineare non porta dentro il bianco
+                var m = tex.GetPixel(tex.width / 2, tex.height - 1);
+                Assert.Less(m.a, 0.01f, path + " margine superiore non trasparente");
+                Assert.Less(m.r + m.g + m.b, 2.8f, path + " margine superiore bianco");
             }
             finally { Object.DestroyImmediate(tex); }
         }
