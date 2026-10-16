@@ -5,8 +5,8 @@
 ## 1. File della pipeline
 | File | Cosa fa |
 |---|---|
-| `Assets/_Game/Scripts/Editor/WebGLBuild.cs` | Build WebGL in batchmode (`WebGLBuild.BuildCI`): compressione **disabilitata** (GitHub Pages non invia `Content-Encoding` per `.br/.gz`), `.nojekyll`, template a finestra intera, exit code 0/1. Voce menu *Ultimo Miglio → Build → WebGL (GitHub Pages)*. |
-| `tools/build_webgl.sh` | Lancia la build, log in `Logs/webgl_build.log`, output in `Builds/WebGL`. |
+| `Assets/_Game/Scripts/Editor/WebGLBuild.cs` | Build WebGL in batchmode (`WebGLBuild.BuildCI`): compressione **disabilitata** (GitHub Pages non invia `Content-Encoding` per `.br/.gz`), `.nojekyll`, template a finestra intera, exit code 0/1. Voce menu *Ultimo Miglio → Build → WebGL (GitHub Pages)*. Alternativa con output personalizzabile (`UM_METHOD=ci`); la build **ufficiale** resta `WebGLMinBuild.Build` del Tech Lead. |
+| `tools/build_webgl.sh` | Lancia la build, log in `Logs/webgl_build.log`, di default con il metodo ufficiale `WebGLMinBuild.Build`, output in `Builds/WebGL_min`. |
 | `tools/run_tests.sh` | Test EditMode/PlayMode, XML NUnit in `Logs/*-results.xml`, riepilogo in `Logs/test-summary.txt`. |
 | `tools/pr_comment.sh` | Legge XML + log della build e scrive/aggiorna **un solo** commento di esito sulla PR (`gh`). |
 | `tools/patch_index_mobile.sh` | Patch mobile dell'`index.html` (viewport senza zoom, touch-action/overscroll none, showBanner/errorHandler su console, niente alert); fallisce se non si applica. Usata dal deploy CI. |
@@ -20,7 +20,7 @@ Non lanciare due istanze Unity sullo stesso progetto né due build insieme (RAM:
 ```bash
 export UNITY=/home/box/Unity/Hub/Editor/6000.3.26f1/Editor/Unity
 tools/run_tests.sh all          # exit 0 = tutti verdi
-tools/build_webgl.sh            # Builds/WebGL
+tools/build_webgl.sh            # Builds/WebGL_min
 tools/pr_comment.sh <N_PR> https://b00rr.github.io/ultimo-miglio-web/
 tools/deploy_pages.sh           # pubblica il link giocabile
 ```
@@ -30,7 +30,7 @@ Exit code: `0` ok · `1` test/build falliti · `2` configurazione (Unity mancant
 
 ## 3. GitHub Actions (game-ci)
 - **Ogni PR verso `main`**: test EditMode + PlayMode (`game-ci/unity-test-runner@v4`), check "Test Unity" e commento unico con l'esito sulla PR (`tools/pr_comment.sh`).
-- **Push/merge su `main`**: build WebGL non compressa (`WebGLBuild.BuildCI`) e deploy dei file sciolti su `B00RR/ultimo-miglio-web` con deploy key (`peaceiris/actions-gh-pages`).
+- **Push/merge su `main`**: build WebGL non compressa con il metodo ufficiale (`WebGLMinBuild.Build`), patch mobile dell'index (`tools/patch_index_mobile.sh`) e deploy dei file sciolti su `B00RR/ultimo-miglio-web` con deploy key (`peaceiris/actions-gh-pages`).
 - **Banda LFS**: `.git/lfs` in cache con chiave sull'elenco degli oggetti LFS → si scaricano solo gli oggetti nuovi; `Library/` in cache separata per test e build.
 
 Secret richiesti (Settings → Secrets → Actions):
@@ -59,7 +59,7 @@ Nota: sulla box c'è solo una licenza *entitlement* legata alla macchina (`Unity
 ## 5. Da provare con il Tech Lead (dopo le 18:00)
 - [ ] Prima compilazione di `WebGLBuild.cs` (non ancora compilato con Unity).
 - [ ] `tools/run_tests.sh all` → XML presenti, EditMode + PlayMode 4/4.
-- [ ] `tools/build_webgl.sh` → `Builds/WebGL/index.html` senza file `.br/.gz`.
+- [ ] `tools/build_webgl.sh` → `Builds/WebGL_min/index.html` senza file `.br/.gz`.
 - [ ] `tools/deploy_pages.sh` e verifica nel browser (desktop + telefono).
 - [ ] `tools/pr_comment.sh` sulla PR della pipeline.
 - [ ] Decidere se attivare la CI (licenza nei secret).
