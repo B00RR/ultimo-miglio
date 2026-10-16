@@ -19,7 +19,7 @@ namespace UltimoMiglio.UI
         readonly VisualElement root, band, note; readonly Label who, body;
         Item current; bool hasCurrent; float shownAt, hideAt = -1;
 
-        public static AdaNoteView Attach(VisualElement hudRoot, string speaker = "Nonna Ada") => new AdaNoteView(hudRoot, speaker);
+        public static AdaNoteView Attach(VisualElement hudRoot, string speaker = "Oma Tilde") => new AdaNoteView(hudRoot, speaker);
 
         AdaNoteView(VisualElement hudRoot, string speaker)
         {
@@ -29,7 +29,7 @@ namespace UltimoMiglio.UI
             var face = new VisualElement { name = "ada-face", pickingMode = PickingMode.Ignore };
             face.AddToClassList("ada-face"); face.AddToClassList("ada-face--portrait"); // ritratto tex_ada_portrait.png via USS
             var col = new VisualElement { pickingMode = PickingMode.Ignore }; col.AddToClassList("ada-col");
-            who = new Label(speaker) { pickingMode = PickingMode.Ignore }; who.AddToClassList("ada-name");
+            who = new Label(UltimoMiglio.Core.DisplayNames.Apply(speaker)) { pickingMode = PickingMode.Ignore }; who.AddToClassList("ada-name");
             body = new Label { pickingMode = PickingMode.Ignore }; body.AddToClassList("ada-text");
             who.style.display = DisplayStyle.None;
             note.Add(face); col.Add(body); note.Add(col); band.Add(note);

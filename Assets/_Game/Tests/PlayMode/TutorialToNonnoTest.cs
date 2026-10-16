@@ -13,7 +13,7 @@ public class TutorialToNonnoTest
     [UnityTest, Timeout(480000)]
     public IEnumerator Path_ArriviShelfBancone_EarnsLn_HiresNonno_Works()
     {
-        PlayerPrefs.DeleteAll();
+        PlayerPrefs.DeleteAll(); UltimoMiglio.Gameplay.TutorialManager.TestSenzaComparse = true; UltimoMiglio.Gameplay.TutorialManager.TestAccelera = true; /* #101: niente comparse graduali, tempi corti */
         var save = System.IO.Path.Combine(Application.persistentDataPath, "save_v1.json");
         if (System.IO.File.Exists(save)) System.IO.File.Delete(save);
 
@@ -28,6 +28,7 @@ public class TutorialToNonnoTest
 
         try
         {
+            PlayerPrefs.SetInt(UltimoMiglio.Gameplay.TutorialManager.PrefGraduale, 0); // #94: test non di onboarding → niente rivelazione graduale
             yield return SceneManager.LoadSceneAsync("Ch1_Deposito");
             Time.timeScale = 3f;
             while (!GameRoot.Ready || !GameRoot.I.Nina) yield return null;
@@ -73,12 +74,37 @@ public class TutorialToNonnoTest
             Assert.GreaterOrEqual(eco.S.CustomersServed, servesNeeded, "could not serve customers");
             Assert.GreaterOrEqual(eco.S.Wallet, hire - 0.01, $"wallet {eco.S.Wallet} after {eco.S.CustomersServed} serves — need ≥{hire} LN");
 
+            // #101: tutorial a 16 passi — lo Zaino viene prima di NONNO; il pad di NONNO compare solo al passo hireNonno (dopo combo/softgate)
+            var padZ = Object.FindObjectsByType<UpgradePad>(FindObjectsSortMode.None).First(p => p.Kind == UpgradeKind.Zaino);
+            float tz = Time.time;
+            while (eco.S.Zaino < 1 && Time.time - tz < 120f)
+            {
+                if (padZ.gameObject.activeInHierarchy) { if (!padZ.Occupied) yield return EnterPad(n, padZ); else n.ScriptedInput = Vector3.zero; yield return null; }
+                else yield return ServeCycle(n, arr, shelves, ban);
+            }
+            Assert.GreaterOrEqual(eco.S.Zaino, 1, "Zaino non comprato (passo zainoPad)");
+            float tn = Time.time;
+            // dopo lo Zaino: combo (comboReached o softgate 40 s) → nonnoIntro (camera) → hireNonno. Con TestSenzaComparse il pad è già attivo:
+            // conta il passo del tutorial, non la visibilità del pad.
+            while (TutorialManager.I.Current < TutorialManager.Step.HireNonno && Time.time - tn < 150f)
+            {
+                if (TutorialManager.I.Current == TutorialManager.Step.NonnoIntro) { n.ScriptedInput = Vector3.zero; yield return null; }
+                else yield return ServeCycle(n, arr, shelves, ban);
+            }
+            Assert.AreEqual(TutorialManager.Step.HireNonno, TutorialManager.I.Current, "passo hireNonno non raggiunto dopo lo Zaino");
+            Assert.IsTrue(padN.gameObject.activeInHierarchy, $"pad NONNO non visibile al passo {TutorialManager.I.Current}");
+            if (eco.S.Wallet < hire) eco.S.Wallet = hire; // l'assist del passo lo garantisce già
+
             // Hire NONNO: cammina sul pad e resta in trigger (teleport CC non genera OnTriggerEnter)
             yield return EnterPad(n, padN);
             float h = Time.time;
             double wStart = eco.S.Wallet;
             while (eco.S.NonnoLevel < 0 && Time.time - h < 60f)
             {
+                // con TestSenzaComparse i pad Scarpe/Insegna sono già attivi (nel gioco vero compaiono a padNuovi): se Nina ci passa sopra
+                // spende qualche LN. Il test verifica l'assunzione, non il percorso: rimette le LN che mancano al costo residuo.
+                double resto = hire - eco.S.PadPaid[(int)UpgradeKind.NonnoHire];
+                if (eco.S.Wallet < resto) eco.S.Wallet = resto;
                 if (!padN.Occupied)
                     yield return EnterPad(n, padN);
                 else
@@ -113,14 +139,16 @@ public class TutorialToNonnoTest
     [UnityTest, Timeout(240000)]
     public IEnumerator HireNonnoStandingOnPad_ThenArriviAndBanconeStillWork()
     {
-        PlayerPrefs.DeleteAll();
+        PlayerPrefs.DeleteAll(); UltimoMiglio.Gameplay.TutorialManager.TestSenzaComparse = true; UltimoMiglio.Gameplay.TutorialManager.TestAccelera = true; /* #101: niente comparse graduali, tempi corti */
         var save = System.IO.Path.Combine(Application.persistentDataPath, "save_v1.json");
         if (System.IO.File.Exists(save)) System.IO.File.Delete(save);
+        PlayerPrefs.SetInt(UltimoMiglio.Gameplay.TutorialManager.PrefGraduale, 0); // #94: test non di onboarding → niente rivelazione graduale
         yield return SceneManager.LoadSceneAsync("Ch1_Deposito");
         Time.timeScale = 3f;
         try
         {
-            while (!GameRoot.Ready || !GameRoot.I.Nina) yield return null;
+            while (!GameRoot.Ready || !GameRoot.I.Nina || TutorialManager.I == null) yield return null;
+            yield return null; TutorialManager.I.Skip(); // test del soft-lock, non del tutorial: tutti i pad visibili
             var n = GameRoot.I.Nina; var eco = GameRoot.I.Eco;
             var arr = Object.FindAnyObjectByType<ArrivalsZone>();
             var shelves = Object.FindObjectsByType<Shelf>(FindObjectsSortMode.None);
@@ -150,6 +178,15 @@ public class TutorialToNonnoTest
             Assert.Greater(eco.S.CustomersServed, before, "il Bancone non serve dopo l'assunzione di NONNO");
         }
         finally { Time.timeScale = 1f; }
+    }
+
+    static IEnumerator ServeCycle(NinaController n, ArrivalsZone arr, Shelf[] shelves, Bancone ban)
+    {
+        yield return Go(n, arr.transform.position);
+        float a = Time.time; while (n.Stack.Count < Mathf.Min(2, n.Stack.Capacity) && Time.time - a < 8f) yield return null;
+        if (shelves.Length > 0) { yield return Go(n, shelves[0].transform.position); yield return Wait(n, 1.2f); }
+        yield return Go(n, ban.transform.position);
+        float b = Time.time; while (n.Stack.Count > 0 && Time.time - b < 12f) yield return null;
     }
 
     static IEnumerator Wait(NinaController n, float s)

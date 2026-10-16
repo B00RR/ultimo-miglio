@@ -35,7 +35,7 @@ namespace UltimoMiglio.EditorTools
             for (int i = 0; i < 9; i++) Place("Kit/env_plinth_edge_2m", _parent, new Vector3(-8 + i * 2, 0, -11.15f), 0, false, false, 2f, true);
             for (int i = 0; i < 11; i++) Place("Kit/env_plinth_edge_2m", _parent, new Vector3(-9.15f, 0, -10 + i * 2), 90, false, false, 2f, true);
             // wall dressing (N wall), sign and lanterns
-            Place("Kit/prop_sign_vela_figli", _parent, new Vector3(0, 1.95f, 8.08f), 0, false); DressSignFace(); // faro + Vela & Figli (piu basso, in camera)
+            Place("Kit/prop_sign_sunn_depot", _parent, new Vector3(0, 1.95f, 8.08f), 0, false); DressSignFace(); // faro + Vela & Figli (piu basso, in camera)
             foreach (var x in new[] { -6f, 3f, 7f }) Place("Kit/prop_lantern_wall", _parent, new Vector3(x, 1.9f, 8.1f), 0, false);
             Place("Kit/prop_wallshelf", _parent, new Vector3(-2.5f, 1.4f, 8.05f), 0, false);
             Place("Kit/prop_books", _parent, new Vector3(-2.5f, 1.55f, 8.05f), 0, false, true);
@@ -106,13 +106,13 @@ namespace UltimoMiglio.EditorTools
             Place("Kit/prop_parcel_stack_a", _parent, banPos + new Vector3(-1.8f, 0, 0.6f), 25, true);
             Place("Kit/prop_sign_board_aperto", _parent, banPos + new Vector3(-1.2f, 0, -2.4f), 30, true);
             Place("Kit/prop_streetlamp", _parent, banPos + new Vector3(-1.9f, 0, -3.4f), 0, true);
-            Place("Kit/prop_plant_pot_round", _parent, banPos + new Vector3(1.6f, 0, 0.7f), 0, true);
+            Place("Kit/prop_plant_pot_round", _parent, banPos + new Vector3(1.25f, 0, 0.75f), 0, true); // #187: spazio per la Cassa
             // Concept: pezzo di muro/arco visibile dietro il Bancone (beauty shot)
             Place("Kit/env_wall_2m_a", _parent, banPos + new Vector3(-0.2f, 0, 2.8f), 0, false, false, 2f, true);
             Place("Kit/env_wall_2m_b", _parent, banPos + new Vector3(1.8f, 0, 2.8f), 0, false, false, 2f, true);
             if (AssetDatabase.LoadAssetAtPath<GameObject>(Root + "Kit/env_wall_arch_4m.fbx"))
                 Place("Kit/env_wall_arch_4m", _parent, banPos + new Vector3(3.6f, 0, 1.2f), -90, false, false, 4f, true);
-            Place("Kit/prop_sign_vela_figli", _parent, banPos + new Vector3(0.6f, 2.0f, 2.55f), 0, false); DressSignFace();
+            Place("Kit/prop_sign_sunn_depot", _parent, banPos + new Vector3(0.6f, 2.0f, 2.55f), 0, false); DressSignFace();
             Place("Kit/prop_lantern_wall", _parent, banPos + new Vector3(-1.4f, 1.85f, 2.55f), 0, false);
             Debug.Log("[Kit] gameplay dressing: " + _parent.childCount + " pieces");
         }
@@ -152,56 +152,19 @@ namespace UltimoMiglio.EditorTools
             col.AddComponent<BoxCollider>().size = new Vector3(0.36f, 2.6f, 0.36f);
         }
 
-        // Concept: insegna con faro + "Vela & Figli" (texture generata, Fredoka).
+        // #70: l'insegna è la mesh 3D prop_sign_sunn_depot v05 «Sunn Depot» (#130; ex prop_sign_vela_figli, stesso GUID) (cornice terracotta, tavola noce, faro in rilievo con lanterna emissiva,
+        // scritta crema in rilievo in Fredoka). Prima qui si spegnevano i renderer della mesh e si metteva un quad Unlit piatto
+        // (tex_sign_vela_figli.png, fondo crema): era il «pannello bianco piatto senza faro». Ora si tiene la mesh e si toglie l'eventuale decal.
         static void DressSignFace()
         {
             if (!_parent) return;
-            Transform sign = null;
             for (int i = _parent.childCount - 1; i >= 0; i--)
             {
                 var c = _parent.GetChild(i);
-                if (c.name.Contains("prop_sign_vela_figli")) { sign = c; break; }
+                if (!c.name.Contains("prop_sign_sunn_depot")) continue;
+                foreach (var r in c.GetComponentsInChildren<Renderer>(true)) r.enabled = true;
+                var d = c.Find("SignFaceDecal"); if (d) Object.DestroyImmediate(d.gameObject);
             }
-            if (!sign || sign.Find("SignFaceDecal")) return;
-            const string texPath = "Assets/_Game/Art/Environment/Kit/tex_sign_vela_figli.png";
-            const string matPath = "Assets/_Game/Art/Materials/M_Sign_VelaFigli.mat";
-            var tex = AssetDatabase.LoadAssetAtPath<Texture2D>(texPath);
-            if (!tex) { Debug.LogWarning("[Kit] missing sign tex " + texPath); return; }
-            var mat = AssetDatabase.LoadAssetAtPath<Material>(matPath);
-            if (!mat)
-            {
-                var sh = Shader.Find("Universal Render Pipeline/Unlit") ?? Shader.Find("Unlit/Texture");
-                if (!sh) { Debug.LogWarning("[Kit] no Unlit shader for sign"); return; }
-                mat = new Material(sh) { name = "M_Sign_VelaFigli" };
-                if (mat.HasProperty("_BaseMap")) mat.SetTexture("_BaseMap", tex);
-                if (mat.HasProperty("_MainTex")) mat.SetTexture("_MainTex", tex);
-                if (mat.HasProperty("_BaseColor")) mat.SetColor("_BaseColor", Color.white);
-                if (mat.HasProperty("_Color")) mat.SetColor("_Color", Color.white);
-                Directory.CreateDirectory(Path.GetDirectoryName(matPath));
-                AssetDatabase.CreateAsset(mat, matPath);
-            }
-            else
-            {
-                if (mat.HasProperty("_BaseMap")) mat.SetTexture("_BaseMap", tex);
-                if (mat.HasProperty("_MainTex")) mat.SetTexture("_MainTex", tex);
-            }
-            var b = Bounds(sign.gameObject);
-            foreach (var r in sign.GetComponentsInChildren<Renderer>()) r.enabled = false;
-            var quad = GameObject.CreatePrimitive(PrimitiveType.Quad);
-            Object.DestroyImmediate(quad.GetComponent<Collider>());
-            quad.name = "SignFaceDecal";
-            quad.transform.SetParent(sign, true);
-            float w = Mathf.Clamp(b.size.x * 1.05f, 2.0f, 3.0f);
-            float h = Mathf.Clamp(b.size.y * 1.05f, 0.7f, 1.15f);
-            // Quad Unity: faccia frontale = -Z locale. Identity = guarda il deposito (verso -Z).
-            quad.transform.position = new Vector3(b.center.x, Mathf.Max(b.center.y, 2.35f), Mathf.Min(b.min.z, 8.05f) - 0.06f);
-            quad.transform.rotation = Quaternion.identity;
-            quad.transform.localScale = new Vector3(w, h, 1f);
-            var qr = quad.GetComponent<Renderer>();
-            qr.sharedMaterial = mat;
-            qr.shadowCastingMode = UnityEngine.Rendering.ShadowCastingMode.Off;
-            quad.isStatic = true;
-            Debug.Log($"[Kit] SignFaceDecal at {quad.transform.position} size={w:F2}x{h:F2}");
         }
 
         static void PlaceFlatFloor(Transform parent, Vector3 center, Vector3 size)

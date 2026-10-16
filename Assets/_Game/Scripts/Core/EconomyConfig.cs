@@ -13,11 +13,13 @@ namespace UltimoMiglio.Core
         public double ComboStep, ComboMax, ComboResetGapSec;
         public double InsegnaBonusPerLevel, PlayerSpendShare, TrancheLn;
         public double NinaBaseSpeed, FullStackSlowdown;
+        /// <summary>Cap. 1: lo Zaino si ferma al livello 7 (decisione Lorenzo/Producer 16/10). I livelli 8+ nei dati restano per i capitoli successivi.</summary>
+        public int ZainoMaxLevel = 7;
         public int[] ZainoCapacity; public double[] ZainoCost, ScarpeBonus, ScarpeCost, InsegnaBonus, InsegnaCost;
         public double NonnoHireCost, NonnoUnlockSec;
         // Ricompense intermedie (economy.json → rewards)
         public int[] ParcelMilestones = new int[0]; public double[] ParcelMilestoneBonusLn = new double[0];
-        public double[] DebtMilestoneShares = new double[0]; public double CassaFirstVisitTipLn; public double NextPadArrowFromSec; public string[] NextPadArrowCandidates = new string[0];
+        public double[] DebtMilestoneShares = new double[0]; public string[] DebtMilestoneRewards = new string[0]; public int[] DebtMilestoneAmounts = new int[0]; public string[] DebtMilestoneItemIds = new string[0]; public double CassaFirstVisitTipLn; public double NextPadArrowFromSec; public string[] NextPadArrowCandidates = new string[0];
         public double[] NonnoRestockPpm, NonnoSelfServicePpm, NonnoCost; public int NonnoMaxLevel;
         public double OfflineRateShare, CassaCapacityShareOfTranche, OfflineShareOfChapterMax; public int AdDoubleMaxPerDay;
         public double MaxOfflineSec = 7 * 24 * 3600; // tech guard (not balance)
@@ -59,6 +61,9 @@ namespace UltimoMiglio.Core
                 ParcelMilestones = e.rewards?.parcelMilestones?.Select(m => m.parcels).ToArray() ?? new int[0],
                 ParcelMilestoneBonusLn = e.rewards?.parcelMilestones?.Select(m => m.bonusLn).ToArray() ?? new double[0],
                 DebtMilestoneShares = e.rewards?.debtMilestones?.Select(m => m.share).ToArray() ?? new double[0],
+                DebtMilestoneRewards = e.rewards?.debtMilestones?.Select(m => m.reward ?? "").ToArray() ?? new string[0],
+                DebtMilestoneAmounts = e.rewards?.debtMilestones?.Select(m => m.amount).ToArray() ?? new int[0],
+                DebtMilestoneItemIds = e.rewards?.debtMilestones?.Select(m => m.itemId ?? "").ToArray() ?? new string[0],
                 CassaFirstVisitTipLn = e.rewards?.cassaFirstVisitTipLn ?? 0, NextPadArrowFromSec = e.rewards?.nextPadArrow?.fromSec ?? 0,
                 NextPadArrowCandidates = e.rewards?.nextPadArrow?.candidates ?? new string[0],
             };

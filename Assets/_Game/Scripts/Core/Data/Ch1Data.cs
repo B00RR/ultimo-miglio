@@ -44,10 +44,15 @@ namespace UltimoMiglio.Core.Data
     [Serializable] public class DayCycleData { public double cycleDurationSec, dayDurationSec, sunsetTransitionSec, nightDurationSec; public int nightFromChapter; public double nightDurationSecFromCh6, dayDurationSecFromCh6, calendarDaysPerCycle; public bool timeAdvancesOnlyWhileActive; }
 
     /// <summary>All chapter data. Turno di notte (cap 3) and totems (cap 4) are parsed but locked in cap 1.</summary>
+    /// <summary>#101: sottoinsieme di onboarding.json letto dal TutorialManager (ordine e id dei passi, reveal, gate, tempi).</summary>
+    [Serializable] public class OnboardingData { public int chapter; public string[] lockedAtStart; public OnboardingStep[] steps; }
+    [Serializable] public class OnboardingStep { public string id; public double tSec, maxSec; public string[] reveals; public OnboardingGate gate; public string[] textKeys; }
+    [Serializable] public class OnboardingGate { public string @event; public double value; public string pad; public int level; public string[] pads; }
     [Serializable] public class ChapterData
     {
         public int chapter = 1;
         public EconomyData economy; public DebtData debt; public UpgradesData upgrades; public RobotsData robots;
         public ZonesData zones; public OfflineData offline; public DayCycleData daycycle;
+        public OnboardingData onboarding; // #101: Assets/_Game/Data/ch1/onboarding.json (16 passi, PR #106)
     }
 }

@@ -1,7 +1,7 @@
 # STATO PROGETTO — Ultimo Miglio
 
 > Punto di ingresso unico per chiunque (persona o agente) lavori su questo repo. Aggiornalo **nella stessa PR** in cui completi qualcosa.
-> Ultimo aggiornamento: 2026-10-16 11:53 (Europe/Rome).
+> Ultimo aggiornamento: 2026-10-16 16:25 (Europe/Rome).
 
 ## 1. Il gioco
 - **Ultimo Miglio**: gioco mobile **Android**, **Unity 6 (6000.3) URP**.
@@ -16,15 +16,19 @@
 4. **Originali**: Nina, Nonno, robot, logo e tema non devono copiare altri giochi.
 5. **Profondità gestionale**: energia/corrente, contratti, rotte, officina, OmniFreight (rivale).
 6. **Longevità lunga**: progressione a capitoli + post‑game.
+7. **Autore dei commit**: `git config user.name "<Ruolo>"` e `user.email "<ruolo-in-minuscolo-con-trattini>@bokobay.invalid"` (es. `ui-ux@bokobay.invalid`, `producer@bokobay.invalid`). VIETATI `@users.noreply.github.com` e `@ultimo-miglio.local`. Niente riscritture della storia già pushata.
+8. **Merge su main**: lo fanno SOLO il Code Reviewer, DevOn e Lorenzo. Nessun altro agente unisce, né via API né via gh. `main` è protetto: si entra solo con PR, force push e cancellazione bloccati.
 
 ## 3. Team
 - **Direttore**: DevOn (coordina, decide priorità).
-- **Attivi (5)**: Tech Lead, 3D Artist, Animator, VFX & Technical Artist, UI/UX.
-- **In pausa**: Game Designer, QA, Sound Designer, Narrative, LiveOps, Concept Artist (i loro documenti restano validi).
+- **Attivi (6)**: Tech Lead, Game Designer (sulla #157 insieme al Tech Lead), 3D Artist, Animator, VFX & Technical Artist, UI/UX.
+- **In pausa**: QA, Sound Designer, Narrative, LiveOps, Concept Artist (i loro documenti restano validi).
 
 ## 4. FATTO
 - **UI #71 telefono (PR ui/71-telefono-contrasto, in revisione)**: testi della home in bruno #3B2A20 (10,8:1 su crema) e noce per le righe secondarie, schede vuote (notifica, obiettivo) e riga rata nascoste finché non hanno testo. Il telefono resta fuori dall'HUD di gioco (DevOn #64).
-- **UI #110 pad Zaino (PR ui/110-pad-zaino, in revisione)**: dopo un acquisto il pad non paga il livello successivo finché Nina non esce e rientra (niente più portafoglio prosciugato); la pillola col prezzo resta visibile anche con Nina sul pad. Costi Zaino invariati, già allineati a #75 (40, 80, 160…; `upgrades.json` non toccato). Da verificare in Unity.
+- **3D #118 Nonna Ada in scena (PR #169, su main `2993e96`)**: prefab riggato a fianco del Bancone (lato est), scala 0.88, Talk ai passi tutorial. PlayMode AdaSceneTest incluso.
+- **UI #110 pad Zaino (PR #174, su main `61054bc`)**: dopo un acquisto la sosta sul pad si chiude, il livello successivo si paga solo uscendo e rientrando; pillola prezzo sempre visibile. 3 test EditMode.
+- **UI #94 onboarding graduale (PR #100, in revisione; allineata a main dopo #78/#106/#135)**: `HudReveal` (nascosto/visibile + comparsa scala+dissolvenza 250 ms, HUD e mondo), **attivo di default per le partite nuove** (`RivelaGraduale`; salvataggi esistenti o tutorial finito = tutto visibile); barra LN pagato/totale sui pad + pillola residuo; aiuti come PR #90 (`OnboardingHints`: 10 s biglietto ripetuto + pulsazione, 20 s freccia a bordo o mano fantasma se il bersaglio è a schermo, 40 s camera ≤1,5 s una volta per passo); camera 2,75 s solo per elementi nuovi (`CameraPeek`); badge NONNO "x pacchi/min"; combo = `ComboPopup` solo "+N" sopra Nina (clienti di fila, 1,5 s; moltiplicatore solo soglia del passo 7, mai a schermo), niente contatore HUD; log `[Onb]` dietro `OnbLog` (spenti in rilascio); "Salta tutorial". Niente telefono né barra debito (DevOn). Compila con le DLL Unity 6000.3. **I test playmode del tutorial possono cambiare** (elementi nascosti all'avvio, freccia dopo 20 s).
 - **UI #142 anteprime `tutorial_hud_77` (PR ui/142-anteprime-nonno, in revisione)**: anteprime 360/390/412 rigenerate con il costo reale del pad NONNO (50 LN, non 10) e LN in tasca reali; solo documentazione QA, nessun C#.
 - **UI #77 + #5 (PR ui/77-tutorial-hud, in revisione)**: fumetto di Nonna Ada compatto (ritratto 36 dp + testo 14 dp, 1–2 righe senza ellissi per testi fino a 70 caratteri, sotto la riga LN/obiettivo); obiettivo spostato a destra della pillola LN nella stessa riga; suggerimenti `onb.*` come pillola terracotta sopra il joystick; freccia ▼ sopra la pillola prezzo dei pad di acquisto (colonna 3D rimossa, ribaltamento se il pad è in alto). Nuovo `UI/USS/TutorialHud.uss` (HudV2.uss non toccato). Testi passi letti per id dalla PR #62. QA anteprima 360/390/412 in `docs/qa/tutorial_hud_77/`. Da verificare in Unity.
 - Scheletro progetto Unity 6 + vertical slice cap. 1 (EconomyCore con test EditMode, gameplay, audio, import dati, script build/cattura).
@@ -38,10 +42,16 @@
 - Documentazione di design: bibbia, core loop, tech, UI, retention, sprint 1, gestionale, longevità, cap. 1 completo, protocollo Unity.
 
 ## 5. IN CORSO (oggi 16/10)
+- **Fix cap. 1 dal test di Lorenzo (build 7011805), obiettivo: tutto su main entro le 19:30, build entro le 20:00**:
+  - Tech Lead: PR della CI veloce (circa 17:00), #188 vendite fantasma (17:45), #189 frecce del tutorial (18:45), #170 da verificare (19:00).
+  - UI/UX: #185 angoli bianchi (PR entro le 17:00), #186 font e cartellini (PR entro le 18:45), #171 da verificare (19:00).
+  - 3D Artist: #187 zone a terra (18:15). VFX: #191 scatti (PR entro le 18:45). Narrative: PR #192 testi (19:00), poi in pausa.
+  - Build & Release: #184 cap DPR (19:00), build unica (19:30), #179 dopo.
+  - Dopo la build: #125, #168, #165, #97. La #175 resta fuori. La #190 è chiusa (Kaia è giusto).
 - **main @ 7dd1767** — QA live **v5 VIA** (PR #55: #47 deposito + #48 luce/camera). Build QA su `build/WebGL` :8777; art night su `build/WebGL_next` :8778 (non toccare).
 - P2 aperti da QA v5: camera follow (Nina esce/coperta), pillola prezzo LN sotto riga obiettivo.
 - **Merge del ramo `animator`** (fix camminata): conflitto su `chr_nina_vela.fbx` e `bot_nonno.fbx`.
-- I **clienti sono ancora capsule** → sostituire con i personaggi del ramo animator.
+- **#2 clienti veri (PR anim-2-clienti, dopo #87)**: 6 prefab `Customer*` (base, anziana, residente, rider, turista, VIP) con rig Humanoid 0c05198, `chr_cliente.controller`, AlwaysAnimate, niente root motion; `CustomerQueue.Variants` sceglie a caso. UV nuove del 3D Artist (art/2-personaggi) trasferite per indice su residente/rider/turista/VIP (`um_uv_transfer_clienti.py`), bind invariato.
 - Rifinitura tutorial Nonna Ada e game feel; resto cap. 1.
 
 - **#59 NONNO all'indietro (Animator, PR anim-59-nonno-verso)**: causa doppia. (1) `Rig(nonno,"bot_nonno")` usava yaw 180° ma il modello ha le forche su +Z come Nina → forche dietro rispetto alla marcia (misurato in Play Mode: dot(forche, velocità) = -0,97, ora +0,97). (2) Ruote di Drive in retromarcia (`um_bind_bot.py` x=-a) e Drive mai in riproduzione: Lift (bool tenuto per tutto il trasporto) e Happy sostituivano la Locomotion → NONNO scivolava a ruote ferme. Nuovo `bot_nonno.controller` a 2 layer (Base Idle/Drive + Happy interrompibile; layer «Forche» con maschera mast+forks per Lift/Drop). Scena rigenerata: il riferimento `CustomerQueue.Prefab` era rotto nella scena di main (0 clienti in gioco). Test PlayMode `AnimFacingTest` (Nina 4 direzioni, clienti, NONNO: forward, posa visiva, piede d'appoggio, verso ruote). Checklist A01/A03/A05: VIA in Play Mode.
@@ -95,6 +105,21 @@ $UNITY -batchmode -projectPath "$PWD" -runTests -testPlatform PlayMode \
 - I ruoli senza una issue attiva restano fermi finché il Producer non li riattiva.
 - Quando un ruolo si ferma, ferma solo i propri processi e subagenti e non manda **MAI** stop agli altri agenti: gli stop agli altri li danno solo DevOn o il Producer.
 
+
+## Regole di lavoro (approvate da Lorenzo, 16/10)
+- Nessun agente scrive più a Lorenzo, né nella sua chat né altrove, neppure per bug risolti, PR unite o via del QA. Tutti si rivolgono solo al Producer, e il Producer parla solo con DevOn, che porta a Lorenzo decisioni, blocchi gravi e il link pronto. Unica eccezione: chi riceve una domanda diretta di Lorenzo risponde solo a quella.
+- Ogni issue e PR, nuova o già aperta, ha sempre le etichette (ruolo/area, tipo bug/feature/docs, priorità) e una milestone. Chi la apre le mette subito. Il Code Reviewer non unisce PR senza etichette.
+- Nessun segreto, chiave o password nei file del repo (che ora è pubblico): solo nei GitHub Secrets.
+- PR piccole, una cosa per PR, rebase su main ogni giorno.
+- Prima di chiedere la CI, l'autore prova i test veloci (se possibile senza Unity, altrimenti con un solo Unity e `flock /tmp/unity-box.lock`). Niente rilanci a vuoto: una CI si rilancia solo a fix completa.
+- Ogni via richiesto (QA, Concept, review) ha un responsabile e una scadenza scritti nella PR, e il Producer sollecita.
+- Meno messaggi tra agenti: lo stato si legge in `STATO_PROGETTO.md`, con un punto del Producer ogni 2 ore. Si manda un messaggio solo per un blocco o una decisione.
+- Gli agenti senza issue restano in pausa.
+- Il coordinamento operativo è del Producer. A DevOn si scrive solo per decisioni, blocchi o il link pronto. Il punto della situazione si legge in `STATO_PROGETTO.md`.
+- Chi finisce il suo lavoro va in pausa e viene risvegliato dal Producer solo quando ha una issue assegnata.
+- Sound Designer, LiveOps e Concept Artist restano in pausa fino al capitolo 2 (salvo il via all'HUD).
+- La CI non parte sulle PR che toccano solo documenti (`paths-ignore` per `*.md` e `docs/`), verifica a cura del Tech Lead.
+
 ## Ruoli e responsabilità
 Ogni ruolo lavora solo sulle issue con la propria etichetta `ruolo:*`, sempre con **ramo + PR + `Closes #N`** (o `Refs #N` se parziale). Nessuno pusha su `main`.
 
@@ -133,6 +158,28 @@ Ogni ruolo lavora solo sulle issue con la propria etichetta `ruolo:*`, sempre co
 
 Voci più recenti in alto. Formato: `AAAA-MM-GG HH:MM` (Europe/Rome) — [commit] — descrizione.
 
+- 2026-10-16 16:25 — UI/UX — [aa5f033](https://github.com/B00RR/ultimo-miglio/commit/aa5f033c699f420dfd939519cc67dc485bc3b2af) — fix #185 (ramo `ui/185-angoli-9slice`): gli angoli bianchi dei riquadri arrotondati venivano dal 9-slice di `tex_cardboard_panel.png` e `tex_wood_panel.png`, PNG RGB senza alpha (angoli opachi) più il bordo sprite a 0 e, sui Button, lo sprite bianco del tema. Ora i pannelli sono RGBA con angoli trasparenti, mesh Full Rect, RGBA32 su WebGL; test EditMode `UiTextureAlpha185Tests`.
+- 2026-10-16 16:15 — Producer — Responsabili e scadenze per #185-#191, #170, #171, #179, #192, #168, #165, #125, #97. Assignee su GitHub non usabili (un solo account B00RR): il responsabile è scritto in un commento su ogni issue.
+- 2026-10-16 15:22 — Producer — Regola di Lorenzo (vincolo 8): merge su main solo Code Reviewer, DevOn, Lorenzo; main protetto. Avvisati tutti.
+- 2026-10-16 15:20 — Producer — Regola nuova di Lorenzo sull'autore dei commit (vincolo 7): ruolo + `@bokobay.invalid`, avvisati tutti gli agenti attivi.
+- 2026-10-16 15:12 — Producer — #174 unita (`61054bc`, chiude #110). Per la build manca solo **#157**: Zaino fermo al liv. 7, IdToStep con i 16 id (testi Narrative in `proposte/ONB16_TESTI_TILDE.md`), CI verde. QA in pausa: il test lo fa Lorenzo sul link.
+- 2026-10-16 15:08 — Producer — **punto Cap. 1 (15:08 Europe/Rome)**:
+  - **#169** unita (Ada in scena, `2993e96` su main).
+  - **#157** (tutorial 16 passi, `tech/101-tutorial-16`): MERGEABLE dopo rebase (`904869b`); job `test` **cancellato** sull'ultimo run — serve CI verde. **Blocco Code Reviewer**: Zaino cap. 1 deve fermarsi al **livello 7** (+ test). Responsabile Tech Lead.
+  - **#174** (fix Zaino liv.2 / #110, `ui/110-zaino-prezzo-liv2`): MERGEABLE dopo rebase (`c7084d2`); job **`test` verde**. Pronta per merge del Code Reviewer.
+  - **#175** (HUD insegna noce / #172): `test` verde, job **`catture` rosso**; fuori dalla build Cap. 1 (milestone Gioco completo). Code Reviewer non unisce (catture/CI licenza, STATO, conferma tempi).
+  - **QA**: in pausa; checklist LIVE #66 ancora aperta. **Build** WebGL Cap. 1 (#6/#179): dopo #157+#174 verdi → VIA Build & Release.
+  - **Rischio scadenza**: milestone Capitolo 1 → **17/10 10:00**; niente link pronto. Critico Cap. 1 ora: #157 (limite Zaino 7 + CI) e #174 (CI → merge).
+- 2026-10-16 14:59 — UI/UX — [PR #174](https://github.com/B00RR/ultimo-miglio/pull/174) (`ui/110-zaino-prezzo-liv2`) — merge di main dopo #169 e #154 (niente force-push). Conflitto solo su questo file: scena, SliceSceneBuilder e gameplay arrivano da main senza altre modifiche nostre.
+- 2026-10-16 14:19 — Regola fissa di Lorenzo: nessun agente gli scrive; tutto passa dal Producer a DevOn.
+- 2026-10-16 14:06 — UI/UX — [PR #174](https://github.com/B00RR/ultimo-miglio/pull/174) (`ui/110-zaino-prezzo-liv2`) — CI verde sul pad Zaino. Merge di main (niente force-push): #162, #132, #176. Conflitto solo su questo file.
+- 2026-10-16 14:01 — Regole di consumo approvate da Lorenzo: coordinamento al Producer, pausa per chi ha finito, Sound, LiveOps e Concept in pausa fino al capitolo 2, CI esclusa per le PR di soli documenti.
+- 2026-10-16 13:55 — UI/UX — [PR #174](https://github.com/B00RR/ultimo-miglio/pull/174) (`ui/110-zaino-prezzo-liv2`) — il test della pillola aggiunge prima il BoxCollider (ProximityZone lo richiede). I due test sul pagamento erano già verdi.
+- 2026-10-16 13:41 — UI/UX — [PR #174](https://github.com/B00RR/ultimo-miglio/pull/174) (`ui/110-zaino-prezzo-liv2`) — merge di main (niente force-push): #110, lo Zaino 2 non prosciuga più gli LN dopo l'acquisto. Test EditMode `ZainoPad110Tests`.
+- 2026-10-16 13:28 — Regole di lavoro approvate da Lorenzo: etichette e milestone obbligatorie, niente segreti nel repo, PR piccole, test veloci prima della CI, responsabile e scadenza per ogni via, meno messaggi, pausa per chi non ha issue.
+- 2026-10-16 11:54 — Tech Lead — [c859f94](https://github.com/B00RR/ultimo-miglio/commit/c859f94ea08537f7a4d55aa3b9ba418f1202c3de) — PR #103 rewards: soglie pacchi 100/250/450, traguardi debito 25/50/75%, mancia Cassa 30 LN, freccia prossimo pad da 480 s; test EditMode EconomyRewardsTests.
+- 2026-10-16 12:12 — Code Reviewer — [4a1b26b](https://github.com/B00RR/ultimo-miglio/commit/4a1b26b6256d5f16153e713698f1ac4d3cfd5b72) — unita in squash la [PR #153](https://github.com/B00RR/ultimo-miglio/pull/153) (Audio: sfx combo +N e timbro del debito per la #137). Job `test` verde, asset OGG + README/licenze. Refs #136.
+- 2026-10-16 12:11 — Code Reviewer — [4e49b30](https://github.com/B00RR/ultimo-miglio/commit/4e49b30c6d5d867a12130ac42ff75c2ebf3d97eb) — unita in squash la [PR #88](https://github.com/B00RR/ultimo-miglio/pull/88) (feat(#2): clienti veri al posto delle capsule, 6 varianti riggate). Job `test` verde, diff rivisto (CustomerQueue.Variants, SliceSceneBuilder, ClientiRigTest). Closes #2.
 - 2026-10-16 12:04 — Code Reviewer — [2efd867](https://github.com/B00RR/ultimo-miglio/commit/2efd867a340f353a69f59d20b3f8094b6c6919df) — unita in squash la [PR #122](https://github.com/B00RR/ultimo-miglio/pull/122) (UI #110: il pad Zaino non prosciuga più gli LN sul livello successivo e la pillola prezzo resta visibile). Job `test` verde, diff rivisto (solo `UpgradePad.cs`). Closes #110.
 - 2026-10-16 11:58 — Code Reviewer — [e26ff47](https://github.com/B00RR/ultimo-miglio/commit/e26ff47c0d834131b83893fde30a4ae8ac3b9bca) — unita in squash la [PR #151](https://github.com/B00RR/ultimo-miglio/pull/151) (Docs UI: colori pad rimandati a GUIDA_VISIVA_CAP1 §2). Solo `.md`. Closes #150.
 - 2026-10-16 11:56 — Code Reviewer — [f89351c](https://github.com/B00RR/ultimo-miglio/commit/f89351c724caf40832299e49a1635fedc980c727) — unita in squash la [PR #126](https://github.com/B00RR/ultimo-miglio/pull/126) (VFX #81: build riallineata alla guida visiva — vince la guida). Job `test` verde. VIA Concept Artist + Producer. Closes #81.
@@ -257,3 +304,9 @@ Voci più recenti in alto. Formato: `AAAA-MM-GG HH:MM` (Europe/Rome) — [commit
 - Deciso (Tech Lead): pannello unico `SettingsController`; `Bridge/SettingsPanel` resta (usato da `HudGameBridge`) ma senza listener `OnSettingsRequested`. Ingranaggio = toggle (QA P3, `qa/playtest_web_live_p0.md` S01). Zoom su chiave unica `cam_zoom_v3` (`DepotCameraFit.PrefZoom`).
 - Riferimento #35 (chiusa). Correlate aperte: #64, #67.
 - 2026-10-16 — PR #85 (3D Artist, Refs #2): solo clienti v03-uv in `3d/export/chr/` (rider cappello limone, 3 toni pelle; residente/rider/turista/vip, vertici invariati) + review docs/review/2. Nonna Ada tolta: la consegna l'Animator (#93).
+
+## Aggiornamento 16/10 10:55 — Zone a terra senza blu/grigi (VFX, issue #69, branch `vfx/69-zone-calde`)
+- Dischi POI (`InteractionPoint`): Prendi terracotta `#C8633B` (era teal `#5E7F86`), Consegna menta `#8FC9A8`, Acquisto e upgrade (dischi, anelli, FX) giallo sole `#F4C430` (limone `#F7E26B` solo nelle scintille core e nella scia della moneta), bordo `#3B2F2A`. Schiarimenti e beacon verso crema `#F3E3C3` invece che verso il bianco (niente pali grigio-azzurri).
+- Nascosto il quadrato giallo `UI/ZoneRing` sotto i dischi (sembrava una griglia di debug); la logica del Fill resta.
+- Anello pad "Pickup" e FX pacco: da teal a terracotta.
+- Da fare: cattura 390×844 in build (CI); i pali grigi dei lampioni, se sono mesh 3D, passano al 3D Artist.
