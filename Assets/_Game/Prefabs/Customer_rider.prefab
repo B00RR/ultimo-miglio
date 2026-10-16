@@ -10,7 +10,7 @@ GameObject:
   m_Component:
   - component: {fileID: 1959102372461451945}
   - component: {fileID: 4325278993878014917}
-  - component: {fileID: 3644137027899504810}
+  - component: {fileID: 9211418316968778842}
   m_Layer: 0
   m_Name: Customer_rider
   m_TagString: Untagged
@@ -57,7 +57,7 @@ CapsuleCollider:
   m_Height: 1.6
   m_Direction: 1
   m_Center: {x: 0, y: 0.8, z: 0}
---- !u!114 &3644137027899504810
+--- !u!114 &9211418316968778842
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
