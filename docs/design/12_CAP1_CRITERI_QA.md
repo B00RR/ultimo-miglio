@@ -82,11 +82,41 @@ Tutti i criteri A-D verdi su 3 run consecutivi del bot; nessun blocco del flusso
 **Cosa si misura per ogni passo** (dai log dei gate + video): durata del passo (dal reveal al gate); livello massimo di aiuto scattato (nessuno / 10 / 20 / 40 s); **punti di confusione** = momenti di più di 10 s senza un'azione utile o con frasi tipo "non so cosa fare" / "e adesso?"; verbalizzazione della meccanica (sa dire cosa ha appena imparato?).
 **Domande finali (2 minuti):** "Cosa fa NONNO?", "Come si compra un miglioramento?", "Cosa succede se non paghi la rata?", "C'è stato un momento in cui non sapevi cosa fare?". Risposta corretta = idea giusta con parole proprie.
 
-**Criterio di superamento (per tester):**
-- **mai più di 10 s senza sapere cosa fare** (nessun punto di confusione oltre 10 s);
-- nessun blocco (intervento del facilitatore);
-- aiuto da 40 s scattato al massimo 1 volta in tutto l'onboarding;
-- ogni passo entro il suo `maxSec`;
-- almeno 3 domande finali su 4 corrette, sempre compresa "Cosa fa NONNO?".
+**Criteri di superamento della run (PT-01…PT-07, tutti obbligatori):**
+| ID | Criterio | Come si misura |
+|---|---|---|
+| PT-01 | Mai più di 10 s senza sapere cosa fare | 0 blocchi >10 s nella scheda |
+| PT-02 | Nessun intervento esterno (nessun blocco grave >60 s) | colonna blocco |
+| PT-03 | Aiuto di livello 3 (40 s) al massimo 1 volta in tutto l'onboarding | colonna "aiuto max" |
+| PT-04 | Ogni passo entro il suo `maxSec` (`freePlay` = 0, terminale: escluso) | t fine ≤ maxSec |
+| PT-05 | Tutti i 18 gate nell'ordine di `onboarding.json`, ognuno loggato una volta | log dei gate |
+| PT-06 | Nessuna chiave grezza `onb.*` / `step:*` a schermo e nessun testo >70 caratteri (ONB-16) | screenshot |
+| PT-07 | Comprensione: almeno 3 domande finali su 4 corrette, sempre "Cosa fa NONNO?" (per la run QA-Playwright: NONNO assunto entro 2:10 +30 s senza aiuto di livello 3) | domande / log |
+
+I criteri dei gate restano GATE-01…GATE-07 in §E: §E = comportamento del gioco, §F = superamento della run.
 
 **Criterio di superamento del giro:** almeno 4 tester su 5 passano; per ogni passo dove 2 o più tester superano i 10 s di confusione si apre un ticket con video e minuto. Template di report: tabella tester × passo (durata, aiuto massimo, confusione sì/no, citazione).
+
+## G. Mappatura ufficiale passo → criteri (rev. 16/10)
+Valgono per **tutti** i passi: GATE-02, GATE-03, ONB-16, PT-01…PT-06. GATE-04 vale per ogni passo con escalation (tutti tranne `coldOpen`, `nonnoIntro`, `nonnoConfirm`, `wallPad`, `freePlay`).
+| # | Passo | Criteri specifici |
+|---|---|---|
+| 1 | `coldOpen` | ONB-01 |
+| 2 | `move` | ONB-02, GATE-01 |
+| 3 | `pickUp` | ONB-03 |
+| 4 | `shelve` | ONB-04 |
+| 5 | `serve` | ONB-05, CLI-01, CLI-05 |
+| 6 | `coins` | ONB-06 |
+| 7 | `zainoPad` | ONB-07, GATE-06, ECO-10 |
+| 8 | `combo` | ONB-08, ONB-15, CLI-02 (anziano da 1:40), GATE-05 |
+| 9 | `nonnoIntro` | ONB-09a |
+| 10 | `hireNonno` | ONB-09, ONB-09b, ONB-09c, GATE-06 |
+| 11 | `nonnoConfirm` | ONB-09d |
+| 12 | `phone` | ONB-10, CLI-02 (frettoloso da 2:30) |
+| 13 | `padNuovi` | GATE-07, ECO-10 |
+| 14 | `ordersApp` | ONB-11 |
+| 15 | `cassaPass` | ONB-12 |
+| 16 | `debtCard` | ONB-13, ECO-06, GATE-06 |
+| 17 | `wallPad` | ONB-14 |
+| 18 | `freePlay` | PT-07, fine run (maxSec 0 = terminale) |
+Criteri a livello di sessione (non legati a un passo): CLI-03, CLI-04, CLI-06, CLI-07, ECO-01…ECO-05, ECO-07…ECO-09, ECO-11, DAT-01…03.

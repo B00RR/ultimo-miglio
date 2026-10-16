@@ -22,12 +22,12 @@ Richiesta di Lorenzo (via DevOn): **una meccanica alla volta**; ogni passo si sb
 | 9 `hireNonno` | 2:10 ±5 | 2:40 | assumere un robot (pad da 50 LN) | pad.assumiNonno | `nonnoHired` | `onb.nonno.cost`, `step:unlock_nonno` | onb.nonno.reminder + pad rimbalza / freccia + camera pulsa sul pad / camera 1,5 s sul pad + ripete onb.nonno.what |
 | 10 `nonnoConfirm` | 2:11 ±5 | 2:30 | vedere NONNO lavorare | robot.nonno.attivo, app.flotta | `nonnoFirstRestock` | `onb.nonno.hired`, `onb.nonno.working` | — |
 | 11 `phone` | 2:45 ±10 | 3:20 | telefono: leggere un messaggio | hud.telefono, app.messaggi | `messageRead` | `onb.civetta.msg1`, `onb.civetta.reply`, `onb.civetta.msg2` | telefono vibra di nuovo / badge rosso + freccia sul telefono / mano fantasma che tocca il telefono |
-| 12 `padNuovi` | 2:50 ±10 | 3:50 | scegliere tra più pad (Scarpe, Insegna) | pad.scarpe, pad.insegna, pad.zaino.livelliSuccessivi | `padPurchasedAny` | `NEW:onb.pads.new` | i due pad pulsano / freccia sul più economico pagabile / camera sui due pad |
+| 12 `padNuovi` | 2:50 ±10 | 3:50 | scegliere tra più pad (Scarpe, Insegna) | pad.scarpe, pad.insegna, pad.zaino.livelliSuccessivi | `padPurchasedAny` | `onb.pads.new` | i due pad pulsano / freccia sul più economico pagabile / camera sui due pad |
 | 13 `ordersApp` | 3:30 ±10 | 4:00 | app Ordini | app.ordini | `ordersTapShowRoute` | `onb.orders.special`, `onb.flotta.hint` | badge rosso fisso / freccia sul telefono / mano fantasma sull'app |
-| 14 `cassaPass` | 3:55 ±10 | 4:15 | Cassa: incasso passandoci sopra | zona.cassa | `cassaPassed` | `NEW:onb.cassa.tip` | Cassa luccica / freccia sulla Cassa / camera sulla Cassa |
+| 14 `cassaPass` | 3:55 ±10 | 4:15 | Cassa: incasso passandoci sopra | zona.cassa | `cassaPassed` | `onb.cassa.tip` | Cassa luccica / freccia sulla Cassa / camera sulla Cassa |
 | 15 `debtCard` | 4:00 ±10 | 4:40 | debito: versare alla Cassaforte | zona.cassaforte, hud.barraDebito | `firstDebtDeposit` | `onb.viktor.call1`, `onb.viktor.call2`, `onb.debt.pedaggioHint` | Cassaforte pulsa / freccia sulla Cassaforte / camera sulla Cassaforte + ripete onb.viktor.call2 |
 | 16 `wallPad` | 4:30 ±10 | 5:00 | obiettivo successivo | pad.apriMuro | `goalSeen ≥3` | `onb.wall.goal` | — |
-| 17 `freePlay` | 5:00 ±0 | — | gioco libero | pad.nonnoUpgrade, tutto il resto del cap 1 | `none` | `fine` | — |
+| 17 `freePlay` | 5:00 ±0 | 0 (terminale) | gioco libero | pad.nonnoUpgrade, tutto il resto del cap 1 | `none` | `fine` | — |
 
 Note ai passi:
 - `shelve` compare quando la pila è piena (5) o quando Nina lascia gli Arrivi con almeno 1 pacco.
@@ -42,14 +42,14 @@ Rieseguito `qa/playthrough_ch1.py` con Scarpe/Insegna nascosti fino a 170 s: **n
 ## Chiavi di testo
 Esistenti (PR #62): tutte le `onb.*` e i biglietti `step:<id>` citati sopra.
 
-**Chiavi NUOVE richieste al Narrative** (max 70 caratteri):
+**Chiavi aggiunte dal Narrative nella PR #92** (testi in `onboarding_testi.json`):
 - `onb.zaino.notEnough`: servono 40 LN per lo Zaino (continua a servire clienti);
 - `onb.pads.new`: ci sono nuovi pad, scegline uno (Scarpe = più veloce, Insegna = clienti che pagano di più);
 - `onb.cassa.tip`: la mancia di 30 LN di Nonna Ada al primo passaggio sulla Cassa.
 
 ## Cosa serve dagli altri ruoli
 **UI/UX:** stati nascosto/rivelato con animazione di comparsa per ogni elemento di `lockedAtStart`; barra di riempimento LN sui pad ("32/50"); freccia a bordo schermo; mano fantasma; pulsazione dei bersagli; camera breve non bloccante (2,5-3 s); badge "6 pacchi/min"; tasto "Salta tutorial" dopo la combo; evento di log per ogni gate e ogni livello di aiuto.
-**Narrative:** le 3 chiavi nuove sopra; conferma che i biglietti `step:*` restano 7 e nello stesso ordine.
+**Narrative:** le 3 chiavi sono arrivate con la PR #92; resta da accorciare `onb.civetta.msg1` (86 caratteri, limite 70); conferma che i biglietti `step:*` restano 7 e nello stesso ordine.
 
 ## Ricompense dopo l'onboarding (rev. 16/10, `economy.json` → `rewards`)
 - Traguardi consegne: 100 / 250 / 450 pacchi = +60 / +120 / +200 LN (golden path: 6:03, 12:25, 20:11).

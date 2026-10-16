@@ -32,7 +32,7 @@
     "20s": "freccia a bordo schermo / mano fantasma",
     "40s": "camera breve sul bersaglio (≤1,5 s, input attivo)"
   },
-  "keyLegend": "step:<id> = biglietto di Nonna Ada in onboarding_testi.json steps[]; NEW: = chiave nuova da creare (Narrative)",
+  "keyLegend": "step:<id> = biglietto di Nonna Ada in onboarding_testi.json steps[]; tutte le chiavi onb.* sono in onboarding_testi.json (PR #62 e #92)",
   "skipTutorial": {
     "availableAfterStep": "combo",
     "effect": "sblocca tutto ciò che i passi saltati avrebbero rivelato"
@@ -202,7 +202,7 @@
       "insufficientLn": {
         "rule": "il pad compare solo a 40 LN; prima si torna in loop serve/coins",
         "textKeys": [
-          "NEW:onb.zaino.notEnough"
+          "onb.zaino.notEnough"
         ]
       },
       "note": "il gate prova che il giocatore sa comprare: serve per NONNO"
@@ -359,7 +359,7 @@
         ]
       },
       "textKeys": [
-        "NEW:onb.pads.new"
+        "onb.pads.new"
       ],
       "hintEscalation": {
         "10s": "i due pad pulsano",
@@ -403,7 +403,7 @@
         "event": "cassaPassed"
       },
       "textKeys": [
-        "NEW:onb.cassa.tip"
+        "onb.cassa.tip"
       ],
       "hintEscalation": {
         "10s": "Cassa luccica",
@@ -461,7 +461,7 @@
       "id": "freePlay",
       "tSec": 300,
       "toleranceSec": 0,
-      "maxSec": null,
+      "maxSec": 0,
       "mechanic": "gioco libero",
       "reveals": [
         "pad.nonnoUpgrade",
@@ -473,7 +473,8 @@
       "textKeys": [
         "fine"
       ],
-      "hintEscalation": null
+      "hintEscalation": null,
+      "maxSecNote": "0 = passo terminale senza limite di tempo e senza escalation: l'onboarding finisce al reveal di freePlay; la sessione di playtest si chiude qui o a 10 min di gioco"
     }
   ]
 }
