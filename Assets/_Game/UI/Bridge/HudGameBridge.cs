@@ -81,6 +81,8 @@ namespace UltimoMiglio.UI.Bridge
             _settings = gameObject.GetComponent<SettingsPanel>() ?? gameObject.AddComponent<SettingsPanel>();
             _settings.Bind(Hud, Hud.Root);
             // Pannello unico = SettingsController (PR #36): SettingsPanel non si apre più dall'ingranaggio.
+            // Nessuno aggiungeva SettingsController: va sul GameObject del UIDocument HUD (TryBind usa GetComponent<UIDocument>)
+            if (!Hud.GetComponent<UltimoMiglio.UI.SettingsController>()) Hud.gameObject.AddComponent<UltimoMiglio.UI.SettingsController>();
             _settingsWired = true;
         }
 
