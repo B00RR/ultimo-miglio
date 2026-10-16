@@ -20,7 +20,7 @@ namespace UltimoMiglio.VFX.EditorTools
             rig.Apply();
             RenderSettings.skybox = null; // flat Cielo background via camera clear color
             foreach (var cam in Object.FindObjectsByType<Camera>(FindObjectsSortMode.None))
-            { cam.clearFlags = CameraClearFlags.SolidColor; cam.backgroundColor = UM_Palette.CieloOriz; // pesca caldo, mai azzurro }
+            { cam.clearFlags = CameraClearFlags.SolidColor; cam.backgroundColor = UM_Palette.CieloOriz; } // pesca caldo, mai azzurro
 
             var urp = GraphicsSettings.defaultRenderPipeline as UniversalRenderPipelineAsset;
             if (urp)
