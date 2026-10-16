@@ -17,6 +17,8 @@ namespace UltimoMiglio.Gameplay
         /// <summary>Passi senza escalation di aiuti (spec #91 §2).</summary>
         public static bool HasHints(Step s) => !(s == Step.ColdOpen || s == Step.NonnoIntro || s == Step.NonnoConfirm || s == Step.WallPad || s >= Step.FreePlay);
         public const string PrefKey = "um_tut_step";
+        /// <summary>Versione del tutorial salvata con il passo: se manca o è diversa (vecchio tutorial a 7 passi, #4) si riparte da coldOpen.</summary>
+        public const string PrefVer = "um_tut_ver"; public const int Versione = 16;
         public static TutorialManager I { get; private set; }
         public static System.Action<Step> StepChanged;
 
@@ -77,6 +79,7 @@ namespace UltimoMiglio.Gameplay
         {
             LoadTesti();
             LoadSteps();
+            if (PlayerPrefs.HasKey(PrefKey) && PlayerPrefs.GetInt(PrefVer, 0) != Versione) PlayerPrefs.DeleteKey(PrefKey);
             Current = (Step)Mathf.Clamp(PlayerPrefs.GetInt(PrefKey, 0), 0, (int)Step.Chiuso);
             _hud = FindAnyObjectByType<UltimoMiglio.UI.HudController>();
             _edge = FindAnyObjectByType<UltimoMiglio.UI.EdgeArrow>(FindObjectsInactive.Include);
@@ -158,13 +161,13 @@ namespace UltimoMiglio.Gameplay
         }
 
         const bool UseAdaNote = true;
-        internal static readonly System.Collections.Generic.Dictionary<string, Step> IdToStep = new()
-        {   // id dei testi (onboarding_testi.json "step:<id>") → passo
-            { "move", Step.Move }, { "pickup", Step.PickUp }, { "shelve", Step.Shelve }, { "serve", Step.Serve }, { "coins", Step.Coins },
-            { "unlock_nonno", Step.HireNonno }, { "upgrade_zaino", Step.ZainoPad },
-            { "combo", Step.Combo }, { "nonno_intro", Step.NonnoIntro }, { "nonno_confirm", Step.NonnoConfirm }, { "pad_nuovi", Step.PadNuovi },
-            { "cassa", Step.CassaPass }, { "debito", Step.DebtCard }, { "muro", Step.WallPad }
-        };
+        internal static readonly System.Collections.Generic.Dictionary<string, Step> IdToStep = BuildIdToStep();
+        static System.Collections.Generic.Dictionary<string, Step> BuildIdToStep()
+        {   // id dei testi = StepIds (onboarding_testi.json steps[].id, onboarding.json "step:<id>")
+            var m = new System.Collections.Generic.Dictionary<string, Step>();
+            for (int i = 0; i < StepIds.Length; i++) m[StepIds[i]] = (Step)i;
+            return m;
+        }
         /// <summary>#101: testi per id (onboarding_testi.json) → array a 16 passi. Sostituisce il vecchio array a 7 passi (#4).</summary>
         public static string[] TextsById(System.Collections.Generic.IEnumerable<(string id, string text)> steps)
         {
@@ -292,7 +295,7 @@ namespace UltimoMiglio.Gameplay
 
         void Enter(Step s)
         {
-            Current = s; PlayerPrefs.SetInt(PrefKey, (int)s); PlayerPrefs.Save();
+            Current = s; PlayerPrefs.SetInt(PrefKey, (int)s); PlayerPrefs.SetInt(PrefVer, Versione); PlayerPrefs.Save();
             var eco = GameRoot.Ready ? GameRoot.I.Eco : null;
             if (GameRoot.I && GameRoot.I.Nina) _startPos = GameRoot.I.Nina.transform.position;
             _shelfBase = ShelfTotal(); _servedBase = eco?.S.CustomersServed ?? 0; _walletBase = eco?.S.Wallet ?? 0; _endT = 0; _stepStart = Time.time;

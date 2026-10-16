@@ -421,7 +421,7 @@ MonoBehaviour:
           level: 0
           pads: []
         textKeys:
-        - step:pickup
+        - step:pickUp
         - onb.pick.max
       - id: shelve
         tSec: 50
@@ -479,7 +479,7 @@ MonoBehaviour:
           level: 1
           pads: []
         textKeys:
-        - step:upgrade_zaino
+        - step:zainoPad
         - onb.zaino.hint
       - id: combo
         tSec: 100
@@ -522,7 +522,7 @@ MonoBehaviour:
           pads: []
         textKeys:
         - onb.nonno.cost
-        - step:unlock_nonno
+        - step:hireNonno
       - id: nonnoConfirm
         tSec: 131
         maxSec: 150
