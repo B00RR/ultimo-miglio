@@ -1,7 +1,7 @@
 # STATO PROGETTO — Bokobay
 
 > Punto di ingresso unico per chiunque (persona o agente) lavori su questo repo. Aggiornalo **nella stessa PR** in cui completi qualcosa.
-> Ultimo aggiornamento: 2026-10-16 09:05 (Europe/Rome).
+> Ultimo aggiornamento: 2026-10-16 11:18 (Europe/Rome).
 
 ## 1. Il gioco
 - **Bokobay**: gioco mobile **Android**, **Unity 6 (6000.3) URP**.
@@ -40,6 +40,8 @@
 - **Merge del ramo `animator`** (fix camminata): conflitto su `chr_nina_vela.fbx` e `bot_nonno.fbx`.
 - I **clienti sono ancora capsule** → sostituire con i personaggi del ramo animator.
 - Rifinitura tutorial Oma Tilde e game feel; resto cap. 1.
+
+- **#59 OLDO all'indietro (Animator, PR anim-59-nonno-verso)**: causa doppia. (1) `Rig(nonno,"bot_nonno")` usava yaw 180° ma il modello ha le forche su +Z come Kaia → forche dietro rispetto alla marcia (misurato in Play Mode: dot(forche, velocità) = -0,97, ora +0,97). (2) Ruote di Drive in retromarcia (`um_bind_bot.py` x=-a) e Drive mai in riproduzione: Lift (bool tenuto per tutto il trasporto) e Happy sostituivano la Locomotion → OLDO scivolava a ruote ferme. Nuovo `bot_nonno.controller` a 2 layer (Base Idle/Drive + Happy interrompibile; layer «Forche» con maschera mast+forks per Lift/Drop). Scena rigenerata: il riferimento `CustomerQueue.Prefab` era rotto nella scena di main (0 clienti in gioco). Test PlayMode `AnimFacingTest` (Kaia 4 direzioni, clienti, OLDO: forward, posa visiva, piede d'appoggio, verso ruote). Checklist A01/A03/A05: VIA in Play Mode.
 
 ## 6. DA FARE
 - Resto del gioco in **3–4 giorni**: capitoli 2+ con **un sistema gestionale per capitolo** (energia/corrente, contratti, rotte, officina, GrayBox).
@@ -116,6 +118,10 @@ Ogni ruolo lavora solo sulle issue con la propria etichetta `ruolo:*`, sempre co
 
 Voci più recenti in alto. Formato: `AAAA-MM-GG HH:MM` (Europe/Rome) — [commit] — descrizione.
 
+- 2026-10-16 11:29 — Code Reviewer — [2f2f61f](https://github.com/B00RR/ultimo-miglio/commit/2f2f61f2d5d4946d01c8b7f65fc192d715cc0e51) — unita in squash la [PR #85](https://github.com/B00RR/ultimo-miglio/pull/85) (clienti v03-uv: rider cappello limone, 3 toni pelle; Tilde già su main via #93). Job `test` verde. Refs #2.
+- 2026-10-16 11:29 — Code Reviewer — [8ed4422](https://github.com/B00RR/ultimo-miglio/commit/8ed4422972dd7c6d3a80a45769034ec6b6c3d270) — unita in squash la [PR #135](https://github.com/B00RR/ultimo-miglio/pull/135) (Zaino 8 = 3.000 LN; combo HUD solo +N). Job `test` verde. Closes #134.
+- 2026-10-16 11:29 — Code Reviewer — [3a3864c](https://github.com/B00RR/ultimo-miglio/commit/3a3864c134075e713eef85346639d11b7b581e12) — unita in squash la [PR #113](https://github.com/B00RR/ultimo-miglio/pull/113) (testi HUD minimo cap. 1 / rinviati_cap2). Job `test` verde. Closes #105.
+- 2026-10-16 11:17 — Code Reviewer — [ad8a98b](https://github.com/B00RR/ultimo-miglio/commit/ad8a98be83087673dcdede2ca108c4cf706d4a5d) — unita in squash la [PR #93](https://github.com/B00RR/ultimo-miglio/pull/93) (anim: Oma Tilde riggata — Idle/Walk/Talk, controller, prefab scala 0,88; Refs #118 / #2). Job `test` verde. #85 resta aperta per clienti v03 (togliere file Tilde).
 - 2026-10-16 11:15 — Code Reviewer — [a65de18](https://github.com/B00RR/ultimo-miglio/commit/a65de1873055ec905d4b54b02535940313ebf2b3) — unita in squash la [PR #124](https://github.com/B00RR/ultimo-miglio/pull/124) (fix(#65): angolo SO, Kaia non compenetra più il lampione).
 - 2026-10-16 11:15 — Code Reviewer — [965e36a](https://github.com/B00RR/ultimo-miglio/commit/965e36a72d586111106b7c6a4e76bbc9ad34cc08) — unita in squash la [PR #121](https://github.com/B00RR/ultimo-miglio/pull/121) (Specifica eventi di log dell'onboarding cap. 1 (playtest QA)).
 - 2026-10-16 11:15 — Code Reviewer — [dc4d728](https://github.com/B00RR/ultimo-miglio/commit/dc4d72869f0239bde76e93ce31da4c1a9b680dc6) — unita in squash la [PR #120](https://github.com/B00RR/ultimo-miglio/pull/120) (QA: checklist Cap.1 aggiornata (C13/P07/Z02) + scheda osservazione playtest).
@@ -223,3 +229,4 @@ Voci più recenti in alto. Formato: `AAAA-MM-GG HH:MM` (Europe/Rome) — [commit
 - Catture anteprima 390x844 (HTML/Playwright, non Unity): `docs/ui/catture/pr36/`.
 - Deciso (Tech Lead): pannello unico `SettingsController`; `Bridge/SettingsPanel` resta (usato da `HudGameBridge`) ma senza listener `OnSettingsRequested`. Ingranaggio = toggle (QA P3, `qa/playtest_web_live_p0.md` S01). Zoom su chiave unica `cam_zoom_v3` (`DepotCameraFit.PrefZoom`).
 - Riferimento #35 (chiusa). Correlate aperte: #64, #67.
+- 2026-10-16 — PR #85 (3D Artist, Refs #2): solo clienti v03-uv in `3d/export/chr/` (rider cappello limone, 3 toni pelle; residente/rider/turista/vip, vertici invariati) + review docs/review/2. Oma Tilde tolta: la consegna l'Animator (#93).
