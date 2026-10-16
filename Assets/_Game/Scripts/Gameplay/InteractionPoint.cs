@@ -132,13 +132,29 @@ namespace UltimoMiglio.Gameplay
             if (Ring && !Pad) Ring.SetProgress(near ? 1f : 0f);
             if (PadIcon) { PadIcon.SetVisible(false); PadIcon.SetPlayerNear(near); }
             var tag = GetComponent<UltimoMiglio.UI.World.PadTag>(); if (tag) tag.enabled = false;
-            Vector3 sp = _cam.WorldToScreenPoint(transform.position + Vector3.up * (2.0f + 0.15f * Mathf.Sin(Time.time * 2.4f + _phase)));
+            // Offset mondo: più basso se il pad è in alto nello schermo, così la pillola non finisce sotto l'obiettivo
+            float bob = 0.12f * Mathf.Sin(Time.time * 2.4f + _phase);
+            Vector3 world = transform.position + Vector3.up * (1.55f + bob);
+            Vector3 sp = _cam.WorldToScreenPoint(world);
+            if (sp.z > 0 && sp.y > Screen.height * 0.72f)
+                sp = _cam.WorldToScreenPoint(transform.position + Vector3.up * (1.05f + bob * 0.5f));
             bool show = avail && !(HasCard && near) && sp.z > 0 && sp.x > 0 && sp.x < Screen.width && sp.y > 0 && sp.y < Screen.height;
             _chip.style.display = show ? DisplayStyle.Flex : DisplayStyle.None;
             if (!show || _chip.panel == null) return;
             var p = UltimoMiglio.UI.SafeAreaUtil.ScreenToPanel(_chip.panel, sp);
+            // QA v5 P2: non sotto la riga obiettivo; QA v6 P3: non tagliata sui bordi SX/DX
+            const float hudTopReserve = 92f;
+            if (p.y < hudTopReserve) p.y = hudTopReserve;
+            float panelW = _chip.panel.visualTree.worldBound.width;
+            if (panelW < 1f) panelW = Screen.width;
+            float halfChip = 70f; // pillola ~140px, anchor al centro (translate -50%)
+            const float edgePad = 10f;
+            if (p.x < halfChip + edgePad) p.x = halfChip + edgePad;
+            if (p.x > panelW - halfChip - edgePad) p.x = panelW - halfChip - edgePad;
             _chip.style.left = p.x; _chip.style.top = p.y;
             _chip.style.scale = new Scale(Vector3.one * (_active ? 1.12f : 1f));
+            // Chip sopra il world-layer ma sotto i controlli: porta in cima al world-layer
+            _chip.BringToFront();
         }
 
         void OnDestroy() { _chip?.RemoveFromHierarchy(); }

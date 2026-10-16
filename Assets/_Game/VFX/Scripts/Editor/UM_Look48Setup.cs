@@ -100,6 +100,7 @@ namespace UltimoMiglio.VFX.EditorTools
                 {
                     Set(so, "DefaultPortraitOrtho", 4.5f); Set(so, "DefaultLandscapeOrtho", 4.8f);
                     Set(so, "MinOrtho", 4.2f); Set(so, "CameraDistance", UM_QualityTier.CameraDistance);
+                    Set(so, "FollowSmoothMove", 14f); Set(so, "FollowSmoothIdle", 12f); Set(so, "DeadZone", 0.14f); Set(so, "FrameMin", 0.15f); Set(so, "FrameMax", 0.85f); // QA v6
                     so.ApplyModifiedProperties(); n++;
                 }
                 else if (tn == "CameraRigSetup")
