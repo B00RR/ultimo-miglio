@@ -66,7 +66,7 @@ namespace UltimoMiglio.UI
                 go.SetActive(true); at = go.transform.position;
                 EnsureRunner().StartCoroutine(ScaleIn(go.transform));
             }
-            Debug.Log($"[Onb] reveal {id}");
+            OnbLog.Write($"reveal {id}");
             Revealed?.Invoke(id, at);
         }
 

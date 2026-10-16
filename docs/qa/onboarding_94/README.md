@@ -6,11 +6,11 @@ Anteprima HTML (`anteprima/index.html`, stessa base della #78) con le classi di 
 |---|---|
 | `onb_*_01_avvio` | avvio: pillola LN nascosta, nessun pad; restano obiettivo, Ada, suggerimento, joystick |
 | `onb_*_02_comparsa_LN` | pillola LN a metà comparsa (scala 0,85, opacità 0,55; animazione 0,6→1 in 250 ms) |
-| `onb_*_03_pad_barra` | pad obiettivo: freccia ▼ (#78) → barra LN "32/50" → pillola "18 LN" |
+| `onb_*_03_pad_barra` | pad obiettivo: freccia ▼ (#78) → barra LN "32/40" → pillola "8 LN" (Zaino 1 = 40 LN, LN in tasca 0) |
 | `onb_*_04_aiuto20_freccia_fuori_camera` | aiuto 20 s, bersaglio fuori camera: freccia a bordo schermo |
 | `onb_*_05_aiuto20_mano_bersaglio_a_schermo` | aiuto 20 s, bersaglio già a schermo: mano fantasma nella zona joystick, il suggerimento testuale si nasconde (40 s = camera breve ≤ 1,5 s, non catturabile in HTML) |
 | `onb_*_06_badge_nonno` | badge NONNO "6 pacchi/min" (22 dp) |
-| `onb_*_08_combo_popup` | combo: "x1,2" sopra Nina (sale 40 dp, sparisce in 1,5 s), nessun contatore HUD |
+| `onb_*_08_combo_popup` | combo: solo "+3" sopra Nina (clienti di fila; sale 40 dp, sparisce in 1,5 s). Il moltiplicatore non si mostra; nessun contatore HUD |
 | `onb_*_07_salta` | "Salta tutorial" a sinistra dell'ingranaggio, riga obiettivo stretta |
 
 ## Esito (24 catture)

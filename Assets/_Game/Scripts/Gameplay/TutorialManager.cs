@@ -191,13 +191,15 @@ namespace UltimoMiglio.Gameplay
         }
 
         /// <summary>Da chiamare quando il moltiplicatore combo supera la soglia del passo combo (onboarding.json: comboReached ≥ 1,2).</summary>
-        public void NotifyCombo() => NotifyCombo(0f);
+        /// <summary>Soglia del gate combo (onboarding.json: comboReached ≥ 1,2). Il moltiplicatore è interno: non si mostra mai.</summary>
+        public const float ComboGate = 1.2f;
 
-        /// <summary>Combo raggiunta (moltiplicatore, es. 1.2): popup "x1,2" sopra Nina (1,5 s) e, la prima volta, gate comboReached → "Salta tutorial".</summary>
-        public void NotifyCombo(float multiplier)
+        /// <summary>Cliente servito in combo (Game Designer, #106): a schermo solo "+N" sopra Nina (N = clienti serviti di fila, 1,5 s).
+        /// Il moltiplicatore serve solo per la soglia del passo combo (≥ 1,2 → gate comboReached → "Salta tutorial").</summary>
+        public void NotifyCombo(int clientiDiFila, float moltiplicatore)
         {
-            ComboPopup.Show(multiplier > 0f ? "x" + multiplier.ToString("0.0", System.Globalization.CultureInfo.GetCultureInfo("it-IT")) : "Combo!");
-            if (!_comboSeen) { _comboSeen = true; Debug.Log("[Onb] gate comboReached"); }
+            if (clientiDiFila >= 2) ComboPopup.Show(clientiDiFila); // il primo cliente non è ancora una combo
+            if (!_comboSeen && moltiplicatore >= ComboGate - 1e-4f) { _comboSeen = true; UltimoMiglio.UI.OnbLog.Write("gate comboReached"); }
         }
 
         void EnsureSkip()
@@ -210,7 +212,7 @@ namespace UltimoMiglio.Gameplay
         /// <summary>Salta il tutorial: rivela tutto ciò che i passi saltati avrebbero rivelato e chiude il tutorial.</summary>
         public void Skip()
         {
-            Debug.Log($"[Onb] skip at step={Current}");
+            UltimoMiglio.UI.OnbLog.Write($"skip at step={Current}");
             UltimoMiglio.UI.HudReveal.ShowAll(); CameraPeek.Cancel();
             if (_hud) _hud.CompleteAdaNote();
             Enter(Step.Chiuso);

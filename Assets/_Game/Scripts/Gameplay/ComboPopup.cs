@@ -4,15 +4,18 @@ using UltimoMiglio.UI;
 
 namespace UltimoMiglio.Gameplay
 {
-    /// <summary>Combo (decisione DevOn, #94): niente contatore nell'HUD. Un piccolo "+N" o "x1,2" ancorato al mondo 2,3 m sopra Nina,
-    /// sale di 40 dp e sparisce in 1,5 s (dissolvenza negli ultimi 0,5 s). Testo 16 dp sole con bordo bruno. Non intercetta input.
-    /// Uso: ComboPopup.Show("x1,2"); collegato a TutorialManager.NotifyCombo(). Un popup nuovo sostituisce quello in corso.</summary>
+    /// <summary>Combo (DevOn + Game Designer, #94/#106 comboFeedback): niente contatore nell'HUD. Solo "+N" (N = clienti serviti di fila)
+    /// ancorato sopra la testa di Nina (2,3 m), sale di 40 dp e sparisce in 1,5 s (dissolvenza negli ultimi 0,5 s). Testo 16 dp sole
+    /// con contorno bruno. Il moltiplicatore (x1,2…) è interno e non si mostra mai. Non intercetta input.
+    /// Uso: ComboPopup.Show(3) → "+3"; chiamato da TutorialManager.NotifyCombo(clientiDiFila, moltiplicatore).</summary>
     public static class ComboPopup
     {
         public const float DurationSec = 1.5f, RiseDp = 40f, HeightM = 2.3f;
         static Label _cur;
 
-        public static void Show(string text)
+        public static void Show(int clientiDiFila) => Show("+" + clientiDiFila);
+
+        static void Show(string text)
         {
             var hud = Object.FindAnyObjectByType<HudController>();
             var nina = GameRoot.I ? GameRoot.I.Nina : null;
@@ -22,7 +25,7 @@ namespace UltimoMiglio.Gameplay
             var l = new Label(text) { name = "combo-popup", pickingMode = PickingMode.Ignore }; l.AddToClassList("combo-popup");
             layer.Add(l); _cur = l;
             float t0 = Time.unscaledTime; var tr = nina.transform;
-            Debug.Log($"[Onb] combo {text}");
+            OnbLog.Write($"combo {text}");
             l.schedule.Execute(() =>
             {
                 float t = Time.unscaledTime - t0; var cam = Camera.main;
