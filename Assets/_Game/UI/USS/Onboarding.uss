@@ -1,0 +1,47 @@
+/* Onboarding graduale cap. 1 (#94). Caricato dopo TutorialHud.uss in Hud.uxml. Unità = dp. Niente !important (USS lo ignora).
+   Palette: terracotta #C8633B, sole #F4C430, menta #8FC9A8, crema #F3E3C3, bruno #3B2A20, outline #3B2F2A. Font Fredoka. */
+
+/* --- 1. Comparsa (HudReveal): scala 0,6 → 1 + dissolvenza, 250 ms, ease-out-back --- */
+.reveal { transition-property: opacity, scale; transition-duration: 0.25s, 0.25s; transition-timing-function: ease-out, ease-out-back; }
+.reveal--hidden { opacity: 0; scale: 0.6 0.6; }
+.reveal--in { transform-origin: center; }
+
+/* --- 2. Barra LN sui pad: freccia ▼ (#78) → barra "32/40" → pillola prezzo, stesso asse verticale --- */
+.poi-bar { display: none; flex-direction: row; align-items: center; height: 18px; margin-bottom: 4px; padding: 0 6px 0 3px;
+    border-radius: 9px; border-width: 2px; border-color: #3B2A20; background-color: #F3E3C3; }
+.poi-bar--on { display: flex; }
+.poi-bar__track { width: 56px; height: 8px; border-radius: 4px; border-width: 1px; border-color: #3B2A20; background-color: #E8D3AC; overflow: hidden; margin-right: 5px; }
+.poi-bar__fill { height: 100%; width: 0; background-color: #C8633B; }
+.poi-bar__label { font-size: 12px; color: #3B2A20; -unity-font-definition: url("project://database/Assets/_Game/UI/Fonts/Fredoka-Bold.ttf"); margin: 0; padding: 0; white-space: nowrap; }
+
+/* --- 3a. Aiuto 10 s: pulsazione della colonna del pad (alternata ogni 0,4 s da InteractionPoint) --- */
+.poi-chip-col { transition-property: scale; transition-duration: 0.2s; }
+.poi-chip-col--pulse { scale: 1.12 1.12; }
+
+/* --- 3c. Aiuto 40 s: mano fantasma nella zona joystick (centro a 68 dp dal fondo), loop 1,4 s, sparisce al tocco --- */
+.ghost-hand { position: absolute; left: 50%; bottom: 44px; width: 48px; height: 48px; margin-left: -24px; display: none; opacity: 0.9;
+    background-image: url("project://database/Assets/_Game/UI/Icons/ic_ghost_hand.png"); -unity-background-scale-mode: scale-to-fit; }
+.ghost-hand--on { display: flex; }
+/* con la mano fantasma il suggerimento testuale sparisce (stessa zona): la mano È il suggerimento */
+.onb-hand .tut-hint--on { display: none; }
+
+/* --- 5. Badge NONNO "6 pacchi/min": 22 dp, ancorato al mondo 2,1 m sopra il robot --- */
+.nonno-badge { position: absolute; translate: -50% -100%; flex-direction: row; align-items: center; height: 22px; padding: 0 8px 0 3px;
+    border-radius: 11px; border-width: 2px; border-color: #3B2A20; background-color: #8FC9A8; }
+.nonno-badge__icon { width: 14px; height: 14px; margin-right: 4px; border-radius: 7px; background-color: #3B2A20;
+    background-image: url("project://database/Assets/_Game/UI/Icons/ic_box_cream.png"); -unity-background-scale-mode: scale-to-fit; }
+.nonno-badge__text { font-size: 12px; color: #3B2A20; -unity-font-definition: url("project://database/Assets/_Game/UI/Fonts/Fredoka-Bold.ttf"); margin: 0; padding: 0; white-space: nowrap; }
+
+/* --- 6. Salta tutorial: riga alta, a sinistra dell'ingranaggio, 26 dp, discreto (crema 85 %, bordo 2 px). Fuori dalla zona pollice. --- */
+.skip-tut { position: absolute; top: 15px; right: 44px; height: 26px; margin: 0; padding: 0 6px; display: none;
+    border-radius: 13px; border-width: 2px; border-color: #3B2A20; background-color: rgba(243, 227, 195, 0.85);
+    font-size: 11px; color: #3B2A20; -unity-font-definition: url("project://database/Assets/_Game/UI/Fonts/Fredoka-SemiBold.ttf"); -unity-text-align: middle-center; }
+.skip-tut--on { display: flex; }
+.skip-tut:active { scale: 0.96 0.96; }
+/* con il tasto visibile la riga obiettivo si stringe fra pillola LN e tasto */
+.hud--skip #safe-root .top-left { max-width: 104px; }
+.hud--skip #safe-root .tutorial-objective { left: 112px; right: 134px; }
+
+/* --- Combo (decisione DevOn): niente contatore HUD; solo "+N" (clienti di fila) sopra Nina, mai il moltiplicatore (2,3 m), sale 40 dp, sparisce in 1,5 s --- */
+.combo-popup { position: absolute; translate: -50% -100%; font-size: 16px; color: #F4C430; -unity-text-outline-width: 2px; -unity-text-outline-color: #3B2A20;
+    -unity-font-definition: url("project://database/Assets/_Game/UI/Fonts/Fredoka-Bold.ttf"); margin: 0; padding: 0; white-space: nowrap; }
