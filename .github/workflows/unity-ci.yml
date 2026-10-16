@@ -1,6 +1,7 @@
 # Pipeline Ultimo Miglio (issue #12)
 # - Ogni PR verso main: test EditMode + PlayMode (game-ci) e commento con l'esito sulla PR.
-# - Push/merge su main: build WebGL non compressa e deploy su B00RR/ultimo-miglio-web (GitHub Pages, file sciolti).
+# - PR verso main e push su main: test EditMode + PlayMode e build WebGL (verifica, artifact).
+# - Deploy su B00RR/ultimo-miglio-web (GitHub Pages) SOLO con avvio manuale (workflow_dispatch): niente deploy automatico al merge.
 # Secret richiesti: UNITY_LICENSE (.ulf Personal), UNITY_EMAIL, UNITY_PASSWORD; PAGES_DEPLOY_KEY (deploy key con scrittura sul repo web).
 name: Unity CI (WebGL)
 on:
@@ -41,7 +42,7 @@ jobs:
 
   test:
     needs: licenza
-    if: needs.licenza.outputs.ok == 'true' && github.event_name != 'push'
+    if: needs.licenza.outputs.ok == 'true'
     runs-on: ubuntu-24.04
     steps:
       # L'immagine unityci/editor è molto grande: liberare spazio sul runner
@@ -102,9 +103,9 @@ jobs:
           [ "$LICENZA_OK" = true ] || export UM_NOTA="⚠️ Test non eseguiti: licenza Unity non configurata nei secret (vedi LEGGIMI_BUILD.md §3)."
           tools/pr_comment.sh ${{ github.event.pull_request.number }} "" "$RUN"
 
-  build-deploy:
+  build:
     needs: licenza
-    if: needs.licenza.outputs.ok == 'true' && github.event_name != 'pull_request'
+    if: needs.licenza.outputs.ok == 'true'
     runs-on: ubuntu-24.04
     steps:
       # L'immagine unityci/editor è molto grande: liberare spazio sul runner
@@ -139,7 +140,8 @@ jobs:
           if ls Builds/WebGL_min/Build/*.br Builds/WebGL_min/Build/*.gz 2>/dev/null; then echo "::error::Build compressa"; exit 1; fi
       - name: Patch mobile su index.html (come um-web/pubblica.sh USE_BUILD_INDEX=1)
         run: tools/patch_index_mobile.sh Builds/WebGL_min/index.html
-      - name: Deploy su GitHub Pages (B00RR/ultimo-miglio-web)
+      - name: Deploy su GitHub Pages (B00RR/ultimo-miglio-web) - solo avvio manuale
+        if: github.event_name == 'workflow_dispatch'
         uses: peaceiris/actions-gh-pages@v4
         with:
           deploy_key: ${{ secrets.PAGES_DEPLOY_KEY }}
