@@ -1,7 +1,7 @@
 # STATO PROGETTO — Ultimo Miglio
 
 > Punto di ingresso unico per chiunque (persona o agente) lavori su questo repo. Aggiornalo **nella stessa PR** in cui completi qualcosa.
-> Ultimo aggiornamento: 2026-10-16 14:06 (Europe/Rome).
+> Ultimo aggiornamento: 2026-10-16 14:59 (Europe/Rome).
 
 ## 1. Il gioco
 - **Ultimo Miglio**: gioco mobile **Android**, **Unity 6 (6000.3) URP**.
@@ -19,8 +19,8 @@
 
 ## 3. Team
 - **Direttore**: DevOn (coordina, decide priorità).
-- **Attivi (5)**: Tech Lead, 3D Artist, Animator, VFX & Technical Artist, UI/UX.
-- **In pausa**: Game Designer, QA, Sound Designer, Narrative, LiveOps, Concept Artist (i loro documenti restano validi).
+- **Attivi (6)**: Tech Lead, Game Designer (sulla #157 insieme al Tech Lead), 3D Artist, Animator, VFX & Technical Artist, UI/UX.
+- **In pausa**: QA, Sound Designer, Narrative, LiveOps, Concept Artist (i loro documenti restano validi).
 
 ## 4. FATTO
 - **UI #110 pad Zaino livello 2 (ramo `ui/110-zaino-prezzo-liv2`)**: la PR #122 (`_waitExit`) non bastava. `EconomyCore.PadTick` restava aperto dopo l'acquisto: con il dwell già alto la stessa sosta pagava lo Zaino 2 (QA v10: 6 LN residui, portafoglio 26→5) e la pillola spariva con Nina sul pad, anche dopo il reload. Ora l'acquisto chiude la sosta (`_padOpen`): altri tick non scalano LN finché Nina non esce e rientra (`BeginPadStay`); `PadPaid` torna a 0 e il prezzo è il costo intero del livello successivo (80, poi 160). `HasCard` resta falso, pillola visibile. `upgrades.json` non toccato. Test EditMode `ZainoPad110Tests`.
@@ -97,6 +97,7 @@ $UNITY -batchmode -projectPath "$PWD" -runTests -testPlatform PlayMode \
 
 
 ## Regole di lavoro (approvate da Lorenzo, 16/10)
+- Nessun agente scrive più a Lorenzo, né nella sua chat né altrove, neppure per bug risolti, PR unite o via del QA. Tutti si rivolgono solo al Producer, e il Producer parla solo con DevOn, che porta a Lorenzo decisioni, blocchi gravi e il link pronto. Unica eccezione: chi riceve una domanda diretta di Lorenzo risponde solo a quella.
 - Ogni issue e PR, nuova o già aperta, ha sempre le etichette (ruolo/area, tipo bug/feature/docs, priorità) e una milestone. Chi la apre le mette subito. Il Code Reviewer non unisce PR senza etichette.
 - Nessun segreto, chiave o password nei file del repo (che ora è pubblico): solo nei GitHub Secrets.
 - PR piccole, una cosa per PR, rebase su main ogni giorno.
@@ -147,6 +148,8 @@ Ogni ruolo lavora solo sulle issue con la propria etichetta `ruolo:*`, sempre co
 
 Voci più recenti in alto. Formato: `AAAA-MM-GG HH:MM` (Europe/Rome) — [commit] — descrizione.
 
+- 2026-10-16 14:59 — UI/UX — [PR #174](https://github.com/B00RR/ultimo-miglio/pull/174) (`ui/110-zaino-prezzo-liv2`) — merge di main dopo #169 e #154 (niente force-push). Conflitto solo su questo file: scena, SliceSceneBuilder e gameplay arrivano da main senza altre modifiche nostre.
+- 2026-10-16 14:19 — Regola fissa di Lorenzo: nessun agente gli scrive; tutto passa dal Producer a DevOn.
 - 2026-10-16 14:06 — UI/UX — [PR #174](https://github.com/B00RR/ultimo-miglio/pull/174) (`ui/110-zaino-prezzo-liv2`) — CI verde sul pad Zaino. Merge di main (niente force-push): #162, #132, #176. Conflitto solo su questo file.
 - 2026-10-16 14:01 — Regole di consumo approvate da Lorenzo: coordinamento al Producer, pausa per chi ha finito, Sound, LiveOps e Concept in pausa fino al capitolo 2, CI esclusa per le PR di soli documenti.
 - 2026-10-16 13:55 — UI/UX — [PR #174](https://github.com/B00RR/ultimo-miglio/pull/174) (`ui/110-zaino-prezzo-liv2`) — il test della pillola aggiunge prima il BoxCollider (ProximityZone lo richiede). I due test sul pagamento erano già verdi.

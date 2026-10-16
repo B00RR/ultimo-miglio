@@ -10,6 +10,8 @@ namespace UltimoMiglio.Gameplay
     public sealed class NonnoRobot : MonoBehaviour
     {
         public ArrivalsZone Arrivals; public Shelf[] Shelves; public Bancone Bancone; public CustomerQueue Queue;
+        /// <summary>#111: raggio del corpo (CapsuleCollider e sweep).</summary>
+        public const float BodyRadius = 0.45f;
         public int CarryMax = 3; public Animator Animator;
         public enum WorkState { Idle, ToArrivals, Loading, ToShelf, Unloading }
         public WorkState State { get; private set; }
@@ -25,7 +27,7 @@ namespace UltimoMiglio.Gameplay
         int _carry; Shelf _target; float _timer, _selfServeAcc, _loadElapsed, _stuckT; bool _announced; Vector3 _dest, _lastPos;
         static readonly int SpeedId = Animator.StringToHash("Speed"), LiftId = Animator.StringToHash("Lift"), DropId = Animator.StringToHash("Drop"), HappyId = Animator.StringToHash("Happy");
         Renderer[] _renderers; bool _shown = true;
-        const float WalkSpeed = 2.6f;
+        public const float WalkSpeed = 2.6f;
         float _curSpeed; // #59: velocità reale -> Animator Speed
         /// <summary>Max seconds loading at Arrivi before departing with whatever is carried (forces progress).</summary>
         const float LoadTimeout = 6f;
@@ -136,19 +138,16 @@ namespace UltimoMiglio.Gameplay
         {
             var d = _dest - transform.position; d.y = 0;
             if (d.sqrMagnitude < 0.35f) { _stuckT = 0; return true; }
-            var applied = AgentMove.Slide(transform, Vector3.ClampMagnitude(d.normalized * WalkSpeed * Time.deltaTime, d.magnitude), 0.4f);
+            var applied = AgentMove.Slide(transform, Vector3.ClampMagnitude(d.normalized * WalkSpeed * Time.deltaTime, d.magnitude), BodyRadius);
+            if (AgentMove.LastBlockedByAgent) { _stuckT = 0; _lastPos = transform.position; _curSpeed = 0f; if (d.sqrMagnitude < 2.25f) return true; return false; } // #111: Nina sulla meta: carica/scarica da vicino, mai attraverso
             AgentMove.Face(transform, applied.sqrMagnitude > 1e-8f ? applied : d, Time.deltaTime); // #59
             _curSpeed = Time.deltaTime > 0 ? applied.magnitude / Time.deltaTime : 0f;
-            // Anti-stuck: if Transform barely moved for 2s (edge case), snap to dest
+            // Anti-stallo #111: incastrato su un solido statico per 2 s aggira di lato con collisioni (niente teletrasporto, mai attraverso i solidi)
             if ((transform.position - _lastPos).sqrMagnitude < 1e-5f) _stuckT += Time.deltaTime;
-            else _stuckT = 0;
+            else if (applied.sqrMagnitude > 1e-8f) _stuckT = 0;
+            if (_stuckT > 2f && d.sqrMagnitude < 1.44f) { _stuckT = 0; return true; } // a ridosso della meta ma fermato da un solido (corpo 0,45 m): carica/scarica da lì
+            if (_stuckT > 2f) { var step = Vector3.ClampMagnitude(d.normalized * WalkSpeed * Time.deltaTime, d.magnitude); var sd = AgentMove.Sidestep(transform, step, BodyRadius); if (sd.sqrMagnitude > 1e-10f) { _stuckT = 0; _curSpeed = sd.magnitude / Mathf.Max(Time.deltaTime, 1e-5f); } }
             _lastPos = transform.position;
-            if (_stuckT > 2f)
-            {
-                transform.position = new Vector3(_dest.x, transform.position.y, _dest.z);
-                _stuckT = 0;
-                return true;
-            }
             return false;
         }
 
