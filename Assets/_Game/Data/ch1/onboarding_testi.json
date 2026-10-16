@@ -1,5 +1,5 @@
 {
-  "_nota": "Testi definitivi onboarding cap.1 (Narrative). Voce: Oma Tilde, dai biglietti lasciati nel deposito, parla a Kaia. Max 70 caratteri. SliceSceneBuilder legge speaker, steps[] PER ID (16 passi, chiavi step:<id>; l'ordine nel file non conta, IdToStep #101) e fine: non cambiare le chiavi. Le chiavi in rinviati_cap2 (telefono) entrano nel cap. 2.",
+  "_nota": "steps[]: biglietti di Tilde per id, gli id sono quelli di TutorialManager.StepIds (l'ordine nel file non conta). Nel cap. 1 coldOpen ha le lettere e freePlay ha \"fine\"; tutti gli altri passi hanno un biglietto e un suggerimento onb.*. Le battute nuove di Ada e onb.debt.milestone1-3 arrivano in una PR separata dopo la #157.",
   "speaker": "Oma Tilde",
   "steps": [
     {
@@ -7,7 +7,7 @@
       "text": "Kaia, sgranchisci le gambe. Il deposito si gira a piedi."
     },
     {
-      "id": "pickup",
+      "id": "pickUp",
       "text": "È arrivato il furgone! Passa agli Arrivi e prendi i pacchi."
     },
     {
@@ -23,11 +23,11 @@
       "text": "Raccogli le monete. Una alla volta si fa un anno."
     },
     {
-      "id": "unlock_nonno",
+      "id": "hireNonno",
       "text": "OLDO brontola, ma lavora. Sveglialo dal pad: 50 LN e ti aiuta."
     },
     {
-      "id": "upgrade_zaino",
+      "id": "zainoPad",
       "text": "Resta sul pad Zaino finché si riempie: più pacchi, meno giri."
     },
     {
@@ -35,27 +35,27 @@
       "text": "Servi senza fermarti, tesoro: i clienti contenti pagano meglio."
     },
     {
-      "id": "nonno_intro",
+      "id": "nonnoIntro",
       "text": "Quello che dorme è OLDO. L'ho costruito io, sii gentile."
     },
     {
-      "id": "nonno_confirm",
+      "id": "nonnoConfirm",
       "text": "Guardalo: gli scaffali li riempie lui. Tu pensa ai clienti."
     },
     {
-      "id": "pad_nuovi",
+      "id": "padNuovi",
       "text": "Scarpe o Insegna? Scegli tu, Kaia. Io avrei preso l'Insegna."
     },
     {
-      "id": "cassa",
+      "id": "cassaPass",
       "text": "Passa dalla Cassa: ti ho lasciato una mancia. Non dirlo a OLDO."
     },
     {
-      "id": "debito",
+      "id": "debtCard",
       "text": "Quelli della GrayBox vogliono la rata. Versala in Cassaforte."
     },
     {
-      "id": "muro",
+      "id": "wallPad",
       "text": "Vedi quel muro? Dietro c'è spazio. Il Sunn Depot può crescere."
     }
   ],

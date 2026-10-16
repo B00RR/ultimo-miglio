@@ -45,6 +45,13 @@ public class EconomyCoreTests
         var t = UltimoMiglio.Gameplay.TutorialManager.TextsById(System.Linq.Enumerable.Select(steps, x => (x.id, x.text)));
         for (int i = 1; i < (int)UltimoMiglio.Gameplay.TutorialManager.Step.FreePlay; i++) Assert.IsFalse(string.IsNullOrEmpty(t[i]), $"passo {(UltimoMiglio.Gameplay.TutorialManager.Step)i} senza biglietto");
     }
+    [Test] public void Onboarding16_IdTestiUgualiAStepIds()
+    {
+        var ids = UltimoMiglio.Gameplay.TutorialManager.StepIds;
+        var t = UltimoMiglio.Gameplay.TutorialManager.TextsById(System.Linq.Enumerable.Select(ids, x => (x, "T" + x)));
+        for (int i = 0; i < ids.Length; i++) Assert.AreEqual("T" + ids[i], t[i]);
+        Assert.AreEqual(16, UltimoMiglio.Gameplay.TutorialManager.Versione);
+    }
     [System.Serializable] class TestiStep { public string id, text; }
     [System.Serializable] class TestiOnb { public TestiStep[] steps; }
     [Test] public void PadInstallmentPersistsWhenWalletEmpty()
