@@ -153,7 +153,7 @@ Voci più recenti in alto. Formato: `AAAA-MM-GG HH:MM` (Europe/Rome) — [commit
 - 2026-10-16 15:08 — Producer — **punto Cap. 1 (15:08 Europe/Rome)**:
   - **#169** unita (Ada in scena, `2993e96` su main).
   - **#157** (tutorial 16 passi, `tech/101-tutorial-16`): MERGEABLE dopo rebase (`904869b`); job `test` **cancellato** sull'ultimo run — serve CI verde. **Blocco Code Reviewer**: Zaino cap. 1 deve fermarsi al **livello 7** (+ test). Responsabile Tech Lead.
-  - **#174** (fix Zaino liv.2 / #110, `ui/110-zaino-prezzo-liv2`): MERGEABLE dopo rebase (`c7084d2`); job `test` **ancora in corso**. Nessuna review formale in attesa del verde.
+  - **#174** (fix Zaino liv.2 / #110, `ui/110-zaino-prezzo-liv2`): MERGEABLE dopo rebase (`c7084d2`); job **`test` verde**. Pronta per merge del Code Reviewer.
   - **#175** (HUD insegna noce / #172): `test` verde, job **`catture` rosso**; fuori dalla build Cap. 1 (milestone Gioco completo). Code Reviewer non unisce (catture/CI licenza, STATO, conferma tempi).
   - **QA**: in pausa; checklist LIVE #66 ancora aperta. **Build** WebGL Cap. 1 (#6/#179): dopo #157+#174 verdi → VIA Build & Release.
   - **Rischio scadenza**: milestone Capitolo 1 → **17/10 10:00**; niente link pronto. Critico Cap. 1 ora: #157 (limite Zaino 7 + CI) e #174 (CI → merge).
