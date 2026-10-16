@@ -6,7 +6,9 @@
 set -euo pipefail
 cd "$(dirname "$0")/.."
 UNITY="${UNITY:-/home/box/Unity/Hub/Editor/6000.3.26f1/Editor/Unity}"
-OUT="${1:-Builds/WebGL}"
+# Default: metodo ufficiale WebGLMinBuild.Build (output fisso Builds/WebGL_min).
+# UM_METHOD=ci usa WebGLBuild.BuildCI con cartella personalizzabile.
+if [ "${UM_METHOD:-min}" = ci ]; then OUT="${1:-Builds/WebGL}"; METHOD=UltimoMiglio.EditorTools.WebGLBuild.BuildCI; else OUT=Builds/WebGL_min; METHOD=UltimoMiglio.EditorTools.WebGLMinBuild.Build; fi
 LOG="Logs/webgl_build.log"
 [ -x "$UNITY" ] || { echo "ERRORE: editor Unity non trovato: $UNITY" >&2; exit 2; }
 if pgrep -f "Unity.*-projectPath $PWD" >/dev/null 2>&1; then
@@ -18,11 +20,11 @@ EXTRA=()
 echo ">> Build WebGL -> $OUT (log: $LOG)"
 set +e
 "$UNITY" -batchmode -nographics -quit -projectPath "$PWD" -buildTarget WebGL \
-  -executeMethod UltimoMiglio.EditorTools.WebGLBuild.BuildCI -outputPath "$OUT" \
+  -executeMethod "$METHOD" -outputPath "$OUT" \
   -logFile "$LOG" "${EXTRA[@]}"
 RC=$?
 set -e
-grep -E "\[WebGLBuild\]" "$LOG" || true
+grep -E "\[WebGL(Build|Min)\]" "$LOG" || true
 if [ $RC -ne 0 ] || [ ! -f "$OUT/index.html" ]; then
   echo "BUILD FALLITA (exit $RC). Ultime righe del log:" >&2; tail -40 "$LOG" >&2; exit 1; fi
 echo "BUILD OK: $(du -sh "$OUT" | cut -f1) in $OUT"

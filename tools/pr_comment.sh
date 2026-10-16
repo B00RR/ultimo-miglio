@@ -28,7 +28,7 @@ for p in ("editmode", "playmode"):
             falliti.append(f"- `{tc.get('fullname')}`: {(m.text or '').strip()[:300] if m is not None else ''}")
 log = "Logs/webgl_build.log"
 if os.path.exists(log):
-    riga = [l for l in open(log, errors="ignore") if "[WebGLBuild] esito=" in l]
+    riga = [l for l in open(log, errors="ignore") if "[WebGLBuild] esito=" in l or "[WebGLMin] " in l and "errors=" in l]
     esito = riga[-1].strip() if riga else "esito non trovato nel log"
     L += ["", f"**Build WebGL:** {'✅' if 'Succeeded' in esito else '❌'} `{esito}`"]
 if url: L += ["", f"**Link giocabile:** {url}"]

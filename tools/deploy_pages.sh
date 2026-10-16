@@ -4,7 +4,7 @@
 # Env: UM_WEB_REPO (default B00RR/ultimo-miglio-web). Richiede gh autenticato con push.
 set -euo pipefail
 cd "$(dirname "$0")/.."
-SRC="${1:-Builds/WebGL}"; REPO="${UM_WEB_REPO:-B00RR/ultimo-miglio-web}"
+SRC="${1:-Builds/WebGL_min}"; REPO="${UM_WEB_REPO:-B00RR/ultimo-miglio-web}"
 [ -f "$SRC/index.html" ] || { echo "ERRORE: $SRC/index.html non trovato: lancia prima tools/build_webgl.sh" >&2; exit 2; }
 if ls "$SRC"/Build/*.br "$SRC"/Build/*.gz >/dev/null 2>&1; then
   echo "ERRORE: build compressa (.br/.gz): GitHub Pages non la serve correttamente. Rifare con WebGLBuild.BuildCI." >&2; exit 2; fi
