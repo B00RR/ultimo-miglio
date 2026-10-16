@@ -35,7 +35,7 @@ namespace UltimoMiglio.EditorTools
             for (int i = 0; i < 9; i++) Place("Kit/env_plinth_edge_2m", _parent, new Vector3(-8 + i * 2, 0, -11.15f), 0, false, false, 2f, true);
             for (int i = 0; i < 11; i++) Place("Kit/env_plinth_edge_2m", _parent, new Vector3(-9.15f, 0, -10 + i * 2), 90, false, false, 2f, true);
             // wall dressing (N wall), sign and lanterns
-            Place("Kit/prop_sign_vela_figli", _parent, new Vector3(0, 1.95f, 8.08f), 0, false); DressSignFace(); // faro + Vela & Figli (piu basso, in camera)
+            Place("Kit/prop_sign_sunn_depot", _parent, new Vector3(0, 1.95f, 8.08f), 0, false); DressSignFace(); // faro + Vela & Figli (piu basso, in camera)
             foreach (var x in new[] { -6f, 3f, 7f }) Place("Kit/prop_lantern_wall", _parent, new Vector3(x, 1.9f, 8.1f), 0, false);
             Place("Kit/prop_wallshelf", _parent, new Vector3(-2.5f, 1.4f, 8.05f), 0, false);
             Place("Kit/prop_books", _parent, new Vector3(-2.5f, 1.55f, 8.05f), 0, false, true);
@@ -112,7 +112,7 @@ namespace UltimoMiglio.EditorTools
             Place("Kit/env_wall_2m_b", _parent, banPos + new Vector3(1.8f, 0, 2.8f), 0, false, false, 2f, true);
             if (AssetDatabase.LoadAssetAtPath<GameObject>(Root + "Kit/env_wall_arch_4m.fbx"))
                 Place("Kit/env_wall_arch_4m", _parent, banPos + new Vector3(3.6f, 0, 1.2f), -90, false, false, 4f, true);
-            Place("Kit/prop_sign_vela_figli", _parent, banPos + new Vector3(0.6f, 2.0f, 2.55f), 0, false); DressSignFace();
+            Place("Kit/prop_sign_sunn_depot", _parent, banPos + new Vector3(0.6f, 2.0f, 2.55f), 0, false); DressSignFace();
             Place("Kit/prop_lantern_wall", _parent, banPos + new Vector3(-1.4f, 1.85f, 2.55f), 0, false);
             Debug.Log("[Kit] gameplay dressing: " + _parent.childCount + " pieces");
         }
@@ -152,7 +152,7 @@ namespace UltimoMiglio.EditorTools
             col.AddComponent<BoxCollider>().size = new Vector3(0.36f, 2.6f, 0.36f);
         }
 
-        // #70: l'insegna è la mesh 3D prop_sign_vela_figli v05 «Sunn Depot» (#130, nome file invariato per GUID) (cornice terracotta, tavola noce, faro in rilievo con lanterna emissiva,
+        // #70: l'insegna è la mesh 3D prop_sign_sunn_depot v05 «Sunn Depot» (#130; ex prop_sign_vela_figli, stesso GUID) (cornice terracotta, tavola noce, faro in rilievo con lanterna emissiva,
         // scritta crema in rilievo in Fredoka). Prima qui si spegnevano i renderer della mesh e si metteva un quad Unlit piatto
         // (tex_sign_vela_figli.png, fondo crema): era il «pannello bianco piatto senza faro». Ora si tiene la mesh e si toglie l'eventuale decal.
         static void DressSignFace()
@@ -161,7 +161,7 @@ namespace UltimoMiglio.EditorTools
             for (int i = _parent.childCount - 1; i >= 0; i--)
             {
                 var c = _parent.GetChild(i);
-                if (!c.name.Contains("prop_sign_vela_figli")) continue;
+                if (!c.name.Contains("prop_sign_sunn_depot")) continue;
                 foreach (var r in c.GetComponentsInChildren<Renderer>(true)) r.enabled = true;
                 var d = c.Find("SignFaceDecal"); if (d) Object.DestroyImmediate(d.gameObject);
             }

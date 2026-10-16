@@ -1,4 +1,4 @@
-# Insegna «Sunn Depot» v05 (#130 + #70; deriva dalla v04 «Vela & Figli»). Il file resta prop_sign_vela_figli.fbx per tenere GUID e riferimenti di DepotKit.
+# Insegna «Sunn Depot» v05 (#130 + #70; deriva dalla v04 «Vela & Figli»). Esporta prop_sign_sunn_depot.fbx (rinominato dal vecchio prop_sign_vela_figli, .meta con lo stesso GUID).
 # v04 (#70): legno noce con cornice terracotta, scritta crema in rilievo (Fredoka Bold, OFL, già nel repo),
 # faro (emblema Faro Spento) in rilievo con lanterna emissiva. Profondità reale: niente più decal piatta (DepotKit.DressSignFace non nasconde più la mesh).
 # blender -b -P 3d/scripts/sign_sunn_depot_v05.py   (riusa helper/atlas/export di kit_deposito_v03.py)
@@ -39,6 +39,6 @@ def sign_sunn_v05():
     bpy.ops.object.convert(target='MESH'); bpy.ops.object.transform_apply(location=True,rotation=True,scale=True)
     bpy.ops.object.mode_set(mode='EDIT'); bpy.ops.mesh.select_all(action='SELECT'); bpy.ops.mesh.dissolve_limited(angle_limit=0.05); bpy.ops.object.mode_set(mode='OBJECT')
     tb=bmesh.new(); tb.from_mesh(t.data); bmesh.ops.triangulate(tb,faces=tb.faces[:]); bpy.data.objects.remove(t)
-    p._add(tb,'crema')
-    export(p,'prop_sign_vela_figli')
+    p._add(tb,'tufo')   # lettere crema #F3E3C3 (cella 'tufo' dell'atlas)
+    export(p,'prop_sign_sunn_depot')
 sign_sunn_v05(); print(''.join(REP))

@@ -1,7 +1,7 @@
 import bpy,math,os
 from mathutils import Vector
 bpy.ops.wm.read_factory_settings(use_empty=True)
-bpy.ops.import_scene.gltf(filepath='/tmp/um_glb_v03/prop_sign_vela_figli.glb')
+bpy.ops.import_scene.gltf(filepath='/tmp/um_glb_v03/prop_sign_sunn_depot.glb')
 o=[x for x in bpy.data.objects if x.type=='MESH'][0]
 for m in o.data.materials:
     if 'Emissive' in m.name and m.use_nodes:
