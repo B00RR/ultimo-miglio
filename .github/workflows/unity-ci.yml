@@ -131,23 +131,23 @@ jobs:
         with:
           unityVersion: ${{ env.UNITY_VERSION }}
           targetPlatform: WebGL
-          buildMethod: UltimoMiglio.EditorTools.WebGLBuild.BuildCI
-          customParameters: -outputPath build/WebGL
+          # Metodo ufficiale del Tech Lead (shader, Look48, HUD, scena): output in Builds/WebGL_min
+          buildMethod: UltimoMiglio.EditorTools.WebGLMinBuild.Build
       - name: Controllo build non compressa
         run: |
-          test -f build/WebGL/index.html
-          if ls build/WebGL/Build/*.br build/WebGL/Build/*.gz 2>/dev/null; then echo "::error::Build compressa"; exit 1; fi
+          test -f Builds/WebGL_min/index.html
+          if ls Builds/WebGL_min/Build/*.br Builds/WebGL_min/Build/*.gz 2>/dev/null; then echo "::error::Build compressa"; exit 1; fi
       - name: Patch mobile su index.html (come um-web/pubblica.sh USE_BUILD_INDEX=1)
-        run: tools/patch_index_mobile.sh build/WebGL/index.html
+        run: tools/patch_index_mobile.sh Builds/WebGL_min/index.html
       - name: Deploy su GitHub Pages (B00RR/ultimo-miglio-web)
         uses: peaceiris/actions-gh-pages@v4
         with:
           deploy_key: ${{ secrets.PAGES_DEPLOY_KEY }}
           external_repository: B00RR/ultimo-miglio-web
           publish_branch: main
-          publish_dir: build/WebGL
+          publish_dir: Builds/WebGL_min
           enable_jekyll: false
           force_orphan: true
           commit_message: "Build WebGL da ultimo-miglio@${{ github.sha }}"
       - uses: actions/upload-artifact@v4
-        with: { name: webgl, path: build/WebGL, retention-days: 3 }
+        with: { name: webgl, path: Builds/WebGL_min, retention-days: 3 }
