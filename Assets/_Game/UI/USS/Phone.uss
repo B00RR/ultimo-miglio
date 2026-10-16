@@ -1,0 +1,56 @@
+/* Stile schermata telefono futura — issue #49.
+   NON montato nell'HUD di gioco (HUD minimo = LN, giorno, obiettivo, joystick, pad).
+   Importato solo da Phone.uxml. */
+#phone {
+    border-width: 4px;
+    border-color: #3B2F2A;
+    border-radius: 24px;
+    background-color: #74503A;
+    background-image: url("project://database/Assets/_Game/UI/Textures/tex_wood_panel.png");
+    -unity-background-scale-mode: stretch-to-fill;
+    -unity-slice-left: 16px;
+    -unity-slice-top: 16px;
+    -unity-slice-right: 16px;
+    -unity-slice-bottom: 16px;
+}
+#phone-screen {
+    border-radius: 18px;
+    background-color: #F3E3C3;
+    background-image: url("project://database/Assets/_Game/UI/Textures/tex_cardboard_panel.png");
+    -unity-background-scale-mode: stretch-to-fill;
+    -unity-slice-left: 16px;
+    -unity-slice-top: 16px;
+    -unity-slice-right: 16px;
+    -unity-slice-bottom: 16px;
+    border-width: 3px;
+    border-color: #3B2F2A;
+}
+#phone-title,
+.tile-name,
+#home-day,
+#home-time {
+    -unity-font-definition: url("project://database/Assets/_Game/UI/Fonts/Fredoka-Bold.ttf");
+}
+#phone-title { color: #3B2A20; }
+.phone-card {
+    background-color: #E8D3AC;
+    border-width: 3px;
+    border-color: #3B2F2A;
+    border-radius: 14px;
+}
+.tile {
+    border-width: 3px;
+    border-color: #3B2F2A;
+}
+/* CTA terracotta solo dentro il telefono (non in zona pollice HUD) */
+#phone .cta,
+#ordini-cta,
+#flotta-cta {
+    background-color: #C8633B;
+    border-width: 3px;
+    border-bottom-width: 6px;
+    border-color: #3B2F2A;
+    border-radius: 14px;
+    color: #FFF9EE;
+    -unity-font-definition: url("project://database/Assets/_Game/UI/Fonts/Fredoka-Bold.ttf");
+}

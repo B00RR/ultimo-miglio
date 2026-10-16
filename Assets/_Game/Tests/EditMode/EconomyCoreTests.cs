@@ -36,10 +36,10 @@ public class EconomyCoreTests
         for (int i = 0; i < 30; i++) e.PadTick(UpgradeKind.Zaino, i * 0.1);
         Assert.AreEqual(20, e.S.PadPaid[(int)UpgradeKind.Zaino], 1e-9); Assert.AreEqual(0, e.S.Zaino);
     }
-    [Test] public void NonnoHireCosts15_WebBalance()
+    [Test] public void NonnoHireCosts10_WebBalance()
     {
-        var e = New(); Assert.AreEqual(15, e.Cost(UpgradeKind.NonnoHire));
-        e.S.Wallet = 15; for (int i = 0; i < 40; i++) e.PadTick(UpgradeKind.NonnoHire, i * .1);
+        var e = New(); Assert.AreEqual(10, e.Cost(UpgradeKind.NonnoHire));
+        e.S.Wallet = 10; for (int i = 0; i < 40; i++) e.PadTick(UpgradeKind.NonnoHire, i * .1);
         Assert.AreEqual(0, e.S.NonnoLevel); Assert.AreEqual(6, e.NonnoRestockPpm, 1e-9);
         Assert.AreEqual(100, e.Cost(UpgradeKind.NonnoLevel), 1e-9);
     }

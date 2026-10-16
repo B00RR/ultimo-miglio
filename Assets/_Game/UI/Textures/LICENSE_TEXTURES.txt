@@ -1,0 +1,8 @@
+Texture UI Diorama Solare — originale progetto Ultimo Miglio (procedurali).
+- tex_wood_panel.png — legno noce/legno (#74503A / #7A4A2E), fill 9-slice
+- tex_cardboard_panel.png — cartone/crema (#F3E3C3 / #E8D3AC), fill 9-slice
+- tex_ada_portrait.png — ritratto circolare da docs/concept/img/sheet_nonna_ada_v01.jpg
+  (Concept Artist, tavola v01); ritaglio busto alto-destra per dialogo HUD (#41)
+
+Licenza: originale del progetto / CC0 quanto applicabile alle texture procedurali.
+Nessuna risorsa a pagamento. Da registrare anche in ultimo-miglio-docs/LICENZE_ASSET.md.
