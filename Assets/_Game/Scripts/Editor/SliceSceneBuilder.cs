@@ -156,11 +156,13 @@ namespace UltimoMiglio.EditorTools
             var cassa = Zone<CassaZone>("Zona_Cassa", banPos + new Vector3(2.8f, 0, 2.8f), new Vector3(1.2f, 1, 1.2f), UM_Palette.TealOmni, props); cassa.Coins = coins; // #82+#187: oltre il muro del set (z +1.45), gap ≥ 0,4 m da muro, arco, pad e vasi (layout_187.py)
 
             // --- pads (near the Cassa, 01 §3)
-            var padRow = banPos + new Vector3(-0.9f, 0, 4.5f);
-            Pad("Pad_Zaino", UpgradeKind.Zaino, padRow, 0, props);
+            // #224: colonna lungo z sul lato camera a ovest del Bancone (proposta GD 0,5 m più a ovest, layout_224.py): fuori dall'ombra del muro
+            // beauty shot, pillole separate in verticale (1,9 m = 137 px a 390x844), golden path scaffali→varco ovest a ≥ 1 m dai dischi
+            var padRow = banPos + new Vector3(-4.5f, 0, 0f);
+            Pad("Pad_Zaino", UpgradeKind.Zaino, padRow + new Vector3(0, 0, 1.9f), 0, props);
             // #101: passo padNuovi (onboarding.json: gate padPurchasedAny su scarpe/insegna). Senza questi pad il tutorial si bloccava al passo 11.
-            Pad("Pad_Scarpe", UpgradeKind.Scarpe, padRow + new Vector3(1.85f, 0, 0), 0, props);
-            Pad("Pad_Insegna", UpgradeKind.Insegna, padRow + new Vector3(3.7f, 0, 0), 0, props);
+            Pad("Pad_Scarpe", UpgradeKind.Scarpe, padRow, 0, props);
+            Pad("Pad_Insegna", UpgradeKind.Insegna, padRow + new Vector3(0, 0, -1.9f), 0, props);
             Pad("Pad_AssumiNonno", UpgradeKind.NonnoHire, arrPos + new Vector3(3.2f, 0, -0.3f), 0, props); // onboarding: last step (#187: fuori dal vaso di limoni)
 
             // --- NONNO
