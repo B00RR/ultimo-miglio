@@ -34,6 +34,7 @@ namespace UltimoMiglio.UI
         /// <summary>Tap on the Pedaggio chip. Expected handler: open safe card + point arrow at Cassaforte.</summary>
         public event Action PedaggioTapped;
         public event Action SafeCardClosed;
+        public event Action SettingsButtonTapped;
 
         /// <summary>Set by the bridge (ChapterDataHudConfig). Optional: every API also takes explicit values.</summary>
         public IHudConfig Config { get; set; }
@@ -42,7 +43,7 @@ namespace UltimoMiglio.UI
         public VisualElement SafeRoot { get; private set; }
 
         Label lnLabel, boltLabel, tokenLabel, tollLabel, roomLabel, toastLabel, phoneBadge, dayLabel, tutorialObjective;
-        VisualElement currencyPill, tokenGroup, tollChip, roomPill, toast, phoneButton, safeCard, popupLayer;
+        VisualElement currencyPill, tokenGroup, tollChip, roomPill, toast, phoneButton, settingsButton, safeCard, popupLayer;
         Coroutine roomCo, toastCo;
         Rect lastSafeArea;
         Vector2Int lastScreen;
@@ -72,7 +73,7 @@ namespace UltimoMiglio.UI
             tollChip = Root.Q("toll-chip");
             tollLabel = Root.Q<Label>("toll-value");
             phoneButton = Root.Q("phone-button");
-            var settingsButton = Root.Q("settings-button");
+            settingsButton = Root.Q("settings-button");
             settingsButton?.RegisterCallback<ClickEvent>(_ => OnSettingsRequested?.Invoke());
             phoneBadge = Root.Q<Label>("phone-badge");
             roomPill = Root.Q("room-pill");
@@ -83,6 +84,7 @@ namespace UltimoMiglio.UI
             popupLayer = Root.Q("popup-layer");
 
             phoneButton?.RegisterCallback<ClickEvent>(_ => PhoneButtonTapped?.Invoke());
+            settingsButton?.RegisterCallback<ClickEvent>(_ => SettingsButtonTapped?.Invoke());
             tollChip?.RegisterCallback<ClickEvent>(_ => PedaggioTapped?.Invoke());
             safeCard?.Q("safe-close")?.RegisterCallback<ClickEvent>(_ => HideSafeCard());
 
@@ -170,7 +172,7 @@ namespace UltimoMiglio.UI
         /// <summary>Screen rects (panel space) the joystick must ignore.</summary>
         public bool IsOverInteractive(Vector2 panelPos)
         {
-            return Contains(currencyPill, panelPos) || Contains(phoneButton, panelPos) ||
+            return Contains(currencyPill, panelPos) || Contains(phoneButton, panelPos) || Contains(settingsButton, panelPos) ||
                    Contains(tollChip, panelPos) || Contains(safeCard, panelPos);
         }
 

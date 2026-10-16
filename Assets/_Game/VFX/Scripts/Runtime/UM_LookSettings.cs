@@ -37,7 +37,16 @@ namespace UltimoMiglio.VFX
         GameObject _sky; MaterialPropertyBlock _mpb;
 
         void OnEnable() => Apply();
-        void OnValidate() => Apply();
+        // OnValidate non può creare/distruggere oggetti (EnsureSky → DestroyImmediate del collider del quad):
+        // "Destroying components immediately is not permitted during physics trigger/contact, animation event callbacks, rendering callbacks or OnValidate".
+        void OnValidate()
+        {
+#if UNITY_EDITOR
+            UnityEditor.EditorApplication.delayCall += () => { if (this) Apply(); };
+#else
+            Apply();
+#endif
+        }
         void LateUpdate() { PushFocus(); FitSky(); PushSky(); }
         void OnDisable() { Shader.SetGlobalFloat(GradeId, 0f); Shader.SetGlobalFloat(VDarkId, 0f); }
 
