@@ -159,7 +159,9 @@
       "trigger": "enRouteCassaforte",
       "target": "cassa",
       "completeWhen": "passedOver",
-      "note": "0 LN in run continua; serve a mostrare la Cassa"
+      "note": "0 LN in run continua; serve a mostrare la Cassa",
+      "rewardLn": 30,
+      "rewardNote": "mancia di Nonna Ada, solo al primo passaggio (16/10)"
     },
     {
       "id": "debtCard",
