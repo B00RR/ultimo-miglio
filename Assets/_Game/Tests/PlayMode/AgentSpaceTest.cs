@@ -33,16 +33,18 @@ public class AgentSpaceTest
         bool done = eco.S.NonnoLevel >= 0; for (int i = 0; i < 500 && !done; i++) done = eco.PadTick(UpgradeKind.NonnoHire, i * 0.1);
         var bot = Object.FindAnyObjectByType<NonnoRobot>(); var n = GameRoot.I.Nina; Assert.IsNotNull(bot); Assert.IsNotNull(n);
         if (bot.Arrivals) bot.Arrivals.Stock = 30;
-        float sum = NinaR(n) + 0.45f, min = float.MaxValue, t = 0; bool worked = false;
+        float sum = NinaR(n) + NonnoRobot.BodyRadius, min = float.MaxValue, t = 0, maxJump = 0; bool worked = false; var prevB = bot.transform.position;
         while (t < 15f)
         {
             Place(n, bot.Arrivals.transform.position); // Nina ferma sulla meta di NONNO (passo QA v9)
             yield return null; t += Time.deltaTime;
             min = Mathf.Min(min, Flat(bot.transform.position, n.transform.position));
+            maxJump = Mathf.Max(maxJump, Flat(bot.transform.position, prevB) - (NonnoRobot.WalkSpeed * Time.deltaTime + 0.03f)); prevB = bot.transform.position; // niente teletrasporti
             worked |= bot.CarryCount > 0;
         }
         Debug.Log($"[AgentSpace] NONNO-Nina min={min:F2} somma raggi={sum:F2} carico={worked}");
         Assert.GreaterOrEqual(min, sum - Tol, $"NONNO entra nello spazio di Nina: {min:F2} < {sum:F2}");
+        Assert.LessOrEqual(maxJump, 0.01f, $"NONNO teletrasportato: salto di {maxJump:F2} m oltre la velocità massima per frame");
         Assert.IsTrue(worked, "NONNO non carica più con Nina su Arrivi");
     }
 

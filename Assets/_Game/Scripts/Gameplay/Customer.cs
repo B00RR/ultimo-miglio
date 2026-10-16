@@ -23,7 +23,16 @@ namespace UltimoMiglio.Gameplay
             var d = Target - transform.position; d.y = 0;
             bool moving = d.sqrMagnitude > 0.0025f;
             float cur = 0f;
-            if (moving) { var ap = AgentMove.Slide(transform, Vector3.ClampMagnitude(d.normalized * Speed * Time.deltaTime, d.magnitude), BodyRadius); if (ap.sqrMagnitude < 1e-10f && !AgentMove.LastBlockedByAgent) { _stuck += Time.deltaTime; if (_stuck > 1.5f) { Debug.Log($"[DBG111] snap {name} da {transform.position} a {Target} blocco={(AgentMove.LastBlocker ? AgentMove.LastBlocker.name : "-")}"); transform.position = new Vector3(Target.x, transform.position.y, Target.z); _stuck = 0; } } else { if (AgentMove.LastBlockedByAgent && Time.frameCount % 120 == 0) Debug.Log($"[DBG111] {name} fermo da {AgentMove.LastBlocker.name} pos={transform.position} target={Target}"); _stuck = 0; } AgentMove.Face(transform, ap.sqrMagnitude > 1e-8f ? ap : d, Time.deltaTime); cur = Time.deltaTime > 0 ? ap.magnitude / Time.deltaTime : 0f; }
+            if (moving)
+            {
+                var step = Vector3.ClampMagnitude(d.normalized * Speed * Time.deltaTime, d.magnitude);
+                var ap = AgentMove.Slide(transform, step, BodyRadius);
+                // #111: niente più teletrasporto al Target. Fermo davanti a un personaggio: si aspetta in fila.
+                // Incastrato su un solido statico da più di 1,5 s: avanza dritto a velocità normale (nessun salto).
+                if (ap.sqrMagnitude < 1e-10f && !AgentMove.LastBlockedByAgent) { _stuck += Time.deltaTime; if (_stuck > 1.5f) { transform.position += step; ap = step; } }
+                else if (ap.sqrMagnitude > 1e-10f) _stuck = 0;
+                AgentMove.Face(transform, ap.sqrMagnitude > 1e-8f ? ap : d, Time.deltaTime); cur = Time.deltaTime > 0 ? ap.magnitude / Time.deltaTime : 0f;
+            }
             else if (Leaving) Owner.Recycle(this);
             var an = Anim();
             if (an && an.runtimeAnimatorController) { an.SetFloat(SpeedId, moving ? Mathf.Max(cur, 0.5f) : 0f); an.SetFloat(PatienceId, Leaving ? 1f : Mathf.Clamp01(1f - Waited / (float)GameRoot.I.Eco.Cfg.CustomerPatienceSec)); }
