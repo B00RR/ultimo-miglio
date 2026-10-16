@@ -139,3 +139,27 @@ public class AnimFacingTest
         Assert.Greater(Probe.Avg(p.Spin), 0.5f, "ruote girano al contrario o ferme mentre guida " + p.Report("NONNO"));
     }
 }
+
+/// <summary>#2: in scena i clienti sono i 6 personaggi riggati (non capsule), Humanoid valido, AlwaysAnimate, senza root motion.</summary>
+public class ClientiRigTest
+{
+    [UnityTest] public IEnumerator Clienti_SonoIRiggatiNonCapsule()
+    {
+        // Solo le chiavi del gioco: i volumi (vol_music/vol_sfx, #36) restano intatti
+        PlayerPrefs.DeleteKey(TutorialManager.PrefKey); PlayerPrefs.DeleteKey("um_save_v1"); PlayerPrefs.DeleteKey(DepotCameraFit.PrefZoom);
+        yield return SceneManager.LoadSceneAsync("Ch1_Deposito");
+        for (int i = 0; i < 60 && !GameRoot.Ready; i++) yield return null;
+        var q = Object.FindAnyObjectByType<CustomerQueue>(); Assert.IsNotNull(q); Assert.IsNotNull(q.Prefab, "CustomerQueue.Prefab rotto");
+        Assert.IsNotNull(q.Variants); Assert.AreEqual(6, q.Variants.Length, "servono le 6 varianti");
+        foreach (var v in q.Variants)
+        {
+            Assert.IsNotNull(v, "variante nulla");
+            Assert.IsNull(v.GetComponentInChildren<MeshFilter>(), $"{v.name}: è ancora una capsula");
+            var an = v.GetComponentInChildren<Animator>(); Assert.IsNotNull(an, v.name);
+            Assert.IsTrue(an.avatar && an.avatar.isValid && an.avatar.isHuman, $"{v.name}: avatar Humanoid non valido");
+            Assert.AreEqual("chr_cliente", an.runtimeAnimatorController ? an.runtimeAnimatorController.name : "", v.name);
+            Assert.AreEqual(AnimatorCullingMode.AlwaysAnimate, an.cullingMode, v.name);
+            Assert.IsFalse(an.applyRootMotion, v.name);
+        }
+    }
+}
