@@ -93,7 +93,7 @@ namespace UltimoMiglio.EditorTools
             NonnoRobot.StripNavMeshAgents(cust.gameObject);
 
             // --- Nina
-            var nina = new GameObject("Nina"); nina.transform.position = new Vector3(0, 0, 0);
+            var nina = new GameObject("Nina"); nina.transform.position = new Vector3(0, 0, -1f); // #60: spawn sicuro nell'area giocabile
             var cc = nina.AddComponent<CharacterController>(); cc.center = new Vector3(0, 0.8f, 0); cc.height = 1.6f; cc.radius = 0.3f;
             var ninaAnim = Rig(nina.transform, "chr_nina_vela", 0f);
             if (!ninaAnim)
@@ -123,8 +123,7 @@ namespace UltimoMiglio.EditorTools
                 var p = arrPos + new Vector3((i - 1) * 2.2f, 0, -dArr);
                 var body = Box($"Scaffale_{(char)('A' + i)}", null, p + new Vector3(0, 0.9f, -0.6f), new Vector3(1.8f, 1.8f, 0.5f), world, UM_Palette.Legno);
                 body.AddComponent<NavMeshObstacle>().carving = true;
-                // B5 P3: mesh decorativa — niente collider solido (Nina si incastrava)
-                foreach (var col in body.GetComponentsInChildren<Collider>()) Object.DestroyImmediate(col);
+                // #58: BoxCollider semplice (il CharacterController scivola sui box, B5)
                 // #47: scaffale caricato se presente
                 if (kitOk && DepotKit.Place(AssetDatabase.LoadAssetAtPath<GameObject>("Assets/_Game/Art/Environment/Kit/prop_shelf_2m_loaded.fbx") ? "Kit/prop_shelf_2m_loaded" : "Kit/prop_shelf_2m", null, body.transform.position - new Vector3(0, 0.9f, 0), 0, false)) body.GetComponent<Renderer>().enabled = false;
                 Box("Code", body.transform, new Vector3(0, 0.55f, 0.52f), new Vector3(0.9f, 0.08f, 0.1f), world, cols[i]);
@@ -136,7 +135,7 @@ namespace UltimoMiglio.EditorTools
             var banPos = shelfC + new Vector3(dBan * 0.8f, 0, -dBan * 0.6f); // 9.4 m
             if (kitOk) DepotKit.DressGameplay(arrPos, shelfC, banPos); // #47 set dressing denso
             var banMesh = Box("Bancone_Mesh", null, banPos + new Vector3(0, 0.5f, -0.9f), new Vector3(2.4f, 1f, 0.7f), world, UM_Palette.Terracotta); banMesh.AddComponent<NavMeshObstacle>().carving = true;
-            foreach (var col in banMesh.GetComponentsInChildren<Collider>()) Object.DestroyImmediate(col); // B5: no solid mesh collider
+           // #58: BoxCollider solido
             // #47: counter + Carico0 + rug
             if (kitOk && DepotKit.Place("Kit/prop_counter_2m", null, banPos + new Vector3(0, 0, -0.9f), 0, false)) { banMesh.GetComponent<Renderer>().enabled = false; DepotKit.Place("Kit/prop_register", null, banPos + new Vector3(0.6f, 1.0f, -0.9f), 0, false, true); DepotKit.Place("Kit/prop_carico0", null, banPos + new Vector3(-0.15f, 1.0f, -0.9f), 8, false, true); DepotKit.Place("ThirdParty/Props/prop_tp_lemon", null, banPos + new Vector3(-0.8f, 1.0f, -0.9f), 0, false, true); DepotKit.Place("Kit/prop_rug_bancone", null, banPos + new Vector3(0, 0.005f, 0.2f), 0, false); }
             var bancone = Zone<Bancone>("Zona_Bancone", banPos, new Vector3(2.4f, 1, 1.2f), UM_Palette.Terracotta, props);
@@ -154,7 +153,7 @@ namespace UltimoMiglio.EditorTools
 
             // --- NONNO
             var nonno = new GameObject("NONNO"); nonno.transform.position = arrPos + new Vector3(2.5f, 0, -2);
-            var nonnoAnim = Rig(nonno.transform, "bot_nonno");
+            var nonnoAnim = Rig(nonno.transform, "bot_nonno", 0f) /* #59: forche su +Z, il 180° lo faceva camminare all'indietro */;
             if (!nonnoAnim)
             {
                 Box("Body", nonno.transform, new Vector3(0, 0.5f, 0), new Vector3(0.8f, 0.8f, 1f), chars, UM_Palette.TealOmni);
