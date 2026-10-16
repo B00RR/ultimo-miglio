@@ -1,0 +1,240 @@
+/* Etichette #186. Baloo 2 = titoli e valori. Fredoka = testo.
+   Pillole: insegna di noce #7A4A2E, crema #F3E3C3, filo oro #F2B53A.
+   L'ombra #9E7873 al 60% è dentro lo sprite, 4 px sotto la sagoma: in UI Toolkit
+   un figlio si disegnerebbe sopra il fondo. «Muoviti» è crema piena.
+   Il fumetto di Oma Tilde è carta piena #F3E3C3, testo #3B2A20, alto quanto le righe.
+   I pannelli 9-slice della #185 non si usano qui. */
+
+.insegna-noce {
+    background-color: #7A4A2E;
+    background-image: url("project://database/Assets/_Game/UI/Textures/tex_insegna_noce.png");
+    -unity-background-scale-mode: stretch-to-fill;
+    border-width: 2px;
+    border-bottom-width: 4px;
+    border-color: #3B2A20;
+    border-radius: 8px;
+}
+
+.poi-chip {
+    flex-direction: row;
+    align-items: center;
+    align-self: center;
+    padding: 4px 12px 7px 8px;
+    min-height: 28px;
+}
+
+.poi-chip__icon {
+    width: 16px;
+    height: 16px;
+    margin-right: 6px;
+    -unity-background-scale-mode: scale-to-fit;
+    -unity-background-image-tint-color: #F2B53A;
+}
+
+.poi-chip__valore {
+    margin: 0;
+    padding: 0 0 1px 0;
+    font-size: 18px;
+    color: #F3E3C3;
+    white-space: nowrap;
+    -unity-font-style: normal;
+    -unity-font-definition: url("project://database/Assets/_Game/UI/Fonts/Baloo2-Bold_SDF.asset");
+    -unity-text-outline-width: 1px;
+    -unity-text-outline-color: #E8D3AC;
+    text-shadow: 0 1px 0 #9E7873;
+}
+
+.currency-slot { position: relative; align-self: flex-start; flex-shrink: 1; min-width: 0; overflow: visible; }
+
+#hud-root #currency-pill {
+    height: 44px !important;
+    padding-bottom: 4px !important;
+    border-width: 0 !important;
+    border-radius: 0 !important;
+    background-color: rgba(0, 0, 0, 0) !important;
+    background-image: url("project://database/Assets/_Game/UI/Textures/tex_capsula_noce_40.png") !important;
+    -unity-background-scale-mode: stretch-to-fill !important;
+    -unity-slice-left: 20px !important;
+    -unity-slice-top: 20px !important;
+    -unity-slice-right: 20px !important;
+    -unity-slice-bottom: 24px !important;
+}
+#hud-root #currency-pill .currency-value,
+#hud-root #currency-pill .day-value {
+    color: #F3E3C3 !important;
+    -unity-text-outline-width: 1px !important;
+    -unity-text-outline-color: #F2B53A !important;
+    text-shadow: 0 1px 0 #9E7873;
+}
+#hud-root #currency-pill .icon-coin { -unity-background-image-tint-color: #F2B53A !important; }
+
+/* Muoviti: nella safe area, a destra, con un vuoto prima dell'ingranaggio (52 px + margini).
+   Altezza 36 = corpo 32 + ombra 4 già nello sprite. Il padding sotto tiene il testo nel noce. */
+#safe-root .objective-slot {
+    position: absolute;
+    left: auto;
+    right: 78px;
+    top: 18px;
+    flex-direction: row;
+    justify-content: flex-end;
+    width: auto;
+    min-width: 0;
+    height: auto;
+    overflow: visible;
+}
+.hud--skip #safe-root .objective-slot { right: 220px; }
+.objective-pill {
+    position: relative;
+    flex-direction: row;
+    flex-shrink: 0;
+    width: auto;
+    height: 36px;
+    overflow: visible;
+}
+#safe-root .objective-slot .tutorial-objective {
+    position: relative !important;
+    left: auto !important;
+    right: auto !important;
+    top: auto;
+    bottom: auto;
+    width: auto;
+    height: 36px !important;
+    max-height: 36px !important;
+    margin: 0;
+    padding: 0 16px 4px 16px;
+    border-width: 0 !important;
+    border-radius: 0 !important;
+    background-color: rgba(0, 0, 0, 0) !important;
+    background-image: url("project://database/Assets/_Game/UI/Textures/tex_capsula_noce_32.png") !important;
+    -unity-background-scale-mode: stretch-to-fill !important;
+    -unity-slice-left: 16px !important;
+    -unity-slice-top: 16px !important;
+    -unity-slice-right: 16px !important;
+    -unity-slice-bottom: 20px !important;
+    color: #F3E3C3 !important;
+    font-size: 13px;
+    -unity-text-align: middle-center;
+    white-space: nowrap;
+    text-overflow: clip;
+    -unity-text-outline-width: 0 !important;
+    -unity-text-outline-color: rgba(0, 0, 0, 0) !important;
+    text-shadow: 0 1px 0 rgba(158, 120, 115, 0.6);
+    -unity-font-definition: url("project://database/Assets/_Game/UI/Fonts/Fredoka-Medium_SDF.asset") !important;
+}
+
+/* Fumetto di Oma Tilde: sprite crema opaco #F3E3C3, testo #3B2A20.
+   L'ombra è nel PNG (slice basso 24 = raggio 20 + 4). padding-bottom 20 = 16 di aria + 4 di ombra.
+   Niente altezza fissa. USS non ha line-height: l'interlinea è quella di Fredoka
+   (108.9 su 90, la discesa è già nel rigo). text-overflow resta clip. */
+.ada-wrap { position: relative; width: 100%; overflow: visible; }
+#hud-root .ada-band.ada-band {
+    height: auto !important;
+    max-height: none !important;
+    overflow: visible !important;
+}
+#hud-root .ada-note.ada-note {
+    position: relative;
+    width: 100% !important;
+    max-width: none !important;
+    height: auto !important;
+    min-height: 0 !important;
+    max-height: none !important;
+    overflow: visible !important;
+    flex-direction: row;
+    align-items: center;
+    padding-top: 12px !important;
+    padding-bottom: 20px !important;
+    padding-left: 8px !important;
+    padding-right: 16px !important;
+    border-width: 0 !important;
+    border-radius: 0 !important;
+    background-color: rgba(0, 0, 0, 0) !important;
+    background-image: url("project://database/Assets/_Game/UI/Textures/tex_fumetto_crema.png") !important;
+    -unity-background-scale-mode: stretch-to-fill !important;
+    -unity-slice-left: 20px !important;
+    -unity-slice-top: 20px !important;
+    -unity-slice-right: 20px !important;
+    -unity-slice-bottom: 24px !important;
+}
+.ada-plate { display: none !important; background-image: none !important; }
+#hud-root .ada-face.ada-face--portrait { border-color: #F2B53A !important; }
+#hud-root .ada-col {
+    flex-grow: 1;
+    flex-shrink: 1;
+    min-width: 0;
+    height: auto;
+    max-height: none;
+    justify-content: center;
+}
+#hud-root .ada-text.ada-text {
+    white-space: normal !important;
+    text-overflow: clip !important;
+    -unity-overflow-clip-box: padding-box;
+    overflow: visible !important;
+    height: auto !important;
+    min-height: 0 !important;
+    max-height: none !important;
+    width: 100%;
+    margin: 0;
+    padding: 0;
+    font-size: 14px !important;
+    color: #3B2A20 !important;
+    -unity-text-align: upper-left;
+    -unity-paragraph-spacing: 0;
+    -unity-text-outline-width: 0 !important;
+    -unity-text-outline-color: rgba(0, 0, 0, 0) !important;
+    text-shadow: none;
+    -unity-font-definition: url("project://database/Assets/_Game/UI/Fonts/Fredoka-Medium_SDF.asset") !important;
+}
+
+#hud-root .tut-hint { height: auto; min-height: 36px; overflow: visible; }
+#hud-root .tut-hint__slot { position: relative; }
+#hud-root .tut-hint__pill {
+    height: 36px;
+    padding: 0 12px 4px 4px;
+    border-width: 0;
+    border-radius: 0;
+    background-color: rgba(0, 0, 0, 0);
+    background-image: url("project://database/Assets/_Game/UI/Textures/tex_capsula_terracotta_32.png");
+    -unity-background-scale-mode: stretch-to-fill;
+    -unity-slice-left: 16px;
+    -unity-slice-top: 16px;
+    -unity-slice-right: 16px;
+    -unity-slice-bottom: 20px;
+}
+#hud-root .tut-hint__text {
+    color: #F3E3C3;
+    -unity-text-outline-width: 1px;
+    -unity-text-outline-color: #E8D3AC;
+    text-shadow: 0 1px 0 #9E7873;
+}
+
+/* Titoli e valori. Il fondo dei pannelli non si tocca qui. */
+.currency-value,
+.day-value,
+#pad-price,
+.pad-tag__price,
+#cassa-amount,
+.collect-amount,
+.combo-popup,
+.stack-pill,
+#room-name,
+#safe-title,
+.settings-title,
+.poi-bar__label,
+.nonno-badge__text {
+    -unity-font-definition: url("project://database/Assets/_Game/UI/Fonts/Baloo2-Bold_SDF.asset") !important;
+    text-shadow: 0 1px 0 #9E7873;
+}
+
+/* Testo di lettura. */
+.ada-text,
+.tutorial-objective,
+.tut-hint__text,
+.settings-label,
+#toast-text,
+.skip-tut,
+#edge-arrow-label,
+.pad-tag__label {
+    -unity-font-definition: url("project://database/Assets/_Game/UI/Fonts/Fredoka-Medium_SDF.asset") !important;
+}

@@ -211,14 +211,15 @@ namespace UltimoMiglio.EditorTools
             // --- punti di interazione stile My Little Universe (pad a terra + chip billboard)
             {
                 Texture2D I(string n) => AssetDatabase.LoadAssetAtPath<Texture2D>($"Assets/_Game/UI/Icons/{n}.png");
-                var font = AssetDatabase.LoadAssetAtPath<Font>("Assets/_Game/UI/Fonts/Fredoka-Bold.ttf");
                 var ringPf = AssetDatabase.LoadAssetAtPath<GameObject>("Assets/_Game/VFX/Prefabs/fx_pad_fill_ring.prefab");
                 var ringModel = AssetDatabase.LoadAssetAtPath<GameObject>(ZoneRingPath);
                 var atlasMat = AssetDatabase.LoadAssetAtPath<Material>("Assets/_Game/VFX/Materials/M_Diorama_Atlas.mat");
+                var font = AssetDatabase.LoadAssetAtPath<Font>("Assets/_Game/UI/Fonts/Fredoka-Bold.ttf");
                 foreach (var z in Object.FindObjectsByType<ProximityZone>(FindObjectsSortMode.None))
                 {
+                    // #187 (Game Designer): anello = trigger. #186: il prezzo a schermo usa il Font Asset in Etichette.uss; LabelFont resta sul componente per la scena.
                     var ip = z.gameObject.AddComponent<InteractionPoint>(); ip.LabelFont = font;
-                    var bc = z.GetComponent<BoxCollider>(); ip.Radius = bc ? Mathf.Min(bc.size.x, bc.size.z) * 0.5f : 0.6f; // #187 (Game Designer): anello = trigger, diametro esterno = lato minore del BoxCollider
+                    var bc = z.GetComponent<BoxCollider>(); ip.Radius = bc ? Mathf.Min(bc.size.x, bc.size.z) * 0.5f : 0.6f;
                     switch (z)
                     {
                         case ArrivalsZone _: ip.Kind = PoiKind.Prendi; ip.Label = "Pacchi"; ip.Icon = I("ic_box"); break;
