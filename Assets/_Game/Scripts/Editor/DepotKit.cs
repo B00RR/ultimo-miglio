@@ -109,11 +109,11 @@ namespace UltimoMiglio.EditorTools
             Place("Kit/prop_plant_pot_round", _parent, banPos + new Vector3(-2.4f, 0, 1.6f), 0, true); // #187: spostato a ovest, fra Bancone e Cassa non c'era spazio con anello = trigger
             // Concept: pezzo di muro/arco visibile dietro il Bancone (beauty shot)
             Place("Kit/env_wall_2m_a", _parent, banPos + new Vector3(-0.2f, 0, 2.8f), 0, false, false, 2f, true);
-            Place("Kit/env_wall_2m_b", _parent, banPos + new Vector3(1.8f, 0, 2.8f), 0, false, false, 2f, true);
+            Place("Kit/env_wall_2m_b", _parent, banPos + new Vector3(-2.2f, 0, 2.8f), 0, false, false, 2f, true); // #256: un modulo (2 m) a ovest, attaccato a env_wall_2m_a: la Cassa si raggiunge da nord
             if (AssetDatabase.LoadAssetAtPath<GameObject>(Root + "Kit/env_wall_arch_4m.fbx"))
-                Place("Kit/env_wall_arch_4m", _parent, banPos + new Vector3(3.6f, 0, 1.2f), -90, false, false, 4f, true);
-            Place("Kit/prop_sign_sunn_depot", _parent, banPos + new Vector3(0.6f, 2.0f, 2.55f), 0, false); DressSignFace();
-            Place("Kit/prop_lantern_wall", _parent, banPos + new Vector3(-1.4f, 1.85f, 2.55f), 0, false);
+                Place("Kit/env_wall_arch_4m", _parent, banPos + new Vector3(3.6f, 0, 0.6f), -90, false, false, 4f, true); // #256: 0,6 m a sud, fuori dal trigger della Cassa (era dentro per 0,5 m)
+            Place("Kit/prop_sign_sunn_depot", _parent, banPos + new Vector3(-1.4f, 2.0f, 2.55f), 0, false); /* #256: insegna 2 m a ovest con il muro, tutta sul tufo */ DressSignFace();
+            Place("Kit/prop_lantern_wall", _parent, banPos + new Vector3(0.3f, 1.85f, 2.55f), 0, false); // #256: lanterna a est dell'insegna, sul muro
             Debug.Log("[Kit] gameplay dressing: " + _parent.childCount + " pieces");
         }
 
