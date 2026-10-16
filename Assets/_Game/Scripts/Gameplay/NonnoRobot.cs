@@ -10,6 +10,8 @@ namespace UltimoMiglio.Gameplay
     public sealed class NonnoRobot : MonoBehaviour
     {
         public ArrivalsZone Arrivals; public Shelf[] Shelves; public Bancone Bancone; public CustomerQueue Queue;
+        /// <summary>#111: raggio del corpo (CapsuleCollider e sweep).</summary>
+        public const float BodyRadius = 0.45f;
         public int CarryMax = 3; public Animator Animator;
         public enum WorkState { Idle, ToArrivals, Loading, ToShelf, Unloading }
         public WorkState State { get; private set; }
@@ -136,7 +138,8 @@ namespace UltimoMiglio.Gameplay
         {
             var d = _dest - transform.position; d.y = 0;
             if (d.sqrMagnitude < 0.35f) { _stuckT = 0; return true; }
-            var applied = AgentMove.Slide(transform, Vector3.ClampMagnitude(d.normalized * WalkSpeed * Time.deltaTime, d.magnitude), 0.4f);
+            var applied = AgentMove.Slide(transform, Vector3.ClampMagnitude(d.normalized * WalkSpeed * Time.deltaTime, d.magnitude), BodyRadius);
+            if (AgentMove.LastBlockedByAgent) { _stuckT = 0; _lastPos = transform.position; _curSpeed = 0f; if (d.sqrMagnitude < 2.25f) return true; return false; } // #111: Nina sulla meta: carica/scarica da vicino, mai attraverso
             AgentMove.Face(transform, applied.sqrMagnitude > 1e-8f ? applied : d, Time.deltaTime); // #59
             _curSpeed = Time.deltaTime > 0 ? applied.magnitude / Time.deltaTime : 0f;
             // Anti-stuck: if Transform barely moved for 2s (edge case), snap to dest
