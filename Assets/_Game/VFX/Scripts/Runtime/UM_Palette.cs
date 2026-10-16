@@ -15,16 +15,16 @@ namespace UltimoMiglio.VFX
         public static readonly Color TealOmni   = H("#5E7F86");
         public static readonly Color Tufo       = H("#E8D3AC");
         public static readonly Color Pavimento  = H("#F3E3C3");
-        public static readonly Color Legno      = H("#74503A");
+        public static readonly Color Legno      = H("#7A4A2E"); // noce leggibile (Concept)
         public static readonly Color Cartone    = H("#C99A62");
         public static readonly Color ScuroCaldo = H("#3B2F2A");
         public static readonly Color AranceNina = H("#E8913A");
         public static readonly Color Crema      = H("#F3E3C3");
         public static readonly Color Cielo      = H("#F3DDB6");
         // VFX/lighting derivati (proposti dal VFX, da validare col Concept Artist)
-        public static readonly Color Sole       = H("#FFE6B8");
-        public static readonly Color AmbSky     = H("#C9B4A6");
-        public static readonly Color AmbEquator = H("#D8B898");
+        public static readonly Color Sole       = H("#FFF0D4"); // key caldo ma meno pesca
+        public static readonly Color AmbSky     = H("#E6D9C8"); // crema neutro caldo
+        public static readonly Color AmbEquator = H("#E8D3AC"); // tufo, non pesca
         public static readonly Color AmbGround  = H("#9E7873");
         public static readonly Color Polvere    = H("#B8906A"); // v1.4: darker, reads on cream floor
         public static readonly Color MonetaOro  = H("#F2B53A"); // lira/gettone di Solara (faro inciso)
@@ -43,7 +43,7 @@ namespace UltimoMiglio.VFX
         public static readonly Color TramSky   = H("#D49A86");
         public static readonly Color TramEq    = H("#E6A07E");
         public static readonly Color TramCielo = H("#F4B88E");
-        public static readonly Color Foschia   = H("#F6D7B0"); // nebbia/orizzonte giorno
+        public static readonly Color Foschia   = H("#F0E4D0"); // foschia crema neutra
         // Notte: stessa palette, toni scuri caldi, niente neon
         public static readonly Color LunaCalda  = H("#C9A98A");
         public static readonly Color NottSky    = H("#8C7880");
@@ -58,7 +58,7 @@ namespace UltimoMiglio.VFX
         public static readonly Color CremaVarB   = H("#E9D2A8");
         public static readonly Color OmniScuro   = H("#3E5A61");
         public static readonly Color Outline     = H("#3B2F2A");
-        public static readonly Color Ombra       = H("#9E7873"); // ombre tinte calde
+        public static readonly Color Ombra       = H("#8F7A76"); // ombra calda + lieve fresco
         public static readonly Color ValoreMin   = H("#5A4A55"); // valore minimo volumi = ambient notte
         public static readonly Color FondoNotte  = H("#2B2230");
         public static readonly Color Lanterna2   = H("#FFB347");
@@ -66,7 +66,7 @@ namespace UltimoMiglio.VFX
         public static readonly Color TshirtNina  = H("#CFC2AE");
         // Cielo/fondo caldo (mai azzurro): crema in alto -> pesca all'orizzonte
         public static readonly Color CieloTop    = H("#F3E3C3");
-        public static readonly Color CieloOriz   = H("#F6D7B0");
+        public static readonly Color CieloOriz   = H("#F0E0C8");
         public static readonly Color CieloBasso  = H("#E9D2A8");
         public static readonly Color TramTop     = H("#E8B48A");
     }

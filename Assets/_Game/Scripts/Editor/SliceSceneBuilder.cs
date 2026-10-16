@@ -163,6 +163,7 @@ namespace UltimoMiglio.EditorTools
             // No NavMeshAgent: WebGL bake is missing at runtime ("Failed to create agent..."). NONNO walks with Transform.
             var bot = nonno.AddComponent<NonnoRobot>(); bot.Arrivals = arrivals; bot.Shelves = shelves; bot.Bancone = bancone; bot.Queue = queue; bot.Animator = nonnoAnim;
             NonnoRobot.StripNavMeshAgents(nonno); // editor+runtime: mai NavMeshAgent su NONNO
+            if (shadowPf) { var nsh = (GameObject)PrefabUtility.InstantiatePrefab(shadowPf); nsh.transform.SetParent(nonno.transform, false); nsh.transform.localPosition = new Vector3(0, 0.02f, 0); nsh.transform.localScale = Vector3.one * 1.1f; }
 
             // --- NavMesh
             var surf = floor.AddComponent<NavMeshSurface>(); surf.collectObjects = CollectObjects.All; surf.useGeometry = NavMeshCollectGeometry.PhysicsColliders;

@@ -14,7 +14,8 @@ namespace UltimoMiglio.Gameplay
     {
         public PoiKind Kind; public string Label; public Texture2D Icon; public Font LabelFont;
         public float Radius = 1.1f; public bool HasCard; public UpgradePad Pad; public UltimoMiglio.VFX.UM_PadFillRing Ring; public UltimoMiglio.VFX.UM_PadIcon PadIcon;
-        public static readonly Color Blu = new(0.369f, 0.498f, 0.525f), Verde = new(0.56f, 0.79f, 0.66f), Giallo = new(0.957f, 0.769f, 0.188f), Ink = new(0.231f, 0.165f, 0.125f);
+        // Concept: Purchase = #F4C430, Pickup = teal, Delivery = menta; bordo bruno #3B2A20
+        public static readonly Color Blu = new(0.369f, 0.498f, 0.525f), Verde = new(0.561f, 0.788f, 0.659f), Giallo = new(0.957f, 0.769f, 0.188f), Ink = new(0.231f, 0.165f, 0.125f);
 
         Transform _rim, _fill, _beacon; Material _fillMat, _beaconMat; Color _col;
         VisualElement _chip; Label _text; UltimoMiglio.UI.HudController _hud; Camera _cam; TutorialManager _tut;
@@ -42,12 +43,15 @@ namespace UltimoMiglio.Gameplay
             _col = KindColor; _phase = Random.value * 6f;
             var sh = Shader.Find("Universal Render Pipeline/Unlit");
             Material M(Color c) { var m = new Material(sh); m.SetColor("_BaseColor", c); if (m.HasProperty("_Color")) m.SetColor("_Color", c); return m; }
-            _rim = Disc("POI_Rim", M(Ink), new Vector3(Radius * 2.55f, 0.14f, Radius * 2.55f), 0.04f);
+            // Bordo bruno sottile (non disco pieno scuro)
+            _rim = Disc("POI_Rim", M(Ink), new Vector3(Radius * 2.15f, 0.06f, Radius * 2.15f), 0.035f);
             _fillMat = M(_col);
-            _col = Color.Lerp(_col, Color.white, 0.05f); _col = Saturate(_col, 1.35f);
-            _fillMat.color = new Color(_col.r, _col.g, _col.b, 0.40f); _fill = Disc("POI_Fill", _fillMat, new Vector3(Radius * 2.2f, 0.12f, Radius * 2.2f), 0.06f);
+            // Riempimento saturo leggibile (Purchase = sole pieno; pickup/consegna teal/menta)
+            float fillA = Kind == PoiKind.Acquisto ? 0.92f : 0.78f;
+            _fillMat.color = new Color(_col.r, _col.g, _col.b, fillA);
+            _fill = Disc("POI_Fill", _fillMat, new Vector3(Radius * 1.95f, 0.08f, Radius * 1.95f), 0.05f);
             _beaconMat = M(Color.Lerp(_col, Color.white, 0.35f));
-            _beacon = Disc("POI_Beacon", _beaconMat, new Vector3(0.18f, 2.2f, 0.18f), 2.2f);
+            _beacon = Disc("POI_Beacon", _beaconMat, new Vector3(0.14f, 1.6f, 0.14f), 1.6f);
             _beacon.gameObject.SetActive(false);
             _tut = FindAnyObjectByType<TutorialManager>();
             if (PadIcon) PadIcon.SetVisible(false);
@@ -83,19 +87,19 @@ namespace UltimoMiglio.Gameplay
             _chip = new VisualElement { name = "poi-chip", pickingMode = PickingMode.Ignore };
             var s = _chip.style; s.position = Position.Absolute; s.flexDirection = FlexDirection.Row; s.alignItems = Align.Center;
             s.translate = new Translate(Length.Percent(-50), Length.Percent(-100));
-            s.paddingLeft = 14; s.paddingRight = 26; s.paddingTop = 8; s.paddingBottom = 8;
+            s.paddingLeft = 8; s.paddingRight = 12; s.paddingTop = 4; s.paddingBottom = 4;
             s.backgroundColor = Kind == PoiKind.Acquisto ? Giallo : new Color(1f, 0.976f, 0.933f);
             s.borderTopLeftRadius = s.borderTopRightRadius = s.borderBottomLeftRadius = s.borderBottomRightRadius = 999;
             s.borderLeftWidth = s.borderRightWidth = s.borderTopWidth = s.borderBottomWidth = 6;
             s.borderLeftColor = s.borderRightColor = s.borderTopColor = s.borderBottomColor = Ink;
             var ic = new VisualElement { pickingMode = PickingMode.Ignore };
-            var i = ic.style; i.width = 40; i.height = 40; i.borderTopLeftRadius = i.borderTopRightRadius = i.borderBottomLeftRadius = i.borderBottomRightRadius = 36;
+            var i = ic.style; i.width = 28; i.height = 28; i.borderTopLeftRadius = i.borderTopRightRadius = i.borderBottomLeftRadius = i.borderBottomRightRadius = 36;
             i.backgroundColor = Kind == PoiKind.Acquisto ? Ink : _col; i.alignItems = Align.Center; i.justifyContent = Justify.Center; i.marginRight = 12;
-            var img = new VisualElement { pickingMode = PickingMode.Ignore }; img.style.width = 28; img.style.height = 28;
+            var img = new VisualElement { pickingMode = PickingMode.Ignore }; img.style.width = 18; img.style.height = 18;
             if (Icon) { img.style.backgroundImage = Icon; img.style.unityBackgroundImageTintColor = new Color(1f, 0.976f, 0.933f); }
             ic.Add(img);
             _text = new Label(Label) { pickingMode = PickingMode.Ignore };
-            var t = _text.style; t.fontSize = Kind == PoiKind.Acquisto ? 28 : 22; t.color = Ink; t.unityFontStyleAndWeight = FontStyle.Bold; t.whiteSpace = WhiteSpace.NoWrap;
+            var t = _text.style; t.fontSize = Kind == PoiKind.Acquisto ? 18 : 16; t.color = Ink; t.unityFontStyleAndWeight = FontStyle.Bold; t.whiteSpace = WhiteSpace.NoWrap;
             if (LabelFont) t.unityFontDefinition = FontDefinition.FromFont(LabelFont);
             _chip.Add(ic); _chip.Add(_text); layer.Add(_chip);
             var arrow = _hud.Root.Q("edge-arrow"); arrow?.BringToFront(); // the off-screen arrow is never under a chip/card
@@ -110,11 +114,14 @@ namespace UltimoMiglio.Gameplay
             _active = avail && target && (target.position - transform.position).sqrMagnitude < 9f;
             _beacon.gameObject.SetActive(_active);
             float t = Time.time * (_active ? 4.5f : 2.2f) + _phase, k = 0.5f + 0.5f * Mathf.Sin(t);
-            float big = _active ? 1.18f : 1f, amp = _active ? 0.08f : 0.035f;
+            float big = _active ? 1.12f : 1f, amp = _active ? 0.07f : 0.04f;
             float sc = big * (1f + amp * k);
-            _rim.localScale = new Vector3((Radius * 2f + 0.45f) * sc, 0.12f, (Radius * 2f + 0.45f) * sc);
-            _fill.localScale = new Vector3(Radius * 2.05f * sc, 0.10f, Radius * 2.05f * sc);
-            var fill = Color.Lerp(_col, Color.white, (_active ? 0.35f : 0.12f) * k); fill.a = _active ? 0.55f : 0.40f; _fillMat.SetColor("_BaseColor", fill); if (_fillMat.HasProperty("_Color")) _fillMat.SetColor("_Color", fill); // "emission" pulse
+            _rim.localScale = new Vector3(Radius * 2.15f * sc, 0.06f, Radius * 2.15f * sc);
+            _fill.localScale = new Vector3(Radius * 1.95f * sc, 0.08f, Radius * 1.95f * sc);
+            float baseA = Kind == PoiKind.Acquisto ? 0.92f : 0.78f;
+            var fill = Color.Lerp(_col, Color.white, (_active ? 0.22f : 0.08f) * k);
+            fill.a = baseA * (0.88f + 0.12f * k); // pulse leggibile
+            _fillMat.SetColor("_BaseColor", fill); if (_fillMat.HasProperty("_Color")) _fillMat.SetColor("_Color", fill);
             if (_active) { _beacon.localScale = new Vector3(0.18f, 2.2f + 0.3f * k, 0.18f); _beaconMat.SetColor("_BaseColor", Color.Lerp(_col, Color.white, 0.3f + 0.4f * k)); }
 
             EnsureChip();
