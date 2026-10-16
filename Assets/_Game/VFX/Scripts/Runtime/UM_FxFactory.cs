@@ -155,7 +155,7 @@ namespace UltimoMiglio.VFX
             rr.renderMode = ParticleSystemRenderMode.HorizontalBillboard; rr.maxParticleSize = 3f;
             // soft ring, slow pulse (2 breaths over 1.2 s), max alpha 0.45
             var rm = ring.main; rm.duration = 1.2f; rm.startLifetime = 1.2f; rm.startSpeed = 0; rm.startSize = 2.2f;
-            var rc = UM_Palette.UiUpgrade; rc.a = 0.45f; // UI: upgrade = limone (distinto dalla consegna menta)
+            var rc = UM_Palette.UiSole; rc.a = 0.45f; // #69 Concept: zone acquisto/upgrade = giallo sole; limone solo nelle scintille core
             rm.startColor = rc;
             var re = ring.emission; re.SetBursts(new[] { new ParticleSystem.Burst(0, 1) });
             var rs = ring.sizeOverLifetime; rs.enabled = true;
@@ -252,7 +252,7 @@ namespace UltimoMiglio.VFX
             m.duration = 0.3f; m.startLifetime = new ParticleSystem.MinMaxCurve(0.5f, 0.7f);
             m.startSpeed = new ParticleSystem.MinMaxCurve(3f, 4.5f);
             m.startSize = new ParticleSystem.MinMaxCurve(0.12f, 0.2f);
-            m.startColor = Grad(UM_Palette.UiSole, UM_Palette.UpgradeLimone); // UI: sole moneta/acquisto
+            m.startColor = UM_Palette.UiSole; // #69: acquisto tutto giallo sole
             m.gravityModifier = 1.3f;
             var e = ps.emission; e.SetBursts(new[] { new ParticleSystem.Burst(0, (short)N(12)) });
             var sh = ps.shape; sh.shapeType = ParticleSystemShapeType.Cone; sh.angle = 22f; sh.radius = 0.15f; sh.rotation = new Vector3(-90, 0, 0);
@@ -286,7 +286,7 @@ namespace UltimoMiglio.VFX
             var fl = Make("flash", mat, 1, out var fr); fl.transform.SetParent(ps.transform, false); Tile(fl, TileDot);
             fr.renderMode = ParticleSystemRenderMode.HorizontalBillboard; fr.maxParticleSize = 3f;
             var fm = fl.main; fm.duration = 0.3f; fm.startLifetime = 0.3f; fm.startSpeed = 0; fm.startSize = 2.4f;
-            var fc = UM_Palette.UpgradeLimone; fc.a = 0.8f; fm.startColor = fc;
+            var fc = UM_Palette.UiSole; fc.a = 0.8f; // #69: flash a terra giallo sole fm.startColor = fc;
             var fe = fl.emission; fe.SetBursts(new[] { new ParticleSystem.Burst(0, 1) });
             FadeOut(fl, fc, 0.1f);
             return ps.gameObject;

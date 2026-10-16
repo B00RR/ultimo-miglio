@@ -14,9 +14,9 @@ namespace UltimoMiglio.Gameplay
     {
         public PoiKind Kind; public string Label; public Texture2D Icon; public Font LabelFont;
         public float Radius = 1.1f; public bool HasCard; public UpgradePad Pad; public UltimoMiglio.VFX.UM_PadFillRing Ring; public UltimoMiglio.VFX.UM_PadIcon PadIcon;
-        // #69 (guida §2: niente blu/grigi freddi): Prendi = terracotta #C8633B, Consegna = menta #8FC9A8, Acquisto = limone #F7E26B; bordo outline #3B2F2A.
+        // #69 (guida §2: niente blu/grigi freddi): Prendi = terracotta #C8633B, Consegna = menta #8FC9A8, Acquisto/upgrade = giallo sole #F4C430 (Concept, #69); bordo outline #3B2F2A.
         // Il nome "Blu" resta per compatibilità API, ma ora vale terracotta.
-        public static readonly Color Blu = new(0.784f, 0.388f, 0.231f), Verde = new(0.561f, 0.788f, 0.659f), Giallo = new(0.969f, 0.886f, 0.420f), Ink = new(0.231f, 0.184f, 0.165f);
+        public static readonly Color Blu = new(0.784f, 0.388f, 0.231f), Verde = new(0.561f, 0.788f, 0.659f), Giallo = new(0.957f, 0.769f, 0.188f), Ink = new(0.231f, 0.184f, 0.165f);
         static readonly Color Crema = new(0.953f, 0.890f, 0.765f); // #F3E3C3: schiarimenti caldi (mai verso il bianco/grigio freddo)
 
         Transform _rim, _fill, _beacon; Material _fillMat, _beaconMat; Color _col;
