@@ -1,4 +1,4 @@
-# HUD "Diorama Solare" (UI Toolkit) – Ultimo Miglio, Sprint 1
+# HUD "Diorama Solare" (UI Toolkit) – Bokobay, Sprint 1
 Owner: UI/UX. Fonte: `04_UI.md` v3.2 (Pedaggio, rate) + `02_TECH.md` v1.3 §2b. Dati: `data/ch1/*.json` via `ChapterDataAsset` del Tech Lead.
 
 ## Struttura
@@ -25,7 +25,7 @@ _Game/UI/
    → crea `Settings/HudPanelSettings.asset` (Scale With Screen Size 1170×2532, match width) e `PhonePanelSettings.asset` (sort 10), `Prefabs/HUD.prefab`, `Demo/HudDemo.unity`.
 2. **Font:** importare Inter (OFL) SemiBold/Bold/ExtraBold come Font Asset (TextCore) e Roboto come fallback; assegnarli nel `PanelTextSettings` delle due PanelSettings (o `-unity-font-definition` nel `:root` della USS). Attivare numeri tabulari (feature `tnum`) se disponibili.
 3. Nella scena slice: istanziare `HUD.prefab`; **usare il suo `FloatingJoystick`** come `NinaController.Joystick` (al posto di quello creato vuoto in `SliceSceneBuilder` riga ~64: funziona anche così, ma senza grafica e senza esclusione degli overlay). Impostare `cameraTransform` del joystick (o lasciare yaw fisso 45°) e `cam`/`nina` di `EdgeArrow`.
-4. Aggiungere `HudGameBridge` (riferimenti Hud/Phone/Joystick/StackCounter/CassaCard/EdgeArrow/Cassa). `StackCounter` va su Nina (template `UXML/StackCounter.uxml`, offset ~2.2 m), `CassaCard` sulla Cassa, `UpgradePadCard` su ogni pad (template `PadCard.uxml`).
+4. Aggiungere `HudGameBridge` (riferimenti Hud/Phone/Joystick/StackCounter/CassaCard/EdgeArrow/Cassa). `StackCounter` va su Kaia (template `UXML/StackCounter.uxml`, offset ~2.2 m), `CassaCard` sulla Cassa, `UpgradePadCard` su ogni pad (template `PadCard.uxml`).
 5. `ProximityZone.Ring` usa già `UltimoMiglio.UI.ZoneFillRing`: mettere il componente sul quad dell'anello con materiale `UltimoMiglio/UI/ZoneRing` (o shader VFX con `_Fill`).
 6. `RoomDoorway` (trigger) su ogni varco con il nome stanza.
 7. Android: `renderOutsideSafeArea = true` è già in `ProjectSetup`; la safe area viene riapplicata a ogni cambio (`Screen.safeArea`).
@@ -37,7 +37,7 @@ _Game/UI/
 - `SettingsController`: `Open()` / `Close()`; PlayerPrefs `cam_zoom_v3` / `vol_music` / `vol_sfx`. Anteprima live via reflection su `DepotCameraFit.SetOrthoSize`/`GetOrthoSize` e `AudioManager.SetMusicVolume`/`SetSfxVolume` (Tech Lead). Eventi: `Opened`, `Closed`. Ingranaggio → `HudController.SettingsButtonTapped`.
 - `UpgradePadCard.ShowOnPad(bool)` / `SetVisible(bool)`: una sola card attiva (`ActiveCard`). Tech Lead: ProximityZone → ShowOnPad.
 - `PhoneController`: `OpenPhone(app)`, `Close()`, `Back()`, `HandleBack()`, `UnlockApp`, `SetLockChapter`, `SetBadge`, `SetHome`, `SetOrders`, `SetChat`, `SetFleet`. Eventi: `Opened`, `Closed`, `AppShown`, `ShowTheWayRequested(app, id)`, `QuickReplyChosen(contact, idx)`.
-- `FloatingJoystick`: `Value`, `WorldDirection`, `IsActive`, eventi `Moved`, `Released`. Si rilascia da solo all'apertura del telefono (Nina si ferma; il gioco non va in pausa).
+- `FloatingJoystick`: `Value`, `WorldDirection`, `IsActive`, eventi `Moved`, `Released`. Si rilascia da solo all'apertura del telefono (Kaia si ferma; il gioco non va in pausa).
 - `EdgeArrow`: `SetTarget(transform, "Cliente al Bancone", "icon-customer")`, `Clear()`.
 - World: `UpgradePadCard.SetProgress(paid,total)/SetLocked(cap)/SetTitle`, `StackCounter.SetCount(n,cap)/SetBuff(icon,sec)`, `CassaCard.SetAmount(ln,cap)/ShowDoublePrompt`, `ZoneFillRing.SetFill/Drain/PulseOnce`.
 
