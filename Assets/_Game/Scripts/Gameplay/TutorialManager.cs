@@ -17,6 +17,8 @@ namespace UltimoMiglio.Gameplay
         [TextArea] public string[] Texts = new string[7]; [TextArea] public string EndText;
         public Transform Arrivi, Scaffale, Bancone, Monete, PadZaino, PadNonno;
         public float EndSeconds = 6f;
+        [Tooltip("onboarding_testi.json (PR #62): passi per id + suggerimenti onb.*. Facoltativo: senza, valgono Texts/EndText.")]
+        public TextAsset TestiJson;
 
         public Step Current { get; private set; }
         public string CurrentObjectiveText => Current < Step.Fine && (int)Current < Objectives.Length ? Objectives[(int)Current] : (Current == Step.Fine ? "Deposito aperto!" : "");
@@ -29,6 +31,7 @@ namespace UltimoMiglio.Gameplay
 
         void Start()
         {
+            LoadTesti();
             Current = (Step)Mathf.Clamp(PlayerPrefs.GetInt(PrefKey, 0), 0, (int)Step.Chiuso);
             _hud = FindAnyObjectByType<UltimoMiglio.UI.HudController>();
             _edge = FindAnyObjectByType<UltimoMiglio.UI.EdgeArrow>(FindObjectsInactive.Include);
@@ -75,6 +78,7 @@ namespace UltimoMiglio.Gameplay
         void EnsureBanner()
         {
             if (_banner != null || !_hud || _hud.Root == null) return;
+            if (UseAdaNote) return; // issue tutorial-HUD: fumetto compatto AdaNoteView, niente banner grande inline
             _banner = new VisualElement { name = "tutorial-banner", pickingMode = PickingMode.Ignore };
             var st = _banner.style;
             st.position = Position.Absolute; st.left = Length.Percent(50); st.top = 56; st.translate = new Translate(Length.Percent(-50), 0); // B4: sotto obiettivo, leggibile
@@ -93,6 +97,51 @@ namespace UltimoMiglio.Gameplay
             _bannerText = new Label { pickingMode = PickingMode.Ignore }; _bannerText.style.color = new Color(0.23f, 0.16f, 0.12f); _bannerText.style.fontSize = 22; _bannerText.style.whiteSpace = WhiteSpace.Normal;
             col.Add(who); col.Add(_bannerText); _banner.Add(face); _banner.Add(col);
             _hud.Root.Add(_banner);
+        }
+
+        const bool UseAdaNote = true;
+        static readonly System.Collections.Generic.Dictionary<string, Step> IdToStep = new()
+        {   // id PR #62 (move…) + id storici (muoviti…): l'ordine nel JSON non conta più
+            { "move", Step.Muoviti }, { "pickup", Step.Arrivi }, { "shelve", Step.Scaffali }, { "serve", Step.Bancone }, { "coins", Step.Monete },
+            { "unlock_nonno", Step.Nonno }, { "upgrade_zaino", Step.Zaino },
+            { "muoviti", Step.Muoviti }, { "arrivi", Step.Arrivi }, { "scaffali", Step.Scaffali }, { "bancone", Step.Bancone }, { "monete", Step.Monete },
+            { "nonno", Step.Nonno }, { "zaino", Step.Zaino }
+        };
+        readonly System.Collections.Generic.Dictionary<string, string> _hints = new();
+        VisualElement _hint; Label _hintText; Step _adaShown = (Step)(-1);
+
+        void LoadTesti()
+        {
+            if (!TestiJson) return;
+            string j = TestiJson.text;
+            foreach (System.Text.RegularExpressions.Match m in System.Text.RegularExpressions.Regex.Matches(j, "\\{\\s*\"id\"\\s*:\\s*\"([^\"]+)\"\\s*,\\s*\"text\"\\s*:\\s*\"((?:[^\"\\\\]|\\\\.)*)\""))
+                if (IdToStep.TryGetValue(m.Groups[1].Value, out var st) && (int)st < Texts.Length) Texts[(int)st] = System.Text.RegularExpressions.Regex.Unescape(m.Groups[2].Value);
+            foreach (System.Text.RegularExpressions.Match m in System.Text.RegularExpressions.Regex.Matches(j, "\"(onb\\.[a-zA-Z.]+)\"\\s*:\\s*\"((?:[^\"\\\\]|\\\\.)*)\""))
+                _hints[m.Groups[1].Value] = System.Text.RegularExpressions.Regex.Unescape(m.Groups[2].Value);
+        }
+
+        /// <summary>Suggerimento onb.* del passo (CTA/hint terracotta in alto nella fascia bassa). null = nessuno.</summary>
+        public string CurrentHint()
+        {
+            string k = Current switch
+            {
+                Step.Muoviti => "onb.move.card",
+                Step.Arrivi => GameRoot.I && GameRoot.I.Nina && GameRoot.I.Nina.Stack.Count >= GameRoot.I.Nina.Stack.Capacity ? "onb.pick.max" : null,
+                Step.Scaffali => "onb.deposit.hint", Step.Bancone => "onb.cust.first", Step.Monete => "onb.coins.walk",
+                Step.Zaino => "onb.zaino.hint", _ => null
+            };
+            return k != null && _hints.TryGetValue(k, out var v) ? v : null;
+        }
+
+        void EnsureHint()
+        {
+            if (_hint != null || !_hud || _hud.Root == null) return;
+            _hint = new VisualElement { name = "tut-hint", pickingMode = PickingMode.Ignore }; _hint.AddToClassList("tut-hint");
+            var pill = new VisualElement { pickingMode = PickingMode.Ignore }; pill.AddToClassList("tut-hint__pill");
+            var go = new VisualElement { pickingMode = PickingMode.Ignore }; go.AddToClassList("tut-hint__go");
+            _hintText = new Label { pickingMode = PickingMode.Ignore }; _hintText.AddToClassList("tut-hint__text");
+            pill.Add(go); pill.Add(_hintText); _hint.Add(pill);
+            (_hud.SafeRoot ?? _hud.Root).Add(_hint);
         }
 
         public string CurrentText => Current < Step.Fine ? Texts[(int)Current] : Current == Step.Fine ? EndText : null;
@@ -116,6 +165,8 @@ namespace UltimoMiglio.Gameplay
             StepChanged?.Invoke(s);
             var t = Target();
             if (_edge) { if (t) _edge.SetTarget(t, s.ToString().ToUpper()); else _edge.Clear(); }
+            // #4 (VFX): anello pulsante a terra sul bersaglio + freccia a terra davanti a Nina (niente waypoint fluttuante, QA #44)
+            if (t) UltimoMiglio.VFX.UM_TutorialMarker.Show(t, GameRoot.I && GameRoot.I.Nina ? GameRoot.I.Nina.transform : null); else UltimoMiglio.VFX.UM_TutorialMarker.Hide();
             if (_marker) _marker.gameObject.SetActive(false); // QA v2: no world waypoint if edge arrow exists
         }
 
@@ -134,6 +185,17 @@ namespace UltimoMiglio.Gameplay
             EnsureBanner();
             EnsureObjective();
             if (_objective != null) { _objective.text = CurrentObjectiveText; _objective.style.display = Current <= Step.Fine ? DisplayStyle.Flex : DisplayStyle.None; _objective.BringToFront(); }
+            // Fumetto Ada compatto (AdaNoteView): un biglietto per passo, chiuso a fine tutorial
+            if (UseAdaNote && _hud && _adaShown != Current)
+            {
+                _adaShown = Current; var at = CurrentText;
+                if (Current <= Step.Fine && !string.IsNullOrEmpty(at)) _hud.ShowAdaNote(at, sticky: Current < Step.Fine, seconds: EndSeconds);
+                else _hud.CompleteAdaNote();
+            }
+            EnsureHint();
+            if (_hint != null) { var h = Current < Step.Fine ? CurrentHint() : null; var joy = _hud.Root.Q("joystick-base"); bool joyOver = joy != null && joy.resolvedStyle.display == DisplayStyle.Flex && joy.resolvedStyle.opacity > 0.05f && joy.worldBound.Overlaps(_hint.worldBound);
+                _hint.EnableInClassList("tut-hint--on", !string.IsNullOrEmpty(h) && !joyOver); // mai sotto il pollice/joystick flottante
+                if (_hintText != null && h != null) _hintText.text = h; }
             // B4 P2: testi Ada nel fumetto HUD (non solo console)
             if (_banner != null)
             {
