@@ -1,7 +1,7 @@
 # Guida visiva — Capitolo 1 «Ultimo Miglio»
 
 Stile **Diorama Solare**: 3D low-poly toon, camera isometrica 3/4 dall'alto, formato portrait (riferimento 1170×2532).
-Autore: Concept Artist · Stato: v1 · Riferimento approvato principale: `conceptA.jpg`.
+Autore: Concept Artist · Stato: v1.1 (valori allineati alla build, vedi §12) · Riferimento approvato principale: `conceptA.jpg`.
 
 ![Concept A](img/ref_conceptA.jpg)
 
@@ -26,7 +26,7 @@ Autore: Concept Artist · Stato: v1 · Riferimento approvato principale: `concep
 | Arancia | `#E8913A` |
 | OmniFreight | `#5E7F86` / `#3E5A61` |
 | Outline | `#3B2F2A` |
-| Ombra | `#9E7873` |
+| Ombra | `#8F7A76` (v1.1; era `#9E7873`) |
 | Valore minimo volumi | `#5A4A55` |
 | Tramonto/notte fondo | `#2B2230` |
 | Lanterne | `#FFB65C` / `#FFB347` |
@@ -38,7 +38,7 @@ Autore: Concept Artist · Stato: v1 · Riferimento approvato principale: `concep
 ## 3. Deposito / Bancone
 - Materiali: **tufo** crema, **archi**, **legno** noce; insegna **«Vela & Figli» con il faro** nel logo.
 - **Carico 0** sul banco con **cuciture emissive ambra** e **bloom isolato solo sul banco**.
-- **Lastre pavimento grandi (3,5 m)** (v1.1, via Concept Artist su #126), 3 toni crema/tufo per lastra (`#F3E3C3` / `#E8D3AC` / `#E9D2A8`), **una fuga su due** (fuga ogni 7 m) in `#E8D3AC` con opacità ~30%. Non un unico arancio saturo.
+- **Lastre pavimento grandi (3,5 m)** (v1.1; era ~0,25 m), 3 toni crema/tufo per lastra (`#F3E3C3` / `#E8D3AC` / `#E9D2A8`), **una fuga su due** (fuga ogni 7 m) in `#E8D3AC` con opacità ~30%. Non un unico arancio saturo.
 - Set dressing: **vasi in terracotta e limoni**, casse, scaffali in legno.
 
 ![Beauty bancone v03 (APPROVATO)](img/ref_3d_beauty_bancone_v03_1170x2532.jpg)
@@ -86,8 +86,8 @@ Autore: Concept Artist · Stato: v1 · Riferimento approvato principale: `concep
 Nonna Ada guida il tutorial del capitolo 1 (ritratto nel dialogo HUD), ma **non esiste ancora una tavola di riferimento** (né sheet né turnaround) tra i materiali approvati. In build compare solo un cerchio con la scritta «ADA». **Da produrre**: sheet volto/busto per il ritratto HUD (stessa palette, toni bruni/limone coerenti con l'anziana, ma riconoscibile). Fino ad allora il ritratto resta segnaposto.
 
 ## 9. Illuminazione «Diorama Solare»
-- **Sole da alto-sinistra (50°, −35°)**, colore `#FFE6B8`.
-- **Ombre tinte calde `#9E7873`**.
+- **Sole da alto-sinistra (50°, −35°)**, colore `#FFF0D4` (v1.1; era `#FFE6B8`).
+- **Ombre tinte calde `#8F7A76`** (v1.1; era `#9E7873`): ombra calda con una lieve nota fresca, mai blu o viola.
 - ⚠️ **DECISIONE DA CONFERMARE DA DevOn**: il VFX propone ombre fredde colorate e palette più satura. Proposta della guida: *ombre leggermente fresche ammesse solo come tinta lieve nelle zone d'ombra, mai blu/viola; saturazione +10-15% ok.*
 - Toon a **3 bande morbide**; **outline solo su personaggi, robot e oggetti interattivi** (non sul set).
 - **Nebbia calda leggera 30-90 m**; **AO di contatto**.
@@ -116,3 +116,10 @@ Nonna Ada, fondatrice di Vela & Figli, circa 75 anni, piccola e robusta. Ha lo c
 
 ## Decisione confermata da DevOn (16/10)
 Ombre leggermente fresche ammesse come tinta lieve nelle zone d'ombra, mai blu o viola. Saturazione +10-15% approvata.
+
+## 12. Registro modifiche
+- **v1.1 (16/10/2026)**: la guida riprende i valori presenti in build su `main`, introdotti dal Concept Artist con i commit `fix(concept)` `ef0b5b2` (pavimento a lastre grandi) e `f464333` (look crema/noce) dopo la QA v7. Chiude #81.
+  - Sole `#FFE6B8` → `#FFF0D4` (`UM_Palette.Sole`).
+  - Ombra `#9E7873` → `#8F7A76` (`UM_Palette.Ombra`, `_ShadowTint` di `M_Diorama_Atlas` = 0.561/0.478/0.463).
+  - Lastre pavimento ~0,25 m → 3,5 m (`_TileSize` 3.5), una fuga su due in `#E8D3AC` al ~30% (shader `UM_ToonDiorama`).
+- **v1.2 (16/10/2026)**: decisione DevOn, **vince la guida**. La build torna ai valori v1: sole `#FFE6B8`, ombra `#9E7873`, legno `#74503A`, notte al 47% dell'esposizione del giorno, swatch dell'atlas `T_Palette_Atlas.png` allineati alla palette §2. Il Concept Artist conferma le lastre del pavimento da 3,5 m con una fuga ogni due (`#E8D3AC` ~30%). I valori v1.1 di sole (`#FFF0D4`) e ombra (`#8F7A76`) sono superati. Rif. #81, PR #126.
