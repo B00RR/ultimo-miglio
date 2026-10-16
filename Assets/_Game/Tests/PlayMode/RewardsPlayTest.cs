@@ -17,21 +17,20 @@ public class RewardsPlayTest
         if (System.IO.File.Exists(save)) System.IO.File.Delete(save);
         yield return SceneManager.LoadSceneAsync("Ch1_Deposito");
         while (!GameRoot.Ready || NextPadArrow.I == null) yield return null;
-        var eco = GameRoot.I.Eco; UpgradePad shown = null; int changes = 0;
-        System.Action<UpgradePad> h = p => { changes++; shown = p; };
+        var eco = GameRoot.I.Eco; UpgradeKind? shown = null; int changes = 0;
+        System.Action<UpgradeKind?, UpgradePad> h = (k, p) => { changes++; shown = k; };
         NextPadArrow.Changed += h;
         try
         {
             eco.S.Scarpe = 1; eco.S.Wallet = 0; eco.S.ActiveSec = 481;
             yield return new WaitForSeconds(0.3f);
-            Assert.IsNull(NextPadArrow.I.Target, "freccia senza LN sufficienti");
+            Assert.IsNull(NextPadArrow.I.TargetKind, "freccia senza LN sufficienti");
             eco.S.Wallet = eco.Cost(UpgradeKind.Scarpe) + 1;
             yield return new WaitForSeconds(0.3f);
-            Assert.IsNotNull(NextPadArrow.I.Target, "freccia non comparsa a 480 s");
-            Assert.AreEqual(UpgradeKind.Scarpe, NextPadArrow.I.Target.Kind);
+            Assert.AreEqual(UpgradeKind.Scarpe, NextPadArrow.I.TargetKind, "freccia non comparsa a 480 s sulle Scarpe");
             Time.timeScale = 10f;
             yield return new WaitForSeconds(21f);
-            Assert.IsNull(NextPadArrow.I.Target, "freccia ancora visibile dopo 20 s");
+            Assert.IsNull(NextPadArrow.I.TargetKind, "freccia ancora visibile dopo 20 s");
             Assert.IsNull(shown); Assert.AreEqual(2, changes);
         }
         finally { NextPadArrow.Changed -= h; Time.timeScale = 1f; }

@@ -10,7 +10,9 @@ namespace UltimoMiglio.Gameplay
     public sealed class NextPadArrow : MonoBehaviour
     {
         public float VisibleSec = 20f;
-        public static event Action<UpgradePad> Changed; // null = nascondi
+        /// <summary>(pad indicato o null = nascondi, pad in scena o null se la slice non ha ancora quel pad).</summary>
+        public static event Action<UpgradeKind?, UpgradePad> Changed;
+        public UpgradeKind? TargetKind { get; private set; }
         public UpgradePad Target { get; private set; }
         public static NextPadArrow I { get; private set; }
         float _shownAt; int _lastLevel; bool _done; UpgradeKind _kind;
@@ -20,26 +22,27 @@ namespace UltimoMiglio.Gameplay
         {
             if (_done || !GameRoot.Ready) return;
             var eco = GameRoot.I.Eco;
-            if (Target)
+            if (TargetKind != null)
             {
                 bool bought = eco.NextLevel(_kind) != _lastLevel;
                 if (bought || Time.time - _shownAt >= VisibleSec) { Hide(bought ? "acquisto" : "timeout"); _done = true; }
                 return;
             }
             var k = eco.NextPadArrowTarget(); if (k == null) return;
-            foreach (var p in FindObjectsByType<UpgradePad>(FindObjectsSortMode.None))
-                if (p.Kind == k.Value) { Show(p, k.Value, eco.NextLevel(k.Value)); break; }
+            UpgradePad pad = null;
+            foreach (var p in FindObjectsByType<UpgradePad>(FindObjectsSortMode.None)) if (p.Kind == k.Value) { pad = p; break; }
+            Show(pad, k.Value, eco.NextLevel(k.Value)); // il pad può mancare nella slice (Scarpe/NONNO lv2): resta l'evento per la UI
         }
         void Show(UpgradePad p, UpgradeKind k, int lvl)
         {
-            Target = p; _kind = k; _lastLevel = lvl; _shownAt = Time.time;
-            Debug.Log($"[REWARD] next_pad_arrow show pad={k} t={GameRoot.I.Eco.S.ActiveSec:0.0}");
-            Changed?.Invoke(p);
+            Target = p; TargetKind = k; _kind = k; _lastLevel = lvl; _shownAt = Time.time;
+            Debug.Log($"[REWARD] next_pad_arrow show pad={k} inScena={(p ? 1 : 0)} t={GameRoot.I.Eco.S.ActiveSec:0.0}");
+            Changed?.Invoke(k, p);
         }
         void Hide(string why)
         {
             Debug.Log($"[REWARD] next_pad_arrow hide pad={_kind} why={why}");
-            Target = null; Changed?.Invoke(null);
+            Target = null; TargetKind = null; Changed?.Invoke(null, null);
         }
     }
 }
