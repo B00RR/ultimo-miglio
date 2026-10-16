@@ -13,9 +13,10 @@ public class P0CollisionFacingTest
 {
     static IEnumerator Load()
     {
-        PlayerPrefs.DeleteKey(UltimoMiglio.Gameplay.TutorialManager.PrefKey); PlayerPrefs.DeleteKey("um_save_v1"); PlayerPrefs.DeleteKey(UltimoMiglio.Gameplay.DepotCameraFit.PrefZoom); // solo chiavi di gioco: vol_music e vol_sfx restano (come #88)
+        PlayerPrefs.DeleteKey(UltimoMiglio.Gameplay.TutorialManager.PrefKey); PlayerPrefs.DeleteKey("um_save_v1"); PlayerPrefs.DeleteKey(UltimoMiglio.Gameplay.DepotCameraFit.PrefZoom); UltimoMiglio.Gameplay.TutorialManager.TestSenzaComparse = true; UltimoMiglio.Gameplay.TutorialManager.TestAccelera = true; /* #101: niente comparse graduali, tempi corti */ // solo chiavi di gioco: vol_music e vol_sfx restano (come #88)
         var save = System.IO.Path.Combine(Application.persistentDataPath, "save_v1.json");
         if (System.IO.File.Exists(save)) System.IO.File.Delete(save);
+        PlayerPrefs.SetInt(UltimoMiglio.Gameplay.TutorialManager.PrefGraduale, 0); // #94: test non di onboarding → niente rivelazione graduale
         yield return SceneManager.LoadSceneAsync("Ch1_Deposito");
         for (int i = 0; i < 90 && !GameRoot.Ready; i++) yield return null;
         Assert.IsTrue(GameRoot.Ready, "GameRoot not ready");
@@ -166,6 +167,7 @@ public class P0CollisionFacingTest
         foreach (var bc in Object.FindObjectsByType<BoxCollider>(FindObjectsSortMode.None))
         {
             var t = bc.transform; if (!t.name.StartsWith("env_") && !t.name.StartsWith("prop_")) continue;
+            if (t.name.EndsWith("_col")) continue; // #65/#124: collider dedicato del palo del lampione, voluto più grande della mesh del pivot
             // tolleranza 10 cm per lato: l'AABB dei renderer figli ruotati non coincide al cm con l'OBB, ma il gonfiaggio da yaw (#82) era del 20-35%
             var rb = RendBounds(t.gameObject); rb.Expand(0.2f); var cb = bc.bounds; n++;
             if (!rb.Contains(cb.min) || !rb.Contains(cb.max)) fails.Add($"{t.name} col={cb.size} mesh={rb.size}");
@@ -215,8 +217,12 @@ public class P0CollisionFacingTest
             if (b.max.x < ban.x - 1.2f || b.min.x > ban.x + 1.2f || b.center.z < ban.z || b.center.z > ban.z + 4f) continue;
             face = Mathf.Min(face, b.min.z - ban.z);
         }
-        Assert.GreaterOrEqual(face, 1.15f, "muro dietro il Bancone troppo vicino");
-        Assert.LessOrEqual(face, 1.3f, "sacca dietro il Bancone: muro a " + face);
+        // #187 ha spostato Zona_Bancone di +0,33 m verso il muro: la misura è fra il retro del banco (Bancone_Mesh) e la faccia del muro
+        var counter = GameObject.Find("Bancone_Mesh"); Assert.IsNotNull(counter, "Bancone_Mesh");
+        float depth = face + ban.z - counter.GetComponent<Collider>().bounds.max.z;
+        Debug.Log($"[#82] corridoio dietro il Bancone: {depth:F2} m (faccia muro {face:F2} dal centro zona)");
+        Assert.GreaterOrEqual(depth, 1.70f, "muro dietro il Bancone troppo vicino: " + depth);
+        Assert.LessOrEqual(depth, 1.85f, "sacca dietro il Bancone: corridoio di " + depth);
         // Nina arriva in Zona_Bancone seguendo il NavMesh
         var nina = GameRoot.I.Nina; Teleport(nina, ban + new Vector3(2.2f, 0.05f, -2.4f)); yield return null; var from = nina.transform.position;
         var path = new NavMeshPath();
@@ -267,5 +273,26 @@ public class P0CollisionFacingTest
         Teleport(nina, ban + new Vector3(-3.0f, 0.05f, (lemon.Value.max.z + stack.Value.min.z) * 0.5f - ban.z)); yield return null;
         nina.ScriptedInput = Vector3.right; for (float t = 0; t < 4f && nina.transform.position.x < ban.x; t += Time.deltaTime) yield return null; nina.ScriptedInput = Vector3.zero;
         Assert.Greater(nina.transform.position.x - ban.x, -0.6f, "Nina non entra da ovest: " + nina.transform.position);
+    }
+
+    // #82 + #187: nessun collider solido (muri, archi, Bancone, prop) dentro l'anello di una zona: dove vedi l'anello, Nina ci può stare
+    [UnityTest, Timeout(120000)]
+    public IEnumerator Zone187_NessunColliderSolidoDentroAnello()
+    {
+        yield return Load();
+        var bad = new List<string>();
+        foreach (var z in Object.FindObjectsByType<ProximityZone>(FindObjectsSortMode.None))
+        {
+            var ip = z.GetComponent<InteractionPoint>(); if (!ip) continue;
+            float r = ip.Radius * InteractionPoint.VisualScale - 0.05f; // tolleranza 5 cm sul bordo esterno
+            var c = z.transform.position;
+            foreach (var h in Physics.OverlapCapsule(new Vector3(c.x, r + 0.15f, c.z), new Vector3(c.x, r + 1.5f, c.z), r, ~0, QueryTriggerInteraction.Ignore))
+            {
+                if (h.name == "Floor") continue; // pavimento: la capsula parte 15 cm sopra
+                if (h is CharacterController || h.GetComponentInParent<NinaController>() || h.attachedRigidbody) continue; // agenti e oggetti mobili
+                bad.Add($"{z.name} ∩ {h.name}");
+            }
+        }
+        Assert.IsEmpty(bad, "collider solidi dentro gli anelli delle zone: " + string.Join(", ", bad));
     }
 }

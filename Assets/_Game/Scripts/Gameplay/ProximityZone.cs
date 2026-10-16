@@ -47,6 +47,7 @@ namespace UltimoMiglio.Gameplay
         {
             foreach (var mb in GetComponents<MonoBehaviour>())
             {
+                if (!mb) continue; // componente con script mancante o già distrutto (es. PadTag rimosso da InteractionPoint)
                 var m = mb.GetType().GetMethod("ShowOnPad", new[] { typeof(bool) });
                 if (m != null) { m.Invoke(mb, new object[] { on }); return; }
             }

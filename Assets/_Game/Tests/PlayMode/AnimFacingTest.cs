@@ -22,7 +22,7 @@ public class AnimFacingTest
     }
 
     /// <summary>Cancella solo le chiavi di gioco (salvataggio + tutorial), non volumi/zoom delle impostazioni (#36).</summary>
-    internal static void ResetGameKeys() { PlayerPrefs.DeleteKey("um_save_v1" /* GameRoot.SaveKey */); PlayerPrefs.DeleteKey(TutorialManager.PrefKey); PlayerPrefs.Save(); }
+    internal static void ResetGameKeys() { PlayerPrefs.DeleteKey("um_save_v1" /* GameRoot.SaveKey */); PlayerPrefs.DeleteKey(TutorialManager.PrefKey); PlayerPrefs.SetInt(TutorialManager.PrefGraduale, 0) /* #94: test non di onboarding → niente rivelazione graduale */; PlayerPrefs.Save(); }
     static IEnumerator Load()
     {
         ResetGameKeys(); Time.timeScale = 1f;
@@ -137,5 +137,30 @@ public class AnimFacingTest
         Assert.Greater(Probe.Avg(p.Visual), 0.7f, "forche dietro rispetto alla marcia (retromarcia) " + p.Report("NONNO"));
         Assert.Greater(p.Spin.Count, 20, "ruote ferme mentre NONNO guida (Drive non in riproduzione) " + p.Report("NONNO"));
         Assert.Greater(Probe.Avg(p.Spin), 0.5f, "ruote girano al contrario o ferme mentre guida " + p.Report("NONNO"));
+    }
+}
+
+/// <summary>#2: in scena i clienti sono i 6 personaggi riggati (non capsule), Humanoid valido, AlwaysAnimate, senza root motion.</summary>
+public class ClientiRigTest
+{
+    [TearDown] public void TearDown() => UltimoMiglio.UI.HudReveal.ResetAll(); // isolamento: lo stato statico non passa ai test successivi
+    [UnityTest] public IEnumerator Clienti_SonoIRiggatiNonCapsule()
+    {
+        // Solo le chiavi del gioco: i volumi (vol_music/vol_sfx, #36) restano intatti
+        AnimFacingTest.ResetGameKeys(); PlayerPrefs.DeleteKey(DepotCameraFit.PrefZoom); // solo chiavi di gioco (non i volumi #36) e niente rivelazione graduale #94: altrimenti NONNO resta nascosto anche nei test successivi
+        yield return SceneManager.LoadSceneAsync("Ch1_Deposito");
+        for (int i = 0; i < 60 && !GameRoot.Ready; i++) yield return null;
+        var q = Object.FindAnyObjectByType<CustomerQueue>(); Assert.IsNotNull(q); Assert.IsNotNull(q.Prefab, "CustomerQueue.Prefab rotto");
+        Assert.IsNotNull(q.Variants); Assert.AreEqual(6, q.Variants.Length, "servono le 6 varianti");
+        foreach (var v in q.Variants)
+        {
+            Assert.IsNotNull(v, "variante nulla");
+            Assert.IsNull(v.GetComponentInChildren<MeshFilter>(), $"{v.name}: è ancora una capsula");
+            var an = v.GetComponentInChildren<Animator>(); Assert.IsNotNull(an, v.name);
+            Assert.IsTrue(an.avatar && an.avatar.isValid && an.avatar.isHuman, $"{v.name}: avatar Humanoid non valido");
+            Assert.AreEqual("chr_cliente", an.runtimeAnimatorController ? an.runtimeAnimatorController.name : "", v.name);
+            Assert.AreEqual(AnimatorCullingMode.AlwaysAnimate, an.cullingMode, v.name);
+            Assert.IsFalse(an.applyRootMotion, v.name);
+        }
     }
 }

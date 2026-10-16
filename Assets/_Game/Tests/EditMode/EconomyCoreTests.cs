@@ -30,6 +30,30 @@ public class EconomyCoreTests
         Assert.IsTrue(done); Assert.AreEqual(6, e.StackCapacity); Assert.AreEqual(60, e.S.Wallet, 1e-9);
         Assert.LessOrEqual(ticks, 31, "pad must fill in ≤3 s");
     }
+    [Test] public void Zaino_Cap1_SiFermaAlLivello7()
+    {
+        var e = New(); Assert.AreEqual(7, e.Cfg.ZainoMaxLevel);
+        e.S.Zaino = 6; Assert.IsFalse(double.IsInfinity(e.Cost(UpgradeKind.Zaino)), "il livello 7 deve essere acquistabile");
+        e.S.Zaino = 7; Assert.IsTrue(double.IsInfinity(e.Cost(UpgradeKind.Zaino)), "nel cap. 1 il livello 8 non si compra");
+        e.S.Wallet = 1e6; Assert.IsFalse(e.PadTick(UpgradeKind.Zaino, 5), "il pad non deve completare oltre il livello 7");
+        Assert.AreEqual(7, e.S.Zaino); Assert.AreEqual(1.0, e.PadFill(UpgradeKind.Zaino), 1e-9);
+    }
+    [Test] public void Onboarding16_OgniPassoHaIlBigliettoDiTilde()
+    {
+        var j = System.IO.File.ReadAllText("Assets/_Game/Data/ch1/onboarding_testi.json");
+        var steps = UnityEngine.JsonUtility.FromJson<TestiOnb>(j).steps;
+        var t = UltimoMiglio.Gameplay.TutorialManager.TextsById(System.Linq.Enumerable.Select(steps, x => (x.id, x.text)));
+        for (int i = 1; i < (int)UltimoMiglio.Gameplay.TutorialManager.Step.FreePlay; i++) Assert.IsFalse(string.IsNullOrEmpty(t[i]), $"passo {(UltimoMiglio.Gameplay.TutorialManager.Step)i} senza biglietto");
+    }
+    [Test] public void Onboarding16_IdTestiUgualiAStepIds()
+    {
+        var ids = UltimoMiglio.Gameplay.TutorialManager.StepIds;
+        var t = UltimoMiglio.Gameplay.TutorialManager.TextsById(System.Linq.Enumerable.Select(ids, x => (x, "T" + x)));
+        for (int i = 0; i < ids.Length; i++) Assert.AreEqual("T" + ids[i], t[i]);
+        Assert.AreEqual(16, UltimoMiglio.Gameplay.TutorialManager.Versione);
+    }
+    [System.Serializable] class TestiStep { public string id, text; }
+    [System.Serializable] class TestiOnb { public TestiStep[] steps; }
     [Test] public void PadInstallmentPersistsWhenWalletEmpty()
     {
         var e = New(); e.S.Wallet = 20;

@@ -11,7 +11,7 @@ public class NonnoWorkTest
 {
     [UnityTest] public IEnumerator HireNonno_StartsWorkingWithin10Seconds()
     {
-        PlayerPrefs.DeleteKey(UltimoMiglio.Gameplay.TutorialManager.PrefKey); PlayerPrefs.DeleteKey("um_save_v1"); PlayerPrefs.DeleteKey(UltimoMiglio.Gameplay.DepotCameraFit.PrefZoom); // solo chiavi di gioco: vol_music e vol_sfx restano (come #88)
+        PlayerPrefs.DeleteKey(UltimoMiglio.Gameplay.TutorialManager.PrefKey); PlayerPrefs.DeleteKey("um_save_v1"); PlayerPrefs.DeleteKey(UltimoMiglio.Gameplay.DepotCameraFit.PrefZoom); UltimoMiglio.Gameplay.TutorialManager.TestSenzaComparse = true; UltimoMiglio.Gameplay.TutorialManager.TestAccelera = true; /* #101: niente comparse graduali, tempi corti */ // solo chiavi di gioco: vol_music e vol_sfx restano (come #88)
         // instabile da solo: un save_v1.json di un run precedente (NONNO già assunto) dava NonnoLevel 0 invece di -1
         var save = System.IO.Path.Combine(Application.persistentDataPath, "save_v1.json");
         if (System.IO.File.Exists(save)) System.IO.File.Delete(save);
@@ -25,6 +25,7 @@ public class NonnoWorkTest
         Application.logMessageReceived += onLog;
         try
         {
+            PlayerPrefs.SetInt(UltimoMiglio.Gameplay.TutorialManager.PrefGraduale, 0); // #94: test non di onboarding → niente rivelazione graduale
             yield return SceneManager.LoadSceneAsync("Ch1_Deposito");
             for (int i = 0; i < 30 && !GameRoot.Ready; i++) yield return null;
             Assert.IsTrue(GameRoot.Ready, "GameRoot not ready");
@@ -68,10 +69,11 @@ public class NonnoWorkTest
     [UnityTest, Timeout(120000)]
     public IEnumerator HireNonno_RestocksShelfWithin20Seconds()
     {
-        PlayerPrefs.DeleteKey(UltimoMiglio.Gameplay.TutorialManager.PrefKey); PlayerPrefs.DeleteKey("um_save_v1"); PlayerPrefs.DeleteKey(UltimoMiglio.Gameplay.DepotCameraFit.PrefZoom); // solo chiavi di gioco: vol_music e vol_sfx restano (come #88)
+        PlayerPrefs.DeleteKey(UltimoMiglio.Gameplay.TutorialManager.PrefKey); PlayerPrefs.DeleteKey("um_save_v1"); PlayerPrefs.DeleteKey(UltimoMiglio.Gameplay.DepotCameraFit.PrefZoom); UltimoMiglio.Gameplay.TutorialManager.TestSenzaComparse = true; UltimoMiglio.Gameplay.TutorialManager.TestAccelera = true; /* #101: niente comparse graduali, tempi corti */ // solo chiavi di gioco: vol_music e vol_sfx restano (come #88)
         var save = System.IO.Path.Combine(Application.persistentDataPath, "save_v1.json");
         if (System.IO.File.Exists(save)) System.IO.File.Delete(save);
 
+        PlayerPrefs.SetInt(UltimoMiglio.Gameplay.TutorialManager.PrefGraduale, 0); // #94: test non di onboarding → niente rivelazione graduale
         yield return SceneManager.LoadSceneAsync("Ch1_Deposito");
         for (int i = 0; i < 60 && !GameRoot.Ready; i++) yield return null;
         Assert.IsTrue(GameRoot.Ready);
