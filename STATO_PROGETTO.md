@@ -133,6 +133,7 @@ Ogni ruolo lavora solo sulle issue con la propria etichetta `ruolo:*`, sempre co
 
 Voci più recenti in alto. Formato: `AAAA-MM-GG HH:MM` (Europe/Rome) — [commit] — descrizione.
 
+- 2026-10-16 13:57 — Tech Lead — [5227d5f](https://github.com/B00RR/ultimo-miglio/commit/5227d5f0c3a300b9023e55a4d3f2be80e47db937) — PR #157 (#101): scena e prefab Customer rigenerati insieme (CustomerQueue.Prefab era null), TutorialToNonnoTest robusto. PlayMode locale 17/17, EditMode 47/47.
 - 2026-10-16 13:27 — Tech Lead — [428180f](https://github.com/B00RR/ultimo-miglio/commit/428180f6fc47df4661df03207e8bb8e94e9b5e8a) — PR #157 (#101): merge di main (con #167), onboarding a 16 passi verde. Aggiunti i pad Scarpe/Insegna in scena (padNuovi), tempi di onboarding.json (coldOpen 15 s, t>=127/170 s, nonnoConfirm 3 s), coins a raccolta, combo '+N' solo al passo combo, niente LN regalate fuori dai test (TestAccelera), log [ONB] con ln/spent/need/have.
 - 2026-10-16 11:54 — Tech Lead — [c859f94](https://github.com/B00RR/ultimo-miglio/commit/c859f94ea08537f7a4d55aa3b9ba418f1202c3de) — PR #103 rewards: soglie pacchi 100/250/450, traguardi debito 25/50/75%, mancia Cassa 30 LN, freccia prossimo pad da 480 s; test EditMode EconomyRewardsTests.
 - 2026-10-16 12:12 — Code Reviewer — [4a1b26b](https://github.com/B00RR/ultimo-miglio/commit/4a1b26b6256d5f16153e713698f1ac4d3cfd5b72) — unita in squash la [PR #153](https://github.com/B00RR/ultimo-miglio/pull/153) (Audio: sfx combo +N e timbro del debito per la #137). Job `test` verde, asset OGG + README/licenze. Refs #136.
