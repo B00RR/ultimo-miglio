@@ -1,0 +1,101 @@
+<!doctype html><html lang="it"><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Anteprima HUD tutorial — Hud.uxml + TutorialHud.uss</title>
+<style>
+@font-face{font-family:Fredoka;src:url(Fredoka-SemiBold.ttf);font-weight:600}
+@font-face{font-family:Fredoka;src:url(Fredoka-Bold.ttf);font-weight:700}
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{width:100%;height:100%;overflow:hidden;font-family:Fredoka;color:#3B2A20}
+/* Unity UI Toolkit: flex-direction column di default, border-box */
+#hud-root{position:relative;width:100%;height:100%;background:url(bg.jpg) center/cover}
+.cardboard{background:#F3E3C3 url(tex_cardboard_panel.png) center/100% 100%;border:3px solid #3B2F2A}
+/* top-bar: HudV2 .top-bar padding 8 */
+.top-bar{position:absolute;left:0;right:0;top:0;padding:8px 8px 0;display:flex;align-items:flex-start}
+.top-left{max-width:44%}
+#currency-pill{height:40px;min-width:96px;padding:0 10px;border-radius:20px;display:flex;align-items:center;white-space:nowrap}
+.icon-coin{width:22px;height:22px;background:#C8633B;-webkit-mask:url(ic_coin.png) center/contain no-repeat;mask:url(ic_coin.png) center/contain no-repeat}
+.currency-value{font-weight:700;font-size:18px;margin:0 8px 0 4px}
+.day-value{font-weight:600;font-size:14px}
+.settings-btn{margin-left:auto;width:32px;height:32px;border-radius:10px;background:#7A4A2E;border:2px solid #3B2A20;margin-right:4px;opacity:.9;display:flex;align-items:center;justify-content:center}
+.settings-btn i{width:16px;height:16px;background:#F3E3C3;-webkit-mask:url(ic_gear.png) center/contain no-repeat;mask:url(ic_gear.png) center/contain no-repeat}
+.tutorial-objective{position:absolute;left:46%;right:44px;top:14px;height:28px;border-radius:16px;font-weight:600;font-size:13px;display:flex;align-items:center;justify-content:center;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;padding:0 10px}
+.ada-band{position:absolute;left:8px;right:8px;top:54px;max-height:52px;display:flex;justify-content:center;overflow:hidden}
+.ada-note{width:100%;max-width:420px;min-height:36px;max-height:52px;padding:3px 10px 3px 4px;border-bottom-width:4px;border-radius:12px;display:flex;align-items:center}
+.ada-face{width:36px;height:36px;flex-shrink:0;margin-right:8px;border-radius:18px;border:2px solid #3B2A20;background:#C8633B url(tex_ada_portrait.png) center/cover}
+.ada-text{font-weight:600;font-size:14px;line-height:1.25;max-height:44px;overflow:hidden}
+.tut-hint{position:absolute;left:12px;right:12px;bottom:130px;height:28px;display:flex;justify-content:center}
+.tut-hint__pill{display:flex;align-items:center;height:28px;padding:0 10px 0 3px;max-width:100%;border-radius:14px;border:3px solid #3B2A20;background:#C8633B}
+.tut-hint__go{width:20px;height:20px;margin-right:6px;border-radius:10px;background:#F4C430;position:relative;flex-shrink:0}
+.tut-hint__go:after{content:"";position:absolute;inset:3px;background:#3B2A20;-webkit-mask:url(ic_arrow.png) center/contain no-repeat;mask:url(ic_arrow.png) center/contain no-repeat}
+.tut-hint__text{font-weight:700;font-size:13px;color:#F3E3C3;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.poi-chip-col{position:absolute;display:flex;flex-direction:column;align-items:center;transform:translate(-50%,-100%)}
+.poi-chevron{width:32px;height:26px;margin-bottom:3px;background:url(ic_chevron_down.png) center/contain no-repeat}
+.poi-chip{display:flex;align-items:center;padding:4px 12px 4px 8px;background:#F4C430;border:3px solid #3B2A20;border-radius:999px;transform:scale(1.08)}
+.poi-chip .ic{width:28px;height:28px;border-radius:14px;background:#3B2A20;margin-right:12px;position:relative}
+.poi-chip .ic:after{content:"";position:absolute;inset:5px;background:#FFF9EE;-webkit-mask:url(ic_coin.png) center/contain no-repeat;mask:url(ic_coin.png) center/contain no-repeat}
+.poi-chip b{font-weight:700;font-size:18px;white-space:nowrap}
+.pad{position:absolute;width:110px;height:56px;border-radius:50%;background:#F4C430;border:4px solid #3B2A20;transform:translate(-50%,-50%)}
+#joystick-base{position:absolute;width:112px;height:112px;border-radius:56px;border:2px solid rgba(59,42,32,.55);background:rgba(243,227,195,.30);transform:translate(-50%,-50%);display:flex;align-items:center;justify-content:center}
+#joystick-knob{width:54px;height:54px;border-radius:27px;border:3px solid #3B2A20;background:#C8633B}
+.guide{position:absolute;left:0;right:0;border:1px dashed rgba(200,0,120,.8);pointer-events:none}
+.guide span{position:absolute;right:4px;font:10px monospace;color:#c00078;background:#fff8}
+.poi-chip-col.flip{transform:translate(-50%,0)}.flip .poi-chevron{transform:rotate(180deg)}
+
+.reveal{transition:opacity .25s ease-out,transform .25s cubic-bezier(.34,1.56,.64,1)}
+.reveal--hidden{opacity:0;transform:scale(.6)}
+.hiddenx{display:none!important}
+.poi-bar{display:flex;align-items:center;height:18px;margin-bottom:4px;padding:0 6px 0 3px;border-radius:9px;border:2px solid #3B2A20;background:#F3E3C3}
+.poi-bar__track{width:56px;height:8px;border-radius:4px;border:1px solid #3B2A20;background:#E8D3AC;overflow:hidden;margin-right:5px}
+.poi-bar__fill{height:100%;background:#C8633B}
+.poi-bar__label{font-weight:700;font-size:12px;white-space:nowrap}
+.ghost-hand{position:absolute;left:50%;bottom:44px;width:48px;height:48px;margin-left:-24px;opacity:.9;background:url(ic_ghost_hand.png) center/contain no-repeat}
+.nonno-badge{position:absolute;transform:translate(-50%,-100%);display:flex;align-items:center;height:22px;padding:0 8px 0 3px;border-radius:11px;border:2px solid #3B2A20;background:#8FC9A8}
+.nonno-badge i{width:14px;height:14px;margin-right:4px;border-radius:7px;background:#3B2A20 url(ic_box_cream.png) center/contain no-repeat}
+.nonno-badge b{font-weight:700;font-size:12px;white-space:nowrap}
+.skip-tut{position:absolute;top:15px;right:44px;height:26px;padding:0 6px;border-radius:13px;border:2px solid #3B2A20;background:rgba(243,227,195,.85);font:600 11px Fredoka;color:#3B2A20;display:flex;align-items:center}
+.hud--skip .top-left{max-width:104px}.hud--skip .tutorial-objective{left:112px;right:134px}.onb-hand .tut-hint{display:none!important}
+#edge-arrow{position:absolute;transform:translate(-50%,-50%);display:flex;flex-direction:column;align-items:center}
+#edge-arrow-head{width:36px;height:36px;border-radius:18px;border:2px solid #3B2A20;background:#C8633B;display:flex;align-items:center;justify-content:center}
+#edge-arrow-head i{width:20px;height:20px;background:url(ic_arrow_cream.png) center/contain no-repeat}
+#edge-arrow-label{margin-top:4px;padding:2px 8px;font:600 12px Fredoka;border:2px solid #3B2A20;border-radius:12px;background:#F3E3C3;max-width:120px;white-space:nowrap}
+.combo-popup{position:absolute;transform:translate(-50%,-100%);font:700 16px Fredoka;color:#F4C430;-webkit-text-stroke:1px #3B2A20;text-shadow:0 0 2px #3B2A20;white-space:nowrap}
+</style>
+<body><div id="hud-root">
+ <div class="pad" id="pad"></div>
+ <div class="poi-chip-col" id="poi"><div class="poi-chevron" id="chev"></div><div class="poi-bar" id="bar"><div class="poi-bar__track"><div class="poi-bar__fill" id="barfill"></div></div><span class="poi-bar__label" id="barl">32/50</span></div><div class="poi-chip"><div class="ic"></div><b id="price">10 LN</b></div></div>
+ <div class="top-bar"><div class="top-left"><div id="currency-pill" class="cardboard reveal"><i class="icon-coin"></i><span class="currency-value">0</span><span class="day-value">G1</span></div></div>
+   <div class="settings-btn" id="gear"><i></i></div></div>
+ <div class="tutorial-objective cardboard" id="obj">Muoviti</div>
+ <div class="ada-band"><div class="ada-note cardboard" id="ada"><div class="ada-face"></div><div class="ada-text" id="adat"></div></div></div>
+ <div class="tut-hint" id="hint"><div class="tut-hint__pill" id="hintpill"><div class="tut-hint__go"></div><div class="tut-hint__text" id="hintt"></div></div></div>
+ <div class="nonno-badge" id="nb"><i></i><b>6 pacchi/min</b></div><div class="skip-tut" id="skip">Salta tutorial</div><div id="edge-arrow"><div id="edge-arrow-head"><i id="eai"></i></div><div id="edge-arrow-label">Vai agli Arrivi</div></div><div class="ghost-hand" id="hand"></div>
+ <div id="joystick-base"><div id="joystick-knob"></div></div>
+ <div class="guide" id="gt"><span>fascia libera alta 350/2532</span></div><div class="guide" id="gb"><span>fascia libera bassa 500/2532</span></div>
+</div>
+<script>
+const q=new URLSearchParams(location.search);
+document.getElementById('adat').textContent=q.get('ada')||'';
+document.getElementById('obj').textContent=q.get('obj')||'Muoviti';
+const h=q.get('hint'); if(h) document.getElementById('hintt').textContent=h; else document.getElementById('hint').style.display='none';
+if(q.get('chev')!=='1') document.getElementById('chev').style.display='none';
+const H=innerHeight,W=innerWidth;
+const fTop=H*350/2532, fBot=H*500/2532;
+gt.style.top=fTop+'px'; gb.style.top=(H-fBot)+'px';
+// pad: richiesto in scena; colonna prezzo ancorata 1.55 m sopra ≈ 80 dp, con clamp hudTopReserve=184
+const px=+(q.get('px')||0.62)*W, py=+(q.get('py')||0.30)*H; pad.style.left=px+'px'; pad.style.top=py+'px';
+let cy=py-40; if(cy<184){poi.classList.add('flip');cy=Math.max(py+10,114);} poi.style.left=Math.min(Math.max(px,80),W-80)+'px'; poi.style.top=cy+'px';
+document.getElementById('price').textContent=q.get('price')||'10 LN';
+// joystick: comparso sotto il pollice (posizione tipica bottom 25% al centro-sinistra)
+const jb=document.getElementById('joystick-base'); jb.style.left=(W*0.5)+'px'; jb.style.top=(H-68)+'px';
+
+const sc=q.get('scene')||'pad'; const R=document.getElementById('hud-root');
+const hide=id=>document.getElementById(id).classList.add('hiddenx');
+['nb','skip','edge-arrow','hand','bar'].forEach(hide);
+if(sc==='avvio'){hide('currency-pill');hide('poi');hide('pad');}
+if(sc==='reveal'){const c=document.getElementById('currency-pill');c.classList.add('reveal--hidden');c.style.transition='none';c.style.opacity=.55;c.style.transform='scale(.85)';hide('poi');hide('pad');}
+if(sc==='pad'){document.getElementById('bar').classList.remove('hiddenx');barfill.style.width=(32/50*100)+'%';}
+if(sc==='aiuto20'){hide('poi');hide('pad');const e=document.getElementById('edge-arrow');e.classList.remove('hiddenx');e.style.left=(W-34)+'px';e.style.top=(H*0.42)+'px';eai.style.transform='rotate(-20deg)';}
+if(sc==='aiuto40'){hide('poi');hide('pad');hide('joystick-base');const h=document.getElementById('hand');h.classList.remove('hiddenx');h.style.transform='translate(30px,-46px)';R.classList.add('onb-hand');}
+if(sc==='nonno'){hide('poi');hide('pad');const n=document.getElementById('nb');n.classList.remove('hiddenx');n.style.left=(W*0.38)+'px';n.style.top=(H*0.47)+'px';}
+if(sc==='combo'){hide('poi');hide('pad');const c=document.createElement('div');c.className='combo-popup';c.id='combo';c.textContent='x1,2';c.style.left=(W*0.115)+'px';c.style.top=(H*0.5-36)+'px';R.appendChild(c);}
+if(sc==='salta'){R.classList.add('hud--skip');document.getElementById('skip').classList.remove('hiddenx');hide('poi');hide('pad');}
+</script></body></html>
