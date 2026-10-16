@@ -1,20 +1,20 @@
-# STATO PROGETTO — Ultimo Miglio
+# STATO PROGETTO — Bokobay
 
 > Punto di ingresso unico per chiunque (persona o agente) lavori su questo repo. Aggiornalo **nella stessa PR** in cui completi qualcosa.
 > Ultimo aggiornamento: 2026-10-16 04:11 (Europe/Rome).
 
 ## 1. Il gioco
-- **Ultimo Miglio**: gioco mobile **Android**, **Unity 6 (6000.3) URP**.
-- Controllo diretto con **joystick** (stile *My Little Universe*): Nina corre, raccoglie pacchi, riempie scaffali, serve i clienti al bancone, incassa e sblocca/potenzia.
+- **Bokobay**: gioco mobile **Android**, **Unity 6 (6000.3) URP**.
+- Controllo diretto con **joystick** (stile *My Little Universe*): Kaia corre, raccoglie pacchi, riempie scaffali, serve i clienti al bancone, incassa e sblocca/potenzia.
 - Ambientazione: città immaginaria di **Solara**. Stile visivo **"Diorama Solare"** (low‑poly caldo, palette su atlas `T_Palette_Atlas`).
-- Personaggi: **Nina** (protagonista), **il Nonno** (Nonna Ada guida l'onboarding del cap. 1), **NONNO** (robot muletto assumibile), TICO (robot timbratore), clienti.
+- Personaggi: **Kaia** (protagonista), **il Nonno** (Oma Tilde guida l'onboarding del cap. 1), **OLDO** (robot muletto assumibile), TIKTAK (robot timbratore), clienti.
 
 ## 2. Vincoli fissi di Lorenzo (non negoziabili)
 1. Tutto in **italiano** (testi di gioco, documenti, commit, issue, PR).
 2. Lorenzo testa **solo tramite build WebGL nel browser** (zip/preview). **Niente video** a lui.
 3. Asset **gratuiti CC0 / licenza commerciale**, sempre **adattati** allo stile (registro in `ultimo-miglio-docs/LICENZE_ASSET.md`).
-4. **Originali**: Nina, Nonno, robot, logo e tema non devono copiare altri giochi.
-5. **Profondità gestionale**: energia/corrente, contratti, rotte, officina, OmniFreight (rivale).
+4. **Originali**: Kaia, Nonno, robot, logo e tema non devono copiare altri giochi.
+5. **Profondità gestionale**: energia/corrente, contratti, rotte, officina, GrayBox (rivale).
 6. **Longevità lunga**: progressione a capitoli + post‑game.
 
 ## 3. Team
@@ -28,20 +28,20 @@
 - Ramo/build **WebGL** (`webgl-min`, ora su `main`): fix magenta (URP Forward, niente post‑process, shader sempre inclusi), template web a finestra intera, input tastiera unico via FloatingJoystick, camera ortografica 4.5.
 - Ciclo cap. 1 completo: pacchi → scaffali → bancone → monete → acquisto Zaino; confini sui 4 lati; kit 3D deposito; materiali su atlas.
 - Game feel: pila a molla, pacchi ad arco, monete verso HUD, pad che pulsano, SFX dopo il primo input; VFX v1.6 (pickup/consegna/upgrade, contact shadow).
-- **Onboarding Nonna Ada**: 7 passi + chiusura, marker a terra, freccia a bordo schermo, salvataggio PlayerPrefs; pad ASSUMI NONNO.
+- **Onboarding Oma Tilde**: 7 passi + chiusura, marker a terra, freccia a bordo schermo, salvataggio PlayerPrefs; pad ASSUMI OLDO.
 - Test PlayMode **4/4 SUPERATI** (ciclo, 9 stati tutorial in ordine, confini).
-- Ramo `animator` (non ancora su main): Nina rig Humanoid 24 ossa + clip (camminata nel verso giusto, Carry, Cheer), NONNO v03 (rig Generic), TICO v02, 6 clienti con rig di Nina e controller `chr_cliente`, verifica anti‑compenetrazione.
+- Ramo `animator` (non ancora su main): Kaia rig Humanoid 24 ossa + clip (camminata nel verso giusto, Carry, Cheer), OLDO v03 (rig Generic), TIKTAK v02, 6 clienti con rig di Kaia e controller `chr_cliente`, verifica anti‑compenetrazione.
 - Documentazione di design: bibbia, core loop, tech, UI, retention, sprint 1, gestionale, longevità, cap. 1 completo, protocollo Unity.
 
 ## 5. IN CORSO (oggi 16/10)
 - **main @ 7dd1767** — QA live **v5 VIA** (PR #55: #47 deposito + #48 luce/camera). Build QA su `build/WebGL` :8777; art night su `build/WebGL_next` :8778 (non toccare).
-- P2 aperti da QA v5: camera follow (Nina esce/coperta), pillola prezzo LN sotto riga obiettivo.
+- P2 aperti da QA v5: camera follow (Kaia esce/coperta), pillola prezzo LN sotto riga obiettivo.
 - **Merge del ramo `animator`** (fix camminata): conflitto su `chr_nina_vela.fbx` e `bot_nonno.fbx`.
 - I **clienti sono ancora capsule** → sostituire con i personaggi del ramo animator.
-- Rifinitura tutorial Nonna Ada e game feel; resto cap. 1.
+- Rifinitura tutorial Oma Tilde e game feel; resto cap. 1.
 
 ## 6. DA FARE
-- Resto del gioco in **3–4 giorni**: capitoli 2+ con **un sistema gestionale per capitolo** (energia/corrente, contratti, rotte, officina, OmniFreight).
+- Resto del gioco in **3–4 giorni**: capitoli 2+ con **un sistema gestionale per capitolo** (energia/corrente, contratti, rotte, officina, GrayBox).
 - **Post‑game** e sistemi di longevità (vedi `11_LONGEVITA.md`).
 - Build Android (APK/AAB) firmata quando il gameplay è stabile.
 
@@ -103,7 +103,7 @@ Ogni ruolo lavora solo sulle issue con la propria etichetta `ruolo:*`, sempre co
 ## Aggiornamento 01:55 (16/10) — HUD superfici concept (UI, issue #49, branch ui/49-hud)
 - Token: `--c-wood` `#74503A`, `--c-walnut` `#7A4A2E`, `--c-paper-hi` `#E8D3AC`, `--c-outline` `#3B2F2A`, `--bw` 3px / `--bw-thick` 4px, radius toon.
 - Texture originali (procedurali / ritaglio concept): `UI/Textures/tex_wood_panel.png`, `tex_cardboard_panel.png`, `tex_ada_portrait.png` + `LICENSE_TEXTURES.txt`.
-- Applicato all'HUD minimo via `Tokens.uss` (`!important`): pillola LN/giorno, riga obiettivo, Ada note 1 riga — bordo outline 3–4 px, fill cartone.
+- Applicato all'HUD minimo via `Tokens.uss` (`!important`): pillola LN/giorno, riga obiettivo, Tilde note 1 riga — bordo outline 3–4 px, fill cartone.
 - `USS/LegnoCartone.uss` classi `.surface-wood` / `.surface-cardboard` / `.cta-terracotta` / `.ada-face--portrait` per wiring TL post `fix-qa`.
 - `USS/Phone.uss` + import in `Phone.uxml`: chrome legno/cartone per schermata telefono **futura** (non nell'HUD di gioco).
 - **Omesso:** telefono in HUD (alto o basso); CTA terracotta zona pollice (contraddice HUD minimo Lorenzo = solo LN, giorno, obiettivo, joystick, pad).
@@ -116,21 +116,21 @@ Ogni ruolo lavora solo sulle issue con la propria etichetta `ruolo:*`, sempre co
 Voci più recenti in alto. Formato: `AAAA-MM-GG HH:MM` (Europe/Rome) — [commit] — descrizione.
 
 - 2026-10-16 10:49 — Code Reviewer — [cdfc53f](https://github.com/B00RR/ultimo-miglio/commit/cdfc53ff2152b4752a8ad5b488729ed824000e4a) — unita in squash la PR #119 (Ruoli e responsabilità, solo .md). Review delle PR aperte con commenti; #114 verde su main.
-- 2026-10-16 10:46 — Producer — aggiunta la sezione **Ruoli e responsabilità**: nuovo **Code Reviewer** che unisce tutte le PR; il Tech Lead non fa più merge (aggiornato *Come lavoriamo* punto 5); Build & Release pubblica su Pages solo dopo il VIA del QA; nuove etichette `ruolo:design` e `ruolo:qa`. Assegnate #107 (P0 zone, tech), #103, #101 (tech), #111 (animator), #110, #71 (ui), #65, #70 (3d), #69 (vfx), #91 (design); nuova #118 (Nonna Ada).
-- **2026-10-16 09:35 (Europe/Rome)** — Fix P0 #58 #59 #60 (ramo fix-p0-lorenzo, [a87edf0](https://github.com/B00RR/ultimo-miglio/commit/a87edf0)): BoxCollider su muri/archi/scaffali/bancone/props, Nina clamp x −8.6..7.0, NONNO yaw 0° + sweep AgentMove, spawn sicuro. EditMode 35/35, PlayMode 11/11. LIVE P0 su 8780: `qa/playtest_web_live_p0.md`.
+- 2026-10-16 10:46 — Producer — aggiunta la sezione **Ruoli e responsabilità**: nuovo **Code Reviewer** che unisce tutte le PR; il Tech Lead non fa più merge (aggiornato *Come lavoriamo* punto 5); Build & Release pubblica su Pages solo dopo il VIA del QA; nuove etichette `ruolo:design` e `ruolo:qa`. Assegnate #107 (P0 zone, tech), #103, #101 (tech), #111 (animator), #110, #71 (ui), #65, #70 (3d), #69 (vfx), #91 (design); nuova #118 (Oma Tilde).
+- **2026-10-16 09:35 (Europe/Rome)** — Fix P0 #58 #59 #60 (ramo fix-p0-lorenzo, [a87edf0](https://github.com/B00RR/ultimo-miglio/commit/a87edf0)): BoxCollider su muri/archi/scaffali/bancone/props, Kaia clamp x −8.6..7.0, OLDO yaw 0° + sweep AgentMove, spawn sicuro. EditMode 35/35, PlayMode 11/11. LIVE P0 su 8780: `qa/playtest_web_live_p0.md`.
 
-- 2026-10-16 08:55 — Producer — **triage Cap. 1** (QA v8 baseline NO-VIA). Aggiornate #58 muri/scaffali (tech+3d, P0), #59 NONNO all'indietro (tech+animator, P0), #60 spawn Nina (tech): fix in PR #63 da unire. Nuove: #64 TAB telefono S04 (ui), #65 lampione/staccionata SO C03/C04 (3d), #66 LIVE completo checklist + checklist su main (QA/build, P0). #61 testi Ada (ui), #62 duplicato di #61. Quadro: Tech #58 #59 #60 #6 · 3D #58 #65 #2 (#2 ferma dal 15/10) · Animator #59 #2 (ferma) · VFX nessuna issue Cap. 1 · UI #64 #61 #5 (#5 ferma dal 15/10) · Build #66 (+#12/PR #14 ferma) · QA #66. Rischi: milestone scaduta 15/10 18:00; `qa/CHECKLIST_CAP1.md` non è su main; molte voci non verificate (P01–P06, Z01, R02, touch).
+- 2026-10-16 08:55 — Producer — **triage Cap. 1** (QA v8 baseline NO-VIA). Aggiornate #58 muri/scaffali (tech+3d, P0), #59 OLDO all'indietro (tech+animator, P0), #60 spawn Kaia (tech): fix in PR #63 da unire. Nuove: #64 TAB telefono S04 (ui), #65 lampione/staccionata SO C03/C04 (3d), #66 LIVE completo checklist + checklist su main (QA/build, P0). #61 testi Tilde (ui), #62 duplicato di #61. Quadro: Tech #58 #59 #60 #6 · 3D #58 #65 #2 (#2 ferma dal 15/10) · Animator #59 #2 (ferma) · VFX nessuna issue Cap. 1 · UI #64 #61 #5 (#5 ferma dal 15/10) · Build #66 (+#12/PR #14 ferma) · QA #66. Rischi: milestone scaduta 15/10 18:00; `qa/CHECKLIST_CAP1.md` non è su main; molte voci non verificate (P01–P06, Z01, R02, touch).
 
 - 2026-10-16 04:11 — [7dd1767](https://github.com/B00RR/ultimo-miglio/commit/7dd1767) — merge [PR #55](https://github.com/B00RR/ultimo-miglio/pull/55): deposito #47 + luce/camera #48; Concept VIA; **QA live v5 VIA**.
 - 2026-10-16 03:18 — [1b5b7be](https://github.com/B00RR/ultimo-miglio/commit/1b5b7be) — merge [PR #45](https://github.com/B00RR/ultimo-miglio/pull/45): fix QA v1–v3 (#41–#44, #49); **QA live v4 VIA**.
-- 2026-10-16 01:51 — [ba25f62](https://github.com/B00RR/ultimo-miglio/commit/ba25f62) — merge [PR #51](https://github.com/B00RR/ultimo-miglio/pull/51): guida visiva — tavola Nonna Ada v01 e decisione ombre/saturazione.
+- 2026-10-16 01:51 — [ba25f62](https://github.com/B00RR/ultimo-miglio/commit/ba25f62) — merge [PR #51](https://github.com/B00RR/ultimo-miglio/pull/51): guida visiva — tavola Oma Tilde v01 e decisione ombre/saturazione.
 - 2026-10-16 01:49 — [29534d3](https://github.com/B00RR/ultimo-miglio/commit/29534d3) — merge [PR #50](https://github.com/B00RR/ultimo-miglio/pull/50): guida visiva capitolo 1 + confronto build (Concept Artist).
 
-- 2026-10-16 03:05 — ramo `night-art` — Tech Lead: merge #52 (vfx/48-luce) + #47 (art/47-deposito) + fix NONNO timeout; build WebGL_next :8778.
+- 2026-10-16 03:05 — ramo `night-art` — Tech Lead: merge #52 (vfx/48-luce) + #47 (art/47-deposito) + fix OLDO timeout; build WebGL_next :8778.
 - 2026-10-16 04:00 — branch art/47-deposito — 3D Artist: deposito fedele alla guida (#47): lastre 0,25 m, archi in tufo, parapetti in tufo e legno, insegna col faro, banco in noce con Carico 0 emissivo, kit premium, DressGameplay, Borgo Gradoni su gradoni.
-- 2026-10-16 02:15 — [6081d67](https://github.com/B00RR/ultimo-miglio/commit/6081d67) — merge #49 LegnoCartone/Ada portrait in fix-qa; EditMode 35/35 PlayMode 6/6; Closes #49 sulla PR #45.
+- 2026-10-16 02:15 — [6081d67](https://github.com/B00RR/ultimo-miglio/commit/6081d67) — merge #49 LegnoCartone/Tilde portrait in fix-qa; EditMode 35/35 PlayMode 6/6; Closes #49 sulla PR #45.
 - 2026-10-16 02:10 — [0f01a85](https://github.com/B00RR/ultimo-miglio/commit/0f01a85) — Tech Lead (PR #45 / fix-qa): Bancone→LN immediato, strip NavMesh/Hidden shader; Closes #41–#44.
-- 2026-10-16 01:55 — ramo `ui/49-hud` — UI: #49 superfici legno/cartone, ritratto Ada; Unity non avviato.
+- 2026-10-16 01:55 — ramo `ui/49-hud` — UI: #49 superfici legno/cartone, ritratto Tilde; Unity non avviato.
 - 2026-10-15 16:35 — PR producer/regola-closes — Producer: regola `Closes #N` / `Refs #N` in *Come lavoriamo*, modello di PR `.github/pull_request_template.md`, corretti gli orari di due voci; aggiunte le parole chiave alle PR #11 e #14.
 - 2026-10-15 16:25 — [8e4e272](https://github.com/B00RR/ultimo-miglio/commit/8e4e272) — Producer: aggiornata la Cronologia.
 - 2026-10-15 16:26 — Producer: create 13 issue della milestone *Gioco completo* divise per ruolo (#13, #15–#26), etichetta `ruolo:build` creata; #7 e #12 assegnate a *Gioco completo*; commento di piano su #7.
@@ -139,27 +139,27 @@ Voci più recenti in alto. Formato: `AAAA-MM-GG HH:MM` (Europe/Rome) — [commit
 - 2026-10-15 16:21 — [c54f667](https://github.com/B00RR/ultimo-miglio/commit/c54f667) — main: merge PR #10, sezione Cronologia.
 - 2026-10-15 16:20 — [643f1f9](https://github.com/B00RR/ultimo-miglio/commit/643f1f9) — main: merge PR #8, aggiunto STATO_PROGETTO.md (PR #9 chiusa come duplicato).
 - 2026-10-15 16:25 — [#8](https://github.com/B00RR/ultimo-miglio/pull/8) + #9 — Aggiunto STATO_PROGETTO.md; create etichette e issue #1–#7.
-- 2026-10-15 16:08 — [0c05198](https://github.com/B00RR/ultimo-miglio/commit/0c051984aef7a75dafc24616fa890cae5cc102b3) — ramo animator: Clienti v02: rig Humanoid di Nina riusato sui 6 clienti, pesi accessori rigidi, clip Idle/Walk/Wait_Impatient/Pay/Happy/Angry e controller condiviso chr_cliente
-- 2026-10-15 16:07 — [b03a3ad](https://github.com/B00RR/ultimo-miglio/commit/b03a3adc9324209f1ec95ac87aa57a0a0939cfbb) — ramo animator: Nina: Carry mani sotto la pila al petto, giacca Cheer senza schegge, soglie Speed in m/s
+- 2026-10-15 16:08 — [0c05198](https://github.com/B00RR/ultimo-miglio/commit/0c051984aef7a75dafc24616fa890cae5cc102b3) — ramo animator: Clienti v02: rig Humanoid di Kaia riusato sui 6 clienti, pesi accessori rigidi, clip Idle/Walk/Wait_Impatient/Pay/Happy/Angry e controller condiviso chr_cliente
+- 2026-10-15 16:07 — [b03a3ad](https://github.com/B00RR/ultimo-miglio/commit/b03a3adc9324209f1ec95ac87aa57a0a0939cfbb) — ramo animator: Kaia: Carry mani sotto la pila al petto, giacca Cheer senza schegge, soglie Speed in m/s
 - 2026-10-15 16:02 — [b59b95e](https://github.com/B00RR/ultimo-miglio/commit/b59b95e7e8e4c57240186b6ab141c9b3f3dd36e7) — ramo animator: AnimWalkVideo: la mesh skinnata ora si deforma nel video di verifica
-- 2026-10-15 15:59 — [3a2d5a9](https://github.com/B00RR/ultimo-miglio/commit/3a2d5a919ba65d71651c240212ba7b76c1ae7290) — ramo animator: NONNO v03: bind dalla mesh v03 (baffi ristretti/avanti, montante abbassato a 1.32 e avanzato, ruote allargate)
+- 2026-10-15 15:59 — [3a2d5a9](https://github.com/B00RR/ultimo-miglio/commit/3a2d5a919ba65d71651c240212ba7b76c1ae7290) — ramo animator: OLDO v03: bind dalla mesh v03 (baffi ristretti/avanti, montante abbassato a 1.32 e avanzato, ruote allargate)
 - 2026-10-15 15:57 — [614ed5d](https://github.com/B00RR/ultimo-miglio/commit/614ed5d14ec6bb9dc5adbb73a90454fe710cbca6) — main: webgl-min: VFX v1.6 (pickup/deliver/upgrade fx, contact shadow), materiali kit su atlas (fix bianco), schede nascoste fuori schermo, margine freccia; test PlayMode 4/4
-- 2026-10-15 15:51 — [8ce7e18](https://github.com/B00RR/ultimo-miglio/commit/8ce7e18ed1037e8e05084990c678add07fa5e025) — ramo animator: Nina: passo nel verso giusto (+Z) e Carry con mani sotto la pila
-- 2026-10-15 15:39 — [1f1d6ca](https://github.com/B00RR/ultimo-miglio/commit/1f1d6ca2ffa6a429a383c513c02bd3e04eab9bd7) — main: webgl-min: onboarding Nonna Ada (7 passi + chiusura, marker a terra, freccia bordo, PlayerPrefs), pad ASSUMI NONNO, pacco prop_parcel_box; Ch1LoopTest copre il tutorial (PASS)
+- 2026-10-15 15:51 — [8ce7e18](https://github.com/B00RR/ultimo-miglio/commit/8ce7e18ed1037e8e05084990c678add07fa5e025) — ramo animator: Kaia: passo nel verso giusto (+Z) e Carry con mani sotto la pila
+- 2026-10-15 15:39 — [1f1d6ca](https://github.com/B00RR/ultimo-miglio/commit/1f1d6ca2ffa6a429a383c513c02bd3e04eab9bd7) — main: webgl-min: onboarding Oma Tilde (7 passi + chiusura, marker a terra, freccia bordo, PlayerPrefs), pad ASSUMI OLDO, pacco prop_parcel_box; Ch1LoopTest copre il tutorial (PASS)
 - 2026-10-15 15:33 — [3b78348](https://github.com/B00RR/ultimo-miglio/commit/3b78348e7faee029d0b880a782424fd7490f2716) — main: webgl-min: confini 4 lati, kit 3D deposito, clamp schede, game feel (pila a molla, pacchi ad arco, monete verso HUD, pad pulse), SFX wt/sound dopo primo input; test loop+confini PASS
-- 2026-10-15 15:25 — [18d4abe](https://github.com/B00RR/ultimo-miglio/commit/18d4abe5e051f102f4781e27c8779c10f9949ed9) — ramo animator: anim v05 Nina: giacca staccata dalle braccia (Cheer stirava i pannelli laterali)
-- 2026-10-15 15:19 — [13cca59](https://github.com/B00RR/ultimo-miglio/commit/13cca59b17e69522405c203e0f7b08959a49cb22) — main: webgl-min: HUD responsive (wt/ui), single keyboard input via FloatingJoystick, full-window web template, palette update, NONNO v02, loop test PASS
-- 2026-10-15 15:13 — [6b91c0e](https://github.com/B00RR/ultimo-miglio/commit/6b91c0e2404228828d6bea1e4945274d33070953) — ramo animator: anim v04: NONNO fork cap 0.40m; Nina v02 mesh + ponytail_01/02 bones w/ baked secondary motion; jacket-hem flap skin; anti-penetration pass; same GUIDs/clip IDs
-- 2026-10-15 15:08 — [a93fd71](https://github.com/B00RR/ultimo-miglio/commit/a93fd710ade8d4adfd6580718dd8da3df60db8ee) — ramo animator: Characters: anti-compenetrazione (audit BVH per frame): NONNO baffi/montante/forche/testa, TICO braccia Happy, Nina braccia-testa/torso; stessi GUID/clip ID
-- 2026-10-15 15:02 — [77d5c30](https://github.com/B00RR/ultimo-miglio/commit/77d5c301b43e19a41a586b28fe07422e4bf0dc59) — main: webgl-min: Nina facing fix, camera ortho 4.5, single Zaino pad, HUD panels 1920x1080 match .5, phone TAB/ESC, LoopAutoTest + PlayMode Ch1 loop test (PASS)
-- 2026-10-15 15:00 — [7dfcd5d](https://github.com/B00RR/ultimo-miglio/commit/7dfcd5d3eced26b4ebd80cbf5ea5973e65539d5a) — ramo animator: Characters: NONNO v02 (muletto, rig Generic 8 ossa dai vertex group, Idle/Drive/Lift/Drop/Happy, stessi GUID/clip ID) + TICO v02 (rig 8 ossa, Idle/Move/Stamp/Happy, nuovo controller + meta GUID fissi); AnimVerify esteso
-- 2026-10-15 14:51 — [3d43efb](https://github.com/B00RR/ultimo-miglio/commit/3d43efbac7071f6b3ac76c31f19550f1ead67b3c) — main: webgl-min: fix magenta (URP Forward, no postFX, always-included shaders), VFX v1.3, 3D kit+palette, final Nina, input handler Both, fps -1 on WebGL
+- 2026-10-15 15:25 — [18d4abe](https://github.com/B00RR/ultimo-miglio/commit/18d4abe5e051f102f4781e27c8779c10f9949ed9) — ramo animator: anim v05 Kaia: giacca staccata dalle braccia (Cheer stirava i pannelli laterali)
+- 2026-10-15 15:19 — [13cca59](https://github.com/B00RR/ultimo-miglio/commit/13cca59b17e69522405c203e0f7b08959a49cb22) — main: webgl-min: HUD responsive (wt/ui), single keyboard input via FloatingJoystick, full-window web template, palette update, OLDO v02, loop test PASS
+- 2026-10-15 15:13 — [6b91c0e](https://github.com/B00RR/ultimo-miglio/commit/6b91c0e2404228828d6bea1e4945274d33070953) — ramo animator: anim v04: OLDO fork cap 0.40m; Kaia v02 mesh + ponytail_01/02 bones w/ baked secondary motion; jacket-hem flap skin; anti-penetration pass; same GUIDs/clip IDs
+- 2026-10-15 15:08 — [a93fd71](https://github.com/B00RR/ultimo-miglio/commit/a93fd710ade8d4adfd6580718dd8da3df60db8ee) — ramo animator: Characters: anti-compenetrazione (audit BVH per frame): OLDO baffi/montante/forche/testa, TIKTAK braccia Happy, Kaia braccia-testa/torso; stessi GUID/clip ID
+- 2026-10-15 15:02 — [77d5c30](https://github.com/B00RR/ultimo-miglio/commit/77d5c301b43e19a41a586b28fe07422e4bf0dc59) — main: webgl-min: Kaia facing fix, camera ortho 4.5, single Zaino pad, HUD panels 1920x1080 match .5, phone TAB/ESC, LoopAutoTest + PlayMode Ch1 loop test (PASS)
+- 2026-10-15 15:00 — [7dfcd5d](https://github.com/B00RR/ultimo-miglio/commit/7dfcd5d3eced26b4ebd80cbf5ea5973e65539d5a) — ramo animator: Characters: OLDO v02 (muletto, rig Generic 8 ossa dai vertex group, Idle/Drive/Lift/Drop/Happy, stessi GUID/clip ID) + TIKTAK v02 (rig 8 ossa, Idle/Move/Stamp/Happy, nuovo controller + meta GUID fissi); AnimVerify esteso
+- 2026-10-15 14:51 — [3d43efb](https://github.com/B00RR/ultimo-miglio/commit/3d43efbac7071f6b3ac76c31f19550f1ead67b3c) — main: webgl-min: fix magenta (URP Forward, no postFX, always-included shaders), VFX v1.3, 3D kit+palette, final Kaia, input handler Both, fps -1 on WebGL
 - 2026-10-15 14:33 — [db1e86b](https://github.com/B00RR/ultimo-miglio/commit/db1e86bb3e2e2ea48536f591400290bda7e35ace) — main: webgl-min: wip
-- 2026-10-15 14:30 — [b11e16c](https://github.com/B00RR/ultimo-miglio/commit/b11e16ca9bda78b7a99cf6ca5e435759afd04f3c) — ramo animator: Characters: Nina skin finale (giunture braccia misurate sulla mesh, re-bake a matrici, take a 30 fps), mesh finale con UV T_Palette_Atlas
+- 2026-10-15 14:30 — [b11e16c](https://github.com/B00RR/ultimo-miglio/commit/b11e16ca9bda78b7a99cf6ca5e435759afd04f3c) — ramo animator: Characters: Kaia skin finale (giunture braccia misurate sulla mesh, re-bake a matrici, take a 30 fps), mesh finale con UV T_Palette_Atlas
 - 2026-10-15 14:16 — [49855ed](https://github.com/B00RR/ultimo-miglio/commit/49855ed4e187e074772c2dd7d9b59a2462f6b7f0) — main: webgl-min: WebGL build entry (EnsureUrp, scene rebuild), particlesystem module, drop vibration/unity-mcp/recorder, Cinemachine lens fix, QA patches 03-10
-- 2026-10-15 14:00 — [01f0b9c](https://github.com/B00RR/ultimo-miglio/commit/01f0b9c7c5a6670b1d2336d85704f6e9eeb841ae) — ramo animator: Characters: Nina re-bind su re-export 13:55; NONNO riportato a v01 blockout (la mesh menta e' il bot del Bancone, non NONNO)
+- 2026-10-15 14:00 — [01f0b9c](https://github.com/B00RR/ultimo-miglio/commit/01f0b9c7c5a6670b1d2336d85704f6e9eeb841ae) — ramo animator: Characters: Kaia re-bind su re-export 13:55; OLDO riportato a v01 blockout (la mesh menta e' il bot del Bancone, non OLDO)
 - 2026-10-15 13:52 — [abcfcd7](https://github.com/B00RR/ultimo-miglio/commit/abcfcd76eb698cb86cfec6b6f28e317c7d783458) — ramo animator: Characters: re-bind su re-export 13:50 delle mesh (UV T_Palette_Atlas), stessi GUID/clip
-- 2026-10-15 13:49 — [3b71509](https://github.com/B00RR/ultimo-miglio/commit/3b715095d9ffbbe5efcc31cec3eabc5810b16c78) — ramo animator: Characters: Nina rig Humanoid su mesh finale (24 ossa, skin max 4) + 7 clip re-bake; NONNO 10 ossa su mesh ricentrata + 5 clip; AnimVerify editor (GUID/meta/controller invariati)
+- 2026-10-15 13:49 — [3b71509](https://github.com/B00RR/ultimo-miglio/commit/3b715095d9ffbbe5efcc31cec3eabc5810b16c78) — ramo animator: Characters: Kaia rig Humanoid su mesh finale (24 ossa, skin max 4) + 7 clip re-bake; OLDO 10 ossa su mesh ricentrata + 5 clip; AnimVerify editor (GUID/meta/controller invariati)
 - 2026-10-15 13:04 — [c3b588a](https://github.com/B00RR/ultimo-miglio/commit/c3b588a4fb23debea683be0008c700ce1265f8c3) — main: HUD integration: core events (OnLnCredited/OnMoraChanged/DayChanged/BulloniChanged)+tests, bridge wiring, HUD.prefab hook, Inter+Roboto OFL fonts, ci hud step
 - 2026-10-15 12:55 — [a7cba95](https://github.com/B00RR/ultimo-miglio/commit/a7cba953cc88b93db02efafa66734e26b94a090a) — main: keep empty folders
 - 2026-10-15 12:55 — [8e08315](https://github.com/B00RR/ultimo-miglio/commit/8e08315b5b3178ce41972f37c02d973b39e67ecd) — main: Unity 6 project skeleton + ch1 vertical slice code (EconomyCore+tests, gameplay, audio, data import, build/capture scripts, Unity-MCP plugin)
@@ -177,8 +177,8 @@ Voci più recenti in alto. Formato: `AAAA-MM-GG HH:MM` (Europe/Rome) — [commit
 
 ## Aggiornamento 17:10 — HUD v2 verticale (UI, issue #30, branch ui/hud-v2-portrait)
 - HUD in unità dp (ResponsivePanel: portrait min(W/411,H/914) → 2,63 a 1080x2400; landscape H/600), solo documento HUD.
-- Nuovi `Assets/_Game/UI/Tokens.uss` + `USS/HudV2.uss`: pillola valute, chip Pedaggio, telefono 3D, etichetta stanza (no ellissi, a capo >22 car.), card pad 128–200 dp, biglietto Ada, pulsanti chunky.
-- Biglietto di Nonna Ada in AdaNoteView (coda, 1 alla volta, 120 dp sotto top sicuro, mai metà bassa); il banner di TutorialManager viene rispecchiato e nascosto (Gameplay non toccato).
+- Nuovi `Assets/_Game/UI/Tokens.uss` + `USS/HudV2.uss`: pillola valute, chip Pedaggio, telefono 3D, etichetta stanza (no ellissi, a capo >22 car.), card pad 128–200 dp, biglietto Tilde, pulsanti chunky.
+- Biglietto di Oma Tilde in AdaNoteView (coda, 1 alla volta, 120 dp sotto top sicuro, mai metà bassa); il banner di TutorialManager viene rispecchiato e nascosto (Gameplay non toccato).
 - Etichette pad clampate nella safe area (margine 8 dp) con flip vicino ai bordi.
 - Font Fredoka (SIL OFL 1.1, Google Fonts) in `UI/Fonts` — licenza in `LICENSE_Fredoka_OFL.txt`; da registrare in LICENZE_ASSET.md.
 - **Non compilato in Unity** (solo check dotnet sui DLL UnityEngine). Da verificare dal Tech Lead.
@@ -191,10 +191,10 @@ Voci più recenti in alto. Formato: `AAAA-MM-GG HH:MM` (Europe/Rome) — [commit
 - **Non compilato in Unity** (dotnet non disponibile sulla macchina dell'agente). Da agganciare ai pad in scena dal Tech Lead.
 
 ## Aggiornamento 18:15 — HUD minimale (UI, issue #38, branch ui/hud-minimale)
-- In vista: **LN + giorno**, obiettivo tutorial 1 riga, Ada **1 riga ≤40 dp**, joystick, telefono/settings **≤40 dp**.
+- In vista: **LN + giorno**, obiettivo tutorial 1 riga, Tilde **1 riga ≤40 dp**, joystick, telefono/settings **≤40 dp**.
 - Nascosti: room label, chip Pedaggio, badge, bulloni; PadTag solo sul pad; pad/cassa card ≤140 dp.
 - File: `Hud.uxml` (`hud--minimal`, `day-value`, `tutorial-objective`), `HudV2.uss`, `Tokens.uss`, `PadTag.uss`, `CassaCard.uxml`; binding in `HudController`/`HudGameBridge`/`AdaNoteView`/`PadTag`.
-- **Tech Lead @1080×2400:** LN+G leggibili, icone non bloccano, Ada non invade, una scheda pad alla volta.
+- **Tech Lead @1080×2400:** LN+G leggibili, icone non bloccano, Tilde non invade, una scheda pad alla volta.
 - **Conflitti attesi con PR #36** (ancora aperta): `Hud.uxml`, `HudV2.uss`, `STATO_PROGETTO.md`. Partiti da `main`.
 
 ## Aggiornamento 16/10 04:00 — Deposito fedele alla guida (3D Artist, issue #47, branch art/47-deposito)
@@ -205,7 +205,7 @@ Voci più recenti in alto. Formato: `AAAA-MM-GG HH:MM` (Europe/Rome) — [commit
 - `DepotKit.DressGameplay()` (set dressing vicino ad Arrivi/scaffali/Bancone) chiamato da `SliceSceneBuilder`. Tutto null-safe: se manca un FBX resta il comportamento di prima.
 - **Borgo Gradoni:** case di Solara alternate su gradone in tufo con scalinate.
 - Layout di riferimento: `Art/Environment/Layouts/bancone_layout.json` (+ README conversione). Licenze 3D: `docs/LICENZE_ASSET.md`.
-- Nina su main: FBX dell'Animator (1.968 facce, UV raccolte nelle celle dell'atlas), **nessuna striatura nel file**. Non toccata.
+- Kaia su main: FBX dell'Animator (1.968 facce, UV raccolte nelle celle dell'atlas), **nessuna striatura nel file**. Non toccata.
 - **Non compilato né testato in Unity** (Unity occupato): servono import, test EditMode/PlayMode e una cattura della scena rigenerata.
 
 ## Aggiornamento 16/10 09:30 — PR #36 riallineata a main (UI)

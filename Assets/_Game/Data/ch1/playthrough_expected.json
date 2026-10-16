@@ -52,7 +52,7 @@
       {
         "zoneId": "arrivi",
         "holdOnZoneSec": 1.0,
-        "when": "shelfStock<stack (Nina rifornisce la quota non coperta da NONNO)"
+        "when": "shelfStock<stack (Kaia rifornisce la quota non coperta da OLDO)"
       }
     ]
   },
@@ -61,7 +61,7 @@
       "id": "moveTutorialStart",
       "tSec": 15,
       "toleranceSec": 5,
-      "note": "Card 'Trascina per muovere Nina'",
+      "note": "Card 'Trascina per muovere Kaia'",
       "cumulativeEarnedLnApprox": 0
     },
     {
@@ -82,7 +82,7 @@
       "id": "firstCustomerServed",
       "tSec": 70,
       "toleranceSec": 15,
-      "note": "Mamma Rosa al Bancone",
+      "note": "Auntie Lulu al Bancone",
       "cumulativeEarnedLnApprox": 3
     },
     {
@@ -110,28 +110,28 @@
       "id": "nonnoHired",
       "tSec": 130,
       "toleranceSec": 5,
-      "note": "Pad 'ASSUMI NONNO · 50 LN'",
+      "note": "Pad 'ASSUMI OLDO · 50 LN'",
       "cumulativeEarnedLnApprox": 211
     },
     {
       "id": "phoneRings",
       "tSec": 165,
       "toleranceSec": 10,
-      "note": "Messaggi (Civetta, teaser)",
+      "note": "Messaggi (Madame Moth, teaser)",
       "cumulativeEarnedLnApprox": 377
     },
     {
       "id": "ordersApp",
       "tSec": 210,
       "toleranceSec": 10,
-      "note": "Ordine speciale Mamma Rosa",
+      "note": "Ordine speciale Auntie Lulu",
       "cumulativeEarnedLnApprox": 612
     },
     {
       "id": "firstCassaCollection",
       "tSec": 235,
       "toleranceSec": 10,
-      "note": "Nina passa sulla Cassa: mancia una tantum di 30 LN (nessun offline)",
+      "note": "Kaia passa sulla Cassa: mancia una tantum di 30 LN (nessun offline)",
       "cumulativeEarnedLnApprox": 776
     },
     {
@@ -188,7 +188,7 @@
     {
       "t": 130.0,
       "pad": "hireNonno",
-      "label": "ASSUMI NONNO · 50 LN",
+      "label": "ASSUMI OLDO · 50 LN",
       "costLn": 50,
       "level": 1,
       "toleranceSec": 20,
@@ -251,7 +251,7 @@
     {
       "t": 448.0,
       "pad": "nonnoUpgrade",
-      "label": "NONNO LV 1 · 100 LN",
+      "label": "OLDO LV 1 · 100 LN",
       "costLn": 100,
       "level": 1,
       "toleranceSec": 67,
@@ -296,7 +296,7 @@
     {
       "t": 1237.0,
       "pad": "nonnoUpgrade",
-      "label": "NONNO LV 2 · 240 LN",
+      "label": "OLDO LV 2 · 240 LN",
       "costLn": 240,
       "level": 2,
       "toleranceSec": 186,
@@ -902,7 +902,7 @@
       "action": "moveTo",
       "zoneId": "padHireNonno",
       "holdOnZoneSec": 3.0,
-      "expect": "NONNO attivo, restock 6 pacchi/min"
+      "expect": "OLDO attivo, restock 6 pacchi/min"
     },
     {
       "tSec": 130.0,
@@ -948,7 +948,7 @@
       "action": "moveTo",
       "zoneId": "cassa",
       "holdOnZoneSec": 1.0,
-      "expect": "+30 LN mancia di Nonna Ada (solo la prima volta)"
+      "expect": "+30 LN mancia di Oma Tilde (solo la prima volta)"
     },
     {
       "tSec": 240,
@@ -1003,7 +1003,7 @@
       "action": "moveTo",
       "zoneId": "padNonnoUpgrade",
       "holdOnZoneSec": 3.0,
-      "expect": "NONNO LV 1 · 100 LN"
+      "expect": "OLDO LV 1 · 100 LN"
     },
     {
       "tSec": 480.0,
@@ -1129,7 +1129,7 @@
       "action": "moveTo",
       "zoneId": "padNonnoUpgrade",
       "holdOnZoneSec": 3.0,
-      "expect": "NONNO LV 2 · 240 LN"
+      "expect": "OLDO LV 2 · 240 LN"
     },
     {
       "tSec": 1260.0,

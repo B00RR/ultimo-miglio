@@ -32,7 +32,7 @@
     "20s": "freccia a bordo schermo / mano fantasma",
     "40s": "camera breve sul bersaglio (≤1,5 s, input attivo)"
   },
-  "keyLegend": "step:<id> = biglietto di Nonna Ada in onboarding_testi.json steps[]; tutte le chiavi onb.* sono in onboarding_testi.json (PR #62 e #92)",
+  "keyLegend": "step:<id> = biglietto di Oma Tilde in onboarding_testi.json steps[]; tutte le chiavi onb.* sono in onboarding_testi.json (PR #62 e #92)",
   "skipTutorial": {
     "availableAfterStep": "combo",
     "effect": "sblocca tutto ciò che i passi saltati avrebbero rivelato"
@@ -125,7 +125,7 @@
         "20s": "freccia verso lo scaffale",
         "40s": "camera sullo scaffale + ripete onb.deposit.hint"
       },
-      "revealWhen": "stack>=5 oppure Nina lascia gli Arrivi con ≥1 pacco"
+      "revealWhen": "stack>=5 oppure Kaia lascia gli Arrivi con ≥1 pacco"
     },
     {
       "id": "serve",
@@ -146,8 +146,8 @@
         "onb.cust.first"
       ],
       "hintEscalation": {
-        "10s": "Mamma Rosa saluta (bark) e la stella pulsa",
-        "20s": "freccia sul Bancone; se Nina ha 0 pacchi la freccia va prima allo scaffale",
+        "10s": "Auntie Lulu saluta (bark) e la stella pulsa",
+        "20s": "freccia sul Bancone; se Kaia ha 0 pacchi la freccia va prima allo scaffale",
         "40s": "camera sul Bancone + ripete onb.cust.first"
       }
     },
@@ -172,7 +172,7 @@
       "hintEscalation": {
         "10s": "monete brillano",
         "20s": "freccia sulle monete",
-        "40s": "le monete saltellano verso Nina (raggio +0,5 m)"
+        "40s": "le monete saltellano verso Kaia (raggio +0,5 m)"
       }
     },
     {
@@ -205,7 +205,7 @@
           "onb.zaino.notEnough"
         ]
       },
-      "note": "il gate prova che il giocatore sa comprare: serve per NONNO"
+      "note": "il gate prova che il giocatore sa comprare: serve per OLDO"
     },
     {
       "id": "combo",
@@ -238,7 +238,7 @@
       "tSec": 127,
       "toleranceSec": 5,
       "maxSec": 132,
-      "mechanic": "conoscere NONNO (solo guardare)",
+      "mechanic": "conoscere OLDO (solo guardare)",
       "reveals": [
         "robot.nonno.dorme"
       ],
@@ -295,7 +295,7 @@
       "tSec": 131,
       "toleranceSec": 5,
       "maxSec": 150,
-      "mechanic": "vedere NONNO lavorare",
+      "mechanic": "vedere OLDO lavorare",
       "reveals": [
         "robot.nonno.attivo",
         "app.flotta"
