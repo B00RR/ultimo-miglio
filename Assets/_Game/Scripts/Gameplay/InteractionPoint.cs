@@ -130,6 +130,9 @@ namespace UltimoMiglio.Gameplay
             var arrow = _hud.Root.Q("edge-arrow"); arrow?.BringToFront(); // the off-screen arrow is never under a chip/card
         }
 
+        int _shownLeft = int.MinValue, _shownPaid = int.MinValue, _shownCost = int.MinValue;
+        UltimoMiglio.UI.World.PadTag _tag; bool _tagLooked;
+
         void LateUpdate()
         {
             if (!_fill) return;
@@ -158,9 +161,12 @@ namespace UltimoMiglio.Gameplay
                 var eco = GameRoot.I.Eco; double cost = eco.Cost(Pad.Kind), paid = eco.S.PadPaid[(int)Pad.Kind];
                 if (!double.IsInfinity(cost))
                 {
-                    _text.text = Mathf.CeilToInt((float)Mathf.Max(0, (float)(cost - paid))) + " LN"; // pillola = quanto manca
+                    // #191: stringhe ricostruite solo quando cambiano i numeri (prima: allocazioni a ogni frame per pad → picchi GC su WebGL)
+                    int left = Mathf.CeilToInt((float)Mathf.Max(0, (float)(cost - paid)));
+                    if (left != _shownLeft) { _shownLeft = left; _text.text = left + " LN"; } // pillola = quanto manca
                     int pd = Mathf.FloorToInt((float)paid), c = Mathf.CeilToInt((float)cost);
-                    _barLabel.text = pd + "/" + c; _barFill.style.width = Length.Percent(c > 0 ? Mathf.Clamp01((float)(paid / cost)) * 100f : 0f);
+                    if (pd != _shownPaid || c != _shownCost) { _shownPaid = pd; _shownCost = c; _barLabel.text = pd + "/" + c; }
+                    _barFill.style.width = Length.Percent(c > 0 ? Mathf.Clamp01((float)(paid / cost)) * 100f : 0f);
                     var n = GameRoot.I.Nina; bool close = n && (n.transform.position - transform.position).sqrMagnitude < 9f;
                     barOn = ForceBar || paid > 0.01 || close;
                 }
@@ -170,7 +176,8 @@ namespace UltimoMiglio.Gameplay
             bool near = nina && (nina.transform.position - transform.position).sqrMagnitude < 9f;
             if (Ring && !Pad) Ring.SetProgress(near ? 1f : 0f);
             if (PadIcon) { PadIcon.SetVisible(false); PadIcon.SetPlayerNear(near); }
-            var tag = GetComponent<UltimoMiglio.UI.World.PadTag>(); if (tag) tag.enabled = false;
+            if (!_tagLooked) { _tagLooked = true; _tag = GetComponent<UltimoMiglio.UI.World.PadTag>(); } // #191: cache
+            if (_tag && _tag.enabled) _tag.enabled = false;
             // Offset mondo: più basso se il pad è in alto nello schermo, così la pillola non finisce sotto l'obiettivo
             float bob = 0.12f * Mathf.Sin(Time.time * 2.4f + _phase);
             Vector3 world = transform.position + Vector3.up * (1.55f + bob);

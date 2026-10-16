@@ -9,6 +9,8 @@ namespace UltimoMiglio.Gameplay
     /// Iso camera: target = Nina. Dead-zone solo in movimento; a idle ricentra in ~0.3 s (QA v6).
     /// Il clamp mappa non può mai spingere Nina fuori dal 70% centrale dello schermo.
     /// </summary>
+    // #191: gira prima del CinemachineBrain (LateUpdate) così la vcam è già aggiornata nello stesso frame (niente ritardo di 1 frame/scatti)
+    [DefaultExecutionOrder(-100)]
     public sealed class DepotCameraFit : MonoBehaviour
     {
         public const string PrefZoom = "cam_zoom_v3";
@@ -56,6 +58,8 @@ namespace UltimoMiglio.Gameplay
             foreach (var z in FindObjectsByType<ProximityZone>(FindObjectsSortMode.None)) { _pts.Add(z.transform.position + new Vector3(-1.2f, 0, -1.2f)); _pts.Add(z.transform.position + new Vector3(1.2f, 0, 1.2f)); }
         }
 
+        CinemachinePositionComposer _pc; bool _pcLooked;
+
         void LateUpdate()
         {
             if (Screen.width != _w || Screen.height != _h) { RecomputeBounds(); Apply(true); }
@@ -97,7 +101,7 @@ namespace UltimoMiglio.Gameplay
             bool moving = false;
             if (Nina && _prevNinaInit)
             {
-                float dt = Mathf.Max(1e-4f, Time.unscaledDeltaTime);
+                float dt = Mathf.Max(1e-4f, Time.deltaTime); // #191: stessa base tempi di Nina (Update)
                 var v = (ninaPos - _prevNina) / dt; v.y = 0f;
                 moving = v.sqrMagnitude > MoveSpeedEps * MoveSpeedEps;
                 if (peek) { if (moving) CameraPeek.NotifyInput(); moving = false; } // durante la camera breve niente dead-zone
@@ -145,10 +149,11 @@ namespace UltimoMiglio.Gameplay
             float dist = CameraDistance > 1f ? CameraDistance : UM_QualityTier.CameraDistance;
             var want = _rot * new Vector3(cx, cy, 0) - Cm.transform.forward * dist;
             float smooth = moving ? FollowSmoothMove : FollowSmoothIdle;
-            float t = snap ? 1f : (1f - Mathf.Exp(-smooth * Time.unscaledDeltaTime));
+            float t = snap ? 1f : (1f - Mathf.Exp(-smooth * Time.deltaTime)); // #191: stessa base tempi di Nina
             Cm.transform.position = Vector3.Lerp(Cm.transform.position, want, t);
             var lens = Cm.Lens; lens.OrthographicSize = _ortho; Cm.Lens = lens;
-            var pc = Cm.GetComponent<CinemachinePositionComposer>(); if (pc) pc.CameraDistance = dist;
+            if (!_pcLooked) { _pcLooked = true; _pc = Cm.GetComponent<CinemachinePositionComposer>(); } // #191: niente GetComponent a ogni frame
+            if (_pc && !Mathf.Approximately(_pc.CameraDistance, dist)) _pc.CameraDistance = dist;
             var cam = Camera.main; if (cam) cam.orthographicSize = _ortho;
         }
 

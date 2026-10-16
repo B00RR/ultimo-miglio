@@ -47,6 +47,7 @@ namespace UltimoMiglio.Gameplay
         public Step SaltaDopo = Step.Combo;
 
         public Step Current { get; private set; }
+        CassaZone _cassaZone; string _hintSrc; // #191 cache
         public string CurrentObjectiveText => Current < Step.Fine && (int)Current < Objectives.Length ? Objectives[(int)Current] : (Current == Step.Fine ? "Deposito aperto!" : "");
         Vector3 _startPos; int _shelfBase, _servedBase, _padBase, _coinBase; double _walletBase, _debtBase; float _endT, _stepStart; bool _cassaSeen;
         int _hintCount, _lvl3; float _nolnpAt = -99f;
@@ -219,7 +220,7 @@ namespace UltimoMiglio.Gameplay
             _hint = new VisualElement { name = "tut-hint", pickingMode = PickingMode.Ignore }; _hint.AddToClassList("tut-hint");
             var pill = new VisualElement { pickingMode = PickingMode.Ignore }; pill.AddToClassList("tut-hint__pill");
             var go = new VisualElement { pickingMode = PickingMode.Ignore }; go.AddToClassList("tut-hint__go");
-            _hintText = new Label { pickingMode = PickingMode.Ignore }; _hintText.AddToClassList("tut-hint__text");
+            _hintText = new Label { pickingMode = PickingMode.Ignore }; _hintSrc = null; _hintText.AddToClassList("tut-hint__text");
             pill.Add(go); pill.Add(_hintText); _hint.Add(pill);
             (_hud.SafeRoot ?? _hud.Root).Add(_hint);
         }
@@ -356,7 +357,7 @@ namespace UltimoMiglio.Gameplay
             EnsureHint();
             if (_hint != null) { var h = Current < Step.Fine ? CurrentHint() : null; var joy = _hud.Root.Q("joystick-base"); bool joyOver = joy != null && joy.resolvedStyle.display == DisplayStyle.Flex && joy.resolvedStyle.opacity > 0.05f && joy.worldBound.Overlaps(_hint.worldBound);
                 _hint.EnableInClassList("tut-hint--on", !string.IsNullOrEmpty(h) && !joyOver); // mai sotto il pollice/joystick flottante
-                if (_hintText != null && h != null) _hintText.text = DisplayNames.Apply(h); }
+                if (_hintText != null && h != null && !string.Equals(h, _hintSrc)) { _hintSrc = h; _hintText.text = DisplayNames.Apply(h); } } // #191: Replace solo quando cambia il suggerimento
             // B4 P2: testi Ada nel fumetto HUD (non solo console)
             if (_banner != null)
             {
@@ -369,7 +370,7 @@ namespace UltimoMiglio.Gameplay
             if (_marker) _marker.gameObject.SetActive(false);
             var eco = GameRoot.I.Eco; var nina = GameRoot.I.Nina;
             float inStep = Time.time - _stepStart;
-            if (Current == Step.CassaPass) { var cz = FindAnyObjectByType<CassaZone>(); if (cz && cz.Occupied) _cassaSeen = true; }
+            if (Current == Step.CassaPass) { if (!_cassaZone) _cassaZone = FindAnyObjectByType<CassaZone>(); var cz = _cassaZone; /* #191: niente ricerca scena a ogni frame */ if (cz && cz.Occupied) _cassaSeen = true; }
             string ev = Current switch
             {
                 Step.ColdOpen => inStep >= ColdOpenEff ? "coldOpenEnd" : null,
