@@ -13,6 +13,8 @@ namespace UltimoMiglio.Gameplay
         UltimoMiglio.UI.HudController _hud; bool _hudLooked;
         readonly List<Coin> _live = new(); readonly Stack<Transform> _pool = new();
         int _pickupSfx;
+        /// <summary>Monete arrivate a Nina/HUD dall'avvio (#101: gate coinsCollected del tutorial).</summary>
+        public static int Raccolte;
 
         public void Spawn(Vector3 at, double ln) => Emit(at, ln, true);
         public void Burst(Vector3 at, double ln) => Emit(at, ln, false);
@@ -56,6 +58,7 @@ namespace UltimoMiglio.Gameplay
                     {
                         if (_hud) _hud.PulseCurrency();
                         c.T.localScale = Vector3.one;
+                        Raccolte++;
                         if (c.Real) GameRoot.I.Eco.CollectActive(c.Ln, c.T.position.ToWP());
                         if ((_pickupSfx++ & 1) == 0) AudioManager.I?.Play(AudioManager.Sfx.CoinPickup);
                         c.T.gameObject.SetActive(false); _pool.Push(c.T); _live.RemoveAt(i);

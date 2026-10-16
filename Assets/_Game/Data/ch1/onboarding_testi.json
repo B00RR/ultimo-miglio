@@ -1,13 +1,17 @@
 {
-  "_nota": "Testi definitivi onboarding cap.1 (Narrative). Voce: Nonna Ada, dai biglietti lasciati nel deposito, parla a Nina. Max 70 caratteri. SliceSceneBuilder legge speaker, steps[].text IN ORDINE (7 passi, ordine del codice: ... monete, NONNO, Zaino) e fine: non cambiare ordine né chiavi. Le chiavi in rinviati_cap2 (telefono) entrano nel cap. 2.",
-  "speaker": "Nonna Ada",
+  "_nota": "steps[]: biglietti di Oma Tilde per i 16 passi, id = TutorialManager.StepIds (collegati per id con IdToStep, l'ordine nel file non conta). coldOpen ha anche le lettere, freePlay anche \"fine\"; gli altri passi hanno un biglietto e un suggerimento onb.*. onb.debt.milestone1-3: traguardi della rata.",
+  "speaker": "Oma Tilde",
   "steps": [
     {
-      "id": "move",
-      "text": "Nina, sgranchisci le gambe. Il deposito si gira a piedi."
+      "id": "coldOpen",
+      "text": "Kaia, il Sunn Depot ora è tuo. Un anno per salvarlo. Coraggio."
     },
     {
-      "id": "pickup",
+      "id": "move",
+      "text": "Kaia, sgranchisci le gambe. Il deposito si gira a piedi."
+    },
+    {
+      "id": "pickUp",
       "text": "È arrivato il furgone! Passa agli Arrivi e prendi i pacchi."
     },
     {
@@ -16,57 +20,92 @@
     },
     {
       "id": "serve",
-      "text": "C'è Mamma Rosa al Bancone. Non farla aspettare, eh."
+      "text": "C'è Auntie Lulu al Bancone. Non farla aspettare, eh."
     },
     {
       "id": "coins",
       "text": "Raccogli le monete. Una alla volta si fa un anno."
     },
     {
-      "id": "unlock_nonno",
-      "text": "NONNO brontola, ma lavora. Sveglialo dal pad, digli ciao."
+      "id": "hireNonno",
+      "text": "OLDO brontola, ma lavora. Sveglialo dal pad: 50 LN e ti aiuta."
     },
     {
-      "id": "upgrade_zaino",
-      "text": "Sali sul pad ZAINO: più pacchi, meno giri. Fidati."
+      "id": "zainoPad",
+      "text": "Resta sul pad Zaino finché si riempie: più pacchi, meno giri."
+    },
+    {
+      "id": "combo",
+      "text": "Servi senza fermarti, tesoro: i clienti contenti pagano meglio."
+    },
+    {
+      "id": "nonnoIntro",
+      "text": "Quello che dorme è OLDO. L'ho costruito io, sii gentile."
+    },
+    {
+      "id": "nonnoConfirm",
+      "text": "Guardalo: gli scaffali li riempie lui. Tu pensa ai clienti."
+    },
+    {
+      "id": "padNuovi",
+      "text": "Scarpe o Insegna? Scegli tu, Kaia. Io avrei preso l'Insegna."
+    },
+    {
+      "id": "cassaPass",
+      "text": "Passa dalla Cassa: ti ho lasciato una mancia. Non dirlo a OLDO."
+    },
+    {
+      "id": "debtCard",
+      "text": "Quelli della GrayBox vogliono la rata. Versala in Cassaforte."
+    },
+    {
+      "id": "wallPad",
+      "text": "Vedi quel muro? Dietro c'è spazio. Il Sunn Depot può crescere."
+    },
+    {
+      "id": "freePlay",
+      "text": "Brava, Kaia. Il resto lo scopri da te. Io l'ho sempre saputo."
     }
   ],
-  "fine": "Brava, Nina. Il resto lo scopri da te. Io l'ho sempre saputo.",
+  "fine": "Brava, Kaia. Il resto lo scopri da te. Io l'ho sempre saputo.",
   "lettere": {
-    "onb.cold.letterAda": "Nina, tesoro,\nse leggi, la serranda l'hai alzata tu. Bene.\nVela & Figli ora è tuo: pacchi, debiti e quel brontolone di NONNO.\nSul bancone c'è un pacco. Non è per i clienti. Lascialo lì, per ora.\nLui saprà aspettare. Tu no, lo so: comincia dagli Arrivi.\nTi voglio bene.\nNonna Ada",
-    "onb.cold.letterOmni": "OmniFreight S.p.A. · Gentile sig.ra Vela, avete 1 anno per rendere redditizio il deposito. Poi lo acquisiremo. Cordialmente, V. Sale"
+    "onb.cold.letterAda": "Kaia, tesoro,\nse leggi, la serranda l'hai alzata tu. Bene.\nIl Sunn Depot ora è tuo: pacchi, debiti e quel brontolone di OLDO.\nSul bancone c'è un pacco. Non è per i clienti. Lascialo lì, per ora.\nLui saprà aspettare. Tu no, lo so: comincia dagli Arrivi.\nTi voglio bene.\nOma Tilde",
+    "onb.cold.letterOmni": "GrayBox Inc. · Gentile sig.ra Rio,\navete 1 anno per rendere redditizio il deposito.\nPoi lo acquisiremo. Cordialmente, M. Vane"
   },
   "suggerimenti": {
-    "onb.move.card": "Trascina per muovere Nina",
+    "onb.move.card": "Trascina per muovere Kaia",
     "onb.pick.max": "Pila piena! Portala allo scaffale",
     "onb.deposit.hint": "Stai sullo scaffale: i pacchi si sistemano da soli",
     "onb.cust.first": "Porta un pacco al Bancone",
     "onb.coins.walk": "Cammina sulle monete",
     "onb.zaino.hint": "Zaino più grande, più pacchi per giro",
     "onb.combo": "Servi di fila, senza pause: ogni cliente rende di più!",
-    "onb.nonno.intro": "Quel brontolone che dorme è NONNO. L'ha fatto la nonna.",
-    "onb.nonno.what": "NONNO porta i pacchi dagli Arrivi agli scaffali.",
-    "onb.nonno.cost": "Stai sul pad: con 50 LN NONNO si sveglia.",
+    "onb.nonno.intro": "Quel brontolone che dorme è OLDO. L'ha fatto Oma Tilde.",
+    "onb.nonno.what": "OLDO porta i pacchi dagli Arrivi agli scaffali.",
+    "onb.nonno.cost": "Stai sul pad: con 50 LN OLDO si sveglia.",
     "onb.nonno.notEnough": "Mancano LN: servi qualche cliente al Bancone.",
-    "onb.nonno.ready": "50 LN in tasca! Torna dal pad di NONNO.",
-    "onb.nonno.reminder": "NONNO ti aspetta sul pad vicino agli Arrivi.",
-    "onb.nonno.hired": "NONNO: «Sveglio. Non per scelta, ma sveglio.»",
+    "onb.nonno.ready": "50 LN in tasca! Torna dal pad di OLDO.",
+    "onb.nonno.reminder": "OLDO ti aspetta sul pad vicino agli Arrivi.",
+    "onb.nonno.hired": "OLDO: «Sveglio. Non per scelta, ma sveglio.»",
     "onb.nonno.working": "Gli scaffali li riempie lui. Tu pensa ai clienti.",
-    "onb.nonno.bark": "NONNO: «Bzz. Di nuovo al lavoro. Contenta, Ada?»",
-    "onb.viktor.call1": "Busta OmniFreight sulla Cassaforte: prima rata entro il Giorno 24.",
-    "onb.viktor.call2": "«Non ci deluda, sig.ra Vela. Cordialmente, V. Sale»",
+    "onb.nonno.bark": "OLDO: «Bzz. Di nuovo al lavoro. Contenta, Tilde?»",
+    "onb.viktor.call1": "Busta GrayBox sulla Cassaforte: prima rata entro il Giorno 24.",
+    "onb.viktor.call2": "«Non ci deluda, sig.ra Rio. Cordialmente, M. Vane»",
     "onb.debt.pedaggioHint": "Salti la rata? Quelli si prendono il 15% di ogni moneta. Occhio.",
     "onb.wall.goal": "Prossimo obiettivo: abbatti il muro",
     "onb.zaino.notEnough": "Per lo Zaino servono 40 LN. Ancora qualche cliente!",
     "onb.pads.new": "Pad nuovi! Scarpe per correre, Insegna per clienti più ricchi.",
-    "onb.cassa.tip": "Sulla Cassa c'è una mancia di Nonna Ada: 30 LN. Prendila.",
-    "onb.debt.adaExplain": "La rata si versa qui, alla Cassaforte. Entro il Giorno 24, Nina."
+    "onb.cassa.tip": "Passa sulla Cassa: c'è una mancia di 30 LN per te.",
+    "onb.debt.adaExplain": "La rata si versa qui, alla Cassaforte. Entro il Giorno 24, Kaia.",
+    "onb.debt.milestone1": "Un quarto della rata! Ecco il timbro: siamo sulla buona strada.",
+    "onb.debt.milestone2": "Metà rata versata. Il quartiere ci ha notati: +1 Reputazione.",
+    "onb.debt.milestone3": "Tre quarti! Ti lascio una mia foto, per farti coraggio."
   },
   "rinviati_cap2": {
     "onb.civetta.msg1": "Conoscevo tua nonna. Il pacco sul bancone? Non aprirlo. 🦉",
     "onb.civetta.reply": "Chi sei?",
-    "onb.civetta.msg2": "Un vecchio socio. Torna al lavoro. 🦉",
-    "onb.orders.special": "Mamma Rosa ha un ordine speciale",
+    "onb.civetta.msg2": "Una vecchia socia. Torna al lavoro. 🦉",
+    "onb.orders.special": "Auntie Lulu ha un ordine speciale",
     "onb.flotta.hint": "Qui vedi i robot. I pad si comprano a terra"
   }
 }

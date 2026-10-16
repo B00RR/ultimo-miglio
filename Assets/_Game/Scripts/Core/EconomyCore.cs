@@ -16,6 +16,7 @@ namespace UltimoMiglio.Core
         public double DebtPaid;          // LN versed on current tranche (60%)
         public double ChapterEarnedActive, ChapterEarnedOffline;
         public int Zaino, Scarpe, Insegna, NonnoLevel = -1; // -1 = not hired
+        public double SpentLn;           // #121: LN spese in totale nei pad (esclusi i versamenti alla Cassaforte)
         public double[] PadPaid = new double[5]; // installment progress per UpgradeKind (saved)
         public double Combo = 1.0; public double LastServeTime = -999;
         public double ActiveSec;         // active (foreground) seconds this chapter
@@ -41,9 +42,20 @@ namespace UltimoMiglio.Core
         /// <summary>#103: ricompensa intermedia (kind = "parcel" | "debt" | "cassa_tip", index soglia, LN accreditati). Hook per coriandoli/timbro/decor/riga di Mamma Rosa.</summary>
         public event Action<string, int, double> RewardGranted;
 
+        /// <summary>#110: sosta del pad aperta. Il costruttore la apre sul livello già in corso (anche da salvataggio).
+        /// Si chiude all'acquisto: gli altri tick della stessa sosta non partono sul livello successivo.</summary>
+        readonly bool[] _padOpen = new bool[5];
+
         public EconomyCore(EconomyConfig cfg, EconomyState state = null) { Cfg = cfg ?? throw new ArgumentNullException(nameof(cfg)); S = state ?? new EconomyState();
             if (S.ProrogaTokens < 0) S.ProrogaTokens = Math.Min(Cfg.ProrogaTokensAtActStart, Cfg.ProrogaTokensMax); // cap 1 = start of Act I
             if (S.DueActiveSec < 0) S.DueActiveSec = Cfg.WindowActiveMin * 60;
+            for (int i = 0; i < _padOpen.Length; i++) _padOpen[i] = true;
+        }
+
+        /// <summary>#110: Nina è entrata di nuovo sul pad (dopo essere uscita). Riattiva il pagamento del livello corrente.</summary>
+        public void BeginPadStay(UpgradeKind k)
+        {
+            int i = (int)k; if (i >= 0 && i < _padOpen.Length) _padOpen[i] = true;
         }
 
         void Emit(string type, string fields) => OnEvent?.Invoke(type, fields);
@@ -178,7 +190,7 @@ namespace UltimoMiglio.Core
         {
             switch (k)
             {
-                case UpgradeKind.Zaino: return S.Zaino + 1 < Cfg.ZainoCost.Length ? Cfg.ZainoCost[S.Zaino + 1] : double.PositiveInfinity;
+                case UpgradeKind.Zaino: return S.Zaino < Cfg.ZainoMaxLevel && S.Zaino + 1 < Cfg.ZainoCost.Length ? Cfg.ZainoCost[S.Zaino + 1] : double.PositiveInfinity;
                 case UpgradeKind.Scarpe: return S.Scarpe + 1 < Cfg.ScarpeCost.Length ? Cfg.ScarpeCost[S.Scarpe + 1] : double.PositiveInfinity;
                 case UpgradeKind.Insegna: return S.Insegna + 1 < Cfg.InsegnaCost.Length ? Cfg.InsegnaCost[S.Insegna + 1] : double.PositiveInfinity;
                 case UpgradeKind.NonnoHire: return S.NonnoLevel >= 0 ? double.PositiveInfinity : Cfg.NonnoHireCost;
@@ -187,20 +199,29 @@ namespace UltimoMiglio.Core
         }
         public double PadFill(UpgradeKind k) { double c = Cost(k); return double.IsInfinity(c) ? 1 : S.PadPaid[(int)k] / c; }
 
+        /// <summary>#110: LN ancora da pagare sul livello corrente. Infinito se il pad è al massimo (niente prezzo).</summary>
+        public double PrezzoResiduo(UpgradeKind k)
+        {
+            double c = Cost(k); if (double.IsInfinity(c)) return double.PositiveInfinity;
+            return Math.Max(0, c - S.PadPaid[(int)k]);
+        }
+
         /// <summary>One 0.1 s pad tick. Accelerating curve: pays cost*tickFraction scaled by dwell so the pad fills in ≤PadFillMaxSec.
-        /// Returns true when the upgrade completes.</summary>
+        /// Returns true when the upgrade completes. #110: dopo l'acquisto la sosta si chiude — il livello successivo
+        /// non viene addebitato finché non si richiama BeginPadStay (Nina esce e rientra).</summary>
         public bool PadTick(UpgradeKind k, double dwellSec)
         {
+            int i = (int)k; if (i < 0 || i >= _padOpen.Length || !_padOpen[i]) return false;
             double cost = Cost(k); if (double.IsInfinity(cost) || S.Wallet <= 0) return false;
-            int i = (int)k; double remaining = cost - S.PadPaid[i];
+            double remaining = cost - S.PadPaid[i];
             // accelerating: rate grows linearly with dwell; integral over PadFillMaxSec = full cost
             double T = Cfg.PadFillMaxSec, dt = Cfg.ZoneTickSec;
             double frac = Math.Max(dt / T, (2 * dwellSec * dt) / (T * T));
             double pay = Math.Min(Math.Min(remaining, S.Wallet), Math.Max(1, Math.Ceiling(cost * frac)));
-            S.Wallet -= pay; S.PadPaid[i] += pay;
+            S.Wallet -= pay; S.PadPaid[i] += pay; S.SpentLn += pay; // #121: LN spese in pad/assunzioni (log [ONB] spent)
             Emit("pad_progress", $"\"id\":\"{k}\",\"ln\":{F(pay)},\"paid\":{F(S.PadPaid[i])},\"cost\":{F(cost)}");
             if (S.PadPaid[i] + 1e-9 < cost) return false;
-            S.PadPaid[i] = 0; Apply(k);
+            S.PadPaid[i] = 0; Apply(k); _padOpen[i] = false;
             Emit("pad_done", $"\"id\":\"{k}\",\"ln\":{F(cost)}");
             return true;
         }

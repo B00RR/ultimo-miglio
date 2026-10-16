@@ -15,6 +15,8 @@ namespace UltimoMiglio.UI.Bridge
     {
         public HudController Hud;
         public PhoneController Phone;
+        [UnityEngine.Tooltip("#160: il telefono è in 'Gioco completo' (#64). Nel capitolo 1 (HUD minimo) resta spento.")]
+        public bool TelefonoAttivo = false;
         public FloatingJoystick Joystick;
         public StackCounter StackCounter;   // world-anchored above Nina
         SettingsPanel _settings; bool _settingsWired;
@@ -32,6 +34,12 @@ namespace UltimoMiglio.UI.Bridge
             var data = Resources.Load<ChapterDataAsset>("Ch1Data");
             if (data) Hud.Config = new ChapterDataHudConfig(data.Data);
             gr.Changed += Refresh;
+            if (!TelefonoAttivo)
+            {   // #160: capitolo 1 senza telefono: niente PhoneController/Phone.uxml né pulsante (TAB)
+                if (Phone) Phone.gameObject.SetActive(false);
+                Phone = null;
+                var pb = Hud.Root != null ? UnityEngine.UIElements.UQueryExtensions.Q(Hud.Root, "phone-button") : null; if (pb != null) pb.style.display = UnityEngine.UIElements.DisplayStyle.None;
+            }
             if (Phone) Hud.PhoneButtonTapped += () => Phone.OpenPhone();
             WireSettings();
             var eco = gr.Eco;

@@ -1,6 +1,6 @@
 # 10 - GESTIONALE v1.3 (Game Designer) - CHIUSO
 **v1.3 (15/10/2026), decisioni finali del Director:**
-1. **NONNO capocantiere (cap 8+):** se le stazioni restano intatte per 3 cicli, NONNO le gestisce a livello *average* con resa ridotta (mercato ×0,98, robot ×0,97).
+1. **OLDO capocantiere (cap 8+):** se le stazioni restano intatte per 3 cicli, OLDO le gestisce a livello *average* con resa ridotta (mercato ×0,98, robot ×0,97).
 2. **Nessun premio a chi non gioca il gestionale:** nei cap 1-7 il naive non è mai peggio di chi ignora; dal cap 8 chi ignora resta più lento di average.
 3. Classifiche: una Cloud Function minima per Play Integrity, **prima del lancio, non nello sprint corrente**.
 4. Solara infinita si sblocca subito dopo il finale (11).
@@ -34,7 +34,7 @@ Lo scarto scende sotto il 21% di §7 perché il naive dei cap 1-7 è stato alzat
 **Storico v1.1:**
 **v1.1 (15/10/2026), decisioni di Lorenzo:** v1 approvata; **lo scarto good/naive del ~21% resta così** (niente taratura); **nessuna rewarded sui sistemi gestionali**: la "Giornata di sole" è tolta. Lorenzo non accoglie la proposta LiveOps (§8, punto 2) di tenerla dentro il tetto dei totem. Il resto della Risposta LiveOps (Fronte settimanale a tema di stagione, contributo all'antenna co-op e al pass, nessuno spoiler prima del cap 10) è recepito.
 Riferimenti: 00_BIBBIA, 01_CORE_LOOP v3.3, 03_MONETIZZAZIONE v2, 04_UI v3, 08_RETENTION, 09_SPRINT1. Sim: `qa/econ_sim_gest.py` (copia di `econ_sim_v3.py`, che resta invariato; flag `--mgr off|naive|good`).
-Direzione di Lorenzo: profondità gestionale vera, che resti una sfida nel lungo periodo. La **Corrente è confermata**. Gli altri sistemi devono essere logistici e legati al tema: spedizioni, deposito, Solara, debito, rivalità con OmniFreight.
+Direzione di Lorenzo: profondità gestionale vera, che resti una sfida nel lungo periodo. La **Corrente è confermata**. Gli altri sistemi devono essere logistici e legati al tema: spedizioni, deposito, Solara, debito, rivalità con GrayBox.
 **Vincolo di sempre:** controllo diretto. Ogni decisione si prende **camminando** fino a una stazione fisica: quadro elettrico, colonnine, bacheca contratti, mappa dei quartieri, banco officina. Nessun menu idle. Il telefono serve solo per grafici e report.
 
 ## 1. Ricerca: cosa fanno i riferimenti
@@ -52,30 +52,30 @@ Direzione di Lorenzo: profondità gestionale vera, che resti una sfida nel lungo
 | # | Sistema | Sfida | Come si gioca (stazione fisica) | Cap | Rif. | Esito |
 |---|---|---|---|---|---|---|
 | E | **Corrente** | Comprare la rete nel momento giusto, sfruttare sole e batterie, evitare i blackout | Quadro elettrico in Magazzino, colonnine, pannelli sul tetto | 3 (base) → 9 | Factorio, SSS2037 (energia dei bot) | **CONFERMATO** |
-| 1 | **Rotte & quartieri** (furgone e droni) | Ogni giorno 4-6 quartieri di Solara chiedono volumi e tipi diversi; il furgone ha slot limitati | Mappa di Solara sul muro del Garage: Nina carica il furgone alla baia del quartiere scelto | 4 | SSS2037 (furgone/drone), Transport Fever, Big Ambitions | **RACCOMANDATO** |
+| 1 | **Rotte & quartieri** (furgone e droni) | Ogni giorno 4-6 quartieri di Solara chiedono volumi e tipi diversi; il furgone ha slot limitati | Mappa di Solara sul muro del Garage: Kaia carica il furgone alla baia del quartiere scelto | 4 | SSS2037 (furgone/drone), Transport Fever, Big Ambitions | **RACCOMANDATO** |
 | 2 | **Contratti & Reputazione** | Scegliere tra contratti sicuri e rischiosi (scadenza, fragili, refrigerati, penale), con reputazione per quartiere | Bacheca dei contratti accanto al Bancone: si prende il cartellino calpestando la zona | 2 (1 contratto) | SSS2037 (VIP), Two Point (reputazione) | **RACCOMANDATO** |
-| 3 | **Officina & usura dei robot** | I robot si consumano; meglio fermarli prima che si guastino in turno | Banco officina in Garage: Nina porta il robot (lo "guida" camminando) o porta i ricambi a terra | 5 | SSS2037 (riparazioni), Transport Fever | **RACCOMANDATO** (ricambi in LN, **mai Bulloni**) |
-| 4 | **Fronte OmniFreight** (quote per quartiere) | Viktor attacca un quartiere a settimana (prezzi bassi, manifesti); bisogna difenderlo o lasciarlo andare | Su un quartiere attaccato: consegne lampo + attacchinaggio con Samir alla mappa | 7 | SSS2037 (QuickBox, poaching) | **RACCOMANDATO**: è il cuore narrativo |
+| 3 | **Officina & usura dei robot** | I robot si consumano; meglio fermarli prima che si guastino in turno | Banco officina in Garage: Kaia porta il robot (lo "guida" camminando) o porta i ricambi a terra | 5 | SSS2037 (riparazioni), Transport Fever | **RACCOMANDATO** (ricambi in LN, **mai Bulloni**) |
+| 4 | **Fronte GrayBox** (quote per quartiere) | Maxim attacca un quartiere a settimana (prezzi bassi, manifesti); bisogna difenderlo o lasciarlo andare | Su un quartiere attaccato: consegne lampo + attacchinaggio con Kenzo alla mappa | 7 | SSS2037 (QuickBox, poaching) | **RACCOMANDATO**: è il cuore narrativo |
 | 5 | Dogana & contrabbando al Molo Basso | Rischio di ispezione contro valore | Esiste già: notte, Calore, Gettoni (01 §8) | 6 | SSS2037 (mercato nero) | Scartato come sistema nuovo: c'è già, lo si collega ai contratti |
 | 6 | Materiale d'imballo (scatole, nastro, ghiaccio) | Scorte da riordinare | Pallet fornitore agli Arrivi | - | Supermarket Sim | Scartato: è un'altra corsa ai rifornimenti senza scelte vere. Il ghiaccio vive dentro i contratti refrigerati |
-| 7 | Layout & smistamento del magazzino | Posizionare gli scaffali | Pad di spostamento | - | shapez, Supermarket Sim | Rimandato: a mobile, con TICO dal cap 4, è costoso da produrre; resta come eventuale post-game |
-| 8 | Prezzi dinamici | Tariffa per quartiere e ora | Cartello prezzi al Bancone | - | Supermarket Sim, Big Ambitions | Scartato: entra in conflitto con la domanda > capacità (01 §1). La tariffa la gioca OmniFreight (#4) |
+| 7 | Layout & smistamento del magazzino | Posizionare gli scaffali | Pad di spostamento | - | shapez, Supermarket Sim | Rimandato: a mobile, con TIKTAK dal cap 4, è costoso da produrre; resta come eventuale post-game |
+| 8 | Prezzi dinamici | Tariffa per quartiere e ora | Cartello prezzi al Bancone | - | Supermarket Sim, Big Ambitions | Scartato: entra in conflitto con la domanda > capacità (01 §1). La tariffa la gioca GrayBox (#4) |
 | 9 | Assicurazione / reclami e resi / meteo e traffico | Varianza | - | - | Big Ambitions | Non come sistemi a sé: il meteo guida solare (E) e rotte (1); reclami e resi = penale del contratto (2); l'assicurazione è una clausola del contratto |
 | 10 | Costi fissi (affitto Garage, ricambi) | Pressione sul margine | Bolletta di fine giornata | 5 | Big Ambitions | Incluso come **voce della bolletta** (§4), non come sistema |
 
-**Perché questi 4 + Corrente:** coprono i tre livelli di una ditta di consegne: dentro il deposito (Corrente, Officina), fuori (Rotte), mercato e trama (Contratti, OmniFreight). Ognuno ha una **scelta con un costo-opportunità**, non solo una manutenzione. Tutti usano spazi già previsti (Magazzino, Garage, tetto, Bancone).
+**Perché questi 4 + Corrente:** coprono i tre livelli di una ditta di consegne: dentro il deposito (Corrente, Officina), fuori (Rotte), mercato e trama (Contratti, GrayBox). Ognuno ha una **scelta con un costo-opportunità**, non solo una manutenzione. Tutti usano spazi già previsti (Magazzino, Garage, tetto, Bancone).
 
 ## 3. Design dei sistemi raccomandati
 ### E. Corrente (cap 3 → 9)
 - **Produzione:**
   - *Rete* con prezzo variabile su 3 fasce: notte 0,5×, giorno 1×, picco serale 2×. Il ciclo di 7 min contiene tutte e 3 le fasce;
-  - *Pannelli solari* sui tetti in terracotta: rendono col sole, a metà con le nuvole, zero di notte. Il meteo del giorno è annunciato da Mamma Rosa (cielo nel diorama);
+  - *Pannelli solari* sui tetti in terracotta: rendono col sole, a metà con le nuvole, zero di notte. Il meteo del giorno è annunciato da Auntie Lulu (cielo nel diorama);
   - *Batterie* nel locale tecnico (cap 6): si caricano a prezzo basso o dal surplus solare e si usano nel picco.
-- **Consumi:** robot in ricarica (la voce principale), nastri di TICO, luci (notte), frigo dei contratti refrigerati (cap 8), lanterne del Retrobottega.
+- **Consumi:** robot in ricarica (la voce principale), nastri di TIKTAK, luci (notte), frigo dei contratti refrigerati (cap 8), lanterne del Retrobottega.
 - **Colonnine fisiche:** i robot hanno una batteria (icona sopra la testa). Sotto il 20% vanno da soli alla colonnina: è tempo morto, e se la colonnina è occupata fanno la coda. Più colonnine (pad) e colonnine rapide (costano di più in picco) sono la leva.
-- **Fasce di prezzo (v1.2):** il **picco 2× cade a metà del giorno-sera** (min 3:30-4:30 del ciclo di 7 min), **non all'inizio della notte**. Notte 0,5×. Il blackout più probabile arriva quindi mentre Nina è in Magazzino, non durante lo stealth.
-- **Blackout e priorità:** se il consumo supera la potenza contrattuale, salta il quadro. Nina corre al quadro elettrico e riarma **camminandoci sopra** (2 s); se non ci va, **il quadro si riarma da solo dopo 45 s** (v1.2). Al quadro ci sono **3 interruttori a terra** (Robot / Nastri / Frigo-Luci): passandoci sopra se ne cambia la priorità, quindi cosa si spegne per primo. **Gli interruttori arrivano al cap 8 insieme al frigo** (v1.2). Dal cap 9 c'è l'interruttore "Notte su batteria" e i blackout diventano più frequenti (meteo, sabotaggi).
-- **Blackout e notte (v1.2):** un blackout **non aiuta lo stealth**. Le ronde hanno torce e i coni di visione non dipendono dalla luce. Se è Nina a causare il blackout (sovraccarico mentre è nel Retrobottega), **Calore +1**.
+- **Fasce di prezzo (v1.2):** il **picco 2× cade a metà del giorno-sera** (min 3:30-4:30 del ciclo di 7 min), **non all'inizio della notte**. Notte 0,5×. Il blackout più probabile arriva quindi mentre Kaia è in Magazzino, non durante lo stealth.
+- **Blackout e priorità:** se il consumo supera la potenza contrattuale, salta il quadro. Kaia corre al quadro elettrico e riarma **camminandoci sopra** (2 s); se non ci va, **il quadro si riarma da solo dopo 45 s** (v1.2). Al quadro ci sono **3 interruttori a terra** (Robot / Nastri / Frigo-Luci): passandoci sopra se ne cambia la priorità, quindi cosa si spegne per primo. **Gli interruttori arrivano al cap 8 insieme al frigo** (v1.2). Dal cap 9 c'è l'interruttore "Notte su batteria" e i blackout diventano più frequenti (meteo, sabotaggi).
+- **Blackout e notte (v1.2):** un blackout **non aiuta lo stealth**. Le ronde hanno torce e i coni di visione non dipendono dalla luce. Se è Kaia a causare il blackout (sovraccarico mentre è nel Retrobottega), **Calore +1**.
 - **Regole del frigo (v1.2):**
   - un contratto refrigerato tiene la catena del freddo per **90 s senza corrente**; oltre, il pacco è "caldo";
   - **penale = 25% del valore del contratto + Reputazione −1** nel quartiere;
@@ -85,47 +85,47 @@ Direzione di Lorenzo: profondità gestionale vera, che resti una sfida nel lungo
 
 ### 1. Rotte & quartieri (cap 4)
 - Ogni giorno la **mappa di Solara** in Garage mostra 4-6 quartieri (Borgo Gradoni, Molo Basso, Terrazze Alte, Faro...) con domanda, tipo di pacco e meteo/traffico (scalinate, vento sul Faro).
-- Il furgone ha N slot. Nina carica i pacchi alla **baia del quartiere scelto**; i droni di PIPPA coprono i quartieri ripidi. Un giro pieno nel quartiere giusto vale +15-25%, uno mezzo vuoto o nel traffico ci perde.
-- Nessuna guida: è una scelta, quindi le corse di Samir restano separate.
+- Il furgone ha N slot. Kaia carica i pacchi alla **baia del quartiere scelto**; i droni di FIZZ coprono i quartieri ripidi. Un giro pieno nel quartiere giusto vale +15-25%, uno mezzo vuoto o nel traffico ci perde.
+- Nessuna guida: è una scelta, quindi le corse di Kenzo restano separate.
 
 ### 2. Contratti & Reputazione (cap 2 → 12)
-- **Bacheca** con 3 cartellini al giorno: *sicuro* (valore basso), *urgente* (scadenza in cicli), *fragile* (niente corsa, pila max 4), *refrigerato* (cap 8, frigo acceso = corrente), *notturno* (collegato alla Civetta).
+- **Bacheca** con 3 cartellini al giorno: *sicuro* (valore basso), *urgente* (scadenza in cicli), *fragile* (niente corsa, pila max 4), *refrigerato* (cap 8, frigo acceso = corrente), *notturno* (collegato a Madame Moth).
 - Consegna in tempo = bonus e Reputazione del quartiere (+domanda e VIP). In ritardo = penale (reclamo) e Reputazione giù. **Mai più di 2 attivi** al cap 2-5, 3 dopo.
-- Il cap 2 ne introduce **uno solo, sicuro, guidato da Mamma Rosa** (sostituisce l'ordine speciale).
+- Il cap 2 ne introduce **uno solo, sicuro, guidato da Auntie Lulu** (sostituisce l'ordine speciale).
 
 ### 3. Officina & usura (cap 5)
 - Ogni robot ha un'**usura** 0-100% (barra sopra la testa, colore). Sopra il 70% rende -10%; al 100% **guasto in turno** (fumo, si ferma).
-- Banco officina in Garage. **Manutenzione programmata:** Nina passa sopra il robot e "Mandalo in officina", poi resta fermo 1 ciclo / 2 se è guasto. Ricambi in LN dal pallet ricambi, **mai in Bulloni né acquistabili**.
+- Banco officina in Garage. **Manutenzione programmata:** Kaia passa sopra il robot e "Mandalo in officina", poi resta fermo 1 ciclo / 2 se è guasto. Ricambi in LN dal pallet ricambi, **mai in Bulloni né acquistabili**.
 - **I timer dell'officina NON si accelerano con i Bulloni** (v1.2): il fermo è la leva economica del sistema.
 - **Auto-riparazione (v1.2):** un robot guasto non resta fermo per sempre. Dopo ~1 ciclo (7 min attivi) si rimette in piedi da solo **al 50% di usura**, rende il 70% finché non passa in officina e costa una piccola fattura in LN (la metà della manutenzione), che compare nella bolletta. Ignorare l'officina costa, ma non blocca mai.
 - I progetti notturni (Gettoni guadagnati **di notte**, 01 §8) danno componenti a usura lenta. **I Gettoni del pass premium non possono comprarli** (v1.2): sono marcati "Gettoni del Libretto", spendibili solo in cosmetici e pezzi decorativi.
 
-### 4. Fronte OmniFreight (cap 7 → 14)
-- Ogni settimana Viktor "attacca" un quartiere: manifesti teal, prezzi bassi, domanda di quel quartiere -40%.
-- Difesa (scelta, non obbligo): contratti in quel quartiere + attacchinaggio (Nina porta i manifesti di Vela & Figli ai 3 muri del quartiere al rientro dal furgone). Quartiere difeso = quota recuperata + Reputazione; ignorato = perso per la settimana.
+### 4. Fronte GrayBox (cap 7 → 14)
+- Ogni settimana Maxim "attacca" un quartiere: manifesti teal, prezzi bassi, domanda di quel quartiere -40%.
+- Difesa (scelta, non obbligo): contratti in quel quartiere + attacchinaggio (Kaia porta i manifesti del Sunn Depot ai 3 muri del quartiere al rientro dal furgone). Quartiere difeso = quota recuperata + Reputazione; ignorato = perso per la settimana.
 - È il motore narrativo dell'Atto II-III: i quartieri difesi sbloccano gli alleati del cap 11 (evento cooperativo).
 
 ## 4. Leggibilità
 - **Bolletta di fine giornata** (toast di 3 righe sulla Cassaforte, report completo nell'app *Conti* del telefono): Incassi · Corrente (rete/solare/batteria) · Ricambi · Affitto Garage · Penali/bonus contratti = Netto. Con il confronto con ieri e 1 consiglio ("Ricarica di notte: -18%").
 - **Indicatori sopra i robot:** anello batteria (verde/giallo/rosso), chiave inglese per l'usura >70%, fulmine per "in coda alla colonnina". Massimo 1 icona per volta, priorità guasto > batteria > coda.
 - **Grafico dei consumi** (app *Rete* del telefono, sola lettura): curva produzione/consumo sulle 3 fasce di prezzo, blackout segnati. In gioco: lancetta sul quadro elettrico (verde/rosso).
-- Mappa dei quartieri: colore = Reputazione, bandierina teal = attacco OmniFreight.
+- Mappa dei quartieri: colore = Reputazione, bandierina teal = attacco GrayBox.
 - **Quartieri 5 e 6 (dal cap 10):**
   - **Rione Lanterne:** botteghe, lanterne e mercato serale; domanda alta di sera, pacchi piccoli e numerosi. Mappa: rosa `#C9719E`, quadretti, icona lanterna.
-  - **Colle delle Antenne:** quartiere alto di antenne e uffici, **roccaforte OmniFreight** (attaccato di default, quota iniziale bassa); contratti d'ufficio a scadenza stretta. Mappa: azzurro `#7FB8E0`, righe orizzontali, icona antenna.
+  - **Colle delle Antenne:** quartiere alto di antenne e uffici, **roccaforte GrayBox** (attaccato di default, quota iniziale bassa); contratti d'ufficio a scadenza stretta. Mappa: azzurro `#7FB8E0`, righe orizzontali, icona antenna.
   - Colore, motivo e icona insieme, così la mappa resta leggibile anche per i daltonici.
 
 ## 5. Curva di introduzione (cap 1-15)
 | Cap | Novità gestionali | Nota |
 |---|---|---|
 | 1 | **Nessuna** | Slice Sprint 1 invariata |
-| 2 | 1 contratto guidato (Mamma Rosa) | Solo bacheca |
-| 3 | Corrente base: 1 colonnina, anello batteria su NONNO/PIPPA, bolletta | Solo rete, prezzo fisso |
-| 4 | Rotte & quartieri (furgone, 4 quartieri); fasce di prezzo della rete | Con TICO |
+| 2 | 1 contratto guidato (Auntie Lulu) | Solo bacheca |
+| 3 | Corrente base: 1 colonnina, anello batteria su OLDO/FIZZ, bolletta | Solo rete, prezzo fisso |
+| 4 | Rotte & quartieri (furgone, 4 quartieri); fasce di prezzo della rete | Con TIKTAK |
 | 5 | Officina & usura; pannelli solari; affitto Garage | |
 | 6 | Batterie; luci notturne; contratti notturni | Con la notte |
-| 7 | Fronte OmniFreight | Guerra dei prezzi (Atto II) |
-| 8 | Contratti refrigerati + frigo + **3 interruttori di priorità**; carichi pesanti | Con BRACCIO |
+| 7 | Fronte GrayBox | Guerra dei prezzi (Atto II) |
+| 8 | Contratti refrigerati + frigo + **3 interruttori di priorità**; carichi pesanti | Con HUGO |
 | 9 | Blackout più frequenti, "Notte su batteria"; meteo variabile | Atto III, sabotaggi |
 | 10-12 | 6 quartieri (5° Rione Lanterne, 6° Colle delle Antenne, vedi sotto); attacchi doppi; sabotaggi al quadro (trama) | |
 | 13-15 | Tutto attivo; sfide "settimana perfetta" | Rampa del Faro: picco di consumo da gestire |
@@ -135,11 +135,11 @@ Regola: **al massimo 1 sistema nuovo per capitolo**, introdotto da un personaggi
 - I sistemi agiscono come **moltiplicatori sul reddito netto**. Chi gestisce bene guadagna; chi gestisce male perde, ma non va in blocco.
 - **No pay-to-win (03 §2):** Bulloni, rewarded e IAP non comprano corrente, ricambi, riparazioni, contratti o quote di quartiere. **I Bulloni non accelerano nessun timer gestionale** (officina, auto-riparazione, ricarica, frigo) e non toccano la Corrente (v1.2). 03 §2 elenca già i timer accelerabili (droni, spedizioni, ispezione) senza l'officina: allineato. I Gettoni del pass premium sono solo cosmetici per il gestionale. **Nessuna rewarded sui sistemi gestionali** (decisione di Lorenzo, v1.1): corrente, officina, rotte, contratti e Fronte non hanno totem né video.
 - **Cosmetici nuovi:** livree furgone, skin delle colonnine, manifesti personalizzati. Pass: missioni "consegna 3 contratti urgenti".
-- **Retention (08):** la bolletta e il "batti ieri" danno un obiettivo giornaliero; il Fronte OmniFreight è settimanale (lun-dom) con tema di stagione S1-S4; ogni quartiere difeso vale +1 all'antenna co-op e conta per le missioni del pass; fino al cap 10 nessun riferimento a ECO (Risposta LiveOps §8). Il post-game ottiene profondità (punteggio di gestione per settimana).
+- **Retention (08):** la bolletta e il "batti ieri" danno un obiettivo giornaliero; il Fronte GrayBox è settimanale (lun-dom) con tema di stagione S1-S4; ogni quartiere difeso vale +1 all'antenna co-op e conta per le missioni del pass; fino al cap 10 nessun riferimento a NULO (Risposta LiveOps §8). Il post-game ottiene profondità (punteggio di gestione per settimana).
 
 ## 7. Check di economia v1.2 (`qa/econ_sim_gest.py` + `qa/gest_model.py`, tranche v3.3)
 **Modello:** tre blocchi separati, senza doppi conteggi.
-- **Mercato** (Nina e robot): contratti cap 2, rotte cap 4, Fronte cap 7, refrigerati cap 8, 6 quartieri cap 10, attacchi doppi cap 11, settimana perfetta cap 13.
+- **Mercato** (Kaia e robot): contratti cap 2, rotte cap 4, Fronte cap 7, refrigerati cap 8, 6 quartieri cap 10, attacchi doppi cap 11, settimana perfetta cap 13.
 - **Robot** (solo la quota automatica e l'offline): ricarica cap 3, usura cap 5, blackout cap 8, sabotaggi cap 11.
 - **Bolletta** in LN: corrente cap 3, frigo cap 8, costi fissi 2% dal cap 5.
 
@@ -152,9 +152,9 @@ L'offline passa dal moltiplicatore robot. I pavimenti valgono per tutti i profil
 | naive | Ci prova ma sbaglia: penali, guasti, picco |
 | ignore | Non tocca mai una stazione: auto-riparazione, riarmo 45 s, nessun contratto |
 
-Il moltiplicatore **Nina/robot** per capitolo esce da `python3 qa/gest_model.py`. Valori al cap 15:
+Il moltiplicatore **Kaia/robot** per capitolo esce da `python3 qa/gest_model.py`. Valori al cap 15:
 
-| Profilo | Nina | Robot |
+| Profilo | Kaia | Robot |
 |---|---|---|
 | good | 1,15 | 1,10 |
 | average | 0,99 | 0,87 |
@@ -191,19 +191,19 @@ Il moltiplicatore **Nina/robot** per capitolo esce da `python3 qa/gest_model.py`
 
 ## 8. Domande per i reparti
 - **QA:** sim indipendente dei moltiplicatori (in particolare il cumulo nei cap 10-15); test "giocatore che ignora tutto" (non deve mai bloccarsi né andare in mora a eff 0,85); casi limite blackout + notte + contratto refrigerato; verifica che nessun acquisto in Bulloni tocchi Corrente/officina oltre il timer.
-- **LiveOps:** il Fronte OmniFreight settimanale va agganciato alle stagioni "Segnali di ECO"? Rewarded "Giornata di sole" sì o no (rischio percezione P2W)? KPI da tracciare: % di bollette in attivo, guasti/giorno, contratti persi, quartieri difesi; A/B sulla durata della manutenzione.
+- **LiveOps:** il Fronte GrayBox settimanale va agganciato alle stagioni "Segnali di NULO"? Rewarded "Giornata di sole" sì o no (rischio percezione P2W)? KPI da tracciare: % di bollette in attivo, guasti/giorno, contratti persi, quartieri difesi; A/B sulla durata della manutenzione.
 ### Risposta LiveOps (LiveOps & Monetizzazione, 15/10/2026)
 Skill seguite: product-analytics, analytics-tracking, ab-test-setup, churn-prevention, paywall-upgrade-cro, pricing-strategy. Tutti i numeri sono **stime da ricalibrare** in soft launch.
 
-**1) Fronte OmniFreight e stagioni "Segnali di ECO": sì, agganciarlo, ma in modo leggero.**
+**1) Fronte GrayBox e stagioni "Segnali di NULO": sì, agganciarlo, ma in modo leggero.**
 - L'attacco resta **settimanale**, dal lunedì alla domenica, e non sostituisce il Weekend del Segnale.
 - La stagione dà il **tema** dell'attacco:
   - S1: manifesti generici;
-  - S2: OmniFreight occupa il Promontorio del Faro;
+  - S2: GrayBox occupa il Promontorio del Faro;
   - S3: ronde al Molo Basso;
-  - S4: OmniFreight assalta il cantiere.
+  - S4: GrayBox assalta il cantiere.
 - Ogni quartiere difeso vale **+1 contributo al co-op mensile dell'antenna** e una missione del pass ("difendi 2 quartieri").
-- Fino al cap 10 non si nomina ECO: è solo "OmniFreight alza il tiro".
+- Fino al cap 10 non si nomina NULO: è solo "GrayBox alza il tiro".
 - **Nessuna ricompensa a pagamento** e nessun attacco più duro durante gli eventi di monetizzazione.
 - Per chi ha finito la storia (post-game), l'attacco vale sui distretti della rete aperta.
 

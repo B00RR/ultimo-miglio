@@ -3,7 +3,8 @@
    Regole canoniche; Tokens.uss applica già le stesse superfici all'HUD minimo via !important. */
 .surface-cardboard,
 .panel--cardboard {
-    background-color: #F3E3C3;
+    /* #185: il fill è il PNG con angoli trasparenti; un colore opaco qui ridisegna il quadrato. */
+    background-color: rgba(0, 0, 0, 0);
     background-image: url("project://database/Assets/_Game/UI/Textures/tex_cardboard_panel.png");
     -unity-background-scale-mode: stretch-to-fill;
     -unity-slice-left: 16px;
@@ -16,7 +17,8 @@
 }
 .surface-wood,
 .panel--wood {
-    background-color: #74503A;
+    /* #185: come il cartone, niente quadretto opaco sotto il 9-slice. */
+    background-color: rgba(0, 0, 0, 0);
     background-image: url("project://database/Assets/_Game/UI/Textures/tex_wood_panel.png");
     -unity-background-scale-mode: stretch-to-fill;
     -unity-slice-left: 16px;

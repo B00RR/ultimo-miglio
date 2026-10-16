@@ -26,7 +26,7 @@ Scopo: il QA legge dalla console del browser (build WebGL) ogni sblocco di passo
 | `end` | inizio di `freePlay` (o dopo skip) | `total=<s>` `hints=<n>` `lvl3=<n>` `ln=<LN in tasca>` `spent=<LN spesi totali>` | `[ONB] end id=freePlay n=15 t=301.0 total=301.0 hints=2 lvl3=0 ln=…` `spent=…` |
 
 Regole:
-- **Inattività** = nessun progresso verso il gate del passo (nessun movimento utile verso il bersaglio e nessun evento di gioco del passo). Il conteggio riparte da 0 a ogni progresso; ogni livello si emette **una volta** per periodo di inattività. Se l'escalation si ripete (es. promemoria NONNO ogni 20 s), si riemette `hint` con lo stesso `lvl`.
+- **Inattività** = nessun progresso verso il gate del passo (nessun movimento utile verso il bersaglio e nessun evento di gioco del passo). Il conteggio riparte da 0 a ogni progresso; ogni livello si emette **una volta** per periodo di inattività. Se l'escalation si ripete (es. promemoria OLDO ogni 20 s), si riemette `hint` con lo stesso `lvl`.
 - `kind` usa i nomi di `hintEscalation`: `lvl=1` → `ripeti` (testo ripetuto/bersaglio pulsa), `lvl=2` → `freccia` o `manoFantasma`, `lvl=3` → `camera`.
 - I passi senza escalation (`coldOpen`, `nonnoIntro`, `nonnoConfirm`, `wallPad`, `freePlay`) emettono solo `start` e `gate`.
 - Ordine garantito per passo: `start` → (`hint`/`nolnp`)* → `gate`, poi `start` del passo successivo **entro 1 s** (GATE-03).
@@ -54,7 +54,7 @@ Regole:
 ## 4. Come lo usa il QA
 - **Controlli economici (golden path, eff 1,0, toll. ±10%):**
   - `gate id=zainoPad` a t≈83: `spent=40`, `ln` residuo ≈ 1 (41 LN guadagnati − 40 di Zaino 1), quindi `ln+spent` ≈ 41;
-  - `gate id=hireNonno` a t≈130: `ln+spent` ≈ 211 (LN cumulate a 2:10; spesi Zaino 1 + NONNO 50 + Zaino 2 80 se comprato nello stesso secondo);
+  - `gate id=hireNonno` a t≈130: `ln+spent` ≈ 211 (LN cumulate a 2:10; spesi Zaino 1 + OLDO 50 + Zaino 2 80 se comprato nello stesso secondo);
   - `start id=debtCard` a t≈240: `ln+spent` ≈ 771 (prima del primo versamento tutte le LN restano nel portafoglio);
   - `gate id=debtCard`: `ln` scende al 40% del portafoglio precedente ±1 LN (versato il 60%);
   - `nolnp`: sempre `have < need`.

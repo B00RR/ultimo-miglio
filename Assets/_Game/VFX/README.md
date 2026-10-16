@@ -1,4 +1,4 @@
-# VFX & Technical Art – Sprint 1 (Capitolo 1) – Ultimo Miglio
+# VFX & Technical Art – Sprint 1 (Capitolo 1) – Bokobay
 Unity 6 + URP. Target attuale: **WebGL** (ordine di Lorenzo); Android resta supportato dai tier Base/Standard/Alto.
 **Cap. 1 = solo giorno e tramonto con lanterne, niente notte** (il preset Notte resta nel codice, inutilizzato). Camera cap. 1: ortografica size 4.5, distanza 15, pitch 35.3°, yaw 45°. **Su WebGL il post-process è spento** (dava magenta).
 Stile "Diorama Solare" (00_BIBBIA, conceptA.jpg, 02_TECH §4-5, 3d/05_3D_PIPELINE). Cartella: `Assets/_Game/VFX/`.
@@ -33,7 +33,7 @@ Stile "Diorama Solare" (00_BIBBIA, conceptA.jpg, 02_TECH §4-5, 3d/05_3D_PIPELIN
 Prefab in `Prefabs/` (da assegnare al componente `UM_FxPlayer` nella scena):
 | Prefab | Uso | Costo |
 |---|---|---|
-| `fx_package_pickup` | Nina/NONNO raccoglie un pacco: pop verso l'alto cartone/crema + 2 stelline | ~11 particelle, 0.4 s |
+| `fx_package_pickup` | Kaia/OLDO raccoglie un pacco: pop verso l'alto cartone/crema + 2 stelline | ~11 particelle, 0.4 s |
 | `fx_package_deliver` | pacco consegnato (bancone, cliente, furgone): anello giallo sole + coriandoli palette + stella | ~16 particelle, 0.7 s |
 | `fx_upgrade_complete` | pad completato: flash a terra + fontana di scintille | ~17 particelle, 0.8 s |
 | `fx_coin_flyer` | una moneta volante: mesh lira + scia corta (`M_FX_Trail`) + scintille per distanza | 34 tri + scia + ≤6 particelle |
@@ -68,14 +68,14 @@ lantern.SetOn(true, instant: false);                               // UM_Lantern
 - Volume "tramonto" opzionale: pesato solo se `UM_QualityTier.PostProcessingEnabled` (mai su WebGL).
 
 ## Palette (05_3D_PIPELINE + conceptA)
-Terracotta `#C8603A` · Giallo sole `#F2B53A` · Menta `#8FC9A8` · Limone `#F4E04D` · Teal OmniFreight `#4E7F86` · Tufo `#D9C4A0` · Pavimento `#E6D2B0` · Legno `#9A6A42` · Cartone `#C99A62` · Scuro caldo `#3B2F2A` · Arancio Nina `#E5743A` · Crema `#FFF4D6` · Cielo `#F3DDB6`.
+Terracotta `#C8603A` · Giallo sole `#F2B53A` · Menta `#8FC9A8` · Limone `#F4E04D` · Teal GrayBox `#4E7F86` · Tufo `#D9C4A0` · Pavimento `#E6D2B0` · Legno `#9A6A42` · Cartone `#C99A62` · Scuro caldo `#3B2F2A` · Arancio Kaia `#E5743A` · Crema `#FFF4D6` · Cielo `#F3DDB6`.
 Derivati VFX: Sole `#FFE6B8`; ambiente giorno `#F3DDB6`/`#E2C49C`/`#8C6A50`; notte luna `#C9A98A`, ambiente `#8C7880`/`#7C665C`/`#4A3C35`, lanterne `#FFB65C`; polvere `#B8906A`.
 Moneta: lira/gettone di Solara con faro inciso, oro `#F2B53A`, bordo `#3B2A20`. Upgrade: giallo sole `#F4C430`, nucleo/scintille limone `#F7E26B`.
 
 ## Valori chiave
 - **Sole**: `#FFE6B8`, 1.05, euler (50, -35, 0) → luce da alto-sinistra come nel concept. Nello shader luce diretta ×0.82, ambiente ×0.25 (margine in LDR).
 - **Notte**: luna 0.5, lanterne 1.7 (luce principale sui personaggi), falloff morbido `smoothstep(0, 0.6)`, peso 0.6.
-- **Fog** lineare `#F3DDB6` 45→140 m (torre OmniFreight leggibile).
+- **Fog** lineare `#F3DDB6` 45→140 m (torre GrayBox leggibile).
 - **Toon**: 3 bande, softness 0.06, tinta ombra `#9E7873` @0.55, rim crema 0.25, bordo ombra `smoothstep(0.3, 0.7)` sull'attenuazione (mantiene il PCF), outline `#3B2F2A` 0.012 m solo su `M_Char_Atlas` e `M_Props_Interactive`.
 - **Variazione pavimento/muri**: `_NoiseStrength` 0.06, `_NoiseScale` 0.35/m su `M_Diorama_Atlas` (2 ottave di value noise, solo ALU, 0 = spento).
 - **Ombra di contatto**: quad 2 tri, `#3B2F2A` alpha 0.45, unlit trasparente, niente SSAO.
@@ -85,7 +85,7 @@ Moneta: lira/gettone di Solara con faro inciso, oro `#F2B53A`, bordo `#3B2A20`. 
 ## Tier di qualità
 | | Base | Standard | Alto | **Web** |
 |---|---|---|---|---|
-| Render scale | 0.6 | 0.75 | 1.0 | 0.9 + cap devicePixelRatio ≤ 1.5 nel template (`config.devicePixelRatio = Math.min(window.devicePixelRatio, 1.5)`) |
+| Render scale | 0.6 | 0.75 | 1.0 | 0.9 + cap devicePixelRatio ≤ 1.25 nel template (`config.devicePixelRatio = Math.min(window.devicePixelRatio, 1.25)`) |
 | Ombre | no | no | soft (Low, 4 tap), 26 m, 2048, 1 cascata | soft (Low), 24 m, 1024, 1 cascata |
 | Outline | no | no | solo `_OutlineOn=1` | solo `_OutlineOn=1` |
 | Post-process | sì | sì | sì | **OFF** (opt-in `UM_QualityTier.AllowPostOnWeb`, solo dopo verifica in build) |

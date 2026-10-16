@@ -2,6 +2,7 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 using UnityEngine.UIElements;
 
 namespace UltimoMiglio.UI
@@ -100,6 +101,13 @@ namespace UltimoMiglio.UI
         sealed class Runner : MonoBehaviour { }
 
         [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.SubsystemRegistration)]
-        static void DomainReset() { ResetAll(); Revealed = null; runner = null; }
+        static void DomainReset()
+        {
+            ResetAll(); Revealed = null; runner = null;
+            // P0: lo stato statico non deve sopravvivere al cambio scena (PlayMode senza domain reload):
+            // altrimenti un id nascosto in una scena precedente (es. pad.assumiNonno) spegne l'oggetto nuovo.
+            SceneManager.sceneUnloaded -= OnSceneUnloaded; SceneManager.sceneUnloaded += OnSceneUnloaded;
+        }
+        static void OnSceneUnloaded(Scene _) => ResetAll();
     }
 }
