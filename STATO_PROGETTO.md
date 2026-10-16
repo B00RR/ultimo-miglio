@@ -207,8 +207,6 @@ Voci più recenti in alto. Formato: `AAAA-MM-GG HH:MM` (Europe/Rome) — [commit
 - Layout di riferimento: `Art/Environment/Layouts/bancone_layout.json` (+ README conversione). Licenze 3D: `docs/LICENZE_ASSET.md`.
 - Nina su main: FBX dell'Animator (1.968 facce, UV raccolte nelle celle dell'atlas), **nessuna striatura nel file**. Non toccata.
 - **Non compilato né testato in Unity** (Unity occupato): servono import, test EditMode/PlayMode e una cattura della scena rigenerata.
-- 2026-10-16 — ramo `art/2-personaggi` (3D Artist, #2): confronto personaggi vs GUIDA_VISIVA_CAP1 (Nina, NONNO, TICO, 6 clienti v02 conformi, invariati); **nuova Nonna Ada** `chr_nonna_ada_mesh.fbx` (1.518 tri, scheletro di Nina, da riggare per l'Animator); review in docs/review/2/. Non compilato: lo testa il Tech Lead.
-- 2026-10-16 — PR #85 review Concept Artist: Ada v02 (grembiule aderente, niente catenella/asta, scala 0.88 nel prefab), clienti v03-uv (rider cappello limone, 3 toni pelle; residente/rider/turista/vip solo UV, vertici invariati).
 
 ## Aggiornamento 16/10 09:30 — PR #36 riallineata a main (UI)
 - Merge di `origin/main` (HUD minimale #38, fix collisioni #63) in `ui/impostazioni-e-schede-pad`, senza rebase/force-push.
@@ -216,3 +214,4 @@ Voci più recenti in alto. Formato: `AAAA-MM-GG HH:MM` (Europe/Rome) — [commit
 - Catture anteprima 390x844 (HTML/Playwright, non Unity): `docs/ui/catture/pr36/`.
 - Deciso (Tech Lead): pannello unico `SettingsController`; `Bridge/SettingsPanel` resta (usato da `HudGameBridge`) ma senza listener `OnSettingsRequested`. Ingranaggio = toggle (QA P3, `qa/playtest_web_live_p0.md` S01). Zoom su chiave unica `cam_zoom_v3` (`DepotCameraFit.PrefZoom`).
 - Riferimento #35 (chiusa). Correlate aperte: #64, #67.
+- 2026-10-16 — PR #85 (3D Artist, Refs #2): solo clienti v03-uv in `3d/export/chr/` (rider cappello limone, 3 toni pelle; residente/rider/turista/vip, vertici invariati) + review docs/review/2. Nonna Ada tolta: la consegna l'Animator (#93).
