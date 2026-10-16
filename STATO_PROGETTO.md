@@ -1,7 +1,7 @@
 # STATO PROGETTO — Ultimo Miglio
 
 > Punto di ingresso unico per chiunque (persona o agente) lavori su questo repo. Aggiornalo **nella stessa PR** in cui completi qualcosa.
-> Ultimo aggiornamento: 2026-10-16 11:53 (Europe/Rome).
+> Ultimo aggiornamento: 2026-10-16 12:12 (Europe/Rome).
 
 ## 1. Il gioco
 - **Ultimo Miglio**: gioco mobile **Android**, **Unity 6 (6000.3) URP**.
@@ -133,6 +133,8 @@ Ogni ruolo lavora solo sulle issue con la propria etichetta `ruolo:*`, sempre co
 Voci più recenti in alto. Formato: `AAAA-MM-GG HH:MM` (Europe/Rome) — [commit] — descrizione.
 
 - 2026-10-16 12:00 — Tech Lead — [892186b](https://github.com/B00RR/ultimo-miglio/commit/892186b717449555652fbca8486655b3bba4a38f) — PR #160: nel capitolo 1 il telefono (PhoneController/Phone.uxml, pulsante TAB) è spento; si riaccende con HudGameBridge.TelefonoAttivo per 'Gioco completo' (#64).
+- 2026-10-16 12:12 — Code Reviewer — [4a1b26b](https://github.com/B00RR/ultimo-miglio/commit/4a1b26b6256d5f16153e713698f1ac4d3cfd5b72) — unita in squash la [PR #153](https://github.com/B00RR/ultimo-miglio/pull/153) (Audio: sfx combo +N e timbro del debito per la #137). Job `test` verde, asset OGG + README/licenze. Refs #136.
+- 2026-10-16 12:11 — Code Reviewer — [4e49b30](https://github.com/B00RR/ultimo-miglio/commit/4e49b30c6d5d867a12130ac42ff75c2ebf3d97eb) — unita in squash la [PR #88](https://github.com/B00RR/ultimo-miglio/pull/88) (feat(#2): clienti veri al posto delle capsule, 6 varianti riggate). Job `test` verde, diff rivisto (CustomerQueue.Variants, SliceSceneBuilder, ClientiRigTest). Closes #2.
 - 2026-10-16 12:04 — Code Reviewer — [2efd867](https://github.com/B00RR/ultimo-miglio/commit/2efd867a340f353a69f59d20b3f8094b6c6919df) — unita in squash la [PR #122](https://github.com/B00RR/ultimo-miglio/pull/122) (UI #110: il pad Zaino non prosciuga più gli LN sul livello successivo e la pillola prezzo resta visibile). Job `test` verde, diff rivisto (solo `UpgradePad.cs`). Closes #110.
 - 2026-10-16 11:58 — Code Reviewer — [e26ff47](https://github.com/B00RR/ultimo-miglio/commit/e26ff47c0d834131b83893fde30a4ae8ac3b9bca) — unita in squash la [PR #151](https://github.com/B00RR/ultimo-miglio/pull/151) (Docs UI: colori pad rimandati a GUIDA_VISIVA_CAP1 §2). Solo `.md`. Closes #150.
 - 2026-10-16 11:56 — Code Reviewer — [f89351c](https://github.com/B00RR/ultimo-miglio/commit/f89351c724caf40832299e49a1635fedc980c727) — unita in squash la [PR #126](https://github.com/B00RR/ultimo-miglio/pull/126) (VFX #81: build riallineata alla guida visiva — vince la guida). Job `test` verde. VIA Concept Artist + Producer. Closes #81.
