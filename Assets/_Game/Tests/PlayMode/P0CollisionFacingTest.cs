@@ -13,7 +13,7 @@ public class P0CollisionFacingTest
 {
     static IEnumerator Load()
     {
-        PlayerPrefs.DeleteAll();
+        PlayerPrefs.DeleteKey(UltimoMiglio.Gameplay.TutorialManager.PrefKey); PlayerPrefs.DeleteKey("um_save_v1"); PlayerPrefs.DeleteKey(UltimoMiglio.Gameplay.DepotCameraFit.PrefZoom); // solo chiavi di gioco: vol_music e vol_sfx restano (come #88)
         var save = System.IO.Path.Combine(Application.persistentDataPath, "save_v1.json");
         if (System.IO.File.Exists(save)) System.IO.File.Delete(save);
         yield return SceneManager.LoadSceneAsync("Ch1_Deposito");
