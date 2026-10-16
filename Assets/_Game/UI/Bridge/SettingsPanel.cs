@@ -31,7 +31,7 @@ namespace UltimoMiglio.UI.Bridge
             _panel.Add(Lab("Zoom", 18, true));
             var row = new VisualElement { style = { flexDirection = FlexDirection.Row, justifyContent = Justify.Center, alignItems = Align.Center, marginBottom = 18 } };
             var minus = Btn("−", () => Zoom(-1.5f)); var plus = Btn("+", () => Zoom(1.5f));
-            _zoomL = Lab("13.5", 22, true); _zoomL.style.minWidth = 80; _zoomL.style.unityTextAlign = TextAnchor.MiddleCenter; _zoomL.style.marginLeft = 12; _zoomL.style.marginRight = 12;
+            _zoomL = Lab("7.0", 22, true); _zoomL.style.minWidth = 80; _zoomL.style.unityTextAlign = TextAnchor.MiddleCenter; _zoomL.style.marginLeft = 12; _zoomL.style.marginRight = 12;
             row.Add(minus); row.Add(_zoomL); row.Add(plus); _panel.Add(row);
 
             _panel.Add(Lab("Musica", 18, true));

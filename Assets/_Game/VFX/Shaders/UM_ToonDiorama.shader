@@ -13,8 +13,10 @@ Shader "UltimoMiglio/ToonDiorama"
         [IntRange] _Bands ("Bands", Range(2,3)) = 3
         _RampSoftness ("Band Softness", Range(0.001,0.3)) = 0.06
         _RampOffset ("Terminator Offset", Range(-0.5,0.5)) = 0.0
-        _ShadowTint ("Shadow Tint (viola fresco, v2.0)", Color) = (0.55,0.50,0.72,1)
+        _ShadowTint ("Shadow Tint (#9E7873 caldo, guida §9)", Color) = (0.62,0.471,0.451,1)
         _ShadowStrength ("Shadow Strength", Range(0,1)) = 0.6
+        _ShadowCool ("Shadow Cool Hint (lieve, mai blu/viola)", Range(0,0.3)) = 0.12
+        _ShadowSoft ("Shadow Edge Softness (PCF, anti-scalettatura)", Range(0.05,0.5)) = 0.35
         [Header(Rim)]
         _RimColor ("Rim Color (Crema)", Color) = (1,0.957,0.839,1)
         _RimPower ("Rim Power", Range(0.5,8)) = 3.5
@@ -24,7 +26,11 @@ Shader "UltimoMiglio/ToonDiorama"
         _NoiseScale ("Variation Scale (1/m)", Range(0.05,2)) = 0.35
         _TileVar ("Floor Tile Variation", Range(0,0.3)) = 0
         _TileSize ("Floor Tile Size (m)", Range(0.25,4)) = 1
-        _FloorTint ("Floor Warm Tint", Color) = (1,1,1,1)
+        _FloorTint ("Floor Warm Tint / Lastra A (#F3E3C3)", Color) = (1,1,1,1)
+        _FloorTintB ("Lastra B (#E8D3AC)", Color) = (1,1,1,1)
+        _FloorTintC ("Lastra C (#E9D2A8)", Color) = (1,1,1,1)
+        _FloorBaseMix ("Floor Base Override (0=albedo, 1=lastre crema)", Range(0,1)) = 0
+        _GroutDark ("Floor Grout Darkening", Range(0,0.3)) = 0
         [Header(Profondita v2.0)]
         _HeightDark ("Height Gradient (base darker)", Range(0,0.5)) = 0.18
         _HeightRange ("Height Range (m)", Range(0.5,6)) = 2.5
@@ -53,6 +59,7 @@ Shader "UltimoMiglio/ToonDiorama"
             half4 _RimColor; half _RimPower; half _RimStrength;
             half4 _EmissionColor; half _NoiseStrength; half _NoiseScale;
             half _TileVar; half _TileSize; half4 _FloorTint;
+            half4 _FloorTintB; half4 _FloorTintC; half _FloorBaseMix; half _GroutDark; half _ShadowCool; half _ShadowSoft;
             half _HeightDark; half _HeightRange; half _WallAO; half _WallAOHeight; half _TopLight;
             half4 _OutlineColor; half _OutlineWidth; half _OutlineOn;
         CBUFFER_END
@@ -149,17 +156,27 @@ Shader "UltimoMiglio/ToonDiorama"
                 half3 n = normalize(i.normalWS);
                 half up = saturate(n.y);
                 half isFloor = step(0.9h, up) * (1.0h - step(0.25h, (half)i.positionWS.y));
-                if (_TileVar > 0.001h && isFloor > 0.5h)
+                half2 fw = (half2)fwidth(i.positionWS.xz / _TileSize) * 1.5h + 0.02h; // derivate fuori dal branch; fuga stabile in pixel
+                if ((_TileVar > 0.001h || _FloorBaseMix > 0.001h) && isFloor > 0.5h)
                 {
-                    float2 cell = floor(i.positionWS.xz / _TileSize);
-                    albedo.rgb *= lerp(1.0h.xxx, _FloorTint.rgb, 1.0h) * (1.0h + ((half)Hash21(cell) - 0.5h) * 2.0h * _TileVar);
+                    // v2.1 (#48): lastre piccole (~0,25 m) crema/tufo: 3 toni della guida per cella + fuga sottile. Solo ALU.
+                    float2 tuv = i.positionWS.xz / _TileSize;
+                    float2 cell = floor(tuv);
+                    half h = (half)Hash21(cell);
+                    half3 slab = h < 0.5h ? lerp(_FloorTint.rgb, _FloorTintB.rgb, h * 2.0h) : lerp(_FloorTintB.rgb, _FloorTintC.rgb, h * 2.0h - 1.0h);
+                    albedo.rgb = lerp(albedo.rgb * _FloorTint.rgb, slab, _FloorBaseMix);
+                    albedo.rgb *= 1.0h + ((half)Hash21(cell + 7.1) - 0.5h) * 2.0h * _TileVar;
+                    half2 e = (half2)abs(frac(tuv) - 0.5);                       // 0 al centro, 0.5 sul bordo
+                    half grout = max(smoothstep(0.5h - fw.x, 0.5h, e.x), smoothstep(0.5h - fw.y, 0.5h, e.y));
+                    albedo.rgb *= 1.0h - grout * _GroutDark;
                 }
                 float4 sc = TransformWorldToShadowCoord(i.positionWS);
                 Light L = GetMainLight(sc);
                 half ramp = Ramp(dot(n, L.direction));
-                half shadow = smoothstep(0.3h, 0.7h, L.shadowAttenuation); // toon edge, but keeps PCF filtering (no stair-stepping)
+                half shadow = smoothstep(0.5h - _ShadowSoft, 0.5h + _ShadowSoft, L.shadowAttenuation); // toon edge, but keeps PCF filtering (no stair-stepping)
                 half lit = min(ramp, shadow);
-                half3 shadowCol = lerp(1.0h.xxx, _ShadowTint.rgb, _ShadowStrength);
+                half3 sTint = lerp(_ShadowTint.rgb, _ShadowTint.rgb * half3(0.94h, 0.98h, 1.06h), _ShadowCool); // tinta lieve piu fresca, resta calda
+                half3 shadowCol = lerp(1.0h.xxx, sTint, _ShadowStrength);
                 half3 direct = lerp(shadowCol, L.color, lit); // v2.0: ombre colorate (tinta fredda) contro luce calda
                 half3 ambient = SAMPLE_GI(i.uvLM, i.sh, n) * 0.3h;
                 half3 col = albedo.rgb * (direct * 0.85h + ambient);
