@@ -7,7 +7,7 @@ namespace UltimoMiglio.UI
 {
     /// <summary>
     /// Pannello Impostazioni (ingranaggio HUD): zoom con anteprima live, slider Musica/Suoni, Salva/Indietro.
-    /// PlayerPrefs: cam_zoom, vol_music, vol_sfx (0–1).
+    /// PlayerPrefs: cam_zoom_v3 (DepotCameraFit.PrefZoom), vol_music, vol_sfx (0–1).
     /// Chiama per nome (reflection, UI non referenzia Gameplay):
     ///   DepotCameraFit.SetOrthoSize(float) / GetOrthoSize()
     ///   AudioManager.SetMusicVolume(float) / SetSfxVolume(float)
@@ -16,7 +16,7 @@ namespace UltimoMiglio.UI
     [RequireComponent(typeof(UIDocument))]
     public class SettingsController : MonoBehaviour
     {
-        public const string PrefCamZoom = "cam_zoom";
+        public const string PrefCamZoom = "cam_zoom_v3"; // = DepotCameraFit.PrefZoom (asmdef UI non referenzia Gameplay)
         public const string PrefVolMusic = "vol_music";
         public const string PrefVolSfx = "vol_sfx";
 
@@ -41,7 +41,7 @@ namespace UltimoMiglio.UI
         void OnEnable() { bound = false; TryBind(); ApplySavedOnBoot(); }
         void OnDisable()
         {
-            if (hud != null) hud.SettingsButtonTapped -= Open;
+            if (hud != null) hud.SettingsButtonTapped -= Toggle;
         }
 
         void ApplySavedOnBoot()
@@ -94,9 +94,10 @@ namespace UltimoMiglio.UI
                 hud = FindFirstObjectByType<HudController>();
                 gear = hud != null && hud.Root != null ? hud.Root.Q("settings-button") : null;
             }
-            gear?.RegisterCallback<ClickEvent>(_ => Open());
+            // Un solo listener per tap (evita apri+chiudi nello stesso click): evento HUD se c'è, altrimenti click diretto.
             if (hud == null) hud = FindFirstObjectByType<HudController>();
-            if (hud != null) hud.SettingsButtonTapped += Open;
+            if (hud != null) { hud.SettingsButtonTapped -= Toggle; hud.SettingsButtonTapped += Toggle; }
+            else gear?.RegisterCallback<ClickEvent>(_ => Toggle());
 
             SetOpen(false);
             RefreshZoomLabel();
@@ -127,6 +128,9 @@ namespace UltimoMiglio.UI
             SetOpen(true);
             Opened?.Invoke();
         }
+
+        /// <summary>Tap sull'ingranaggio: apre, o se già aperto chiude ripristinando (come Indietro). QA P3 (qa/playtest_web_live_p0.md, S01).</summary>
+        public void Toggle() { if (IsOpen) CancelAndClose(); else Open(); }
 
         public void Close() { SetOpen(false); Closed?.Invoke(); }
 
