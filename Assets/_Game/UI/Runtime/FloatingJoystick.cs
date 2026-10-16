@@ -7,25 +7,31 @@ using ETouch = UnityEngine.InputSystem.EnhancedTouch.Touch;
 namespace UltimoMiglio.UI
 {
     /// <summary>
-    /// Full-screen floating joystick (04_UI §1.1, 02_TECH §2b). EnhancedTouch, first touchId wins, dp units,
-    /// dead zone 8 dp, radius 56 dp, dragged base, 150 ms fade. Ignores touches on HUD overlays, on the open
-    /// phone and on the 24 dp side gesture strips. Output: <see cref="Value"/> (screen space, normalized) and
-    /// <see cref="WorldDirection"/> (rotated by camera yaw, default 45°). Visuals are drawn in the HUD document.
-    /// Desktop/WebGL: mouse click-drag uses the same floating-stick path; WASD/arrows feed the same Value (no visuals).
+    /// Joystick flottante a tutto schermo (04_UI §1.1, 02_TECH §2b). EnhancedTouch, vince il primo touchId, unità dp,
+    /// zona morta 8 dp, raggio 56 dp, base trascinata, dissolvenza 150 ms. Ignora i tocchi sugli overlay dell'HUD, sul
+    /// telefono aperto e sulle strisce laterali dei gesti da 24 dp. Uscita: <see cref="Value"/> (spazio schermo, normalizzato) e
+    /// <see cref="WorldDirection"/> (ruotato dallo yaw della telecamera, predefinito 45°). La grafica è disegnata nel documento dell'HUD.
+    /// Desktop/WebGL: clic e trascinamento del mouse usano lo stesso percorso dello stick flottante; WASD/frecce alimentano lo stesso Value (senza grafica).
+    /// #205: con due dita sullo schermo (pinch della telecamera) lo stick resta sospeso finché tutte le dita non vengono sollevate, così il pinch
+    /// non muove mai Nina. WorldDirection segue lo yaw attuale della telecamera (rotazione del giocatore −45°..+45°): "su" è sempre il su dello schermo.
     /// </summary>
     public class FloatingJoystick : MonoBehaviour
     {
         [SerializeField] HudController hud;
         [SerializeField] PhoneController phone;
-        [SerializeField] Transform cameraTransform;           // yaw source; if null uses fixedYaw
+        [SerializeField] Transform cameraTransform;           // sorgente dello yaw; se null usa fixedYaw
         [SerializeField] float fixedYaw = 45f;
         [SerializeField] float deadZoneDp = 8f, radiusDp = 56f, edgeExclusionDp = 24f, fadeSeconds = 0.15f;
-        [SerializeField, Range(1f, 2f)] float responseExponent = 1.25f; // "slightly exponential"
+        [SerializeField, Range(1f, 2f)] float responseExponent = 1.25f; // "leggermente esponenziale"
 
-        public event Action<Vector2> Moved;   // per frame while active
+        public event Action<Vector2> Moved;   // a ogni frame mentre è attivo
         public event Action Released;
 
         public Vector2 Value { get; private set; }
+        /// <summary>#205: true dal momento in cui si appoggia un secondo dito finché tutte le dita non vengono sollevate (pinch).</summary>
+        public bool Suspended { get; private set; }
+        /// <summary>Solo per i test: se impostato, sostituisce l'input da tocco/mouse/tastiera (nessuna allocazione: struct nullable).</summary>
+        public Vector2? TestValue;
         public bool IsActive => fingerId != -1 || KeyboardActive;
         public Vector3 WorldDirection
         {
@@ -44,8 +50,8 @@ namespace UltimoMiglio.UI
         void OnEnable()
         {
             EnhancedTouchSupport.Enable();
-            // Desktop/WebGL: mouse click-drag and WASD/arrows are read directly in Update (no TouchSimulation,
-            // which would double-count browser-emulated mouse events on touch devices).
+            // Desktop/WebGL: clic e trascinamento del mouse e WASD/frecce sono letti direttamente in Update (niente TouchSimulation,
+            // che conterebbe due volte gli eventi mouse emulati dal browser sui dispositivi touch).
             ETouch.onFingerDown += OnDown;
             ETouch.onFingerMove += OnMove;
             ETouch.onFingerUp += OnUp;
@@ -76,7 +82,8 @@ namespace UltimoMiglio.UI
 
         void OnDown(Finger f)
         {
-            if (fingerId != -1 || Excluded(f.screenPosition)) return; // first touch wins
+            if (ETouch.activeFingers.Count >= 2) { Suspend(); return; } // #205: pinch → nessun movimento
+            if (Suspended || fingerId != -1 || Excluded(f.screenPosition)) return; // vince il primo tocco
             Begin(f.index, f.screenPosition);
         }
 
@@ -88,13 +95,15 @@ namespace UltimoMiglio.UI
         {
             float dp = SafeAreaUtil.DpToPx, r = radiusDp * dp, dz = deadZoneDp * dp;
             Vector2 d = screenPosition - basePx;
-            if (d.magnitude > r) { basePx = screenPosition - d.normalized * r; d = d.normalized * r; } // dragged base
+            if (d.magnitude > r) { basePx = screenPosition - d.normalized * r; d = d.normalized * r; } // base trascinata
             float m = d.magnitude;
             Value = m <= dz ? Vector2.zero : d / m * Mathf.Pow((m - dz) / (r - dz), responseExponent);
             Draw(screenPosition);
         }
 
         void OnUp(Finger f) { if (f.index == fingerId) ForceRelease(); }
+
+        void Suspend() { Suspended = true; ForceRelease(); }
 
         void ForceRelease()
         {
@@ -105,9 +114,11 @@ namespace UltimoMiglio.UI
         void Update()
         {
             if (baseEl == null && hud && hud.Root != null) { baseEl = hud.Root.Q("joystick-base"); knobEl = hud.Root.Q("joystick-knob"); }
-            PollDesktop();
+            if (Suspended && ETouch.activeFingers.Count == 0) Suspended = false;
+            if (TestValue.HasValue) { Value = TestValue.Value; KeyboardActive = Value != Vector2.zero; }
+            else PollDesktop();
             if (IsActive) Moved?.Invoke(Value);
-            float target = fingerId != -1 ? 1f : 0f; // keyboard has no on-screen stick
+            float target = fingerId != -1 ? 1f : 0f; // la tastiera non ha uno stick a schermo
             alpha = Mathf.MoveTowards(alpha, target, fadeSeconds > 0 ? Time.unscaledDeltaTime / fadeSeconds : 1f);
             if (baseEl != null) { baseEl.style.opacity = alpha; baseEl.style.display = alpha > 0.001f ? DisplayStyle.Flex : DisplayStyle.None; }
         }
