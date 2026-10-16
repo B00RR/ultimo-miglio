@@ -24,7 +24,7 @@ ZAINO=[5,6,7,8,9,10,12,14,16,18,20,22,24,27,30]
 LINES={ # nome: (costo base, crescita, max liv, cap sblocco)
  'zaino':(40,2.0,14,1),'scarpe':(60,2.7,10,1),'insegna':(90,2.7,10,1),
  'nonno':(100,2.4,10,1),'pippa':(600,2.4,10,3),'braccio':(15000,2.4,10,8)}
-ZAINO_OVR={5:560,6:960,7:1700}   # 16/10 GD: Zaino 5-7 a x1,7 (data/ch1/upgrades.json)
+ZAINO_OVR={5:560,6:960,7:1700,8:3000}   # 16/10 GD: Zaino 5-7 a x1,7, Zaino 8 a 3.000 (data/ch1/upgrades.json)
 INSEGNA_VAL=0.06
 SPEED,PICK,SERVE,COIN,DWELL,SLOW=3.0,0.1,1.0,1.5,0.5,0.10
 D_BANCO=lambda c:(9+0.4*c)*(0.75 if c>=4 else 1)
