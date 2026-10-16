@@ -13,14 +13,14 @@ Richiesta di Lorenzo (via DevOn): **una meccanica alla volta**; ogni passo si sb
 |---|---|---|---|---|---|---|---|
 | 0 `coldOpen` | 0:00 ±1 | 0:15 | nessuna (scena) | — | `coldOpenEnd` | `onb.cold.letterAda`, `onb.cold.letterOmni` | — |
 | 1 `move` | 0:15 ±5 | 0:30 | muoversi col joystick | input.joystick | `playerMoved ≥1.5` | `onb.move.card`, `step:move` | ripete onb.move.card, joystick fantasma pulsa / mano fantasma che trascina / mano fantasma in loop + vibrazione leggera |
-| 2 `pickUp` | 0:30 ±10 | 0:45 | raccogliere pacchi (stare sulla zona) | zona.arrivi | `parcelPicked ≥1` | `step:pickup`, `onb.pick.max` | cerchio Arrivi pulsa più forte / freccia a bordo schermo verso gli Arrivi / camera si sposta 1,5 s sugli Arrivi e torna |
+| 2 `pickUp` | 0:30 ±10 | 0:45 | raccogliere pacchi (stare sulla zona) | zona.arrivi | `parcelPicked ≥1` | `step:pickUp`, `onb.pick.max` | cerchio Arrivi pulsa più forte / freccia a bordo schermo verso gli Arrivi / camera si sposta 1,5 s sugli Arrivi e torna |
 | 3 `shelve` | 0:50 ±10 | 1:00 | depositare sullo scaffale | zona.scaffaleTerracotta | `shelfDeposit ≥1` | `step:shelve`, `onb.deposit.hint` | scaffale lampeggia / freccia verso lo scaffale / camera sullo scaffale + ripete onb.deposit.hint |
 | 4 `serve` | 1:10 ±15 | 1:30 | servire al Bancone (pacco dallo scaffale al cliente) | zona.bancone, cliente.mammaRosa | `customerServed ≥1` | `step:serve`, `onb.cust.first` | Auntie Lulu saluta (bark) e la stella pulsa / freccia sul Bancone; se Kaia ha 0 pacchi la freccia va prima allo scaffale / camera sul Bancone + ripete onb.cust.first |
 | 5 `coins` | 1:15 ±15 | 1:35 | raccogliere monete | hud.pillolaValute, monete | `coinsCollected ≥1` | `step:coins`, `onb.coins.walk` | monete brillano / freccia sulle monete / le monete saltellano verso Kaia (raggio +0,5 m) |
-| 6 `zainoPad` | 1:23 ±20 | 2:00 | comprare un pad (stare sopra finché si riempie) | pad.zaino | `padPurchased (zaino 1)` | `step:upgrade_zaino`, `onb.zaino.hint` | pad pulsa / freccia sul pad / camera sul pad + barra 'LN/40' |
+| 6 `zainoPad` | 1:23 ±20 | 2:00 | comprare un pad (stare sopra finché si riempie) | pad.zaino | `padPurchased (zaino 1)` | `step:zainoPad`, `onb.zaino.hint` | pad pulsa / freccia sul pad / camera sul pad + barra 'LN/40' |
 | 7 `combo` | 1:40 ±15 | 2:05 | combo: servire clienti di fila (feedback '+N' sopra Kaia) | clienti.normali, feedback.comboPlusN | `comboReached ≥1.2` | `onb.combo` | il '+N' sopra Kaia diventa più grande per un istante / freccia sul Bancone quando c'è coda / ripete onb.combo; dopo 40 s il gate si considera passato (combo non bloccante) |
 | 8 `nonnoIntro` | 2:07 ±5 | 2:12 | conoscere OLDO (solo guardare) | robot.nonno.dorme | `cameraDone` | `onb.nonno.intro`, `onb.nonno.what` | — |
-| 9 `hireNonno` | 2:10 ±5 | 2:40 | assumere un robot (pad da 50 LN) | pad.assumiNonno | `nonnoHired` | `onb.nonno.cost`, `step:unlock_nonno` | onb.nonno.reminder + pad rimbalza / freccia + camera pulsa sul pad / camera 1,5 s sul pad + ripete onb.nonno.what |
+| 9 `hireNonno` | 2:10 ±5 | 2:40 | assumere un robot (pad da 50 LN) | pad.assumiNonno | `nonnoHired` | `onb.nonno.cost`, `step:hireNonno` | onb.nonno.reminder + pad rimbalza / freccia + camera pulsa sul pad / camera 1,5 s sul pad + ripete onb.nonno.what |
 | 10 `nonnoConfirm` | 2:11 ±5 | 2:30 | vedere OLDO lavorare | robot.nonno.attivo | `nonnoFirstRestock` | `onb.nonno.hired`, `onb.nonno.working` | — |
 | 11 `padNuovi` | 2:50 ±10 | 3:50 | scegliere tra più pad (Scarpe, Insegna) | pad.scarpe, pad.insegna, pad.zaino.livelliSuccessivi | `padPurchasedAny` | `onb.pads.new` | i due pad pulsano / freccia sul più economico pagabile / camera sui due pad |
 | 12 `cassaPass` | 3:55 ±10 | 4:15 | Cassa: incasso passandoci sopra | zona.cassa | `cassaPassed` | `onb.cassa.tip` | Cassa luccica / freccia sulla Cassa / camera sulla Cassa |
@@ -76,7 +76,7 @@ Al golden path il portafoglio vale 41 LN a 1:23 e 211 LN cumulati a 2:10: tutti 
 - **Da riscrivere come lettera, non telefonata:** `onb.viktor.call1`, `onb.viktor.call2`.
 - **Nuova:** `onb.debt.adaExplain`: Oma Tilde spiega in una riga (max 70 caratteri) che si versa alla Cassaforte per la rata del Giorno 24.
 - **Da rileggere:** `onb.debt.pedaggioHint` ora è nel fumetto di Tilde (voce di Tilde); `onb.combo` non deve citare un contatore.
-- Il biglietto `step:unlock_nonno` e gli altri `step:*` restano invariati.
+- Il biglietto `step:hireNonno` e gli altri `step:*` restano invariati.
 
 ## Tappe del debito e audio: richieste (rev. 16/10)
 **Narrative, chiavi nuove** (voce di Oma Tilde, ≤70 caratteri):

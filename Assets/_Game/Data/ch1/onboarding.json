@@ -87,7 +87,7 @@
         "value": 1
       },
       "textKeys": [
-        "step:pickup",
+        "step:pickUp",
         "onb.pick.max"
       ],
       "hintEscalation": {
@@ -184,7 +184,7 @@
         "level": 1
       },
       "textKeys": [
-        "step:upgrade_zaino",
+        "step:zainoPad",
         "onb.zaino.hint"
       ],
       "hintEscalation": {
@@ -277,7 +277,7 @@
       },
       "textKeys": [
         "onb.nonno.cost",
-        "step:unlock_nonno"
+        "step:hireNonno"
       ],
       "hintEscalation": {
         "10s": "onb.nonno.reminder + pad rimbalza",

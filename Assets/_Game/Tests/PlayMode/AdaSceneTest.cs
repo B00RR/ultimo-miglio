@@ -23,7 +23,7 @@ public class AdaSceneTest
         Assert.IsTrue(an.avatar && an.avatar.isHuman, "avatar non Humanoid");
         Assert.AreEqual(0f, an.GetFloat("Speed"), 0.001f, "Ada deve partire ferma (Idle)");
         Assert.IsNotNull(ada.GetComponent<Collider>(), "Ada senza collider");
-        TutorialManager.StepChanged?.Invoke(TutorialManager.Step.Arrivi);
+        TutorialManager.StepChanged?.Invoke(TutorialManager.Step.PickUp) /* #101: ex Arrivi */;
         yield return null; yield return null;
         Assert.IsTrue(an.GetBool("Talk"), "Talk non attivato dal cambio passo del tutorial");
     }

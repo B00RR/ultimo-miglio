@@ -33,10 +33,16 @@ namespace UltimoMiglio.Gameplay
             }
         }
 
+        int _clientiDiFila;
         public void Serve(Customer c)
         {
             if (!GameRoot.Ready || c == null) return;
             double ln = GameRoot.I.Eco.Serve(GameRoot.I.ActiveTime);
+            // #101/#106: moltiplicatore combo applicato a questo cliente (1 = combo azzerata → nuova serie). Il tutorial mostra "+N" (N = clienti di fila)
+            // e al primo moltiplicatore ≥ 1,2 apre il gate comboReached.
+            double mult = GameRoot.I.Eco.CustomerValue > 0 ? ln / GameRoot.I.Eco.CustomerValue : 1;
+            _clientiDiFila = mult > 1 + 1e-6 ? _clientiDiFila + 1 : 1;
+            if (TutorialManager.I) TutorialManager.I.NotifyCombo(_clientiDiFila, (float)mult);
             // Credit wallet immediately (40% spend share). Coins are visual-only so magnet/HUD fly can't soft-lock LN at 0.
             GameRoot.I.Eco.CollectActive(ln, transform.position.ToWP());
             UM_FxPlayer.Play(UM_FxPlayer.Fx.PackageDeliver, c.transform.position + Vector3.up);

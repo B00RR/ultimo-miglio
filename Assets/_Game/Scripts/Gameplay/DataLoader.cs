@@ -14,6 +14,9 @@ namespace UltimoMiglio.Gameplay
             return EconomyConfig.From(a.Data);
         }
 
+        /// <summary>#101: passi dell'onboarding dall'asset importato (null se assente).</summary>
+        public static OnboardingData LoadOnboarding(int chapter = 1) => Resources.Load<ChapterDataAsset>($"Ch{chapter}Data")?.Data?.onboarding;
+
         /// <summary>Parses the 7 JSON texts into ChapterData (used by the editor importer and tests).</summary>
         public static ChapterData Parse(int chapter, System.Func<string, string> readJson)
         {
@@ -27,6 +30,7 @@ namespace UltimoMiglio.Gameplay
                 zones = JsonUtility.FromJson<ZonesData>(readJson("zones")),
                 offline = JsonUtility.FromJson<OfflineData>(readJson("offline")),
                 daycycle = JsonUtility.FromJson<DayCycleData>(readJson("daycycle")),
+                onboarding = JsonUtility.FromJson<OnboardingData>(readJson("onboarding")),
             };
         }
     }
