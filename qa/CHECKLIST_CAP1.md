@@ -49,3 +49,6 @@ Riferimenti codice: bordi `SliceSceneBuilder.cs` (Bound_N/S/E/O a ±11.15/±9.15
 | F03 | Console | 0 errori Shader/NavMesh/eccezioni | Solo 404 favicon tollerato | Log console |
 | R01 | Regressione | #41 #43 #44 #49 #42, B2–B5 | Restano risolti | Riprova casi originali |
 | R02 | Regressione | Cap.1 completo (Arrivi→Scaffale→Bancone→NONNO→Zaino) | Tutti gli step tutorial avanzano | Gioco completo |
+| C13 | Collisioni | Nina vs NONNO | NONNO non compenetra Nina (si ferma o la aggira) | Stai su Arrivi mentre NONNO carica, shot (aggiunta QA v9; bug #111) |
+| P07 | Pad | Zone attive dopo un acquisto (pad che sparisce con Nina sopra) | Arrivi, Scaffali e Bancone funzionano subito dopo l'assunzione di NONNO, senza reload | Assumi NONNO, poi carica su Arrivi e vendi al Bancone (aggiunta QA v9; bug #107) |
+| Z02 | Zaino | Pad dopo l'acquisto (livello successivo) | Prezzo del livello successivo visibile; nessun drenaggio LN non voluto | Resta sul pad dopo l'acquisto, osserva LN (aggiunta QA v9; bug #110) |
