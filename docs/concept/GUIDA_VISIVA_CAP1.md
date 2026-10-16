@@ -122,4 +122,5 @@ Ombre leggermente fresche ammesse come tinta lieve nelle zone d'ombra, mai blu o
   - Sole `#FFE6B8` → `#FFF0D4` (`UM_Palette.Sole`).
   - Ombra `#9E7873` → `#8F7A76` (`UM_Palette.Ombra`, `_ShadowTint` di `M_Diorama_Atlas` = 0.561/0.478/0.463).
   - Lastre pavimento ~0,25 m → 3,5 m (`_TileSize` 3.5), una fuga su due in `#E8D3AC` al ~30% (shader `UM_ToonDiorama`).
+
 - **v1.2 (16/10/2026)**: decisione DevOn, **vince la guida**. La build torna ai valori v1: sole `#FFE6B8`, ombra `#9E7873`, legno `#74503A`, notte al 47% dell'esposizione del giorno, swatch dell'atlas `T_Palette_Atlas.png` allineati alla palette §2. Il Concept Artist conferma le lastre del pavimento da 3,5 m con una fuga ogni due (`#E8D3AC` ~30%). I valori v1.1 di sole (`#FFF0D4`) e ombra (`#8F7A76`) sono superati. Rif. #81, PR #126.
