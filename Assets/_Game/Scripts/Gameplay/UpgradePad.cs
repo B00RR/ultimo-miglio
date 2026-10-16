@@ -17,7 +17,7 @@ namespace UltimoMiglio.Gameplay
         protected override void OnIdleUpdate()
         {
             var eco = GameRoot.I.Eco; bool avail = !double.IsInfinity(eco.Cost(Kind)) && GameRoot.I.ActiveTime >= UnlockAtActiveSec;
-            if (_avail != (avail ? 1 : 0)) { _avail = avail ? 1 : 0; foreach (var r in _renderers) if (r) r.enabled = avail; _col.enabled = avail; } // was 2 GetComponent* per pad per frame
+            if (_avail != (avail ? 1 : 0)) { _avail = avail ? 1 : 0; foreach (var r in _renderers) if (r) r.enabled = avail; if (!avail) ReleaseNina(); _col.enabled = avail; } // was 2 GetComponent* per pad per frame
             if (Ring && !Nina) Ring.SetFill((float)eco.PadFill(Kind));
             if (FillRing) { FillRing.gameObject.SetActive(avail); if (avail) FillRing.SetProgress((float)eco.PadFill(Kind)); }
             var icon = GetComponent<UM_PadIcon>(); if (icon) icon.SetPlayerNear(Nina);
