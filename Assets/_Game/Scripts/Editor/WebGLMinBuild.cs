@@ -4,6 +4,8 @@ using UnityEditor;
 using UnityEditor.Build;
 using UnityEditor.Build.Reporting;
 using UnityEngine;
+using UnityEngine.Rendering;
+using UnityEngine.Rendering.Universal;
 
 namespace UltimoMiglio.EditorTools
 {
@@ -12,13 +14,41 @@ namespace UltimoMiglio.EditorTools
         public static void Build()
         {
             ProjectSetup.EnsureUrp();
-            var urp = UnityEngine.Rendering.GraphicsSettings.defaultRenderPipeline as UnityEngine.Rendering.Universal.UniversalRenderPipelineAsset;
-            if (urp) { urp.supportsHDR = false; urp.msaaSampleCount = 1; urp.renderScale = 1f; EditorUtility.SetDirty(urp);
-                var rd = AssetDatabase.LoadAssetAtPath<UnityEngine.Rendering.Universal.UniversalRendererData>("Assets/_Game/Settings/URP_Mobile_Renderer.asset");
-                if (rd) { rd.renderingMode = UnityEngine.Rendering.Universal.RenderingMode.Forward; EditorUtility.SetDirty(rd); } }
+            var urp = GraphicsSettings.defaultRenderPipeline as UniversalRenderPipelineAsset;
+            if (urp)
+            {
+                urp.supportsHDR = false; urp.msaaSampleCount = 1; urp.renderScale = 1f;
+                // Evita StencilDitherMaskSeed su WebGL/SwiftShader
+                try
+                {
+                    var uso = new SerializedObject(urp);
+                    var lod = uso.FindProperty("m_EnableLODCrossFade"); if (lod != null) lod.boolValue = false;
+                    var lodt = uso.FindProperty("m_LODCrossFadeDitheringType"); if (lodt != null) lodt.intValue = 0;
+                    uso.ApplyModifiedPropertiesWithoutUndo();
+                }
+                catch { }
+                EditorUtility.SetDirty(urp);
+                var rd = AssetDatabase.LoadAssetAtPath<UniversalRendererData>("Assets/_Game/Settings/URP_Mobile_Renderer.asset");
+                if (rd)
+                {
+                    rd.renderingMode = RenderingMode.Forward;
+                    rd.intermediateTextureMode = IntermediateTextureMode.Auto;
+                    // Azzera debug PS (HDRDebugView) — altrimenti Unity li carica comunque
+                    var rso = new SerializedObject(rd);
+                    var dbg = rso.FindProperty("debugShaders");
+                    if (dbg != null)
+                    {
+                        var hdr = dbg.FindPropertyRelative("hdrDebugViewPS"); if (hdr != null) hdr.objectReferenceValue = null;
+                        var rep = dbg.FindPropertyRelative("debugReplacementPS"); if (rep != null) rep.objectReferenceValue = null;
+                    }
+                    rso.ApplyModifiedPropertiesWithoutUndo();
+                    EditorUtility.SetDirty(rd);
+                }
+            }
             var gs = AssetDatabase.LoadAllAssetsAtPath("ProjectSettings/GraphicsSettings.asset")[0]; var so = new SerializedObject(gs);
             var arr = so.FindProperty("m_AlwaysIncludedShaders");
-            foreach (var n in new[] {
+            // Solo shader di gioco/URP base. NON includere Hidden/*: su SwiftShader "not supported" = ERROR in console.
+            var keep = new[] {
                 "UltimoMiglio/ToonDiorama",
                 "UltimoMiglio/UI/ZoneRing",
                 "UltimoMiglio/FX/RingFill",
@@ -26,10 +56,20 @@ namespace UltimoMiglio.EditorTools
                 "Universal Render Pipeline/Lit",
                 "Universal Render Pipeline/Unlit",
                 "Universal Render Pipeline/Particles/Unlit",
-                "Hidden/CoreSRP/CoreCopy",
-                "Hidden/Universal Render Pipeline/StencilDitherMaskSeed",
-                "Hidden/Universal/HDRDebugView",
-            }) { var sh = Shader.Find(n); if (!sh) continue; bool has = false; for (int i = 0; i < arr.arraySize; i++) if (arr.GetArrayElementAtIndex(i).objectReferenceValue == sh) has = true; if (!has) { arr.InsertArrayElementAtIndex(arr.arraySize); arr.GetArrayElementAtIndex(arr.arraySize - 1).objectReferenceValue = sh; } }
+            };
+            foreach (var n in keep)
+            {
+                var sh = Shader.Find(n); if (!sh) continue;
+                bool has = false; for (int i = 0; i < arr.arraySize; i++) if (arr.GetArrayElementAtIndex(i).objectReferenceValue == sh) has = true;
+                if (!has) { arr.InsertArrayElementAtIndex(arr.arraySize); arr.GetArrayElementAtIndex(arr.arraySize - 1).objectReferenceValue = sh; }
+            }
+            // Rimuovi Hidden forzati in sessioni precedenti
+            for (int i = arr.arraySize - 1; i >= 0; i--)
+            {
+                var sh = arr.GetArrayElementAtIndex(i).objectReferenceValue as Shader;
+                if (sh != null && sh.name.StartsWith("Hidden/"))
+                    arr.DeleteArrayElementAtIndex(i);
+            }
             so.ApplyModifiedProperties();
             AssetDatabase.SaveAssets();
             { var t = System.AppDomain.CurrentDomain.GetAssemblies().Select(a => a.GetType("UltimoMiglio.UI.EditorTools.HudSetup")).FirstOrDefault(x => x != null); t?.GetMethod("BuildAll")?.Invoke(null, null); Debug.Log("[WebGLMin] HudSetup ran=" + (t != null)); }
