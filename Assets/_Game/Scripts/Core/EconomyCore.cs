@@ -41,9 +41,20 @@ namespace UltimoMiglio.Core
         /// <summary>#103: ricompensa intermedia (kind = "parcel" | "debt" | "cassa_tip", index soglia, LN accreditati). Hook per coriandoli/timbro/decor/riga di Mamma Rosa.</summary>
         public event Action<string, int, double> RewardGranted;
 
+        /// <summary>#110: sosta del pad aperta. Il costruttore la apre sul livello già in corso (anche da salvataggio).
+        /// Si chiude all'acquisto: gli altri tick della stessa sosta non partono sul livello successivo.</summary>
+        readonly bool[] _padOpen = new bool[5];
+
         public EconomyCore(EconomyConfig cfg, EconomyState state = null) { Cfg = cfg ?? throw new ArgumentNullException(nameof(cfg)); S = state ?? new EconomyState();
             if (S.ProrogaTokens < 0) S.ProrogaTokens = Math.Min(Cfg.ProrogaTokensAtActStart, Cfg.ProrogaTokensMax); // cap 1 = start of Act I
             if (S.DueActiveSec < 0) S.DueActiveSec = Cfg.WindowActiveMin * 60;
+            for (int i = 0; i < _padOpen.Length; i++) _padOpen[i] = true;
+        }
+
+        /// <summary>#110: Nina è entrata di nuovo sul pad (dopo essere uscita). Riattiva il pagamento del livello corrente.</summary>
+        public void BeginPadStay(UpgradeKind k)
+        {
+            int i = (int)k; if (i >= 0 && i < _padOpen.Length) _padOpen[i] = true;
         }
 
         void Emit(string type, string fields) => OnEvent?.Invoke(type, fields);
@@ -187,12 +198,21 @@ namespace UltimoMiglio.Core
         }
         public double PadFill(UpgradeKind k) { double c = Cost(k); return double.IsInfinity(c) ? 1 : S.PadPaid[(int)k] / c; }
 
+        /// <summary>#110: LN ancora da pagare sul livello corrente. Infinito se il pad è al massimo (niente prezzo).</summary>
+        public double PrezzoResiduo(UpgradeKind k)
+        {
+            double c = Cost(k); if (double.IsInfinity(c)) return double.PositiveInfinity;
+            return Math.Max(0, c - S.PadPaid[(int)k]);
+        }
+
         /// <summary>One 0.1 s pad tick. Accelerating curve: pays cost*tickFraction scaled by dwell so the pad fills in ≤PadFillMaxSec.
-        /// Returns true when the upgrade completes.</summary>
+        /// Returns true when the upgrade completes. #110: dopo l'acquisto la sosta si chiude — il livello successivo
+        /// non viene addebitato finché non si richiama BeginPadStay (Nina esce e rientra).</summary>
         public bool PadTick(UpgradeKind k, double dwellSec)
         {
+            int i = (int)k; if (i < 0 || i >= _padOpen.Length || !_padOpen[i]) return false;
             double cost = Cost(k); if (double.IsInfinity(cost) || S.Wallet <= 0) return false;
-            int i = (int)k; double remaining = cost - S.PadPaid[i];
+            double remaining = cost - S.PadPaid[i];
             // accelerating: rate grows linearly with dwell; integral over PadFillMaxSec = full cost
             double T = Cfg.PadFillMaxSec, dt = Cfg.ZoneTickSec;
             double frac = Math.Max(dt / T, (2 * dwellSec * dt) / (T * T));
@@ -200,7 +220,7 @@ namespace UltimoMiglio.Core
             S.Wallet -= pay; S.PadPaid[i] += pay;
             Emit("pad_progress", $"\"id\":\"{k}\",\"ln\":{F(pay)},\"paid\":{F(S.PadPaid[i])},\"cost\":{F(cost)}");
             if (S.PadPaid[i] + 1e-9 < cost) return false;
-            S.PadPaid[i] = 0; Apply(k);
+            S.PadPaid[i] = 0; Apply(k); _padOpen[i] = false;
             Emit("pad_done", $"\"id\":\"{k}\",\"ln\":{F(cost)}");
             return true;
         }

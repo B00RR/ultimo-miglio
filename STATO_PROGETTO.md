@@ -1,7 +1,7 @@
 # STATO PROGETTO — Ultimo Miglio
 
 > Punto di ingresso unico per chiunque (persona o agente) lavori su questo repo. Aggiornalo **nella stessa PR** in cui completi qualcosa.
-> Ultimo aggiornamento: 2026-10-16 12:12 (Europe/Rome).
+> Ultimo aggiornamento: 2026-10-16 13:20 (Europe/Rome).
 
 ## 1. Il gioco
 - **Ultimo Miglio**: gioco mobile **Android**, **Unity 6 (6000.3) URP**.
@@ -23,7 +23,7 @@
 - **In pausa**: Game Designer, QA, Sound Designer, Narrative, LiveOps, Concept Artist (i loro documenti restano validi).
 
 ## 4. FATTO
-- **UI #110 pad Zaino (PR ui/110-pad-zaino, in revisione)**: dopo un acquisto il pad non paga il livello successivo finché Nina non esce e rientra (niente più portafoglio prosciugato); la pillola col prezzo resta visibile anche con Nina sul pad. Costi Zaino invariati, già allineati a #75 (40, 80, 160…; `upgrades.json` non toccato). Da verificare in Unity.
+- **UI #110 pad Zaino livello 2 (ramo `ui/110-zaino-prezzo-liv2`)**: la PR #122 (`_waitExit`) non bastava. `EconomyCore.PadTick` restava aperto dopo l'acquisto: con il dwell già alto la stessa sosta pagava lo Zaino 2 (QA v10: 6 LN residui, portafoglio 26→5) e la pillola spariva con Nina sul pad, anche dopo il reload. Ora l'acquisto chiude la sosta (`_padOpen`): altri tick non scalano LN finché Nina non esce e rientra (`BeginPadStay`); `PadPaid` torna a 0 e il prezzo è il costo intero del livello successivo (80, poi 160). `HasCard` resta falso, pillola visibile. `upgrades.json` non toccato. Test EditMode `ZainoPad110Tests`.
 - **UI #94 onboarding graduale (PR #100, in revisione; allineata a main dopo #78/#106/#135)**: `HudReveal` (nascosto/visibile + comparsa scala+dissolvenza 250 ms, HUD e mondo), **attivo di default per le partite nuove** (`RivelaGraduale`; salvataggi esistenti o tutorial finito = tutto visibile); barra LN pagato/totale sui pad + pillola residuo; aiuti come PR #90 (`OnboardingHints`: 10 s biglietto ripetuto + pulsazione, 20 s freccia a bordo o mano fantasma se il bersaglio è a schermo, 40 s camera ≤1,5 s una volta per passo); camera 2,75 s solo per elementi nuovi (`CameraPeek`); badge NONNO "x pacchi/min"; combo = `ComboPopup` solo "+N" sopra Nina (clienti di fila, 1,5 s; moltiplicatore solo soglia del passo 7, mai a schermo), niente contatore HUD; log `[Onb]` dietro `OnbLog` (spenti in rilascio); "Salta tutorial". Niente telefono né barra debito (DevOn). Compila con le DLL Unity 6000.3. **I test playmode del tutorial possono cambiare** (elementi nascosti all'avvio, freccia dopo 20 s).
 - **UI #142 anteprime `tutorial_hud_77` (PR ui/142-anteprime-nonno, in revisione)**: anteprime 360/390/412 rigenerate con il costo reale del pad NONNO (50 LN, non 10) e LN in tasca reali; solo documentazione QA, nessun C#.
 - **UI #77 + #5 (PR ui/77-tutorial-hud, in revisione)**: fumetto di Nonna Ada compatto (ritratto 36 dp + testo 14 dp, 1–2 righe senza ellissi per testi fino a 70 caratteri, sotto la riga LN/obiettivo); obiettivo spostato a destra della pillola LN nella stessa riga; suggerimenti `onb.*` come pillola terracotta sopra il joystick; freccia ▼ sopra la pillola prezzo dei pad di acquisto (colonna 3D rimossa, ribaltamento se il pad è in alto). Nuovo `UI/USS/TutorialHud.uss` (HudV2.uss non toccato). Testi passi letti per id dalla PR #62. QA anteprima 360/390/412 in `docs/qa/tutorial_hud_77/`. Da verificare in Unity.
@@ -133,6 +133,7 @@ Ogni ruolo lavora solo sulle issue con la propria etichetta `ruolo:*`, sempre co
 
 Voci più recenti in alto. Formato: `AAAA-MM-GG HH:MM` (Europe/Rome) — [commit] — descrizione.
 
+- 2026-10-16 13:20 — UI/UX — ramo `ui/110-zaino-prezzo-liv2` — #110 riaperto dal QA v10: dopo l'acquisto lo Zaino 2 non prosciuga più gli LN (sosta chiusa in `PadTick`, prezzo intero 80/160, pillola sempre visibile). Test EditMode `ZainoPad110Tests`.
 - 2026-10-16 11:54 — Tech Lead — [c859f94](https://github.com/B00RR/ultimo-miglio/commit/c859f94ea08537f7a4d55aa3b9ba418f1202c3de) — PR #103 rewards: soglie pacchi 100/250/450, traguardi debito 25/50/75%, mancia Cassa 30 LN, freccia prossimo pad da 480 s; test EditMode EconomyRewardsTests.
 - 2026-10-16 12:12 — Code Reviewer — [4a1b26b](https://github.com/B00RR/ultimo-miglio/commit/4a1b26b6256d5f16153e713698f1ac4d3cfd5b72) — unita in squash la [PR #153](https://github.com/B00RR/ultimo-miglio/pull/153) (Audio: sfx combo +N e timbro del debito per la #137). Job `test` verde, asset OGG + README/licenze. Refs #136.
 - 2026-10-16 12:11 — Code Reviewer — [4e49b30](https://github.com/B00RR/ultimo-miglio/commit/4e49b30c6d5d867a12130ac42ff75c2ebf3d97eb) — unita in squash la [PR #88](https://github.com/B00RR/ultimo-miglio/pull/88) (feat(#2): clienti veri al posto delle capsule, 6 varianti riggate). Job `test` verde, diff rivisto (CustomerQueue.Variants, SliceSceneBuilder, ClientiRigTest). Closes #2.
