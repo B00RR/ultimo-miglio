@@ -4,6 +4,32 @@
 
 /* --- Riga 1: LN/giorno a sinistra, obiettivo a destra, ingranaggio. Tutto in 48 dp. --- */
 #safe-root .top-left { max-width: 44%; }
+
+/* #235: il saldo e G4 stanno sulla stessa riga e non si comprimono.
+   Senza questo la pillola resta a min-width (96) e "9.999" copre "G4".
+   flex-shrink 0 + nowrap: la pillola si allarga col testo. Il distacco resta 8 px (lo stile di HudV2).
+   max-width in px, non in %: il 100% di HudV2 si risolve contro il genitore e blocca la larghezza.
+   220 dp bastano a 6 cifre ("999.999") e ai formati compatti oltre la soglia, senza cambiare colori, font o raggio. */
+#safe-root #currency-pill {
+    flex-direction: row;
+    flex-wrap: nowrap;
+    flex-shrink: 0;
+    align-items: center;
+    max-width: 220px;
+}
+#safe-root #currency-pill > .currency {
+    flex-direction: row;
+    flex-shrink: 0;
+    align-items: center;
+    margin-right: 8px;
+}
+#safe-root #currency-pill > .day-group {
+    flex-shrink: 0;
+    margin-right: 0px;
+}
+#safe-root #currency-pill .icon { flex-shrink: 0; width: 22px; height: 22px; }
+#ln-value { flex-shrink: 0; white-space: nowrap; }
+#day-value { flex-shrink: 0; white-space: nowrap; }
 #safe-root .tutorial-objective {
     left: 46%; right: 44px; top: 14px;
     height: 28px; max-height: 28px; font-size: 13px;
