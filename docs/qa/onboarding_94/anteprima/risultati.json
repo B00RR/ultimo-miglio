@@ -1,0 +1,191 @@
+[
+ {
+  "w": 360,
+  "h": 800,
+  "caso": "01_avvio",
+  "ov": [],
+  "objCut": false,
+  "top": 103,
+  "fT": 111
+ },
+ {
+  "w": 360,
+  "h": 800,
+  "caso": "02_comparsa_LN",
+  "ov": [],
+  "objCut": false,
+  "top": 103,
+  "fT": 111
+ },
+ {
+  "w": 360,
+  "h": 800,
+  "caso": "03_pad_barra",
+  "ov": [],
+  "objCut": false,
+  "top": 103,
+  "fT": 111
+ },
+ {
+  "w": 360,
+  "h": 800,
+  "caso": "04_aiuto20_freccia",
+  "ov": [],
+  "objCut": false,
+  "top": 103,
+  "fT": 111
+ },
+ {
+  "w": 360,
+  "h": 800,
+  "caso": "05_aiuto40_mano",
+  "ov": [],
+  "objCut": false,
+  "top": 103,
+  "fT": 111
+ },
+ {
+  "w": 360,
+  "h": 800,
+  "caso": "06_badge_nonno",
+  "ov": [],
+  "objCut": false,
+  "top": 103,
+  "fT": 111
+ },
+ {
+  "w": 360,
+  "h": 800,
+  "caso": "07_salta",
+  "ov": [],
+  "objCut": false,
+  "top": 103,
+  "fT": 111
+ },
+ {
+  "w": 390,
+  "h": 844,
+  "caso": "01_avvio",
+  "ov": [],
+  "objCut": false,
+  "top": 103,
+  "fT": 117
+ },
+ {
+  "w": 390,
+  "h": 844,
+  "caso": "02_comparsa_LN",
+  "ov": [],
+  "objCut": false,
+  "top": 103,
+  "fT": 117
+ },
+ {
+  "w": 390,
+  "h": 844,
+  "caso": "03_pad_barra",
+  "ov": [],
+  "objCut": false,
+  "top": 103,
+  "fT": 117
+ },
+ {
+  "w": 390,
+  "h": 844,
+  "caso": "04_aiuto20_freccia",
+  "ov": [],
+  "objCut": false,
+  "top": 103,
+  "fT": 117
+ },
+ {
+  "w": 390,
+  "h": 844,
+  "caso": "05_aiuto40_mano",
+  "ov": [],
+  "objCut": false,
+  "top": 103,
+  "fT": 117
+ },
+ {
+  "w": 390,
+  "h": 844,
+  "caso": "06_badge_nonno",
+  "ov": [],
+  "objCut": false,
+  "top": 103,
+  "fT": 117
+ },
+ {
+  "w": 390,
+  "h": 844,
+  "caso": "07_salta",
+  "ov": [],
+  "objCut": false,
+  "top": 103,
+  "fT": 117
+ },
+ {
+  "w": 412,
+  "h": 915,
+  "caso": "01_avvio",
+  "ov": [],
+  "objCut": false,
+  "top": 103,
+  "fT": 126
+ },
+ {
+  "w": 412,
+  "h": 915,
+  "caso": "02_comparsa_LN",
+  "ov": [],
+  "objCut": false,
+  "top": 103,
+  "fT": 126
+ },
+ {
+  "w": 412,
+  "h": 915,
+  "caso": "03_pad_barra",
+  "ov": [],
+  "objCut": false,
+  "top": 103,
+  "fT": 126
+ },
+ {
+  "w": 412,
+  "h": 915,
+  "caso": "04_aiuto20_freccia",
+  "ov": [],
+  "objCut": false,
+  "top": 103,
+  "fT": 126
+ },
+ {
+  "w": 412,
+  "h": 915,
+  "caso": "05_aiuto40_mano",
+  "ov": [],
+  "objCut": false,
+  "top": 103,
+  "fT": 126
+ },
+ {
+  "w": 412,
+  "h": 915,
+  "caso": "06_badge_nonno",
+  "ov": [],
+  "objCut": false,
+  "top": 103,
+  "fT": 126
+ },
+ {
+  "w": 412,
+  "h": 915,
+  "caso": "07_salta",
+  "ov": [],
+  "objCut": false,
+  "top": 103,
+  "fT": 126
+ }
+]

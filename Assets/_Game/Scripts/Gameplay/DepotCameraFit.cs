@@ -86,7 +86,8 @@ namespace UltimoMiglio.Gameplay
             float aspect = Mathf.Max(0.2f, (float)_w / Mathf.Max(1, _h));
             var inv = Quaternion.Inverse(_rot);
             Vector3 ninaPos = Nina ? Nina.position : _centreWorld;
-            var local = inv * ninaPos;
+            bool peek = CameraPeek.Active; // #94: camera breve, il joystick resta attivo
+            var local = inv * (peek ? CameraPeek.Blend(ninaPos) : ninaPos);
             float halfH = _ortho * (1f - TopHud - BottomHud), halfW = _ortho * aspect;
             float hudBias = _ortho * (TopHud - BottomHud) * 0.5f;
 
@@ -97,6 +98,7 @@ namespace UltimoMiglio.Gameplay
                 float dt = Mathf.Max(1e-4f, Time.unscaledDeltaTime);
                 var v = (ninaPos - _prevNina) / dt; v.y = 0f;
                 moving = v.sqrMagnitude > MoveSpeedEps * MoveSpeedEps;
+                if (peek) { if (moving) CameraPeek.NotifyInput(); moving = false; } // durante la camera breve niente dead-zone
             }
             if (Nina) { _prevNina = ninaPos; _prevNinaInit = true; }
 

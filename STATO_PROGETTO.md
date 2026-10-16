@@ -1,7 +1,7 @@
 # STATO PROGETTO — Ultimo Miglio
 
 > Punto di ingresso unico per chiunque (persona o agente) lavori su questo repo. Aggiornalo **nella stessa PR** in cui completi qualcosa.
-> Ultimo aggiornamento: 2026-10-16 09:05 (Europe/Rome).
+> Ultimo aggiornamento: 2026-10-16 10:05 (Europe/Rome).
 
 ## 1. Il gioco
 - **Ultimo Miglio**: gioco mobile **Android**, **Unity 6 (6000.3) URP**.
@@ -23,6 +23,7 @@
 - **In pausa**: Game Designer, QA, Sound Designer, Narrative, LiveOps, Concept Artist (i loro documenti restano validi).
 
 ## 4. FATTO
+- **UI #94 onboarding graduale (PR ui/94-onboarding-ui, dipende dalla #78, in revisione)**: `HudReveal` (nascosto/visibile + comparsa scala+dissolvenza 250 ms, HUD e oggetti di mondo), barra LN "32/50" sui pad fra freccia e pillola, aiuti 10/20/40 s (`OnboardingHints`: pulsazione → freccia a bordo → mano fantasma), camera breve 2,75 s non bloccante (`CameraPeek` + 3 righe in `DepotCameraFit`), badge NONNO "x pacchi/min", tasto "Salta tutorial". Rivelazione graduale dietro il flag `TutorialManager.RivelaGraduale` (spento di default). Controllo statico: compila con le DLL di Unity 6000.3. Da verificare in Unity.
 - **UI #77 + #5 (PR ui/77-tutorial-hud, in revisione)**: fumetto di Nonna Ada compatto (ritratto 36 dp + testo 14 dp, 1–2 righe senza ellissi per testi fino a 70 caratteri, sotto la riga LN/obiettivo); obiettivo spostato a destra della pillola LN nella stessa riga; suggerimenti `onb.*` come pillola terracotta sopra il joystick; freccia ▼ sopra la pillola prezzo dei pad di acquisto (colonna 3D rimossa, ribaltamento se il pad è in alto). Nuovo `UI/USS/TutorialHud.uss` (HudV2.uss non toccato). Testi passi letti per id dalla PR #62. QA anteprima 360/390/412 in `docs/qa/tutorial_hud_77/`. Da verificare in Unity.
 - Scheletro progetto Unity 6 + vertical slice cap. 1 (EconomyCore con test EditMode, gameplay, audio, import dati, script build/cattura).
 - HUD integrato agli eventi core (LN, Mora, giorno, bulloni), font Inter/Roboto (OFL), HUD responsive (1920x1080 / 1366x768 / 960x600).
