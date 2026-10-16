@@ -133,6 +133,7 @@ Ogni ruolo lavora solo sulle issue con la propria etichetta `ruolo:*`, sempre co
 
 Voci più recenti in alto. Formato: `AAAA-MM-GG HH:MM` (Europe/Rome) — [commit] — descrizione.
 
+- 2026-10-16 11:54 — Tech Lead — [c859f94](https://github.com/B00RR/ultimo-miglio/commit/c859f94ea08537f7a4d55aa3b9ba418f1202c3de) — PR #103 rewards: soglie pacchi 100/250/450, traguardi debito 25/50/75%, mancia Cassa 30 LN, freccia prossimo pad da 480 s; test EditMode EconomyRewardsTests.
 - 2026-10-16 12:12 — Code Reviewer — [4a1b26b](https://github.com/B00RR/ultimo-miglio/commit/4a1b26b6256d5f16153e713698f1ac4d3cfd5b72) — unita in squash la [PR #153](https://github.com/B00RR/ultimo-miglio/pull/153) (Audio: sfx combo +N e timbro del debito per la #137). Job `test` verde, asset OGG + README/licenze. Refs #136.
 - 2026-10-16 12:11 — Code Reviewer — [4e49b30](https://github.com/B00RR/ultimo-miglio/commit/4e49b30c6d5d867a12130ac42ff75c2ebf3d97eb) — unita in squash la [PR #88](https://github.com/B00RR/ultimo-miglio/pull/88) (feat(#2): clienti veri al posto delle capsule, 6 varianti riggate). Job `test` verde, diff rivisto (CustomerQueue.Variants, SliceSceneBuilder, ClientiRigTest). Closes #2.
 - 2026-10-16 12:04 — Code Reviewer — [2efd867](https://github.com/B00RR/ultimo-miglio/commit/2efd867a340f353a69f59d20b3f8094b6c6919df) — unita in squash la [PR #122](https://github.com/B00RR/ultimo-miglio/pull/122) (UI #110: il pad Zaino non prosciuga più gli LN sul livello successivo e la pillola prezzo resta visibile). Job `test` verde, diff rivisto (solo `UpgradePad.cs`). Closes #110.
