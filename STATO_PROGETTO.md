@@ -98,6 +98,7 @@ $UNITY -batchmode -projectPath "$PWD" -runTests -testPlatform PlayMode \
 ## 11. Cronologia
 Voci più recenti in alto. Formato: `AAAA-MM-GG HH:MM` (Europe/Rome) — [commit] — descrizione.
 
+- 2026-10-16 08:55 — Producer — **triage Cap. 1** (QA v8 baseline NO-VIA). Aggiornate #58 muri/scaffali (tech+3d, P0), #59 NONNO all'indietro (tech+animator, P0), #60 spawn Nina (tech): fix in PR #63 da unire. Nuove: #64 TAB telefono S04 (ui), #65 lampione/staccionata SO C03/C04 (3d), #66 LIVE completo checklist + checklist su main (QA/build, P0). #61 testi Ada (ui), #62 duplicato di #61. Quadro: Tech #58 #59 #60 #6 · 3D #58 #65 #2 (#2 ferma dal 15/10) · Animator #59 #2 (ferma) · VFX nessuna issue Cap. 1 · UI #64 #61 #5 (#5 ferma dal 15/10) · Build #66 (+#12/PR #14 ferma) · QA #66. Rischi: milestone scaduta 15/10 18:00; `qa/CHECKLIST_CAP1.md` non è su main; molte voci non verificate (P01–P06, Z01, R02, touch).
 - 2026-10-16 04:11 — [7dd1767](https://github.com/B00RR/ultimo-miglio/commit/7dd1767) — merge [PR #55](https://github.com/B00RR/ultimo-miglio/pull/55): deposito #47 + luce/camera #48; Concept VIA; **QA live v5 VIA**.
 - 2026-10-16 03:18 — [1b5b7be](https://github.com/B00RR/ultimo-miglio/commit/1b5b7be) — merge [PR #45](https://github.com/B00RR/ultimo-miglio/pull/45): fix QA v1–v3 (#41–#44, #49); **QA live v4 VIA**.
 - 2026-10-16 01:51 — [ba25f62](https://github.com/B00RR/ultimo-miglio/commit/ba25f62) — merge [PR #51](https://github.com/B00RR/ultimo-miglio/pull/51): guida visiva — tavola Nonna Ada v01 e decisione ombre/saturazione.
