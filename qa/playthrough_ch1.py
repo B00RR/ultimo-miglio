@@ -18,10 +18,8 @@ ONB=[("moveTutorialStart",15,5,"Card 'Trascina per muovere Nina'"),
      ("firstCoinsCollected",75,15,"Monete a terra davanti al Bancone"),
      ("firstCombo",100,15,"Due clienti ravvicinati x1,1 -> x1,2"),
      ("nonnoHired",130,5,"Pad 'ASSUMI NONNO · 50 LN'"),
-     ("phoneRings",165,10,"Messaggi (Civetta, teaser)"),
-     ("ordersApp",210,10,"Ordine speciale Mamma Rosa"),
      ("firstCassaCollection",235,10,"Nina passa sulla Cassa: mancia una tantum di 30 LN (nessun offline)"),
-     ("firstDebtDeposit",240,10,"Cassaforte: card 'Giorno 3/365 · Rata 1 · 8.400 LN · scade Giorno 24'"),
+     ("firstDebtDeposit",240,10,"Cassaforte: fumetto di Nonna Ada che spiega il debito (Rata 1 · 8.400 LN · scade Giorno 24); progresso solo a fine giornata"),
      ("wallPadShown",270,10,"Pad APRI MURO come obiettivo successivo")]
 _D=os.path.join(HERE,'..','data','ch1'); _UP=json.load(open(os.path.join(_D,'upgrades.json'))); _RW=json.load(open(os.path.join(_D,'economy.json'))).get('rewards',{})
 ZCOST={L['level']:L['costLn'] for L in _UP['zaino']['levels']}
@@ -96,10 +94,8 @@ steps=[
  dict(tSec=75,action="moveTo",zoneId="coinDrop",holdOnZoneSec=1.5,expect="LN nella pillola valute"),
  dict(tSec=80,action="loop",loopId="preNonno",untilSec=130),
  dict(tSec=130,action="moveTo",zoneId="padHireNonno",holdOnZoneSec=3.0,expect="NONNO attivo, restock 6 pacchi/min"),
- dict(tSec=165,action="tapPhone",then="quickReply:Chi sei?"),
- dict(tSec=210,action="openApp",app="Ordini",then="Mostra la strada"),
  dict(tSec=235,action="moveTo",zoneId="cassa",holdOnZoneSec=1.0,expect="+30 LN mancia di Nonna Ada (solo la prima volta)"),
- dict(tSec=240,action="moveTo",zoneId="cassaforte",holdOnZoneSec=3.0,expect="card debito Giorno 3/365, primo versamento"),
+ dict(tSec=240,action="moveTo",zoneId="cassaforte",holdOnZoneSec=3.0,expect="fumetto di Ada sul debito, primo versamento"),
  dict(tSec=250,action="loop",loopId="postNonno",untilEvent="tranchePaidChapterEnd")]
 for b in buys:
     if b['pad']!='hireNonno': steps.append(dict(tSec=b['t'],action="moveTo",zoneId={"zaino":"padZaino","scarpe":"padScarpe","insegna":"padInsegna","nonnoUpgrade":"padNonnoUpgrade"}[b['pad']],holdOnZoneSec=3.0,expect=b['label']))
