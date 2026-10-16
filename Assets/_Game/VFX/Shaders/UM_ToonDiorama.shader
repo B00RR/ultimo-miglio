@@ -77,12 +77,13 @@ Shader "UltimoMiglio/ToonDiorama"
             #pragma target 3.0
             #pragma vertex vert
             #pragma fragment frag
-            #pragma multi_compile _ _MAIN_LIGHT_SHADOWS _MAIN_LIGHT_SHADOWS_CASCADE
+            #pragma multi_compile _ _MAIN_LIGHT_SHADOWS   // perf: 1 sola cascata su tutti i tier -> niente varianti _CASCADE (variante dimezzata)
             #pragma multi_compile_fragment _ _SHADOWS_SOFT  // toon uses step() anyway; kept for URP keyword parity
             #pragma multi_compile _ _ADDITIONAL_LIGHTS_VERTEX _ADDITIONAL_LIGHTS
             #pragma multi_compile _ LIGHTMAP_ON
             #pragma multi_compile_fog
             #pragma multi_compile_instancing
+            #pragma multi_compile_fragment _ _UM_LITE   // perf: percorso economico (UM_QualityTier: Base/Standard e Web-lite)
             #include "Packages/com.unity.render-pipelines.universal/ShaderLibrary/Lighting.hlsl"
 
             struct Attributes { float4 positionOS:POSITION; float3 normalOS:NORMAL; float2 uv:TEXCOORD0; float2 uvLM:TEXCOORD1; half4 color:COLOR; UNITY_VERTEX_INPUT_INSTANCE_ID };
@@ -147,16 +148,20 @@ Shader "UltimoMiglio/ToonDiorama"
                 UNITY_SETUP_INSTANCE_ID(i);
                 half4 albedo = SAMPLE_TEXTURE2D(_BaseMap, sampler_BaseMap, i.uv) * _BaseColor;
                 // Cheap low-frequency world-space variation (2 value-noise octaves, ALU only, no texture). 0 = off.
+                #ifndef _UM_LITE
                 if (_NoiseStrength > 0.001h)
                 {
                     float2 p = i.positionWS.xz * _NoiseScale;
                     half nv = ValueNoise(p) * 0.65h + ValueNoise(p * 2.7 + 17.3) * 0.35h;
                     albedo.rgb *= 1.0h + (nv - 0.5h) * 2.0h * _NoiseStrength;
                 }
+                #endif
                 half3 n = normalize(i.normalWS);
                 half up = saturate(n.y);
                 half isFloor = step(0.9h, up) * (1.0h - step(0.25h, (half)i.positionWS.y));
+                #ifndef _UM_LITE
                 half2 fw = (half2)fwidth(i.positionWS.xz / _TileSize) * 1.5h + 0.02h; // derivate fuori dal branch; fuga stabile in pixel
+                #endif
                 if ((_TileVar > 0.001h || _FloorBaseMix > 0.001h) && isFloor > 0.5h)
                 {
                     // v2.1 (#48): lastre piccole (~0,25 m) crema/tufo: 3 toni della guida per cella + fuga sottile. Solo ALU.
@@ -166,6 +171,7 @@ Shader "UltimoMiglio/ToonDiorama"
                     half3 slab = h < 0.5h ? lerp(_FloorTint.rgb, _FloorTintB.rgb, h * 2.0h) : lerp(_FloorTintB.rgb, _FloorTintC.rgb, h * 2.0h - 1.0h);
                     albedo.rgb = lerp(albedo.rgb * _FloorTint.rgb, slab, _FloorBaseMix);
                     albedo.rgb *= 1.0h + ((half)Hash21(cell + 7.1) - 0.5h) * 2.0h * _TileVar;
+                    #ifndef _UM_LITE // lite: lastre e toni restano, niente fughe (fwidth + 2 smoothstep)
                     // Concept: togli 1 fuga ogni 2 + fuga #E8D3AC ~30% (fw clampato: niente rete densa in camera)
                     float2 tuv2 = tuv * 0.5;
                     half2 fw2 = min(fw * 0.5h, half2(0.045h, 0.045h));
@@ -174,6 +180,7 @@ Shader "UltimoMiglio/ToonDiorama"
                     half3 groutCol = half3(0.910h, 0.827h, 0.675h); // #E8D3AC
                     half ga = grout * 0.30h; // opacita ~30% come da Concept
                     albedo.rgb = lerp(albedo.rgb, groutCol, ga);
+                    #endif
                 }
                 float4 sc = TransformWorldToShadowCoord(i.positionWS);
                 Light L = GetMainLight(sc);
@@ -200,6 +207,7 @@ Shader "UltimoMiglio/ToonDiorama"
                     }
                 #endif
                 col += albedo.rgb * i.fogAndVL.xyz;
+                #ifndef _UM_LITE // lite: niente rim (pow + view dir) ne' vignetta a terra
                 half3 v = SafeNormalize(GetWorldSpaceViewDir(i.positionWS));
                 half fr = pow(1.0h - saturate(dot(n, v)), _RimPower);
                 fr = smoothstep(0.25h, 0.7h, fr) * _RimStrength * (1.0h - isFloor);
@@ -211,6 +219,7 @@ Shader "UltimoMiglio/ToonDiorama"
                     half vg = smoothstep((half)_UM_Focus.w, (half)_UM_Focus.w + _UM_VignetteRange, dist) * _UM_VignetteDark;
                     col = lerp(col, col * _UM_VignetteColor.rgb, vg);
                 }
+                #endif
                 if (_UM_Grade > 0.5h) col = Grade(col);
                 col = MixFog(col, i.fogAndVL.w);
                 return half4(col, 1);

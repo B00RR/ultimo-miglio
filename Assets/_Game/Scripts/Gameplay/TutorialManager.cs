@@ -190,7 +190,6 @@ namespace UltimoMiglio.Gameplay
             UltimoMiglio.UI.HudReveal.Register("hud.pillolaValute", _hud.Root.Q("currency-pill"));
         }
 
-        /// <summary>Da chiamare quando il moltiplicatore combo supera la soglia del passo combo (onboarding.json: comboReached ≥ 1,2).</summary>
         /// <summary>Soglia del gate combo (onboarding.json: comboReached ≥ 1,2). Il moltiplicatore è interno: non si mostra mai.</summary>
         public const float ComboGate = 1.2f;
 
@@ -241,6 +240,8 @@ namespace UltimoMiglio.Gameplay
             var t = Target();
             // #94: con gli aiuti progressivi la freccia a bordo schermo arriva solo dopo 20 s di inattività (OnboardingHints)
             if (_edge) { if (t && !OnboardingHints.Active) _edge.SetTarget(t, s.ToString().ToUpper()); else _edge.Clear(); }
+            // #4 (VFX): anello pulsante a terra sul bersaglio + freccia a terra davanti a Nina (niente waypoint fluttuante, QA #44)
+            if (t) UltimoMiglio.VFX.UM_TutorialMarker.Show(t, GameRoot.I && GameRoot.I.Nina ? GameRoot.I.Nina.transform : null); else UltimoMiglio.VFX.UM_TutorialMarker.Hide();
             if (_marker) _marker.gameObject.SetActive(false); // QA v2: no world waypoint if edge arrow exists
         }
 
