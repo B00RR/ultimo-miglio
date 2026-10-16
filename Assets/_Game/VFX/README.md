@@ -116,3 +116,49 @@ Con Unity-MCP attivo: `script-update-or-create` per i `.cs`, `script-execute` pe
 - v1.4 (review 2 Concept Artist): lanterne 1.7 con falloff morbido (luna 0.5); polvere `#B8906A` con alpha più persistente; scintille upgrade +30% con nucleo limone `#F7E26B` e alone `#F4C430`; ombre filtrate (soft Low + bordo toon smoothstep), distanze/risoluzioni per tier; variazione world-space sul set; ombra di contatto `fx_contact_shadow`; assegnato `PostProcessData` (il post non era attivo); esposizione notte +0.45 per il rapporto notte/giorno.
 - v1.5 (sprint game feel): `fx_package_pickup`, `fx_package_deliver`, `fx_upgrade_complete`, `fx_coin_flyer` + API `FlyCoins*`, `fx_pad_fill_ring` + `UM_PadFillRing.SetProgress`; shader `UM_FxRingFill`; notte schiarita col colorFilter (postExposure ignorato in LDR).
 - v1.6: cap. 1 senza notte → `UM_DayCycle` (giorno → tramonto) + `UM_Lantern`; `UM_LightingRig.SetGoldenBlend`; tier Web con post OFF e MSAA 2x; screenshot con camera 15/4.5; `vfx_night.png` sostituito da `vfx_sunset.png`.
+
+## v2.0 – Look premium + acquisto (ricostruito dopo la perdita di wt/vfx)
+- `UM_ToonDiorama` premium: ombre colorate viola (`_ShadowTint` 0.55/0.50/0.72), gradiente in altezza (`_HeightDark`), AO alla base dei muri e di vertice (alpha del vertex color), highlight facce superiori (`_TopLight`), rim fresnel (fresco dal lato ombra), variazione piastrelle (`_TileVar`), vignetta a terra e grading in-shader (tonemap morbido, contrasto 1.14, saturazione 1.18, glow 0.35) pilotati da `UM_LookSettings`. Funziona con post-processing OFF (WebGL).
+- Nuovo `UM_SkyGradient.shader` + `UM_LookSettings`: cielo a gradiente dietro la scena, giorno → tramonto seguendo `UM_DayCycle`.
+- Luce: sole `#FFD08A` intensità 1.3 (tramonto `#FF9F5A` 1.0), ambiente cielo fresco `#9FBCD8`, nebbia `#F6D7B0`.
+- Nuovo effetto `fx_purchase` → `UM_FxPlayer.Play(UM_FxPlayer.Fx.Purchase, pos)`.
+- `fx_package_deliver` più grande (coriandoli +40%, anello 2.3 m, stella 1.0).
+- **Materiali e prefab si generano in Unity**: menu *Ultimo Miglio/VFX/Build FX Prefabs + Materials* e poi *Ultimo Miglio/VFX/Setup Scene* (`UM_VfxSceneSetup.Setup`), che cabla UM_FX (FxPlayer + LookSettings) e UM_DayCycle sul sole. Salvare la scena.
+
+## v2.1 – Colori UI/UX esatti
+- Pacco / `Fx.PackagePickup` = teal `#5E7F86` (particelle + anello a terra nuovo).
+- Moneta / `Fx.Purchase` e riempimento durante il pagamento = sole `#F4C430`.
+- Cliente / `Fx.PackageDeliver` = terracotta `#C8633B` (coriandoli 60% terracotta + crema, anello terracotta).
+- Upgrade = sole `#F4C430` (alternativa `UM_Palette.UiMenta` `#8FC9A8`).
+- `UM_PadFillRing.kind` (`Purchase`/`Upgrade`/`Pickup`/`Delivery`) e `SetKind(kind)`: imposta il colore UI su pulsazione e riempimento (via MaterialPropertyBlock, un solo materiale). Default `Purchase` = sole.
+- Costanti in `UM_Palette`: `UiPacco`, `UiSole`, `UiCliente`, `UiMenta`. Rigenerare i prefab (*Ultimo Miglio/VFX/Build FX Prefabs + Materials*).
+
+## v2.2 – Icone fluttuanti + colori Lorenzo (17:28)
+- Nuovo `UM_PadIcon` su ogni oggetto pad: billboard a 1.6 m, bob 0.12 m / 1.2 s, pulsazione scala, disco colorato + glifo.
+  - API: `SetKind(Kind)`, `SetIcon(Texture2D)`, `SetPlayerNear(bool)`, `SetVisible(bool)`, `AssignDefaultIcon()` (editor).
+  - Icone UI/UX per path: `Assets/_Game/UI/Icons/ic_pad_{pickup,buy,deliver,upgrade}_white.png` (non copiate; se mancano, glifo procedurale).
+  - Spazio sopra l'icona lasciato libero per etichette/prezzi UI.
+- Colori (correzione Lorenzo): Pickup teal `#5E7F86`; Delivery menta `#8FC9A8` (NO terracotta); Purchase sole `#F4C430`; Upgrade limone `#F7E26B` (distinto dalla consegna).
+- `UM_PadFillRing.ColorOf` e `fx_package_deliver` aggiornati (coriandoli menta + crema, anello menta).
+- Setup: aggiungere `UM_PadIcon` a ciascun pad; *Ultimo Miglio/VFX/Setup Scene* assegna le icone UI/UX presenti.
+
+## v2.1 — Issue #48: luce e palette «Diorama Solare» (senza post-processing)
+
+Riferimento: `docs/concept/GUIDA_VISIVA_CAP1.md` §2 Palette, §9 Illuminazione, §11 Camera. Tutto il look viene da luci, materiali e shader (WebGL: post OFF, niente magenta).
+
+**Da eseguire in Unity (una volta, scena gameplay aperta):** menu `Ultimo Miglio/VFX/Applica Look #48 (luce + palette + camera)` → salvare scena e asset.
+
+| Area | Prima | v2.1 |
+|---|---|---|
+| Sole | `#FFD08A` 1.3 | `#FFE6B8` 1.35, euler (50, −35) |
+| Ambient trilight | cielo `#9FBCD8` (azzurro) | cielo `#C9B4A6` / equatore `#D8B898` / terra `#9E7873` |
+| Tinta ombre (shader) | lavanda (0.55,0.50,0.72) | `#9E7873` + `_ShadowCool` 0.12 (lieve, mai blu/viola) |
+| Grading in-shader | sat 1.18, contr 1.14, lift viola | sat 1.12 (+12%), contr 1.18, lift `#5A4A55` |
+| Vignetta a terra | viola, 0.35 | `#9E7873`, 0.25 |
+| Cielo/fondo | top azzurro | crema `#F3E3C3` → pesca `#F6D7B0` → tufo `#E9D2A8`; tramonto `#E8B48A`/`#E8913A`/`#F4B88E` |
+| Pavimento | atlas arancio ×tint, celle 1 m | lastre 0,25 m: `#F3E3C3`/`#E8D3AC`/`#E9D2A8` per cella, var 0.04, fuga 0.12 (`_FloorBaseMix`=1) |
+| Ombre URP | 26 m, 1024 (Web), PCF Low, bias 1/1 | 30 m, 2048, 1 cascata, PCF Medium, bias 0.6/0.7, bordo shader `_ShadowSoft` 0.35 |
+| Camera | ortho portrait 13.5, distanza 40 m | ortho portrait 7 (landscape 6.5, min 5.5), distanza 20 m, pref `cam_zoom_v2` |
+| Nebbia | 45–140 m | 30–90 m dalla scena (= camera 20 m + 30..90) |
+
+Perché la scalettatura: la shadow map copre l'intervallo [near, shadowDistance] dalla camera; con la camera a 40 m e distanza 24 m le ombre erano quasi tutte nel vuoto/bordo e i texel enormi. Camera a 20 m + 30 m + 2048 → texel ~1,7 cm; il PCF Medium resta filtrato perché lo shader non binarizza più l'attenuazione (smoothstep 0.15–0.85).

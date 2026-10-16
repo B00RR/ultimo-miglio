@@ -29,12 +29,12 @@ namespace UltimoMiglio.Core.Data
     [Serializable] public class DistancesData { public double arriviToShelves, shelvesToBancone; }
     [Serializable] public class TimingsData { public double zoneDwellBeforeAction, pickPerParcel, dropPerParcel, servePerCustomer, coinPickupPerTrip, padFillMax; }
     [Serializable] public class PadData { public string id; public double costLn, unlockAtOnboardingSec; public string costRef; }
-    [Serializable] public class ZonesData { public DistancesData distancesM; public TimingsData timingsSec; public PadData[] pads; public bool padPaymentPersistent; }
+    [Serializable] public class ZonesData { public DistancesData distancesM; public TimingsData timingsSec; public PadData[] pads; public bool padPaymentPersistent; public string[] zoneIds; }
 
     [Serializable] public class TurnoDiNotteData { public int unlockChapter; public double costLn, cassaCapacityShareOfTranche; }
     [Serializable] public class TotemData { public double speedBonus, stackBonus, durationSec; }
     [Serializable] public class TotemsData { public int unlockChapter, maxPerSession, maxPerDay; public TotemData caffeTurbo, zainoGonfio; }
-    [Serializable] public class OfflineData { public string collectionMethod; public bool modalSummary; public double rateShareOfRobotThroughput, cassaCapacityShareOfTranche, cassaCapacityLn, offlineShareOfChapterCoinsMax, offlineShareOfChapterCoinsMaxAssist; public int adDoubleMaxPerDay; public bool adDoubleAlsoWithBulloni, pedaggioApplies; public TurnoDiNotteData turnoDiNotte; public TotemsData boostTotems; }
+    [Serializable] public class OfflineData { public string collectionMethod; public bool modalSummary; public double rateShareOfRobotThroughput, cassaCapacityShareOfTranche, cassaCapacityLn, offlineShareOfChapterCoinsMax, offlineShareOfChapterCoinsMaxAssist; public int adDoubleMaxPerDay; public bool adDoubleAlsoWithBulloni, pedaggioApplies; public TurnoDiNotteData turnoDiNotte; public TotemsData boostTotems; public string offlineAssistNote; }
 
     [Serializable] public class DayCycleData { public double cycleDurationSec, dayDurationSec, sunsetTransitionSec, nightDurationSec; public int nightFromChapter; public double nightDurationSecFromCh6, dayDurationSecFromCh6, calendarDaysPerCycle; public bool timeAdvancesOnlyWhileActive; }
 
