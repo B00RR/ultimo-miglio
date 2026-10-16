@@ -144,6 +144,9 @@ jobs:
         run: |
           test -f Builds/WebGL_min/index.html
           if ls Builds/WebGL_min/Build/*.br Builds/WebGL_min/Build/*.gz 2>/dev/null; then echo "::error::Build compressa"; exit 1; fi
+      # Il container Unity scrive Builds/ come root: senza chown lo step patch fallisce con "Permission denied"
+      - name: Proprietà di Builds al runner
+        run: sudo chown -R "$(id -u):$(id -g)" Builds
       - name: Patch mobile su index.html (come um-web/pubblica.sh USE_BUILD_INDEX=1)
         run: tools/patch_index_mobile.sh Builds/WebGL_min/index.html
       - name: Deploy su GitHub Pages (B00RR/ultimo-miglio-web) - solo avvio manuale
