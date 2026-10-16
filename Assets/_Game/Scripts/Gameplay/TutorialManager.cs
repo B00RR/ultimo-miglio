@@ -188,6 +188,9 @@ namespace UltimoMiglio.Gameplay
         readonly System.Collections.Generic.Dictionary<string, string> _hints = new();
         VisualElement _hint; Label _hintText; Step _adaShown = (Step)(-1);
 
+        /// <summary>Testo onb.* da onboarding_testi.json (null se assente). Usato anche da DebtMilestoneFeedback.</summary>
+        public string Hint(string key) => key != null && _hints.TryGetValue(key, out var v) ? v : null;
+
         void LoadTesti()
         {
             if (Texts == null || Texts.Length != StepCount) Texts = new string[StepCount]; // #101: niente più migrazione dal tutorial lineare a 7 passi (#4)
@@ -277,8 +280,18 @@ namespace UltimoMiglio.Gameplay
         void EnsureSkip()
         {
             if (_skip != null || !_hud || _hud.Root == null) return;
-            var b = new Button(Skip) { name = "skip-tutorial", text = "Salta tutorial" }; b.AddToClassList("skip-tut");
-            _skip = b; (_hud.SafeRoot ?? _hud.Root).Add(_skip);
+            // #224: il bottone è figlio di top-bar (Hud.uxml), posizionato in USS rispetto a quella riga.
+            // La safe area è il padding di safe-root: la riga (e quindi la pillola) scende col notch insieme all'ingranaggio.
+            var b = _hud.Root.Q<Button>("skip-tutorial");
+            if (b == null)
+            {
+                b = new Button(Skip) { name = "skip-tutorial", text = "Salta tutorial" };
+                b.AddToClassList("skip-tut");
+                var bar = (_hud.SafeRoot ?? _hud.Root).Q(className: "top-bar");
+                (bar ?? _hud.SafeRoot ?? _hud.Root).Add(b);
+            }
+            else b.RegisterCallback<ClickEvent>(_ => Skip());
+            _skip = b;
         }
 
         /// <summary>Salta il tutorial: rivela tutto ciò che i passi saltati avrebbero rivelato e chiude il tutorial.</summary>

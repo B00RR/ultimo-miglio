@@ -26,6 +26,7 @@ namespace UltimoMiglio.Core
         public int CustomersServed, CustomersLost;
         public bool ChapterComplete;
         public int ParcelMilestonesHit, DebtMilestonesHit, Reputation; public bool CassaTipGiven; // #103 rewards (save)
+        public int debt_ms;              // #136: bitmask delle tappe del debito già mostrate (nel salvataggio: si azzera con la partita nuova)
         public double Bulloni; public int ProrogaTokens = -1; public double DueActiveSec = -1; public bool Mora; public int Day = 1;
     }
 

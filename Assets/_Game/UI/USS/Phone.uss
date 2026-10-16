@@ -8,20 +8,20 @@
     background-color: rgba(0, 0, 0, 0);
     background-image: url("project://database/Assets/_Game/UI/Textures/tex_wood_panel.png");
     -unity-background-scale-mode: stretch-to-fill;
-    -unity-slice-left: 16px;
-    -unity-slice-top: 16px;
-    -unity-slice-right: 16px;
-    -unity-slice-bottom: 16px;
+    -unity-slice-left: 18px; /* #185: 16 + 2 px di margine trasparente */
+    -unity-slice-top: 18px; /* #185: 16 + 2 px di margine trasparente */
+    -unity-slice-right: 18px; /* #185: 16 + 2 px di margine trasparente */
+    -unity-slice-bottom: 18px; /* #185: 16 + 2 px di margine trasparente */
 }
 #phone-screen {
     border-radius: 16px; /* #185: uguale al raggio alpha del 9-slice */
     background-color: rgba(0, 0, 0, 0);
     background-image: url("project://database/Assets/_Game/UI/Textures/tex_cardboard_panel.png");
     -unity-background-scale-mode: stretch-to-fill;
-    -unity-slice-left: 16px;
-    -unity-slice-top: 16px;
-    -unity-slice-right: 16px;
-    -unity-slice-bottom: 16px;
+    -unity-slice-left: 18px; /* #185: 16 + 2 px di margine trasparente */
+    -unity-slice-top: 18px; /* #185: 16 + 2 px di margine trasparente */
+    -unity-slice-right: 18px; /* #185: 16 + 2 px di margine trasparente */
+    -unity-slice-bottom: 18px; /* #185: 16 + 2 px di margine trasparente */
     border-width: 3px;
     border-color: #3B2F2A;
 }

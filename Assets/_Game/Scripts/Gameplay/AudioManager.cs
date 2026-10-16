@@ -18,6 +18,7 @@ namespace UltimoMiglio.Gameplay
         [Header("UI / onboarding")] public AudioClip[] UiTap; public AudioClip TutorialArrow, TutorialStep;
         [Header("Passi")] public float StepDistance = 0.85f;
         public AudioClip StackMax, Bell, Served, UpgradeLoop, UpgradeComplete, ComboX15, ComboX2, NonnoStart;
+        [Header("Tappe del debito (#136)")] public AudioClip[] DebtStamp = new AudioClip[3]; // sfx_debt_stamp_01..03
         public AudioMixerGroup MusicGroup, SfxGroup;
         public int MaxVoices = 6;
 
@@ -101,6 +102,7 @@ namespace UltimoMiglio.Gameplay
             if (Pickup == null || Pickup.Length == 0) return;
             One(Pickup[Mathf.Clamp(stackHeight - 1, 0, Pickup.Length - 1)], 1f);
         }
+        public void PlayDebtStamp(int i) { if (DebtStamp != null && i >= 0 && i < DebtStamp.Length) One(DebtStamp[i], 1f, 0f); }
         public void Play(Sfx k)
         {
             switch (k)

@@ -1,7 +1,7 @@
 # STATO PROGETTO — Ultimo Miglio
 
 > Punto di ingresso unico per chiunque (persona o agente) lavori su questo repo. Aggiornalo **nella stessa PR** in cui completi qualcosa.
-> Ultimo aggiornamento: 2026-10-16 19:12 (Europe/Rome).
+> Ultimo aggiornamento: 2026-10-16 21:07 (Europe/Rome).
 
 ## 1. Il gioco
 - **Ultimo Miglio**: gioco mobile **Android**, **Unity 6 (6000.3) URP**.
@@ -158,6 +158,14 @@ Ogni ruolo lavora solo sulle issue con la propria etichetta `ruolo:*`, sempre co
 
 Voci più recenti in alto. Formato: `AAAA-MM-GG HH:MM` (Europe/Rome) — [commit] — descrizione.
 
+- 2026-10-16 21:07 — UI/UX — merge di `origin/main` (`15c9d5a`, che contiene `2515ee0` / #242) nel ramo etichette (#186), niente rebase. Restano il margine di NONNO, Salta tutorial (#224), il margine dei pannelli #185, la telecamera e le tappe del debito. Il fumetto crema e l'ombra cotta nello sprite restano.
+- **16/10/2026 21:05 (Europe/Rome)**: unita in squash la #242 (Tech Lead, Closes #226: NONNO tiene 0,20 m di margine da Nina agli Arrivi, distanza minima da 0,69 a 0,96 m, soglia del test invariata). Corregge il main rosso su 2150050. Commit [2515ee0](https://github.com/B00RR/ultimo-miglio/commit/2515ee0d10bb30a3be78a252486a81f208746783).
+- **16/10/2026 20:08 (Europe/Rome)**: unita in squash la #232 (Tech Lead, Closes #221: NONNO carica solo quanto entra negli scaffali, salta quelli pieni e non butta più il carico). Commit [2150050](https://github.com/B00RR/ultimo-miglio/commit/2150050f972ea47052030b6c601f5e933870ec01). Dato il via a Build & Release per la build in radice.
+- **16/10/2026 20:04 (Europe/Rome)**: unita in squash la #230 (UI/UX, Closes #224: il pulsante Salta tutorial non copre più l'ingranaggio). Commit [9f35fca](https://github.com/B00RR/ultimo-miglio/commit/9f35fca).
+- **16/10/2026 19:57 (Europe/Rome)**: unita in squash la #227 (Build & Release: cache-bust `?v=<sha>` negli index, deploy-dev solo con test e build verdi, `keep_files` al posto di `force_orphan`; Refs #179, #185). Commit [d5789d5](https://github.com/B00RR/ultimo-miglio/commit/d5789d59201e1a445f45ebf6fb5c0ee29c1bd492).
+- 2026-10-16 19:53 — Code Reviewer — [454eb61](https://github.com/B00RR/ultimo-miglio/commit/454eb61) — unita #228 (chiude #185, VFX): margine trasparente di 2 px sui pannelli 9-slice, angoli arrotondati senza bianco; manca l'ok della UI/UX sul telefono dopo il deploy.
+- 2026-10-16 19:32 — Code Reviewer — [a91d6d3](https://github.com/B00RR/ultimo-miglio/commit/a91d6d3e02d68960b79abd2e295e6a69e06d21f1) — unita #217 (chiude #205, Tech Lead): telecamera regolabile con zoom, rotazione e inclinazione (pinch, slider, reset, salvataggio). Milestone «Gioco completo», entra nella prossima build.
+- 2026-10-16 19:18 — Code Reviewer — [3e810ea](https://github.com/B00RR/ultimo-miglio/commit/3e810ea) — unita #219 (chiude #136 e #203, Animator): tappe del debito 25/50/75% con frase di Oma Tilde, sfx e ricompensa; la bitmask delle tappe sta nel salvataggio.
 - 2026-10-16 19:12 — UI/UX — merge di `origin/main` (`c96cbc0`) nel ramo etichette (#186), niente rebase: restano il trigger tondo dei pad (#214) e la cache della guida (#211). L'ombra cotta nello sprite resta.
 - 2026-10-16 19:10 — UI/UX — #186 sulla cattura di `2457adf` (390×844): la seconda riga resta intera. L'ombra figlia copriva il crema (un figlio si disegna sopra il fondo) e in basso restava una fascia squadrata. L'ombra #9E7873 al 60% è ora dentro lo sprite 9-slice del fumetto e delle pillole (4 px, angoli alpha 0, slice basso che la include, padding sotto compensato). Rimossi gli elementi ombra da UXML e dal codice. Il fumetto torna crema pieno #F3E3C3 e opaco. Unity non rieseguito: non è la via finché una cattura nuova non mostra il crema e l'ombra stondata.
 - 2026-10-16 18:46 — Code Reviewer — [31c33cb](https://github.com/B00RR/ultimo-miglio/commit/31c33cb) — unita #214 (chiude #171): il trigger dei pad d'acquisto è tondo e coincide con il cerchio visibile (raggio del cerchio meno quello di Kaia); test PlayMode in 8 direzioni.

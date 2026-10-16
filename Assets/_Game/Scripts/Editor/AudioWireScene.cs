@@ -45,6 +45,7 @@ namespace UltimoMiglio.EditorTools
             Chk("Stack MAX", am.StackMax); Chk("Upgrade loop", am.UpgradeLoop); Chk("Upgrade completo", am.UpgradeComplete);
             Chk("Combo x1.5/x2", am.ComboX15 && am.ComboX2); Chk("NONNO", am.NonnoStart && All(am.NonnoMumble, 3));
             Chk("UI tap x2", All(am.UiTap, 2)); Chk("Tutorial freccia", am.TutorialArrow); Chk("Tutorial step completato", am.TutorialStep);
+            Chk("Tappe debito x3", All(am.DebtStamp, 3));
             return miss;
         }
     }

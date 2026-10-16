@@ -3,7 +3,7 @@
 # - PR verso main: EditMode sempre, PlayMode solo se cambiano gameplay/scene/prefab/pacchetti/impostazioni (una sola invocazione game-ci) + commento.
 # - Push su main e avvio manuale: test + build WebGL (verifica, artifact). Le modifiche solo .md/docs non avviano la CI.
 # - Deploy su B00RR/ultimo-miglio-web (GitHub Pages) in radice SOLO con avvio manuale (workflow_dispatch).
-# - Preview /dev/ (issue #179): a ogni push su main il job deploy-dev pubblica la build SOLO in dev/ (mai radice o prova/).
+# - Preview /dev/ (issue #179): a ogni push su main, solo con test e build verdi, il job deploy-dev pubblica la build SOLO in dev/ (mai radice o prova/).
 # game-ci v4 con licenza Personal vuole UNITY_LICENSE (.ulf) + UNITY_EMAIL/UNITY_PASSWORD: senza .ulf la build si ferma con
 # "Missing Unity License File and no Serial was found" (run 38865014865). Con la .ulf i test erano verdi (run 38757501264).
 # Secret richiesti: UNITY_LICENSE, UNITY_EMAIL, UNITY_PASSWORD; PAGES_DEPLOY_KEY (deploy key con scrittura sul repo web).
@@ -186,6 +186,9 @@ jobs:
         run: sudo chown -R "$(id -u):$(id -g)" Builds
       - name: Patch mobile su index.html (come um-web/pubblica.sh USE_BUILD_INDEX=1)
         run: tools/patch_index_mobile.sh Builds/WebGL_min/index.html
+      - name: Cache-bust ?v=<sha corto> su index.html - solo avvio manuale
+        if: github.event_name == 'workflow_dispatch'
+        run: tools/cache_bust_index.sh Builds/WebGL_min/index.html "$GITHUB_SHA"
       - name: Deploy su GitHub Pages (B00RR/ultimo-miglio-web) - solo avvio manuale
         if: github.event_name == 'workflow_dispatch'
         uses: peaceiris/actions-gh-pages@v4
@@ -195,15 +198,19 @@ jobs:
           publish_branch: main
           publish_dir: Builds/WebGL_min
           enable_jekyll: false
-          force_orphan: true
+          # keep_files: preserva dev/ e prova/ del sito (force_orphan li cancellava). exclude_assets filtra solo
+          # publish_dir, non protegge la destinazione. I nomi fissi della build (index.html, Build/, TemplateData/)
+          # vengono sovrascritti; eventuali file vecchi della radice con altri nomi restano.
+          keep_files: true
           commit_message: "Build WebGL da ultimo-miglio@${{ github.sha }}"
       - uses: actions/upload-artifact@v4
         with: { name: webgl, path: Builds/WebGL_min, retention-days: 3 }
 
   # Preview automatica su /dev/ (issue #179): solo push su main, copia mirata in dev/ del repo del sito
+  # Parte SOLO con test e build verdi: con needs: build e basta partiva anche a test rossi (run 38938654414 su 3e810ea)
   deploy-dev:
-    needs: build
-    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    needs: [build, test]
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main' && needs.build.result == 'success' && needs.test.result == 'success'
     runs-on: ubuntu-24.04
     permissions: { contents: read }
     # Due deploy dev non si sovrappongono: si accodano (nessuno viene annullato a meta')
