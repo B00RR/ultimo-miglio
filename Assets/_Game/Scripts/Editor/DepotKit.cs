@@ -152,56 +152,19 @@ namespace UltimoMiglio.EditorTools
             col.AddComponent<BoxCollider>().size = new Vector3(0.36f, 2.6f, 0.36f);
         }
 
-        // Concept: insegna con faro + "Vela & Figli" (texture generata, Fredoka).
+        // #70: l'insegna è la mesh 3D prop_sign_vela_figli v04 (cornice terracotta, tavola noce, faro in rilievo con lanterna emissiva,
+        // scritta crema in rilievo in Fredoka). Prima qui si spegnevano i renderer della mesh e si metteva un quad Unlit piatto
+        // (tex_sign_vela_figli.png, fondo crema): era il «pannello bianco piatto senza faro». Ora si tiene la mesh e si toglie l'eventuale decal.
         static void DressSignFace()
         {
             if (!_parent) return;
-            Transform sign = null;
             for (int i = _parent.childCount - 1; i >= 0; i--)
             {
                 var c = _parent.GetChild(i);
-                if (c.name.Contains("prop_sign_vela_figli")) { sign = c; break; }
+                if (!c.name.Contains("prop_sign_vela_figli")) continue;
+                foreach (var r in c.GetComponentsInChildren<Renderer>(true)) r.enabled = true;
+                var d = c.Find("SignFaceDecal"); if (d) Object.DestroyImmediate(d.gameObject);
             }
-            if (!sign || sign.Find("SignFaceDecal")) return;
-            const string texPath = "Assets/_Game/Art/Environment/Kit/tex_sign_vela_figli.png";
-            const string matPath = "Assets/_Game/Art/Materials/M_Sign_VelaFigli.mat";
-            var tex = AssetDatabase.LoadAssetAtPath<Texture2D>(texPath);
-            if (!tex) { Debug.LogWarning("[Kit] missing sign tex " + texPath); return; }
-            var mat = AssetDatabase.LoadAssetAtPath<Material>(matPath);
-            if (!mat)
-            {
-                var sh = Shader.Find("Universal Render Pipeline/Unlit") ?? Shader.Find("Unlit/Texture");
-                if (!sh) { Debug.LogWarning("[Kit] no Unlit shader for sign"); return; }
-                mat = new Material(sh) { name = "M_Sign_VelaFigli" };
-                if (mat.HasProperty("_BaseMap")) mat.SetTexture("_BaseMap", tex);
-                if (mat.HasProperty("_MainTex")) mat.SetTexture("_MainTex", tex);
-                if (mat.HasProperty("_BaseColor")) mat.SetColor("_BaseColor", Color.white);
-                if (mat.HasProperty("_Color")) mat.SetColor("_Color", Color.white);
-                Directory.CreateDirectory(Path.GetDirectoryName(matPath));
-                AssetDatabase.CreateAsset(mat, matPath);
-            }
-            else
-            {
-                if (mat.HasProperty("_BaseMap")) mat.SetTexture("_BaseMap", tex);
-                if (mat.HasProperty("_MainTex")) mat.SetTexture("_MainTex", tex);
-            }
-            var b = Bounds(sign.gameObject);
-            foreach (var r in sign.GetComponentsInChildren<Renderer>()) r.enabled = false;
-            var quad = GameObject.CreatePrimitive(PrimitiveType.Quad);
-            Object.DestroyImmediate(quad.GetComponent<Collider>());
-            quad.name = "SignFaceDecal";
-            quad.transform.SetParent(sign, true);
-            float w = Mathf.Clamp(b.size.x * 1.05f, 2.0f, 3.0f);
-            float h = Mathf.Clamp(b.size.y * 1.05f, 0.7f, 1.15f);
-            // Quad Unity: faccia frontale = -Z locale. Identity = guarda il deposito (verso -Z).
-            quad.transform.position = new Vector3(b.center.x, Mathf.Max(b.center.y, 2.35f), Mathf.Min(b.min.z, 8.05f) - 0.06f);
-            quad.transform.rotation = Quaternion.identity;
-            quad.transform.localScale = new Vector3(w, h, 1f);
-            var qr = quad.GetComponent<Renderer>();
-            qr.sharedMaterial = mat;
-            qr.shadowCastingMode = UnityEngine.Rendering.ShadowCastingMode.Off;
-            quad.isStatic = true;
-            Debug.Log($"[Kit] SignFaceDecal at {quad.transform.position} size={w:F2}x{h:F2}");
         }
 
         static void PlaceFlatFloor(Transform parent, Vector3 center, Vector3 size)
