@@ -88,8 +88,9 @@ namespace UltimoMiglio.UI
 
             SetVisible(tollChip, false);
             SetVisible(roomPill, false); SetVisible(toast, false); SetVisible(safeCard, false);
-            SetVisible(phoneButton, true);
-            SetVisible(Root.Q("phone-key-hint"), !Application.isMobilePlatform); // desktop/WebGL: "TAB" hint
+            // HUD minimo Concept: niente telefono (Phone.uss); solo Impostazioni discreta
+            SetVisible(phoneButton, false);
+            SetVisible(Root.Q("phone-key-hint"), false);
             SetPhoneBadge(cBadge);
             SetCurrencies(cLn, cBolt, cTok);
             SetDay(cDay, cDaysPerYear);

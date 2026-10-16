@@ -7,7 +7,7 @@ namespace UltimoMiglio.Gameplay
     /// look-ahead (1.5 m at Nina's max speed), optional confiner per room. No player pan/zoom.</summary>
     public sealed class CameraRigSetup : MonoBehaviour
     {
-        public Transform Target; public float OrthoSize = 4.5f, Distance = 30f, Pitch = 50f, Yaw = 45f;
+        public Transform Target; public float OrthoSize = 4.5f, Distance = 20f, /* #48: camera più vicina e shadow map densa */ Pitch = 50f, Yaw = 45f;
         public Collider ConfinerVolume;
 
         public CinemachineCamera Build(Camera main)
