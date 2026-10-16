@@ -43,7 +43,7 @@ namespace UltimoMiglio.UI
         public VisualElement SafeRoot { get; private set; }
 
         Label lnLabel, boltLabel, tokenLabel, tollLabel, roomLabel, toastLabel, phoneBadge, dayLabel, tutorialObjective;
-        VisualElement currencyPill, tokenGroup, tollChip, roomPill, toast, phoneButton, settingsButton, safeCard, popupLayer;
+        VisualElement currencyPill, tokenGroup, tollChip, roomPill, toast, phoneButton, settingsButton, safeCard, popupLayer, orderRow, actionPad;
         Coroutine roomCo, toastCo;
         Rect lastSafeArea;
         Vector2Int lastScreen;
@@ -87,6 +87,9 @@ namespace UltimoMiglio.UI
             settingsButton?.RegisterCallback<ClickEvent>(_ => SettingsButtonTapped?.Invoke());
             tollChip?.RegisterCallback<ClickEvent>(_ => PedaggioTapped?.Invoke());
             safeCard?.Q("safe-close")?.RegisterCallback<ClickEvent>(_ => HideSafeCard());
+            orderRow = Root.Q("order-row");
+            actionPad = Root.Q("action-pad");
+            if (GetComponent<InsegnaMotion>() == null) gameObject.AddComponent<InsegnaMotion>();
 
             SetVisible(tollChip, false);
             SetVisible(roomPill, false); SetVisible(toast, false); SetVisible(safeCard, false);
@@ -111,8 +114,20 @@ namespace UltimoMiglio.UI
         {
             if (!TryBind()) return;
             EnsureAda(); MirrorTutorialBanner();
+            PlaceAdaBelowOrder();
             if (Screen.safeArea != lastSafeArea || lastScreen.x != Screen.width || lastScreen.y != Screen.height)
                 RefreshSafeArea(false);
+        }
+
+        /// <summary>Il fumetto di Ada resta sotto l'ordine: la fascia dell'insegna occupa già i primi ~120 dp.</summary>
+        void PlaceAdaBelowOrder()
+        {
+            var band = Root.Q("ada-band");
+            if (band == null || band.resolvedStyle.display == DisplayStyle.None) return;
+            float top = 128f;
+            if (orderRow != null && orderRow.resolvedStyle.display != DisplayStyle.None && orderRow.worldBound.height > 1f)
+                top = orderRow.worldBound.yMax + 6f;
+            band.style.top = top;
         }
 
         void RefreshSafeArea(bool force)
@@ -137,15 +152,23 @@ namespace UltimoMiglio.UI
         }
 
         int cDay = 1, cDaysPerYear = 365;
-        /// <summary>Giorno compatto in pillola (HUD minimale #38): "G12".</summary>
-        public void SetDay(int day, int daysPerYear = 365)
+        /// <summary>Giorno sul cartellino di carta: solo il numero (la parola GIORNO è fissa nel cartellino).
+        /// animate = false per le catture, così il cartellino non è a metà rotazione.</summary>
+        public void SetDay(int day, int daysPerYear = 365, bool animate = true)
         {
             cDay = day > 0 ? day : 1;
             cDaysPerYear = daysPerYear > 0 ? daysPerYear : 365;
-            if (dayLabel != null) dayLabel.text = "G" + cDay;
+            string next = cDay.ToString();
+            bool changed = animate && dayLabel != null && !string.IsNullOrEmpty(dayLabel.text) && dayLabel.text != next;
+            if (dayLabel != null) dayLabel.text = next;
+            if (changed) Root?.Q("day-group")?.AddToClassList("day--pop");
         }
 
-        public void PulseCurrency() => Pulse(currencyPill);
+        public void PulseCurrency()
+        {
+            Pulse(currencyPill);
+            currencyPill?.AddToClassList("sign--pop");
+        }
         /// <summary>Screen position (pixels, origin bottom-left) of the LN icon: coins fly here.</summary>
         public Vector2 CurrencyScreenPos()
         {
@@ -173,7 +196,7 @@ namespace UltimoMiglio.UI
         public bool IsOverInteractive(Vector2 panelPos)
         {
             return Contains(currencyPill, panelPos) || Contains(phoneButton, panelPos) || Contains(settingsButton, panelPos) ||
-                   Contains(tollChip, panelPos) || Contains(safeCard, panelPos);
+                   Contains(tollChip, panelPos) || Contains(safeCard, panelPos) || Contains(orderRow, panelPos) || Contains(actionPad, panelPos);
         }
 
         // ---------------- Pedaggio ----------------

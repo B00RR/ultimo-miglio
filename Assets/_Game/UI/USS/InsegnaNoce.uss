@@ -1,0 +1,209 @@
+/* Direzione C — insegna di noce appesa (issue #172).
+   Unità = dp. Caricato per ultimo: vince su HudV2 / TutorialHud / Onboarding.
+   Niente blur, niente bianco puro. Ombre e bevel sono nelle texture 9-slice.
+   Fascia alta: icona ~117 dp, ordine aperto ~122 dp (tetto 140). Riferimento 390×844. */
+
+#safe-root { position: relative; }
+
+/* ---------- insegna ---------- */
+#hud-root #currency-pill {
+    position: absolute; left: 14px; right: 92px; top: 30px; height: 58px;
+    margin: 0; padding: 0; border-width: 0; border-radius: 14px;
+    background-color: rgba(0, 0, 0, 0);
+    background-image: url("project://database/Assets/_Game/UI/Textures/tex_sign_walnut.png");
+    -unity-background-scale-mode: stretch-to-fill;
+    -unity-slice-left: 22px; -unity-slice-right: 22px; -unity-slice-top: 22px; -unity-slice-bottom: 22px;
+    flex-direction: row; align-items: center; overflow: visible;
+    transform-origin: 50% 0;
+    transition-property: scale, opacity;
+    transition-duration: 0.2s, 0.25s;
+}
+.sign-cord { position: absolute; top: -18px; width: 3px; height: 22px; background-color: #3B2A20; }
+.sign-cord--l { left: 22%; rotate: 8deg; transform-origin: 50% 0; }
+.sign-cord--r { right: 22%; rotate: -8deg; transform-origin: 50% 0; }
+.sign-nail { position: absolute; top: -22px; width: 8px; height: 8px; border-radius: 4px; background-color: #C9A27A; border-width: 1px; border-color: #3B2A20; }
+.sign-nail--l { left: 22%; }
+.sign-nail--r { right: 22%; }
+.sign-coin {
+    position: absolute; left: 4px; top: 4px; width: 50px; height: 50px;
+    background-image: url("project://database/Assets/_Game/UI/Icons/ic_coin_faro.png");
+    -unity-background-scale-mode: scale-to-fit;
+}
+.sign-spark {
+    position: absolute; width: 14px; height: 14px;
+    background-image: url("project://database/Assets/_Game/UI/Icons/ic_spark.png");
+    -unity-background-scale-mode: scale-to-fit;
+}
+.sign-spark--a { left: 2px; top: 0; }
+.sign-spark--b { left: 36px; top: 36px; width: 10px; height: 10px; }
+.sign-recess {
+    position: absolute; left: 58px; right: 48px; top: 10px; bottom: 10px;
+    flex-direction: row; align-items: center; padding-left: 8px; padding-right: 6px;
+    background-color: #3A2416; border-radius: 8px;
+}
+#hud-root #ln-value {
+    font-size: 26px; margin: 0; padding: 0; letter-spacing: 0; color: #F3E3C3;
+    -unity-font-definition: url("project://database/Assets/_Game/UI/Fonts/Baloo2-Bold.ttf");
+    -unity-font-style: normal; white-space: nowrap;
+}
+.ln-unit {
+    font-size: 14px; margin-left: 6px; margin-top: 6px; padding: 0; color: #F4C430;
+    -unity-font-definition: url("project://database/Assets/_Game/UI/Fonts/Baloo2-Bold.ttf");
+    -unity-font-style: normal;
+}
+#hud-root #settings-button {
+    position: absolute; right: 4px; top: 8px; width: 40px; height: 40px;
+    margin: 0; padding: 0; border-width: 0; border-radius: 20px;
+    background-color: rgba(0, 0, 0, 0); opacity: 1;
+    align-items: center; justify-content: center;
+}
+#hud-root #settings-button .icon {
+    width: 22px; height: 22px;
+    background-image: url("project://database/Assets/_Game/UI/Icons/ic_gear.png");
+    -unity-background-image-tint-color: #F3E3C3;
+    -unity-background-scale-mode: scale-to-fit;
+}
+
+/* ---------- cartellino GIORNO (niente faccina) ---------- */
+#hud-root #day-group {
+    position: absolute; top: 24px; right: 8px; width: 66px; height: 70px;
+    margin: 0; padding: 16px 0 0 0; border-width: 0;
+    flex-direction: column; align-items: center; justify-content: flex-start;
+    background-color: rgba(0, 0, 0, 0);
+    background-image: url("project://database/Assets/_Game/UI/Textures/tex_tag_paper.png");
+    -unity-background-scale-mode: stretch-to-fill;
+    -unity-slice-left: 16px; -unity-slice-right: 16px; -unity-slice-top: 16px; -unity-slice-bottom: 16px;
+    transform-origin: 50% 0;
+}
+.day-string { position: absolute; top: -16px; left: 31px; width: 2px; height: 18px; background-color: #3B2A20; }
+.day-kicker {
+    font-size: 10px; margin: 0; padding: 0; color: #3B2A20; letter-spacing: 0.6px;
+    -unity-font-definition: url("project://database/Assets/_Game/UI/Fonts/Fredoka-SemiBold.ttf");
+}
+#hud-root #day-value {
+    font-size: 28px; margin: 0; padding: 0; color: #3B2A20;
+    -unity-font-definition: url("project://database/Assets/_Game/UI/Fonts/Baloo2-Bold.ttf");
+    -unity-font-style: normal;
+}
+
+/* ---------- ordine: biglietto, poi icona dopo 3 s ---------- */
+#order-row { position: absolute; left: 16px; right: 16px; top: 86px; height: 36px; flex-direction: row; align-items: flex-start; }
+#order-ticket {
+    flex-grow: 1; flex-direction: row; align-items: center; height: 34px;
+    padding-left: 30px; padding-right: 52px; border-width: 0; border-radius: 8px;
+    background-color: rgba(0, 0, 0, 0);
+    background-image: url("project://database/Assets/_Game/UI/Textures/tex_ticket_cardboard.png");
+    -unity-background-scale-mode: stretch-to-fill;
+    -unity-slice-left: 18px; -unity-slice-right: 18px; -unity-slice-top: 18px; -unity-slice-bottom: 18px;
+    rotate: -1.5deg; transform-origin: 0 50%;
+    transition-property: scale, opacity; transition-duration: 0.22s, 0.22s; transition-timing-function: ease-out-back, ease-out;
+}
+.order-pin { position: absolute; left: 8px; top: 10px; width: 14px; height: 14px; border-radius: 7px; background-color: #F2B53A; border-width: 2px; border-color: #3B2A20; }
+.order-kicker {
+    font-size: 10px; margin: 0 6px 0 0; padding: 0; color: #3B2A20; letter-spacing: 1px;
+    -unity-font-definition: url("project://database/Assets/_Game/UI/Fonts/Fredoka-Bold.ttf");
+}
+#hud-root #order-ticket .tutorial-objective {
+    position: relative; left: auto; right: auto; top: auto; bottom: auto;
+    flex-grow: 1; height: 22px; max-height: 22px; min-width: 0;
+    margin: 0; padding: 0; border-width: 0; border-radius: 0;
+    background-color: rgba(0, 0, 0, 0); background-image: none;
+    font-size: 14px; color: #3B2A20;
+    -unity-font-definition: url("project://database/Assets/_Game/UI/Fonts/Baloo2-SemiBold.ttf");
+    -unity-font-style: normal; -unity-text-align: middle-left;
+    white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+}
+#order-ticket .order-count { position: absolute; right: 8px; top: 6px; }
+#order-chip {
+    flex-direction: row; align-items: center; height: 31px; width: 84px;
+    padding-left: 4px; padding-right: 36px; border-width: 0;
+    background-color: rgba(0, 0, 0, 0);
+    background-image: url("project://database/Assets/_Game/UI/Textures/tex_chip_cardboard.png");
+    -unity-background-scale-mode: stretch-to-fill;
+    -unity-slice-left: 16px; -unity-slice-right: 16px; -unity-slice-top: 16px; -unity-slice-bottom: 16px;
+    rotate: -2deg; transform-origin: 0 50%;
+    transition-property: scale; transition-duration: 0.22s; transition-timing-function: ease-out-back;
+}
+.order-box {
+    width: 22px; height: 22px;
+    background-image: url("project://database/Assets/_Game/UI/Icons/ic_box_order.png");
+    -unity-background-scale-mode: scale-to-fit;
+}
+.order-count {
+    height: 22px; min-width: 28px; margin: 0; padding: 0 6px;
+    border-radius: 11px; border-width: 2px; border-color: #3B2A20; background-color: #8FC9A8;
+    color: #3B2A20; font-size: 13px; -unity-text-align: middle-center;
+    -unity-font-definition: url("project://database/Assets/_Game/UI/Fonts/Baloo2-Bold.ttf");
+    -unity-font-style: normal;
+}
+#order-chip .order-count { position: absolute; right: 4px; top: 4px; }
+.order--open #order-chip { display: none; }
+.order--icon #order-ticket { display: none; }
+
+/* ---------- joystick e pad PRENDI (122 dp, margine 24) ---------- */
+#hud-root #joystick-base {
+    width: 122px; height: 122px; border-radius: 61px; border-width: 0;
+    background-color: rgba(0, 0, 0, 0);
+    background-image: url("project://database/Assets/_Game/UI/Textures/tex_joy_ring.png");
+    -unity-background-scale-mode: stretch-to-fill;
+}
+#hud-root #joystick-knob {
+    width: 58px; height: 58px; border-radius: 29px;
+    border-width: 3px; border-color: #3B2A20; background-color: #C8633B; background-image: none;
+}
+#action-pad { position: absolute; right: 24px; bottom: 24px; width: 122px; height: 135px; }
+.action-pad__btn {
+    position: absolute; left: 0; right: 0; top: 0; height: 97px;
+    align-items: center; justify-content: center; border-width: 0;
+    background-color: rgba(0, 0, 0, 0);
+    background-image: url("project://database/Assets/_Game/UI/Textures/tex_pad_terracotta.png");
+    -unity-background-scale-mode: stretch-to-fill;
+    -unity-slice-left: 28px; -unity-slice-right: 28px; -unity-slice-top: 28px; -unity-slice-bottom: 28px;
+}
+.action-pad__sun {
+    width: 52px; height: 52px;
+    background-image: url("project://database/Assets/_Game/UI/Icons/ic_sun_face.png");
+    -unity-background-scale-mode: scale-to-fit;
+}
+.action-pad__plate {
+    position: absolute; left: 4px; right: 4px; bottom: 0; height: 47px;
+    flex-direction: column; align-items: center; justify-content: center; border-width: 0;
+    background-color: rgba(0, 0, 0, 0);
+    background-image: url("project://database/Assets/_Game/UI/Textures/tex_plate_tuff.png");
+    -unity-background-scale-mode: stretch-to-fill;
+    -unity-slice-left: 16px; -unity-slice-right: 16px; -unity-slice-top: 16px; -unity-slice-bottom: 16px;
+}
+.action-pad__title {
+    font-size: 16px; margin: 0; padding: 0; color: #3B2A20; -unity-text-align: middle-center;
+    -unity-font-definition: url("project://database/Assets/_Game/UI/Fonts/Baloo2-Bold.ttf");
+    -unity-font-style: normal;
+}
+.action-pad__cargo {
+    font-size: 11px; margin: 0; padding: 0; color: #3B2A20; -unity-text-align: middle-center;
+    -unity-font-definition: url("project://database/Assets/_Game/UI/Fonts/Baloo2-SemiBold.ttf");
+    -unity-font-style: normal;
+}
+
+/* ---------- combo +N (mai il moltiplicatore) ---------- */
+#hud-root .combo-popup {
+    font-size: 22px; color: #F4C430;
+    -unity-text-outline-width: 2px; -unity-text-outline-color: #3B2A20;
+    -unity-font-definition: url("project://database/Assets/_Game/UI/Fonts/Baloo2-Bold.ttf");
+    -unity-font-style: normal;
+}
+
+/* Il carico sta sulla targhetta del pad, non sopra Kaia. */
+#hud-root .stack-pill { display: none; }
+
+/* Suggerimento sopra il joystick fermo (122 + 24) e fuori dal pad. */
+#hud-root .tut-hint { bottom: 160px; right: 154px; }
+#hud-root .skip-tut { top: 128px; right: 12px; left: auto; }
+#hud-root.hud--skip #order-row { right: 128px; }
+#hud-root.hud--skip #order-ticket .tutorial-objective { left: auto; right: auto; }
+
+/* Debito e telefono restano fuori dall'HUD minimo. */
+#hud-root.hud--minimal #toll-chip,
+#hud-root.hud--minimal #phone-button,
+#hud-root.hud--minimal #phone-badge,
+#hud-root.hud--minimal #room-pill,
+#hud-root.hud--minimal .bottom-dock { display: none; }

@@ -88,6 +88,91 @@ jobs:
         if: always()
         with: { name: test-results, path: test-results }
 
+  # Catture HUD direzione C (390×844 e 360×800) per la revisione del Concept Artist.
+  # Parte dopo i test: la licenza Personal ha un posto solo, non va attivata in parallelo al job test.
+  # unity-editor non legge UNITY_LICENSE: come game-ci, il seriale sta in DeveloperData della .ulf.
+  catture:
+    needs: [licenza, test]
+    if: needs.licenza.outputs.ok == 'true' && github.event_name == 'pull_request' && needs.test.result == 'success'
+    runs-on: ubuntu-24.04
+    timeout-minutes: 90
+    steps:
+      - uses: jlumbroso/free-disk-space@v1.3.1
+        with: { tool-cache: false, android: true, dotnet: true, haskell: true, large-packages: false, docker-images: false, swap-storage: false }
+      - uses: actions/checkout@v4
+      - name: Elenco oggetti LFS
+        run: git lfs ls-files -l | cut -d' ' -f1 | sort > .lfs-assets-id
+      - uses: actions/cache@v4
+        with:
+          path: .git/lfs
+          key: lfs-${{ hashFiles('.lfs-assets-id') }}
+          restore-keys: lfs-
+      - run: git lfs pull
+      - uses: actions/cache@v4
+        with:
+          path: Library
+          key: Library-${{ runner.os }}-insegna-${{ hashFiles('Packages/packages-lock.json', 'Packages/manifest.json', 'ProjectSettings/**') }}
+          restore-keys: |
+            Library-${{ runner.os }}-insegna-
+            Library-${{ runner.os }}-test-
+      - name: Cattura HUD insegna
+        env:
+          UNITY_LICENSE: ${{ secrets.UNITY_LICENSE }}
+          UNITY_EMAIL: ${{ secrets.UNITY_EMAIL }}
+          UNITY_PASSWORD: ${{ secrets.UNITY_PASSWORD }}
+        run: |
+          set -euo pipefail
+          python3 - <<'PY'
+          import os, base64, pathlib
+          lic = os.environ["UNITY_LICENSE"]
+          key = '<DeveloperData Value="'
+          i = lic.find(key)
+          if i < 0:
+              raise SystemExit("UNITY_LICENSE senza DeveloperData: attesa la .ulf, come per game-ci")
+          i += len(key)
+          j = lic.find('"/>', i)
+          serial = base64.b64decode(lic[i:j]).decode("latin1")[4:]
+          pathlib.Path("/tmp/unity-serial").write_text(serial)
+          PY
+          UNITY_SERIAL="$(cat /tmp/unity-serial)"
+          rm -f /tmp/unity-serial
+          echo "::add-mask::$UNITY_SERIAL"
+          mkdir -p Logs Captures/hud
+          docker run --rm \
+            -e UNITY_SERIAL -e UNITY_EMAIL -e UNITY_PASSWORD \
+            -v "$PWD:/project" -w /project \
+            --shm-size=1025m \
+            --entrypoint /bin/bash \
+            unityci/editor:ubuntu-6000.3.26f1-webgl-3 \
+            -lc '
+              set -e
+              if [[ "$UNITY_SERIAL" == F* ]]; then
+                dbus-uuidgen > /etc/machine-id
+                mkdir -p /var/lib/dbus
+                ln -sf /etc/machine-id /var/lib/dbus/machine-id
+              fi
+              mkdir -p /BlankProject/Assets /project/Logs
+              unity-editor -quit -serial "$UNITY_SERIAL" -username "$UNITY_EMAIL" -password "$UNITY_PASSWORD" \
+                -projectPath /BlankProject -logFile /project/Logs/insegna-activate.log
+              set +e
+              unity-editor -projectPath /project \
+                -executeMethod UltimoMiglio.UI.EditorTools.InsegnaCapture.Run \
+                -logFile /project/Logs/insegna-capture.log
+              code=$?
+              unity-editor -quit -returnlicense -username "$UNITY_EMAIL" -password "$UNITY_PASSWORD" \
+                -projectPath /BlankProject -logFile /project/Logs/insegna-return.log || true
+              exit $code
+            '
+      - name: Log cattura se fallisce
+        if: failure()
+        run: |
+          echo "---- activate ----"; tail -n 80 Logs/insegna-activate.log || true
+          echo "---- capture ----"; tail -n 160 Logs/insegna-capture.log || true
+          echo "---- return ----"; tail -n 40 Logs/insegna-return.log || true
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with: { name: catture-hud, path: Captures/hud, retention-days: 5 }
+
   commento:
     needs: [licenza, test]
     if: always() && github.event_name == 'pull_request'
