@@ -149,7 +149,7 @@ Ogni ruolo lavora solo sulle issue con la propria etichetta `ruolo:*`, sempre co
 
 Voci più recenti in alto. Formato: `AAAA-MM-GG HH:MM` (Europe/Rome) — [commit] — descrizione.
 
-- 2026-10-16 14:39 — UI/UX — merge di main nel ramo `ui/172-hud-insegna-noce` (niente force-push). La #172 e la PR #175 stanno nella milestone Gioco completo, fuori dalla build del capitolo 1 (nessuna data fissa). Tavola `docs/qa/hud_insegna_c/confronto_390_icona.png`: cattura 390 a icona con i righelli 117/140 del mockup C v2. Il PNG allegato non è nel workspace.
+- 2026-10-16 14:39 — UI/UX — [8b8d9bd](https://github.com/B00RR/ultimo-miglio/commit/8b8d9bd5ec48d34fb666857482f55bc8d5daa81b) — merge di main nel ramo `ui/172-hud-insegna-noce` (niente force-push). La #172 e la PR #175 stanno nella milestone Gioco completo, fuori dalla build del capitolo 1 (nessuna data fissa). Tavola `docs/qa/hud_insegna_c/confronto_390_icona.png`: cattura 390 a icona con i righelli 117/140 del mockup C v2. Il PNG allegato non è nel workspace.
 - 2026-10-16 14:23 — UI/UX — catture Unity 390×844 e 360×800 in `docs/qa/hud_insegna_c/` (CI verde, run 38897133634). Via visivo già dato dal Concept Artist sul mockup C v2. Responsabile: UI/UX Designer. Scadenza: milestone Gioco completo (nessuna data fissa).
 - 2026-10-16 14:19 — Regola fissa di Lorenzo: nessun agente gli scrive; tutto passa dal Producer a DevOn.
 - 2026-10-16 14:01 — Regole di consumo approvate da Lorenzo: coordinamento al Producer, pausa per chi ha finito, Sound, LiveOps e Concept in pausa fino al capitolo 2, CI esclusa per le PR di soli documenti.
