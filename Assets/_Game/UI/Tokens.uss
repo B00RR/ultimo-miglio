@@ -28,10 +28,10 @@
     background-color: rgba(0, 0, 0, 0) !important;
     background-image: url("project://database/Assets/_Game/UI/Textures/tex_cardboard_panel.png") !important;
     -unity-background-scale-mode: stretch-to-fill !important;
-    -unity-slice-left: 16px;
-    -unity-slice-top: 16px;
-    -unity-slice-right: 16px;
-    -unity-slice-bottom: 16px;
+    -unity-slice-left: 18px; /* #185: 16 + 2 px di margine trasparente */
+    -unity-slice-top: 18px; /* #185: 16 + 2 px di margine trasparente */
+    -unity-slice-right: 18px; /* #185: 16 + 2 px di margine trasparente */
+    -unity-slice-bottom: 18px; /* #185: 16 + 2 px di margine trasparente */
     border-radius: 16px !important;
 }
 .tutorial-objective {
@@ -40,10 +40,10 @@
     background-color: rgba(0, 0, 0, 0) !important;
     background-image: url("project://database/Assets/_Game/UI/Textures/tex_cardboard_panel.png") !important;
     -unity-background-scale-mode: stretch-to-fill !important;
-    -unity-slice-left: 16px;
-    -unity-slice-top: 16px;
-    -unity-slice-right: 16px;
-    -unity-slice-bottom: 16px;
+    -unity-slice-left: 18px; /* #185: 16 + 2 px di margine trasparente */
+    -unity-slice-top: 18px; /* #185: 16 + 2 px di margine trasparente */
+    -unity-slice-right: 18px; /* #185: 16 + 2 px di margine trasparente */
+    -unity-slice-bottom: 18px; /* #185: 16 + 2 px di margine trasparente */
     border-radius: 16px !important;
     -unity-font-definition: url("project://database/Assets/_Game/UI/Fonts/Fredoka-SemiBold.ttf") !important;
     color: var(--c-ink) !important;
@@ -55,10 +55,10 @@
     background-color: rgba(0, 0, 0, 0) !important;
     background-image: url("project://database/Assets/_Game/UI/Textures/tex_cardboard_panel.png") !important;
     -unity-background-scale-mode: stretch-to-fill !important;
-    -unity-slice-left: 16px;
-    -unity-slice-top: 16px;
-    -unity-slice-right: 16px;
-    -unity-slice-bottom: 16px;
+    -unity-slice-left: 18px; /* #185: 16 + 2 px di margine trasparente */
+    -unity-slice-top: 18px; /* #185: 16 + 2 px di margine trasparente */
+    -unity-slice-right: 18px; /* #185: 16 + 2 px di margine trasparente */
+    -unity-slice-bottom: 18px; /* #185: 16 + 2 px di margine trasparente */
     border-radius: 16px !important;
 }
 /* #185: il tema dei Button dipinge uno sprite 9-slice bianco. Senza questo, Salta tutorial
