@@ -1,7 +1,7 @@
 # STATO PROGETTO — Ultimo Miglio
 
 > Punto di ingresso unico per chiunque (persona o agente) lavori su questo repo. Aggiornalo **nella stessa PR** in cui completi qualcosa.
-> Ultimo aggiornamento: 2026-10-16 14:59 (Europe/Rome).
+> Ultimo aggiornamento: 2026-10-16 15:12 (Europe/Rome).
 
 ## 1. Il gioco
 - **Ultimo Miglio**: gioco mobile **Android**, **Unity 6 (6000.3) URP**.
@@ -23,7 +23,8 @@
 - **In pausa**: QA, Sound Designer, Narrative, LiveOps, Concept Artist (i loro documenti restano validi).
 
 ## 4. FATTO
-- **UI #110 pad Zaino livello 2 (ramo `ui/110-zaino-prezzo-liv2`)**: la PR #122 (`_waitExit`) non bastava. `EconomyCore.PadTick` restava aperto dopo l'acquisto: con il dwell già alto la stessa sosta pagava lo Zaino 2 (QA v10: 6 LN residui, portafoglio 26→5) e la pillola spariva con Nina sul pad, anche dopo il reload. Ora l'acquisto chiude la sosta (`_padOpen`): altri tick non scalano LN finché Nina non esce e rientra (`BeginPadStay`); `PadPaid` torna a 0 e il prezzo è il costo intero del livello successivo (80, poi 160). `HasCard` resta falso, pillola visibile. `upgrades.json` non toccato. Test EditMode `ZainoPad110Tests`.
+- **3D #118 Nonna Ada in scena (PR #169, su main `2993e96`)**: prefab riggato a fianco del Bancone (lato est), scala 0.88, Talk ai passi tutorial. PlayMode AdaSceneTest incluso.
+- **UI #110 pad Zaino (PR #174, su main `61054bc`)**: dopo un acquisto la sosta sul pad si chiude, il livello successivo si paga solo uscendo e rientrando; pillola prezzo sempre visibile. 3 test EditMode.
 - **UI #94 onboarding graduale (PR #100, in revisione; allineata a main dopo #78/#106/#135)**: `HudReveal` (nascosto/visibile + comparsa scala+dissolvenza 250 ms, HUD e mondo), **attivo di default per le partite nuove** (`RivelaGraduale`; salvataggi esistenti o tutorial finito = tutto visibile); barra LN pagato/totale sui pad + pillola residuo; aiuti come PR #90 (`OnboardingHints`: 10 s biglietto ripetuto + pulsazione, 20 s freccia a bordo o mano fantasma se il bersaglio è a schermo, 40 s camera ≤1,5 s una volta per passo); camera 2,75 s solo per elementi nuovi (`CameraPeek`); badge NONNO "x pacchi/min"; combo = `ComboPopup` solo "+N" sopra Nina (clienti di fila, 1,5 s; moltiplicatore solo soglia del passo 7, mai a schermo), niente contatore HUD; log `[Onb]` dietro `OnbLog` (spenti in rilascio); "Salta tutorial". Niente telefono né barra debito (DevOn). Compila con le DLL Unity 6000.3. **I test playmode del tutorial possono cambiare** (elementi nascosti all'avvio, freccia dopo 20 s).
 - **UI #142 anteprime `tutorial_hud_77` (PR ui/142-anteprime-nonno, in revisione)**: anteprime 360/390/412 rigenerate con il costo reale del pad NONNO (50 LN, non 10) e LN in tasca reali; solo documentazione QA, nessun C#.
 - **UI #77 + #5 (PR ui/77-tutorial-hud, in revisione)**: fumetto di Nonna Ada compatto (ritratto 36 dp + testo 14 dp, 1–2 righe senza ellissi per testi fino a 70 caratteri, sotto la riga LN/obiettivo); obiettivo spostato a destra della pillola LN nella stessa riga; suggerimenti `onb.*` come pillola terracotta sopra il joystick; freccia ▼ sopra la pillola prezzo dei pad di acquisto (colonna 3D rimossa, ribaltamento se il pad è in alto). Nuovo `UI/USS/TutorialHud.uss` (HudV2.uss non toccato). Testi passi letti per id dalla PR #62. QA anteprima 360/390/412 in `docs/qa/tutorial_hud_77/`. Da verificare in Unity.
@@ -148,6 +149,14 @@ Ogni ruolo lavora solo sulle issue con la propria etichetta `ruolo:*`, sempre co
 
 Voci più recenti in alto. Formato: `AAAA-MM-GG HH:MM` (Europe/Rome) — [commit] — descrizione.
 
+- 2026-10-16 15:12 — Producer — #174 unita (`61054bc`, chiude #110). Per la build manca solo **#157**: Zaino fermo al liv. 7, IdToStep con i 16 id (testi Narrative in `proposte/ONB16_TESTI_TILDE.md`), CI verde. QA in pausa: il test lo fa Lorenzo sul link.
+- 2026-10-16 15:08 — Producer — **punto Cap. 1 (15:08 Europe/Rome)**:
+  - **#169** unita (Ada in scena, `2993e96` su main).
+  - **#157** (tutorial 16 passi, `tech/101-tutorial-16`): MERGEABLE dopo rebase (`904869b`); job `test` **cancellato** sull'ultimo run — serve CI verde. **Blocco Code Reviewer**: Zaino cap. 1 deve fermarsi al **livello 7** (+ test). Responsabile Tech Lead.
+  - **#174** (fix Zaino liv.2 / #110, `ui/110-zaino-prezzo-liv2`): MERGEABLE dopo rebase (`c7084d2`); job **`test` verde**. Pronta per merge del Code Reviewer.
+  - **#175** (HUD insegna noce / #172): `test` verde, job **`catture` rosso**; fuori dalla build Cap. 1 (milestone Gioco completo). Code Reviewer non unisce (catture/CI licenza, STATO, conferma tempi).
+  - **QA**: in pausa; checklist LIVE #66 ancora aperta. **Build** WebGL Cap. 1 (#6/#179): dopo #157+#174 verdi → VIA Build & Release.
+  - **Rischio scadenza**: milestone Capitolo 1 → **17/10 10:00**; niente link pronto. Critico Cap. 1 ora: #157 (limite Zaino 7 + CI) e #174 (CI → merge).
 - 2026-10-16 14:59 — UI/UX — [PR #174](https://github.com/B00RR/ultimo-miglio/pull/174) (`ui/110-zaino-prezzo-liv2`) — merge di main dopo #169 e #154 (niente force-push). Conflitto solo su questo file: scena, SliceSceneBuilder e gameplay arrivano da main senza altre modifiche nostre.
 - 2026-10-16 14:19 — Regola fissa di Lorenzo: nessun agente gli scrive; tutto passa dal Producer a DevOn.
 - 2026-10-16 14:06 — UI/UX — [PR #174](https://github.com/B00RR/ultimo-miglio/pull/174) (`ui/110-zaino-prezzo-liv2`) — CI verde sul pad Zaino. Merge di main (niente force-push): #162, #132, #176. Conflitto solo su questo file.
