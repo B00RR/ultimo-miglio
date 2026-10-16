@@ -13,7 +13,9 @@ namespace UltimoMiglio.Gameplay
         Transform _padVis; float _pulse; Vector3 _padBase = Vector3.zero;
         void LateUpdate() { if (!_padVis) return; if (_padBase == Vector3.zero) _padBase = _padVis.localScale; _pulse = Mathf.MoveTowards(_pulse, 0, Time.deltaTime * 6f); _padVis.localScale = _padBase * (1f + 0.08f * Mathf.Sin(_pulse * Mathf.PI)); }
         // #110: dopo un acquisto il pad aspetta che Nina esca prima di pagare il livello successivo (_waitExit)
-        bool _paying, _waitExit; Renderer[] _renderers; Collider _col; int _avail = -1;
+        bool _paying, _waitExit;
+        /// #240: true dopo un acquisto finché Kaia non esce dal pad (= _waitExit della #110): anello, freccia e prezzo spenti.
+        public bool IsArmedOff => _waitExit; Renderer[] _renderers; Collider _col; int _avail = -1;
         void Awake()
         {
             _renderers = GetComponentsInChildren<Renderer>(true); _col = GetComponent<Collider>();
@@ -38,8 +40,13 @@ namespace UltimoMiglio.Gameplay
         protected override bool PerDistanza => true;
         protected override bool DentroPerDistanza(NinaController n)
         {
+            return FeetOnDisc(n.transform.position);
+        }
+        /// <summary>#171/#240: unica condizione dentro/fuori: piedi (pivot) entro il disco. La usano attivazione, _waitExit (#110) e il ritorno attivo del pad spento.</summary>
+        public bool FeetOnDisc(Vector3 p)
+        {
             if (!_col || !_col.enabled) return false; // pad non disponibile (costo infinito / non sbloccato): mai dentro
-            var c = DiscCenter; var p = n.transform.position; float dx = p.x - c.x, dz = p.z - c.z;
+            var c = DiscCenter; float dx = p.x - c.x, dz = p.z - c.z;
             float r = DiscRadius; return dx * dx + dz * dz <= r * r;
         }
         InteractionPoint _ip; bool _ipCercato; Transform _disc;
@@ -80,9 +87,20 @@ namespace UltimoMiglio.Gameplay
             if (!_paying) { _paying = true; AudioManager.I?.StartUpgradeLoop(); }
             if (!_padVis) _padVis = transform.Find("Pad"); if (_padVis) { _pulse = 1f; }
             if (Ring) Ring.SetFill((float)eco.PadFill(Kind));
-            if (done) { _waitExit = true; StopLoop(); AudioManager.I?.Play(AudioManager.Sfx.UpgradeComplete); UM_FxPlayer.Play(UM_FxPlayer.Fx.Upgrade, transform.position); UM_FxPlayer.Play(UM_FxPlayer.Fx.UpgradeComplete, transform.position); UM_FxPlayer.Play(UM_FxPlayer.Fx.Purchase, transform.position); Completed?.Invoke(Kind); Nina.Cheer(); }
+            if (done) { SetWaitExit(true); StopLoop(); AudioManager.I?.Play(AudioManager.Sfx.UpgradeComplete); UM_FxPlayer.Play(UM_FxPlayer.Fx.Upgrade, transform.position); UM_FxPlayer.Play(UM_FxPlayer.Fx.UpgradeComplete, transform.position); UM_FxPlayer.Play(UM_FxPlayer.Fx.Purchase, transform.position); Completed?.Invoke(Kind); Nina.Cheer(); }
         }
-        protected override void OnZoneExit() { base.OnZoneExit(); StopLoop(); _waitExit = false; }
+        protected override void OnZoneExit() { base.OnZoneExit(); StopLoop(); SetWaitExit(false); }
+        /// #240: unico punto in cui cambia _waitExit, così la grafica segue sempre il blocco della #110.
+        void SetWaitExit(bool v)
+        {
+            _waitExit = v;
+            if (FillRing) FillRing.SetOff(v);
+            foreach (var ip in GetComponentsInChildren<InteractionPoint>(true)) if (ip && ip.Pad == this) ip.SetPadOff(v);
+        }
+        /// Solo test: simula l'acquisto completato (done) e l'uscita di Kaia senza GameRoot.
+        public void TestCompletePurchase() => SetWaitExit(true);
+        /// Solo test: piedi di Kaia in p. Fuori dal disco = uscita (come ProximityZone.Update con PerDistanza), dentro = nessun cambio.
+        public void TestFeetAt(Vector3 p) { if (!FeetOnDisc(p)) OnZoneExit(); }
         void StopLoop() { if (_paying) { _paying = false; AudioManager.I?.StopUpgradeLoop(); } }
     }
 }
