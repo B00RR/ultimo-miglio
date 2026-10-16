@@ -9,10 +9,12 @@ SRC="${1:-Builds/WebGL_min}"; REPO="${UM_WEB_REPO:-B00RR/ultimo-miglio-web}"
 if ls "$SRC"/Build/*.br "$SRC"/Build/*.gz >/dev/null 2>&1; then
   echo "ERRORE: build compressa (.br/.gz): GitHub Pages non la serve correttamente. Rifare con WebGLBuild.BuildCI." >&2; exit 2; fi
 SHA=$(git rev-parse --short HEAD); TMP=$(mktemp -d)
+# Svuota la radice ma preserva dev/ (preview) e prova/
 gh repo clone "$REPO" "$TMP" -- -q --depth 1
-find "$TMP" -mindepth 1 -maxdepth 1 ! -name .git -exec rm -rf {} +
+find "$TMP" -mindepth 1 -maxdepth 1 ! -name .git ! -name dev ! -name prova -exec rm -rf {} +
 cp -r "$SRC"/. "$TMP"/; touch "$TMP/.nojekyll"
 tools/patch_index_mobile.sh "$TMP/index.html"
+tools/cache_bust_index.sh "$TMP/index.html" "$SHA"
 echo "commit sorgente: $SHA — $(date '+%Y-%m-%d %H:%M') Europe/Rome" > "$TMP/VERSIONE.txt"
 cd "$TMP"; git add -A
 git commit -qm "Build WebGL da ultimo-miglio@$SHA" && git push -q origin HEAD:main

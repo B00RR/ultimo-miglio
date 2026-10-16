@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 # Prepara la preview /dev/ (issue #179) dentro un clone del repo del sito (B00RR/ultimo-miglio-web).
 # Copia la build SOLO in <clone_sito>/dev/ (la radice e prova/ non vengono mai toccate), poi sull'index di dev/:
-# patch mobile (se manca), cap DPR a 1.25 ed etichetta fissa "dev <sha corto> - gg/mm HH:MM" (ora Europe/Rome).
+# patch mobile (se manca), cap DPR a 1.25, cache-bust ?v=<sha corto> sugli URL della build ed etichetta fissa "dev <sha corto> - gg/mm HH:MM" (ora Europe/Rome).
 # Uso: tools/deploy_dev.sh <cartella_build> <clone_sito> [sha]
 # Non fa commit ne' push: li fa il workflow (o chi lo lancia) dopo aver controllato che cambi solo dev/.
 set -euo pipefail
@@ -24,6 +24,7 @@ if ! grep -qF "devicePixelRatio:$CAP" "$F"; then
   fi
 fi
 grep -qF "devicePixelRatio:$CAP" "$F" || { echo "ERRORE: cap DPR non applicato" >&2; exit 1; }
+"$QUI/cache_bust_index.sh" "$F" "$CORTO"
 QUANDO="$(TZ=Europe/Rome date '+%d/%m %H:%M')"
 ETI="dev $CORTO - $QUANDO"
 DIV="<div id=\"um-dev\" style=\"position:fixed;right:4px;bottom:4px;z-index:9999;padding:2px 6px;font:11px/1.3 monospace;color:#fff;background:rgba(0,0,0,.55);border-radius:3px;pointer-events:none\">$ETI</div>"
