@@ -1,5 +1,5 @@
 {
-  "_nota": "Testi definitivi onboarding cap.1 (Narrative). Voce: Nonna Ada, dai biglietti lasciati nel deposito, parla a Nina. Max 70 caratteri. SliceSceneBuilder legge speaker, steps[].text IN ORDINE (7 passi, ordine del codice: ... monete, NONNO, Zaino) e fine: non cambiare ordine né chiavi.",
+  "_nota": "Testi definitivi onboarding cap.1 (Narrative). Voce: Nonna Ada, dai biglietti lasciati nel deposito, parla a Nina. Max 70 caratteri. SliceSceneBuilder legge speaker, steps[].text IN ORDINE (7 passi, ordine del codice: ... monete, NONNO, Zaino) e fine: non cambiare ordine né chiavi. Le chiavi in rinviati_cap2 (telefono) entrano nel cap. 2.",
   "speaker": "Nonna Ada",
   "steps": [
     {
@@ -43,7 +43,7 @@
     "onb.cust.first": "Porta un pacco al Bancone",
     "onb.coins.walk": "Cammina sulle monete",
     "onb.zaino.hint": "Zaino più grande, più pacchi per giro",
-    "onb.combo": "Servi di fila: la combo sale!",
+    "onb.combo": "Servi di fila, senza pause: ogni cliente rende di più!",
     "onb.nonno.intro": "Quel brontolone che dorme è NONNO. L'ha fatto la nonna.",
     "onb.nonno.what": "NONNO porta i pacchi dagli Arrivi agli scaffali.",
     "onb.nonno.cost": "Stai sul pad: con 50 LN NONNO si sveglia.",
@@ -53,17 +53,20 @@
     "onb.nonno.hired": "NONNO: «Sveglio. Non per scelta, ma sveglio.»",
     "onb.nonno.working": "Gli scaffali li riempie lui. Tu pensa ai clienti.",
     "onb.nonno.bark": "NONNO: «Bzz. Di nuovo al lavoro. Contenta, Ada?»",
+    "onb.viktor.call1": "Busta OmniFreight sulla Cassaforte: prima rata entro il Giorno 24.",
+    "onb.viktor.call2": "«Non ci deluda, sig.ra Vela. Cordialmente, V. Sale»",
+    "onb.debt.pedaggioHint": "Salti la rata? Quelli si prendono il 15% di ogni moneta. Occhio.",
+    "onb.wall.goal": "Prossimo obiettivo: abbatti il muro",
+    "onb.zaino.notEnough": "Per lo Zaino servono 40 LN. Ancora qualche cliente!",
+    "onb.pads.new": "Pad nuovi! Scarpe per correre, Insegna per clienti più ricchi.",
+    "onb.cassa.tip": "Sulla Cassa c'è una mancia di Nonna Ada: 30 LN. Prendila.",
+    "onb.debt.adaExplain": "La rata si versa qui, alla Cassaforte. Entro il Giorno 24, Nina."
+  },
+  "rinviati_cap2": {
     "onb.civetta.msg1": "Conoscevo tua nonna. Il pacco sul bancone? Non aprirlo. 🦉",
     "onb.civetta.reply": "Chi sei?",
     "onb.civetta.msg2": "Un vecchio socio. Torna al lavoro. 🦉",
     "onb.orders.special": "Mamma Rosa ha un ordine speciale",
-    "onb.flotta.hint": "Qui vedi i robot. I pad si comprano a terra",
-    "onb.viktor.call1": "Signora Vela. Viktor Sale, OmniFreight.",
-    "onb.viktor.call2": "La prima rata scade il Giorno 24. Non ci deluda.",
-    "onb.debt.pedaggioHint": "Salti la scadenza? OmniFreight prende il 15% di ogni moneta",
-    "onb.wall.goal": "Prossimo obiettivo: abbatti il muro",
-    "onb.zaino.notEnough": "Per lo Zaino servono 40 LN. Ancora qualche cliente!",
-    "onb.pads.new": "Pad nuovi! Scarpe per correre, Insegna per clienti più ricchi.",
-    "onb.cassa.tip": "Sulla Cassa c'è una mancia di Nonna Ada: 30 LN. Prendila."
+    "onb.flotta.hint": "Qui vedi i robot. I pad si comprano a terra"
   }
 }
