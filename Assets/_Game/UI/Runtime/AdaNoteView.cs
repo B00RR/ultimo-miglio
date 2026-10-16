@@ -26,11 +26,13 @@ namespace UltimoMiglio.UI
             root = hudRoot;
             band = new VisualElement { name = "ada-band", pickingMode = PickingMode.Ignore }; band.AddToClassList("ada-band");
             note = new VisualElement { name = "ada-note", pickingMode = PickingMode.Ignore }; note.AddToClassList("ada-note");
-            var face = new Label("ADA") { pickingMode = PickingMode.Ignore }; face.AddToClassList("ada-face");
+            var face = new VisualElement { name = "ada-face", pickingMode = PickingMode.Ignore };
+            face.AddToClassList("ada-face"); face.AddToClassList("ada-face--portrait");
             var col = new VisualElement { pickingMode = PickingMode.Ignore }; col.AddToClassList("ada-col");
             who = new Label(speaker) { pickingMode = PickingMode.Ignore }; who.AddToClassList("ada-name");
             body = new Label { pickingMode = PickingMode.Ignore }; body.AddToClassList("ada-text");
-            who.style.display = DisplayStyle.None; face.style.display = DisplayStyle.None; col.Add(body); note.Add(col); band.Add(note);
+            who.style.display = DisplayStyle.None;
+            note.Add(face); col.Add(body); note.Add(col); band.Add(note);
             band.style.display = DisplayStyle.None;
             root.Add(band);
         }

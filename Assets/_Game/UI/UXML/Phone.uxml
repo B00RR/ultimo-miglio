@@ -1,5 +1,8 @@
 <ui:UXML xmlns:ui="UnityEngine.UIElements" editor-extension-mode="False">
     <Style src="project://database/Assets/_Game/UI/USS/DioramaSolare.uss" />
+    <Style src="project://database/Assets/_Game/UI/Tokens.uss" />
+    <Style src="project://database/Assets/_Game/UI/USS/LegnoCartone.uss" />
+    <Style src="project://database/Assets/_Game/UI/USS/Phone.uss" />
     <ui:VisualElement name="phone-layer" class="fill" style="display: none;">
         <ui:VisualElement name="phone-scrim" class="fill">
             <ui:VisualElement name="phone-frame" picking-mode="Ignore"><ui:VisualElement name="phone">
