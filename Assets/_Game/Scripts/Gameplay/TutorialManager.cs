@@ -188,6 +188,9 @@ namespace UltimoMiglio.Gameplay
         readonly System.Collections.Generic.Dictionary<string, string> _hints = new();
         VisualElement _hint; Label _hintText; Step _adaShown = (Step)(-1);
 
+        /// <summary>Testo onb.* da onboarding_testi.json (null se assente). Usato anche da DebtMilestoneFeedback.</summary>
+        public string Hint(string key) => key != null && _hints.TryGetValue(key, out var v) ? v : null;
+
         void LoadTesti()
         {
             if (Texts == null || Texts.Length != StepCount) Texts = new string[StepCount]; // #101: niente più migrazione dal tutorial lineare a 7 passi (#4)
