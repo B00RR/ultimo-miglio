@@ -14,8 +14,8 @@
                     <ui:ScrollView mode="Vertical" horizontal-scroller-visibility="Hidden" name="screen-home">
                         <ui:Label name="home-day" text="Giorno 1/365 · Solara" />
                         <ui:Label name="home-time" text="08:00" />
-                        <ui:Label name="home-installment" text="" />
-                        <ui:VisualElement name="home-notification-card" class="phone-card"><ui:Label name="home-notification" text="" /></ui:VisualElement>
+                        <ui:Label name="home-installment" text="" style="display: none;" />
+                        <ui:VisualElement name="home-notification-card" class="phone-card" style="display: none;"><ui:Label name="home-notification" text="" /></ui:VisualElement>
                         <ui:VisualElement class="app-grid">
                             <ui:VisualElement name="tile-messaggi" class="tile tile--messaggi"><ui:VisualElement class="icon icon-chat" /><ui:Label class="tile-name" text="Messaggi" /><ui:Label class="tile-lock" text="" /><ui:Label class="badge" text="" style="display: none;" /></ui:VisualElement>
                             <ui:VisualElement name="tile-ordini" class="tile tile--ordini"><ui:VisualElement class="icon icon-box" /><ui:Label class="tile-name" text="Ordini" /><ui:Label class="tile-lock" text="" /><ui:Label class="badge" text="" style="display: none;" /></ui:VisualElement>
@@ -24,7 +24,7 @@
                             <ui:VisualElement name="tile-bottega" class="tile tile--bottega"><ui:VisualElement class="icon icon-bag" /><ui:Label class="tile-name" text="Bottega" /><ui:Label class="tile-lock" text="" /><ui:Label class="badge" text="" style="display: none;" /></ui:VisualElement>
                             <ui:VisualElement name="tile-razzo" class="tile tile--razzo"><ui:VisualElement class="icon icon-lock" /><ui:Label class="tile-name" text="Razzo" /><ui:Label class="tile-lock" text="" /><ui:Label class="badge" text="" style="display: none;" /></ui:VisualElement>
                         </ui:VisualElement>
-                        <ui:VisualElement class="phone-card"><ui:Label name="home-quest" text="" /></ui:VisualElement>
+                        <ui:VisualElement name="home-quest-card" class="phone-card" style="display: none;"><ui:Label name="home-quest" text="" /></ui:VisualElement>
                     </ui:ScrollView>
                     <ui:ScrollView mode="Vertical" horizontal-scroller-visibility="Hidden" name="screen-ordini" style="display: none;">
                         <ui:VisualElement name="ordini-list" />

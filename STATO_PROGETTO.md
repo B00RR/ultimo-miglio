@@ -1,7 +1,7 @@
 # STATO PROGETTO — Ultimo Miglio
 
 > Punto di ingresso unico per chiunque (persona o agente) lavori su questo repo. Aggiornalo **nella stessa PR** in cui completi qualcosa.
-> Ultimo aggiornamento: 2026-10-16 18:18 (Europe/Rome).
+> Ultimo aggiornamento: 2026-10-16 18:20 (Europe/Rome).
 
 ## 1. Il gioco
 - **Ultimo Miglio**: gioco mobile **Android**, **Unity 6 (6000.3) URP**.
@@ -25,6 +25,7 @@
 - **In pausa**: QA, Sound Designer, Narrative, LiveOps, Concept Artist (i loro documenti restano validi).
 
 ## 4. FATTO
+- **UI #71 telefono (PR ui/71-telefono-contrasto, in revisione)**: testi della home in bruno #3B2A20 (10,8:1 su crema) e noce per le righe secondarie, schede vuote (notifica, obiettivo) e riga rata nascoste finché non hanno testo. Il telefono resta fuori dall'HUD di gioco (DevOn #64).
 - **3D #118 Nonna Ada in scena (PR #169, su main `2993e96`)**: prefab riggato a fianco del Bancone (lato est), scala 0.88, Talk ai passi tutorial. PlayMode AdaSceneTest incluso.
 - **UI #110 pad Zaino (PR #174, su main `61054bc`)**: dopo un acquisto la sosta sul pad si chiude, il livello successivo si paga solo uscendo e rientrando; pillola prezzo sempre visibile. 3 test EditMode.
 - **UI #94 onboarding graduale (PR #100, in revisione; allineata a main dopo #78/#106/#135)**: `HudReveal` (nascosto/visibile + comparsa scala+dissolvenza 250 ms, HUD e mondo), **attivo di default per le partite nuove** (`RivelaGraduale`; salvataggi esistenti o tutorial finito = tutto visibile); barra LN pagato/totale sui pad + pillola residuo; aiuti come PR #90 (`OnboardingHints`: 10 s biglietto ripetuto + pulsazione, 20 s freccia a bordo o mano fantasma se il bersaglio è a schermo, 40 s camera ≤1,5 s una volta per passo); camera 2,75 s solo per elementi nuovi (`CameraPeek`); badge NONNO "x pacchi/min"; combo = `ComboPopup` solo "+N" sopra Nina (clienti di fila, 1,5 s; moltiplicatore solo soglia del passo 7, mai a schermo), niente contatore HUD; log `[Onb]` dietro `OnbLog` (spenti in rilascio); "Salta tutorial". Niente telefono né barra debito (DevOn). Compila con le DLL Unity 6000.3. **I test playmode del tutorial possono cambiare** (elementi nascosti all'avvio, freccia dopo 20 s).
@@ -157,7 +158,13 @@ Ogni ruolo lavora solo sulle issue con la propria etichetta `ruolo:*`, sempre co
 
 Voci più recenti in alto. Formato: `AAAA-MM-GG HH:MM` (Europe/Rome) — [commit] — descrizione.
 
+- 2026-10-16 18:20 — UI/UX — merge di `origin/main` (`9f6553c`) nel ramo etichette (#186), niente rebase: restano l'anello = trigger (#187), la cache #191 e il punto Cap. 1 delle 18:10. Il prezzo resta sull'insegna (#186).
 - 2026-10-16 18:18 — UI/UX — #186 sulla cattura di `9063e83` (390×844): l'ombra del fumetto è figlia del fumetto (`left`/`right` 0, `top` 4 px, `bottom` -4 px, #9E7873 al 60%), così non sporge più a destra; stessa misura per «Muoviti». Il testo non ha più un tetto: `max-height: none`, overflow visibile, `text-overflow: clip`, padding sotto 16 dp. USS non ha `line-height`: l'interlinea resta quella di Fredoka. Unity non rieseguito.
+- 2026-10-16 18:10 — Producer — **punto Cap. 1 (18:10 Europe/Rome)**, main a [ee59380](https://github.com/B00RR/ultimo-miglio/commit/ee59380fdab2bb148e8515eeff2d2aa2c51ecc84):
+  - **#157** (tutorial 16 passi), **#174** (Zaino liv. 2, chiude #110) e **#169** (Ada in scena): unite.
+  - **#175** (HUD insegna di noce): ancora aperta, **in conflitto** con main, ferma dalle 15:49. Anche **#214** (trigger pad = cerchio, #171) e **#202** (fumetto HUD, #186) sono in conflitto: serve rebase.
+  - **Build**: su main `build` e `deploy-dev` verdi (link dev: https://b00rr.github.io/ultimo-miglio-web/dev/); il job `test` è **fallito per la licenza Unity** (0 entitlement, immagine `unityci/editor:ubuntu-6000.3.26f1-webgl-3` non trovata), non per il codice. Stesso errore su **#211**. Rilanciati i job falliti alle 18:10.
+  - **QA**: nessuna issue `ruolo:qa` aperta; il test lo fa Lorenzo sul link.
 - 2026-10-16 17:50 — UI/UX — #186 sulle catture della build `24b9bfc` (390×844): il fumetto di Oma Tilde è carta #F3E3C3 con testo #3B2A20, alto quanto le due righe, senza sprite di luce; l'ombra portata ha la stessa sagoma della pillola e del fumetto e scende di 4 dp (#9E7873 al 60%); «Muoviti» è crema #F3E3C3, senza contorno chiaro. L'insegna di noce tiene un alpha usato, così il test #185 non la scarta. Unity non rieseguito: non è la via finché non c'è una cattura nuova.
 - 2026-10-16 17:26 — UI/UX — #186 sulle catture della build `075f0f6` (390×844): «Muoviti» lascia 10 dp prima dell'ingranaggio e segue la safe area; il fumetto di Oma Tilde va a capo (2 righe, niente ellissi); le pillole hanno luce in alto, ombra portata #9E7873 e contorno leggero; sopra i 32 px il raggio è metà altezza, con sprite capsula dello stesso raggio. I pannelli #185 restano quelli di main.
 - 2026-10-16 17:18 — UI/UX — merge di `origin/main` nel ramo `ui/186-font-etichette` (niente rebase): entra il fix #185 (angoli 9-slice RGBA) e le zone #187. Il prezzo dei pad resta sull'insegna (#186), senza il font dinamico.

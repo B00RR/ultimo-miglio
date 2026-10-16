@@ -123,10 +123,29 @@ namespace UltimoMiglio.VFX.EditorTools
             m.name = name; AssetDatabase.CreateAsset(m, p); return m;
         }
 
+        /// Salva il prefab SOLO se ogni MonoBehaviour ha il suo MonoScript come asset. Se un tipo non è ancora mappato
+        /// (batchmode con script non importati/compilati), SaveAsPrefabAsset scriverebbe m_Script {fileID: 0} e il
+        /// componente sparirebbe (es. UM_PadFillRing nei 13 pad): in quel caso errore e si tiene il prefab esistente.
         static void Save(GameObject go)
         {
-            PrefabUtility.SaveAsPrefabAsset(go, $"{PrefabDir}/{go.name}.prefab");
+            string path = $"{PrefabDir}/{go.name}.prefab";
+            foreach (var mb in go.GetComponentsInChildren<MonoBehaviour>(true))
+            {
+                var ms = mb ? MonoScript.FromMonoBehaviour(mb) : null;
+                if (!mb || !ms || string.IsNullOrEmpty(AssetDatabase.GetAssetPath(ms)))
+                {
+                    Debug.LogError($"[UM VFX] {path}: script mancante per {(mb ? mb.GetType().FullName : "<null>")} — prefab NON sovrascritto (eviterebbe m_Script fileID 0)");
+                    Object.DestroyImmediate(go);
+                    return;
+                }
+            }
+            PrefabUtility.SaveAsPrefabAsset(go, path);
             Object.DestroyImmediate(go);
+            var saved = AssetDatabase.LoadAssetAtPath<GameObject>(path);
+            if (saved)
+                foreach (var t in saved.GetComponentsInChildren<Transform>(true))
+                    if (GameObjectUtility.GetMonoBehavioursWithMissingScriptCount(t.gameObject) > 0)
+                        Debug.LogError($"[UM VFX] {path}: componente con script mancante su '{t.name}' dopo il salvataggio");
         }
 
         static void Ensure(string parent, string child)

@@ -47,6 +47,7 @@ namespace UltimoMiglio.Gameplay
         public Step SaltaDopo = Step.Combo;
 
         public Step Current { get; private set; }
+        CassaZone _cassaZone; string _hintSrc; // #191 cache
         public string CurrentObjectiveText => Current < Step.Fine && (int)Current < Objectives.Length ? Objectives[(int)Current] : (Current == Step.Fine ? "Deposito aperto!" : "");
         Vector3 _startPos; int _shelfBase, _servedBase, _padBase, _coinBase; double _walletBase, _debtBase; float _endT, _stepStart; bool _cassaSeen;
         int _hintCount, _lvl3; float _nolnpAt = -99f;
@@ -222,7 +223,7 @@ namespace UltimoMiglio.Gameplay
             shadow.AddToClassList("ombra-portata"); shadow.AddToClassList("ombra-portata--32");
             var pill = new VisualElement { pickingMode = PickingMode.Ignore }; pill.AddToClassList("tut-hint__pill");
             var go = new VisualElement { pickingMode = PickingMode.Ignore }; go.AddToClassList("tut-hint__go");
-            _hintText = new Label { pickingMode = PickingMode.Ignore }; _hintText.AddToClassList("tut-hint__text");
+            _hintText = new Label { pickingMode = PickingMode.Ignore }; _hintSrc = null; _hintText.AddToClassList("tut-hint__text");
             pill.Add(go); pill.Add(_hintText); slot.Add(shadow); slot.Add(pill); _hint.Add(slot);
             (_hud.SafeRoot ?? _hud.Root).Add(_hint);
         }
@@ -318,22 +319,73 @@ namespace UltimoMiglio.Gameplay
             Debug.Log($"[Tutorial] step {(int)s} {s}: {CurrentText}");
             StepChanged?.Invoke(s);
             RevealFor(s);
-            var t = Target();
-            // #94: con gli aiuti progressivi la freccia a bordo schermo arriva solo dopo 20 s di inattività (OnboardingHints)
-            if (_edge) { if (t && !OnboardingHints.Active) _edge.SetTarget(t, s.ToString().ToUpper()); else _edge.Clear(); }
-            // #4 (VFX): anello pulsante a terra sul bersaglio + freccia a terra davanti a Nina (niente waypoint fluttuante, QA #44)
-            if (t) UltimoMiglio.VFX.UM_TutorialMarker.Show(t, GameRoot.I && GameRoot.I.Nina ? GameRoot.I.Nina.transform : null); else UltimoMiglio.VFX.UM_TutorialMarker.Hide();
+            AggiornaGuida(true);
             if (_marker) _marker.gameObject.SetActive(false); // QA v2: no world waypoint if edge arrow exists
         }
 
         static int ShelfTotal() { int n = 0; foreach (var sh in FindObjectsByType<Shelf>(FindObjectsSortMode.None)) n += sh.Count; return n; }
 
         public Transform CurrentTarget => Target();
-        Transform Target() => Current switch
+        Transform Target() => TargetOf(Current);
+
+        /// <summary>#189 (spec GD 16/10): come si indica il bersaglio di un passo. Freccia = chevron a terra da Nina al bersaglio;
+        /// FrecciaOltre = la freccia sparisce sotto questa distanza (m); Anello = anello pulsante sotto il bersaglio.</summary>
+        public struct Guida { public Transform Target; public bool Freccia, Anello; public float FrecciaOltre; }
+        /// <summary>Passi con un bersaglio nel mondo (spec #189: 2-14; il passo move usa joystick e mano fantasma, nessun bersaglio a terra).</summary>
+        public static bool HasWorldTarget(Step s) => s >= Step.PickUp && s <= Step.WallPad;
+        public static bool HasArrow(Step s) => s == Step.PickUp || s == Step.Shelve || s == Step.Serve || s == Step.Coins || s == Step.ZainoPad
+            || s == Step.HireNonno || s == Step.PadNuovi || s == Step.CassaPass || s == Step.DebtCard;
+        public Guida GuidaDi(Step s) => new Guida { Target = TargetOf(s), Freccia = HasArrow(s), Anello = HasWorldTarget(s), FrecciaOltre = s == Step.Coins ? 3f : 1.2f };
+
+        /// <summary>Bersaglio del passo s, ricalcolato ogni frame (scaffale libero più vicino, pad nuovo più vicino, ...).</summary>
+        public Transform TargetOf(Step s) => s switch
         {
-            Step.PickUp => Arrivi, Step.Shelve => Scaffale, Step.Serve => Bancone, Step.Coins => Monete, Step.Combo => Bancone,
-            Step.ZainoPad => PadZaino, Step.NonnoIntro => PadNonno, Step.HireNonno => PadNonno, Step.PadNuovi => CheapestNewPad(), Step.CassaPass => Cassa(), _ => null
+            Step.PickUp => Arrivi, Step.Shelve => NearestFreeShelf() ?? Scaffale, Step.Serve => Bancone, Step.Coins => Monete ? Monete : Bancone, Step.Combo => Bancone,
+            Step.ZainoPad => PadZaino, Step.NonnoIntro => PadNonno, Step.HireNonno => PadNonno, Step.NonnoConfirm => Nonno() ?? PadNonno,
+            Step.PadNuovi => NearestNewPad() ?? CheapestNewPad(), Step.CassaPass => Cassa(), Step.DebtCard => Ada() ?? Bancone,
+            Step.WallPad => NearestNewPad() ?? Cassa(), // la slice non ha ancora il pad muro: anello sul prossimo pad (o Cassa), vedi PR #189
+            _ => null
         };
+
+        Transform _guidaT; Step _guidaS = Step.Chiuso;
+        /// <summary>#189: freccia a terra, anello e freccia a bordo schermo seguono il bersaglio del passo corrente (anche se cambia o compare dopo).</summary>
+        void AggiornaGuida(bool forza)
+        {
+            var g = Current < Step.FreePlay ? GuidaDi(Current) : default;
+            if (!forza && g.Target == _guidaT && _guidaS == Current) return;
+            _guidaT = g.Target; _guidaS = Current;
+            var nina = GameRoot.I && GameRoot.I.Nina ? GameRoot.I.Nina.transform : null;
+            if (g.Target && g.Anello) UltimoMiglio.VFX.UM_TutorialMarker.Show(g.Target, nina, g.Freccia, g.FrecciaOltre); else UltimoMiglio.VFX.UM_TutorialMarker.Hide();
+            // #94: con gli aiuti progressivi la freccia a bordo schermo arriva solo dopo 20 s di inattività (OnboardingHints)
+            if (_edge) { if (g.Target && g.Freccia && !OnboardingHints.Active) _edge.SetTarget(g.Target, Current.ToString().ToUpper()); else if (!OnboardingHints.Active) _edge.Clear(); }
+        }
+        /// <summary>Solo test #189: i passi non avanzano da soli (si entra con <see cref="TestEntraNelPasso"/>).</summary>
+        public static bool TestBloccaPassi;
+        /// <summary>Solo test: entra direttamente nel passo s.</summary>
+        public void TestEntraNelPasso(Step s) => Enter(s);
+
+        Transform NearestFreeShelf()
+        {
+            var n = GameRoot.I ? GameRoot.I.Nina : null; Transform best = null; float bd = float.MaxValue;
+            foreach (var sh in FindObjectsByType<Shelf>(FindObjectsSortMode.None))
+            {
+                if (sh.Count >= sh.Capacity) continue;
+                float d = n ? (sh.transform.position - n.transform.position).sqrMagnitude : 0; if (d < bd) { bd = d; best = sh.transform; }
+            }
+            return best;
+        }
+        Transform NearestNewPad()
+        {
+            var n = GameRoot.I ? GameRoot.I.Nina : null; var eco = GameRoot.I ? GameRoot.I.Eco : null; Transform best = null; float bd = float.MaxValue;
+            foreach (var p in FindObjectsByType<UpgradePad>(FindObjectsSortMode.None))
+            {
+                if ((p.Kind != UpgradeKind.Scarpe && p.Kind != UpgradeKind.Insegna) || (eco != null && double.IsInfinity(eco.Cost(p.Kind)))) continue;
+                float d = n ? (p.transform.position - n.transform.position).sqrMagnitude : 0; if (d < bd) { bd = d; best = p.transform; }
+            }
+            return best;
+        }
+        static Transform Nonno() { var b = FindAnyObjectByType<NonnoRobot>(); return b ? b.transform : null; }
+        static Transform Ada() { var a = FindAnyObjectByType<AdaPresence>(); return a ? a.transform : null; }
 
         void Update()
         {
@@ -359,7 +411,7 @@ namespace UltimoMiglio.Gameplay
             EnsureHint();
             if (_hint != null) { var h = Current < Step.Fine ? CurrentHint() : null; var joy = _hud.Root.Q("joystick-base"); bool joyOver = joy != null && joy.resolvedStyle.display == DisplayStyle.Flex && joy.resolvedStyle.opacity > 0.05f && joy.worldBound.Overlaps(_hint.worldBound);
                 _hint.EnableInClassList("tut-hint--on", !string.IsNullOrEmpty(h) && !joyOver); // mai sotto il pollice/joystick flottante
-                if (_hintText != null && h != null) _hintText.text = DisplayNames.Apply(h); }
+                if (_hintText != null && h != null && !string.Equals(h, _hintSrc)) { _hintSrc = h; _hintText.text = DisplayNames.Apply(h); } } // #191: Replace solo quando cambia il suggerimento
             // B4 P2: testi Ada nel fumetto HUD (non solo console)
             if (_banner != null)
             {
@@ -368,11 +420,12 @@ namespace UltimoMiglio.Gameplay
                 _banner.style.display = show ? DisplayStyle.Flex : DisplayStyle.None;
                 if (show && _bannerText != null) _bannerText.text = txt;
             }
-            var t = Target();
+            AggiornaGuida(false);
             if (_marker) _marker.gameObject.SetActive(false);
+            if (TestBloccaPassi) return;
             var eco = GameRoot.I.Eco; var nina = GameRoot.I.Nina;
             float inStep = Time.time - _stepStart;
-            if (Current == Step.CassaPass) { var cz = FindAnyObjectByType<CassaZone>(); if (cz && cz.Occupied) _cassaSeen = true; }
+            if (Current == Step.CassaPass) { if (!_cassaZone) _cassaZone = FindAnyObjectByType<CassaZone>(); var cz = _cassaZone; /* #191: niente ricerca scena a ogni frame */ if (cz && cz.Occupied) _cassaSeen = true; }
             string ev = Current switch
             {
                 Step.ColdOpen => inStep >= ColdOpenEff ? "coldOpenEnd" : null,
