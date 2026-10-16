@@ -7,6 +7,7 @@ Sim di design: `qa/econ_sim_v3.py` v3.3 (`--eff`, `--sess NxL|none`, `--ad`, `--
 **Tempi per zona:** 0,5 s di permanenza prima che l'azione parta; 0,1 s per pacco preso o posato; 1,0 s per cliente servito; 1,5 s di raccolta monete per giro; i pad incassano a curva accelerata (pad pieno in max 3 s di sosta).
 **Clienti e abilità:** arrivano 30 + 5×(cap-1) clienti/min, **sempre più di quanti Nina riesca a servire** (27-45/min nella sim). La coda tiene fino a 20 s di **pazienza**: chi aspetta di più se ne va e la vendita è persa. Chi gioca meglio serve più clienti, quindi il ritmo dipende dall'abilità e dagli upgrade di Nina, non dalla domanda.
 **Combo:** +0,1 per cliente servito, max x2. Si azzera se tra un cliente e il successivo passano **più di 5 s** (7 s in Assist). Dentro un giro i clienti sono a 1 s l'uno dall'altro; tra due giri conta il tempo di ritorno, quindi la combo sopravvive al giro solo se Nina è veloce (Scarpe, TICO, pila grande). Media nella sim: x1,5 al cap 1, x1,8 dal cap 10.
+**Combo, cosa vede il giocatore (HUD minimo, decisione DevOn 16/10):** l'unico feedback a schermo è **"+N" sopra Nina**, dove N = clienti serviti di fila nella combo in corso; compare a ogni cliente e sparisce in **1,5 s**. Il moltiplicatore (x1,1, x1,2 … x2) è **solo interno**: serve al calcolo delle LN e come soglia del gate dell'onboarding (x1,2), e **non viene mai mostrato nell'HUD**.
 **Sessione (3-5 min):** Cassa (offline) → ordini speciali di Mamma Rosa → 1-2 pad → Cassaforte → missione drone (cap 3+).
 **Ciclo giorno/notte = 7 min attivi ≈ 4,26 giorni di calendario** (4 in Assist, §7). Cap 1-5: giorno 6:55 + tramonto di 5 s. Dal cap 6: **giorno 5:00 + notte 2:00**. Il tempo scorre solo giocando.
 
@@ -22,7 +23,7 @@ La pila parte da **5**. Con la pila piena compare MAX e Nina rallenta del 10%. P
 | costo LN | 40 | 80 | 160 | 320 | 640 | 1.280 | 2.560 | 5.120 | 10.240 | 20.480 | 40.960 | 81.920 | 163.840 | 327.680 |
 | Scarpe (+vel.) | +6% | +12% | +18% | +24% | +30% | +36% | +42% | +48% | +54% | +60% | | | | |
 | costo LN | 60 | 162 | 437 | 1.181 | 3.189 | 8.609 | 23.245 | 62.762 | 169.458 | 457.536 | | | | |
-- **Zaino:** meno viaggi e combo più lunghe. **Scarpe:** circa 1 s in meno a giro. Visto che Nina è sempre il collo di bottiglia (§1), tutti e due alzano davvero le LN/min.
+- **Zaino** (costi: 40/80/160/320/560/960/1.700/**3.000**, poi ×2 dal livello 9 = 10.240): meno viaggi e combo più lunghe. **Scarpe:** circa 1 s in meno a giro. Visto che Nina è sempre il collo di bottiglia (§1), tutti e due alzano davvero le LN/min.
 - **Insegna** (10 liv, 90×2,7^(n-1) LN): **+6% di valore medio per cliente** (più VIP), non più clienti. La domanda è già oltre la capacità di Nina.
 - Acquisti scelti per **miglior guadagno di LN/min per LN spesa** (sim). Giocatore medio: Zaino 6 a fine cap 1, 10 al cap 4, 14 al cap 10; Insegna max al cap 11, Scarpe al cap 13 (§6).
 **Pacchi pesanti (cap 8):** occupano **5 slot** della stessa pila, quindi Nina ne porta floor(pila/5) e li può mescolare con i normali. Valgono 6× un pacco normale. BRACCIO li sposta in automatico.

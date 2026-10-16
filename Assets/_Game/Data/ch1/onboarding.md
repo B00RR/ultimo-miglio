@@ -32,7 +32,7 @@ Note ai passi:
 - `shelve` compare quando la pila è piena (5) o quando Nina lascia gli Arrivi con almeno 1 pacco.
 - `zainoPad` compare a 40 LN in tasca. È un gate vero (insegna a comprare un pad): senza, NONNO non si capisce.
 - `nonnoIntro`/`hireNonno`/`nonnoConfirm`: camera su NONNO e pad (2,5 s), barra "LN/50" sul pad, con LN insufficienti `onb.nonno.notEnough` e freccia al Bancone, poi `onb.nonno.ready`; dopo l'assunzione camera su NONNO al lavoro (3 s), `onb.nonno.hired` + `onb.nonno.working`; da lì `onb.nonno.bark` solo come bark ricorrente.
-- `combo`: gate x1,2; feedback solo "+N" sopra Nina (1,5 s).
+- `combo`: a schermo solo **"+N" sopra Nina** (N = clienti serviti di fila), che sparisce in 1,5 s. Il gate è il moltiplicatore interno x1,2 (cioè il 2° cliente di fila, "+2"): x1,2 non compare mai nell'HUD.
 - `debtCard`: Nonna Ada spiega il debito nel fumetto (`onb.debt.adaExplain`, `onb.debt.pedaggioHint`); le righe di Viktor arrivano come **lettera di OmniFreight** sulla Cassaforte (`onb.viktor.call1/2`, non più telefonata). Il progresso del debito (versato/8.400, giorno/scadenza Giorno 24) compare nella **schermata di fine giornata**.
 - Rimossi i passi `phone` (Civetta) e `ordersApp` (ordine speciale, app Flotta): rinviati al cap 2, quando arriva il telefono.
 - `padNuovi`: Scarpe e Insegna compaiono solo qui (prima era tutto visibile dopo NONNO); gate = un acquisto qualsiasi dei due.
