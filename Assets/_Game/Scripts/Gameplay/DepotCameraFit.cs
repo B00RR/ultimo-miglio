@@ -12,6 +12,8 @@ namespace UltimoMiglio.Gameplay
     public sealed class DepotCameraFit : MonoBehaviour
     {
         public const string PrefZoom = "cam_zoom_v3";
+        /// <summary>#104: range dello zoom scelto dal giocatore (pannello Impostazioni) = range accettato al boot da cam_zoom_v3.</summary>
+        public const float UserMinOrtho = 4.2f, UserMaxOrtho = 9f;
         public CinemachineCamera Cm; public Transform Nina;
         public float Margin = 1.0f, TopHud = 0.20f, BottomHud = 0.08f, MinOrtho = 4.2f, MaxOrtho = 18f;
         /// <summary>FollowSmoothMove in corsa; FollowSmoothIdle ricentra da fermi (~0.3 s). DeadZone solo se velocity > soglia.</summary>
@@ -40,8 +42,8 @@ namespace UltimoMiglio.Gameplay
             RecomputeBounds();
             float saved = PlayerPrefs.GetFloat(PrefZoom, 0f);
             bool portrait = Screen.height > Screen.width;
-            if (portrait) _ortho = (saved >= 4.2f && saved <= 6.5f) ? saved : DefaultPortraitOrtho;
-            else _ortho = (saved >= 5f && saved <= 10f) ? saved : DefaultLandscapeOrtho;
+            // #104: prima in verticale si accettava solo 4.2-6.5 e lo zoom salvato dal pannello (fino a 9) si perdeva al reload
+            _ortho = (saved >= UserMinOrtho && saved <= UserMaxOrtho) ? saved : (portrait ? DefaultPortraitOrtho : DefaultLandscapeOrtho);
             _ortho = Mathf.Clamp(_ortho, MinOrtho, MaxOrtho);
             Apply(true);
         }
@@ -150,8 +152,8 @@ namespace UltimoMiglio.Gameplay
             var cam = Camera.main; if (cam) cam.orthographicSize = _ortho;
         }
 
-        public void ZoomBy(float delta) { OrthoSize = _ortho + delta; }
-        public void SetOrthoSize(float v) { OrthoSize = v; }
+        public void ZoomBy(float delta) { OrthoSize = Mathf.Clamp(_ortho + delta, UserMinOrtho, UserMaxOrtho); }
+        public void SetOrthoSize(float v) { OrthoSize = Mathf.Clamp(v, UserMinOrtho, UserMaxOrtho); }
         public float GetOrthoSize() => OrthoSize;
         public void SaveZoom() { PlayerPrefs.SetFloat(PrefZoom, _ortho); PlayerPrefs.Save(); }
     }

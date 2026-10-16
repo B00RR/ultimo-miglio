@@ -1,5 +1,5 @@
 <ui:UXML xmlns:ui="UnityEngine.UIElements" editor-extension-mode="False">
-    <Style src="project://database/Assets/_Game/UI/USS/DioramaSolare.uss" /><Style src="project://database/Assets/_Game/UI/Tokens.uss" /><Style src="project://database/Assets/_Game/UI/USS/HudV2.uss" />
+    <Style src="project://database/Assets/_Game/UI/USS/DioramaSolare.uss" /><Style src="project://database/Assets/_Game/UI/Tokens.uss" /><Style src="project://database/Assets/_Game/UI/USS/HudV2.uss" /><Style src="project://database/Assets/_Game/UI/USS/Settings.uss" />
     <Style src="project://database/Assets/_Game/UI/USS/LegnoCartone.uss" />
     <Style src="project://database/Assets/_Game/UI/USS/TutorialHud.uss" />
     <Style src="project://database/Assets/_Game/UI/USS/Onboarding.uss" />
@@ -38,6 +38,34 @@
                 <ui:Label name="safe-progress-text" text="" />
                 <ui:Label name="safe-close" text="×" />
             </ui:VisualElement></ui:VisualElement>
+        </ui:VisualElement>
+
+        <ui:VisualElement name="settings-root" class="fill" picking-mode="Ignore" style="display: none;">
+            <ui:VisualElement name="settings-scrim" class="settings-scrim">
+                <ui:VisualElement name="settings-panel" class="settings-panel" picking-mode="Position">
+                    <ui:Label name="settings-title" class="settings-title" text="Impostazioni" picking-mode="Ignore" />
+                    <ui:VisualElement class="settings-row" picking-mode="Ignore">
+                        <ui:Label class="settings-label" text="Zoom" picking-mode="Ignore" />
+                        <ui:VisualElement class="settings-zoom-group" picking-mode="Ignore">
+                            <ui:Button name="zoom-minus" class="settings-zoom-btn" text="−" />
+                            <ui:Label name="zoom-value" class="settings-zoom-value" text="—" picking-mode="Ignore" />
+                            <ui:Button name="zoom-plus" class="settings-zoom-btn" text="+" />
+                        </ui:VisualElement>
+                    </ui:VisualElement>
+                    <ui:VisualElement class="settings-row" picking-mode="Ignore">
+                        <ui:Label class="settings-label" text="Musica" picking-mode="Ignore" />
+                        <ui:Slider name="slider-music" class="settings-slider" low-value="0" high-value="1" value="0.6" />
+                    </ui:VisualElement>
+                    <ui:VisualElement class="settings-row" picking-mode="Ignore">
+                        <ui:Label class="settings-label" text="Suoni" picking-mode="Ignore" />
+                        <ui:Slider name="slider-sfx" class="settings-slider" low-value="0" high-value="1" value="1" />
+                    </ui:VisualElement>
+                    <ui:VisualElement class="settings-actions" picking-mode="Ignore">
+                        <ui:Button name="settings-save" class="settings-btn-save" text="Salva" />
+                        <ui:Button name="settings-back" class="settings-btn-back" text="Indietro" />
+                    </ui:VisualElement>
+                </ui:VisualElement>
+            </ui:VisualElement>
         </ui:VisualElement>
     </ui:VisualElement>
 </ui:UXML>
