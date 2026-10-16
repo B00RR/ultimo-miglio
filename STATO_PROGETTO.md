@@ -1,7 +1,7 @@
 # STATO PROGETTO — Ultimo Miglio
 
 > Punto di ingresso unico per chiunque (persona o agente) lavori su questo repo. Aggiornalo **nella stessa PR** in cui completi qualcosa.
-> Ultimo aggiornamento: 2026-10-16 02:10 (Europe/Rome).
+> Ultimo aggiornamento: 2026-10-16 02:15 (Europe/Rome).
 
 ## 1. Il gioco
 - **Ultimo Miglio**: gioco mobile **Android**, **Unity 6 (6000.3) URP**.
@@ -96,6 +96,8 @@ $UNITY -batchmode -projectPath "$PWD" -runTests -testPlatform PlayMode \
 
 ## 11. Cronologia
 Voci più recenti in alto. Formato: `AAAA-MM-GG HH:MM` (Europe/Rome) — [commit] — descrizione.
+
+- 2026-10-16 02:15 — [6081d67](https://github.com/B00RR/ultimo-miglio/commit/6081d67) — merge #49 LegnoCartone/Ada portrait in fix-qa; EditMode 35/35 PlayMode 6/6; Closes #49 sulla PR #45. #52/#47 ancora in coda.
 
 - 2026-10-16 02:10 — [0f01a85](https://github.com/B00RR/ultimo-miglio/commit/0f01a85) — Tech Lead (PR #45 / fix-qa): Bancone→LN immediato (CollectActive+Burst), obiettivo top, strip NavMeshAgent, strip Hidden shader WebGL (console 0 errori Shader/NavMesh/last-child); EditMode 35/35 + PlayMode 6/6; Closes #41–#44. In coda: #53 UI → #52 VFX → #47 art.
 - 2026-10-16 01:55 — ramo `ui/49-hud` — UI: #49 superfici legno/cartone (Tokens + texture 9-slice + LegnoCartone.uss), Phone.uss per schermata futura (non montata in HUD), ritratto Ada texture per #41; **non** toccati Hud.uxml / HudV2.uss / HudController; CTA pollice omessa (HUD minimo); Unity non avviato.
