@@ -158,6 +158,9 @@ Ogni ruolo lavora solo sulle issue con la propria etichetta `ruolo:*`, sempre co
 
 Voci più recenti in alto. Formato: `AAAA-MM-GG HH:MM` (Europe/Rome) — [commit] — descrizione.
 
+- **17/10/2026 02:30 (Europe/Rome)**: unita in squash la #268 (Tech Lead, Refs #256: VarcoMarker con i campi larghezza, default 1,6 m, e ordine al posto di RaggioPassaggio). Commit [96ea4df](https://github.com/B00RR/ultimo-miglio/commit/96ea4dff98aed81c9aac150cb6d74cab70a3b518).
+- **17/10/2026 02:01 (Europe/Rome)**: unita in squash la #265 (Tech Lead, Refs #256: la mano del tutorial guida verso i varchi tramite VarcoMarker). Commit [71c288b](https://github.com/B00RR/ultimo-miglio/commit/71c288b4023610d796d5149fb18c052417ad92f0).
+- **17/10/2026 00:29 (Europe/Rome)**: unita in squash la #261 (Animator, Refs #223: test PlayMode PrimoVersamento223Test). Commit [5eb9f71](https://github.com/B00RR/ultimo-miglio/commit/5eb9f714d7f41274f99a0731819cd285fa56608b).
 - **17/10/2026 00:09 (Europe/Rome)**: unita in squash la #97 (3D Artist, Closes #82 e #256: collider di archi e Bancone, varco ovest a 1,26 m approvato dal Game Designer, Cassa non più chiusa tra i muri, test di regressione PassoCassa256Test). Commit [8e33a40](https://github.com/B00RR/ultimo-miglio/commit/8e33a401f41601d839af5eee15166b9174163d3d).
 - **16/10/2026 23:17 (Europe/Rome)**: unita in squash la #251 (Animator, Refs #223: il primo versamento alla Cassaforte prende il 60% del portafoglio, poi parte la divisione 40/60). Commit [e5e77c8](https://github.com/B00RR/ultimo-miglio/commit/e5e77c8e549ba48fcd1a575af7fd7a31a66d4eca).
 - **16/10/2026 22:59 (Europe/Rome)**: unita in squash la #237 (UI/UX, Closes #235: la pillola LN non copre più G4, catture 390×844 e 1080×1920 con saldo 999999 verificate; il formato «1000K» è a parte nella #254). Commit [5cf919c](https://github.com/B00RR/ultimo-miglio/commit/5cf919c3dc87afc9916e3fec794a024ca22ea657).
