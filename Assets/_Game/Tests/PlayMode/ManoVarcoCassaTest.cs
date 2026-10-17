@@ -37,13 +37,13 @@ public class ManoVarcoCassaTest
             var rends = arco.GetComponentsInChildren<Renderer>(); Assert.Greater(rends.Length, 0, "arco senza mesh"); var bb = rends[0].bounds; foreach (var r in rends) bb.Encapsulate(r.bounds);
             Vector3 varco = new Vector3(bb.center.x, 0f, bb.center.z); // centro dell'apertura (il pivot dell'fbx è a un'estremità del modulo da 4 m)
             finto = new GameObject("Varchi_test");
-            Marker(finto, "Varco_Cassa_test", varco);
+            Marker(finto, "Varco_Cassa_test", varco, 0, 1.6f); // contratto con il layout: arco della Cassa ordine 0
             // Con il layout attuale, oltre l'arco la Cassa non è ancora dritta (muro del set a z −4,19, #259: il giro passa dal varco ovest).
             // Gli altri marker finti si ricavano dalla fisica: BFS a griglia (capsula di Kaia) dall'arco alla Cassa, angoli del percorso
             // (string pulling con la stessa sonda della guida). Con il nuovo layout del 3D Artist resterà il solo arco.
             var giro = Percorso(varco, cassaZ.transform.position, cc.radius + 0.02f, cassa);
             Assert.IsNotNull(giro, "nessun percorso fisico dall'arco alla Cassa");
-            for (int i = 1; i < giro.Count - 1; i++) Marker(finto, "Varco_giro_test_" + i, giro[i]);
+            for (int i = 1; i < giro.Count - 1; i++) Marker(finto, "Varco_giro_test_" + i, giro[i], i, 1.6f);
             Debug.Log("[#256] giro arco→Cassa: " + string.Join(" → ", giro.Select(g => $"({g.x:0.00};{g.z:0.00})")));
 
             // Kaia dalla parte opposta: punto libero a 1,5-3 m dall'arco, dall'altro lato rispetto alla Cassa, con la linea retta verso la Cassa chiusa
@@ -117,7 +117,7 @@ public class ManoVarcoCassaTest
         }
         return res;
     }
-    static void Marker(GameObject root, string nome, Vector3 p) { var g = new GameObject(nome); g.transform.SetParent(root.transform); g.transform.position = p; g.AddComponent<VarcoMarker>(); }
+    static void Marker(GameObject root, string nome, Vector3 p, int ordine, float larghezza) { var g = new GameObject(nome); g.transform.SetParent(root.transform); g.transform.position = p; var m = g.AddComponent<VarcoMarker>(); m.ordine = ordine; m.larghezza = larghezza; }
     static Vector2 Pannello(Camera cam, Vector3 a, Vector3 b) { Vector3 sa = cam.WorldToScreenPoint(a), sb = cam.WorldToScreenPoint(b); return new Vector2(sb.x - sa.x, -(sb.y - sa.y)).normalized; }
     static float Flat(Vector3 a, Vector3 b) { a.y = b.y = 0; return Vector3.Distance(a, b); }
     static Vector3 Flat3(Vector3 v) { v.y = 0; return v; }

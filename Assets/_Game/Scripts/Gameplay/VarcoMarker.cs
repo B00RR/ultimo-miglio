@@ -11,8 +11,11 @@ namespace UltimoMiglio.Gameplay
         static readonly List<VarcoMarker> _tutti = new();
         /// <summary>Marker attivi in scena (lista condivisa: non modificarla).</summary>
         public static IReadOnlyList<VarcoMarker> Tutti => _tutti;
-        /// <summary>Distanza (m) entro cui il varco si considera attraversato e la guida passa oltre.</summary>
-        public float RaggioPassaggio = 0.8f;
+        /// <summary>Larghezza utile del varco (m). Entro larghezza/2 dal centro il varco si considera attraversato e la guida passa oltre.</summary>
+        public float larghezza = 1.6f;
+        /// <summary>Preferenza a parità di giro (più basso = preferito). L'arco della Cassa ha ordine 0.</summary>
+        public int ordine;
+        float Passaggio => Mathf.Max(0.1f, larghezza * 0.5f);
         void OnEnable() { if (!_tutti.Contains(this)) _tutti.Add(this); }
         void OnDisable() { _tutti.Remove(this); }
 
@@ -48,7 +51,7 @@ namespace UltimoMiglio.Gameplay
         {
             varco = null;
             for (int i = 0; i < _tutti.Count && i < 32; i++)
-            { var m = _tutti[i]; if (!m) continue; var fl = m.transform.position - da; fl.y = 0; if (fl.sqrMagnitude < m.RaggioPassaggio * m.RaggioPassaggio) passati |= 1 << i; }
+            { var m = _tutti[i]; if (!m) continue; var fl = m.transform.position - da; fl.y = 0; if (fl.sqrMagnitude < m.Passaggio * m.Passaggio) passati |= 1 << i; }
             if (_tutti.Count == 0 || !Chiuso(da, bersaglio, ignora)) return bersaglio;
             float best = float.MaxValue, riserva = float.MaxValue; VarcoMarker vRiserva = null;
             for (int i = 0; i < _tutti.Count && i < 32; i++)
@@ -56,11 +59,17 @@ namespace UltimoMiglio.Gameplay
                 var m = _tutti[i]; if (!m || (passati & (1 << i)) != 0) continue; var p = m.transform.position;
                 var fl = p - da; fl.y = 0;
                 float costo = fl.magnitude + Flat(p, bersaglio);
-                if (Chiuso(da, p, null, 0f)) { if (costo < riserva) { riserva = costo; vRiserva = m; } continue; }
-                if (costo < best) { best = costo; varco = m; }
+                if (Chiuso(da, p, null, 0f)) { if (Meglio(costo, m, riserva, vRiserva)) { riserva = costo; vRiserva = m; } continue; }
+                if (Meglio(costo, m, best, varco)) { best = costo; varco = m; }
             }
             if (!varco) varco = vRiserva; // nessun varco in vista: meglio il varco più conveniente (la scivolata sui muri ci porta) che dritto contro il muro
             return varco ? varco.transform.position : bersaglio;
+        }
+        /// <summary>Giro più corto; a parità (entro 5 cm) vince l'ordine più basso.</summary>
+        static bool Meglio(float costo, VarcoMarker m, float best, VarcoMarker cur)
+        {
+            if (!cur || costo < best - 0.05f) return true;
+            return costo <= best + 0.05f && m.ordine < cur.ordine;
         }
         static float Flat(Vector3 a, Vector3 b) { a.y = b.y = 0; return Vector3.Distance(a, b); }
     }
