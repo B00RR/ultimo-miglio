@@ -69,7 +69,8 @@ public class PadTriggerCerchioTest
             for (int k = 0; k < 8; k++)
             {
                 bool dentro = f < 1f;
-                float a = k * 45f * Mathf.Deg2Rad; var off = new Vector3(Mathf.Sin(a), 0, Mathf.Cos(a)) * (r * f); // N = +z
+                float a = k * 45f * Mathf.Deg2Rad; // #171 (Producer): verso la camera il pad accetta fino a TolleranzaCamera in più; il caso "fuori" è al 120% del raggio d'attivazione in quella direzione
+                var off = new Vector3(Mathf.Sin(a), 0, Mathf.Cos(a)) * ((dentro ? r : pad.RaggioVerso(Mathf.Sin(a), Mathf.Cos(a))) * f); // N = +z
                 yield return Metti(nina, lontano); yield return Attendi(0.3f);
                 eco.S.Wallet = 1e6; eco.S.PadPaid[(int)pad.Kind] = 0;
                 double prima = eco.S.Wallet;
@@ -79,6 +80,23 @@ public class PadTriggerCerchioTest
                 if (dentro) Assert.IsTrue(carica && pad.Occupied, $"{chi}: il pad non si carica dentro il disco");
                 else Assert.IsFalse(carica || pad.Occupied, $"{chi}: il pad si carica fuori dal disco");
             }
+        // #171 (Producer, review Tech Lead): caso esplicito sul lato della camera reale (proiettata sul piano, rotazione #205 compresa):
+        // carica entro raggio + TolleranzaCamera (95%), non carica oltre (raggio + TolleranzaCamera + 0,1).
+        var cam = Camera.main; Assert.IsNotNull(cam, "Camera.main mancante");
+        var fw = cam.transform.forward; fw.y = 0; if (fw.sqrMagnitude < 1e-4f) { fw = cam.transform.up; fw.y = 0; }
+        var vc = -fw.normalized;
+        Assert.AreEqual(r, pad.RaggioVerso(-vc.x, -vc.z), 1e-4f, $"{pad.name}: lato opposto alla camera, il raggio deve restare quello del disco");
+        Assert.AreEqual(r, pad.RaggioVerso(vc.z, -vc.x), 1e-4f, $"{pad.name}: di lato rispetto alla camera, il raggio deve restare quello del disco");
+        foreach (var caso in new[] { (d: r + pad.TolleranzaCamera * 0.95f, dentro: true), (d: r + pad.TolleranzaCamera + 0.1f, dentro: false) })
+        {
+            yield return Metti(nina, lontano); yield return Attendi(0.3f);
+            eco.S.Wallet = 1e6; eco.S.PadPaid[(int)pad.Kind] = 0; double prima = eco.S.Wallet;
+            yield return Metti(nina, new Vector3(c.x + vc.x * caso.d, nina.transform.position.y, c.z + vc.z * caso.d)); yield return Attendi(1.2f);
+            bool carica = eco.S.Wallet < prima;
+            string chi = $"{pad.name} lato camera {caso.d:0.00} m (Kaia {nina.transform.position:F2})";
+            if (caso.dentro) Assert.IsTrue(carica && pad.Occupied, $"{chi}: il pad non si carica entro raggio + tolleranza verso la camera");
+            else Assert.IsFalse(carica || pad.Occupied, $"{chi}: il pad si carica oltre raggio + tolleranza verso la camera");
+        }
         yield return Metti(nina, lontano); yield return Attendi(0.3f);
         eco.S.PadPaid[(int)pad.Kind] = 0;
     }
