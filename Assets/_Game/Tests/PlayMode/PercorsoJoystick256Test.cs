@@ -130,20 +130,28 @@ public class PercorsoJoystick256Test
         return pad.DiscRadius + (a < 90f ? extra * Mathf.Cos(a * Mathf.Deg2Rad) : 0f);
     }
     static UpgradePad[] _pads; static Component _metaAttuale, _partenza;
-    static void Meta(Component m) { _partenza = _metaAttuale; _metaAttuale = m; } static string _modo = "";
+    static void Meta(Component m) { _partenza = _metaAttuale; _metaAttuale = m; _uscitaCassa = false; } static string _modo = "";
     /// <summary>pad → (margine minimo = distanza − raggio area, percorso, punto)</summary>
     static readonly Dictionary<string, (float margine, string rotta, Vector3 punto)> _minPad = new();
     // ---- condizione GD (#270, 6228063616): fuori dalle tappe verso la Cassa, il bordo del CC di Kaia (r 0,3) e i clienti (collider vero)
     //      restano ad almeno 0,30 m dal trigger di Zona_Cassa ----
     const float DistanzaCassaMin = 0.30f;
-    static Bounds? _cassaB; static Component _cassaZ;
+    static Bounds? _cassaB; static Component _cassaZ; static bool _uscitaCassa; static int _puntiCoda;
+    static readonly HashSet<string> _tappeDallaCassa = new();
     static readonly Dictionary<string, (float d, Vector3 p)> _minCassa = new();
     static float DistRett(Vector3 p, Bounds b) { float dx = Mathf.Max(b.min.x - p.x, 0f, p.x - b.max.x), dz = Mathf.Max(b.min.z - p.z, 0f, p.z - b.max.z); return Mathf.Sqrt(dx * dx + dz * dz); }
     static void Registra(string chiave, float d, Vector3 p) { if (!_minCassa.TryGetValue(chiave, out var x) || d < x.d) _minCassa[chiave] = (d, p); }
     static void ControllaCassa(Vector3 p, string cosa)
     {
         if (_cassaB == null) return;
-        if (_metaAttuale != _cassaZ && _partenza != _cassaZ) Registra(_modo + cosa, DistRett(p, _cassaB.Value) - 0.3f, p); // la tappa che parte dalla Cassa non conta
+        // review #270 (6228339511): la tappa VERSO la Cassa non conta; quella che PARTE dalla Cassa conta da quando il bordo di Kaia
+        // è uscito per la prima volta oltre 0,30 m dal trigger (poi non deve più rientrare sotto 0,30 m)
+        if (_metaAttuale != _cassaZ)
+        {
+            float d = DistRett(p, _cassaB.Value) - 0.3f;
+            if (_partenza == _cassaZ && !_uscitaCassa) { _tappeDallaCassa.Add(_modo + cosa); if (d >= DistanzaCassaMin) _uscitaCassa = true; }
+            if (_partenza != _cassaZ || _uscitaCassa) Registra(_modo + cosa, d, p);
+        }
         foreach (var c in Object.FindObjectsByType<Customer>(FindObjectsSortMode.None))
         {
             var col = c.GetComponent<CapsuleCollider>(); float r = col ? col.radius * Mathf.Max(c.transform.lossyScale.x, c.transform.lossyScale.z) : Customer.BodyRadius;
@@ -297,7 +305,7 @@ public class PercorsoJoystick256Test
             float Oriz(Vector3 a, Vector3 b) { a.y = b.y = 0; return Vector3.Distance(a, b); }
 
             var bancone = Object.FindAnyObjectByType<Bancone>(); Assert.IsNotNull(bancone, "Bancone mancante");
-            _minPad.Clear(); _minCassa.Clear(); _cassaZ = cassa; var cassaCol = cassa.GetComponent<Collider>(); Assert.IsNotNull(cassaCol, "Zona_Cassa senza trigger"); _cassaB = cassaCol.bounds; _metaAttuale = _partenza = null; _pads = Object.FindObjectsByType<UpgradePad>(FindObjectsInactive.Include, FindObjectsSortMode.None);
+            _minPad.Clear(); _minCassa.Clear(); _tappeDallaCassa.Clear(); _puntiCoda = 0; _uscitaCassa = false; _cassaZ = cassa; var cassaCol = cassa.GetComponent<Collider>(); Assert.IsNotNull(cassaCol, "Zona_Cassa senza trigger"); _cassaB = cassaCol.bounds; _metaAttuale = _partenza = null; _pads = Object.FindObjectsByType<UpgradePad>(FindObjectsInactive.Include, FindObjectsSortMode.None);
             var arrivi = Object.FindAnyObjectByType<ArrivalsZone>(); Assert.IsNotNull(arrivi, "Zona_Arrivi mancante");
             ProximityZone Z(string n) { var g = GameObject.Find(n); Assert.IsNotNull(g, n + " mancante"); return g.GetComponent<ProximityZone>(); }
             var scaffA = Z("Zona_Scaffale_A"); var prendiA = Z("Zona_Prendi_A"); var scaffC = Z("Zona_Scaffale_C"); var prendiC = Z("Zona_Prendi_C");
@@ -321,8 +329,8 @@ public class PercorsoJoystick256Test
             Meta(null);
             // coda clienti (informativo: i pad li attiva solo Kaia): margine degli slot e del tratto porta → coda dall'area estesa dei pad
             var coda = Object.FindAnyObjectByType<CustomerQueue>();
-            if (coda)
-                foreach (var pad in _pads)
+            Assert.IsNotNull(coda, "CustomerQueue mancante nella scena: impossibile verificare la coda dei clienti"); // review #270: niente salto silenzioso
+            foreach (var pad in _pads)
                 {
                     float mm = float.MaxValue; Vector3 pp = Vector3.zero;
                     var pts = new List<Vector3> { coda.SpawnPoint }; for (int i = 0; i < coda.MaxLine; i++) pts.Add(coda.Slot(i));
@@ -330,13 +338,18 @@ public class PercorsoJoystick256Test
                     log.AppendLine($"coda {pad.name}: margine minimo {mm:0.00} m dall'area estesa (a ({pp.x:0.00}; {pp.z:0.00}))");
                 }
             // coda clienti con il collider vero del prefab: porta → slot
-            if (coda)
+            string chiaveCoda = null;
             {
                 var pref = coda.Prefab ? coda.Prefab.GetComponent<CapsuleCollider>() : null; float rc = pref ? pref.radius * Mathf.Max(coda.Prefab.transform.localScale.x, coda.Prefab.transform.localScale.z) : Customer.BodyRadius;
                 var pts = new List<Vector3> { coda.SpawnPoint }; for (int i = 0; i < coda.MaxLine; i++) pts.Add(coda.Slot(i));
-                for (int i = 0; i + 1 < pts.Count; i++) for (float t = 0; t <= 1f; t += 0.05f) { var q = Vector3.Lerp(pts[i], pts[i + 1], t); Registra($"coda clienti (porta → slot, r {rc:0.00})", DistRett(q, _cassaB.Value) - rc, q); }
+                for (int i = 0; i + 1 < pts.Count; i++) for (float t = 0; t <= 1f; t += 0.05f) { var q = Vector3.Lerp(pts[i], pts[i + 1], t); chiaveCoda = $"coda clienti (porta → slot, r {rc:0.00})"; Registra(chiaveCoda, DistRett(q, _cassaB.Value) - rc, q); _puntiCoda++; }
             }
+            Assert.Greater(_puntiCoda, 0, "coda clienti: nessun punto del tratto porta → slot misurato dal trigger della Cassa");
+            Assert.IsTrue(chiaveCoda != null && _minCassa.ContainsKey(chiaveCoda), "coda clienti: la distanza dal trigger della Cassa non è stata registrata");
             var vicini = new List<string>();
+            // review #270 (Code Reviewer + Tech Lead): sulle tappe che partono dalla Cassa il controllo deve essersi armato
+            Assert.IsNotEmpty(_tappeDallaCassa, "nessuna tappa in partenza dalla Cassa: la Cassa → Nonna Ada non è stata controllata");
+            foreach (var t in _tappeDallaCassa) Assert.IsTrue(_minCassa.ContainsKey(t), $"{t}: controllo della Cassa mai armato (il bordo di Kaia non è mai arrivato a {DistanzaCassaMin:0.00} m dal trigger)");
             foreach (var kv in _minCassa)
             {
                 log.AppendLine($"Cassa: {kv.Key}: distanza minima {kv.Value.d:0.00} m dal trigger (a ({kv.Value.p.x:0.00}; {kv.Value.p.z:0.00}))");
