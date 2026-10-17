@@ -132,6 +132,9 @@ namespace UltimoMiglio.EditorTools
             if (archBan) { var sg = _parent.GetChild(_parent.childCount - 1); if (sg.name.Contains("prop_sign_sunn_depot")) sg.localScale *= 0.55f; }
             // #256: lanterna sul pilastro est dell'arco (quello ovest ha l'insegna)
             Place("Kit/prop_lantern_wall", _parent, banPos + new Vector3(archBan ? 2.5f : -1.4f, 1.85f, 1.2f), 0, false);
+            // #256 (condizione GD, review #270): vaso tondo sull'angolo nord-ovest della Cassa. La linea guida Cassaforte → Pad Zaino
+            // tagliava l'angolo del trigger (bordo di Kaia a -0,07 m): col vaso la mano gira larga e Kaia resta ad almeno 0,30 m (PercorsoJoystick256Test)
+            Place("Kit/prop_plant_pot_round", _parent, banPos + new Vector3(0f, 0, 5.85f), 0, true);
             // #256/#262: varchi sui percorsi di Kaia (larghezza nominale, misurata nei test con i collider veri: tutti ≥ 1,2 m)
             Varco("Varco_ArcoBancone", banPos + new Vector3(0.9f, 0, 1.45f), 0, 2.4f, 0); // 0 = arco della Cassa
             Varco("Varco_CorridoioOvest", banPos + new Vector3(-1.0f, 0, 0.37f), 90, 1.66f, 1); // centro e larghezza misurati sui collider (review Tech Lead #270)
@@ -144,6 +147,9 @@ namespace UltimoMiglio.EditorTools
             // tappa intermedia (campo aperto) davanti agli scaffali, a est del vaso tondo: dal Bancone la fila (vasi ai due capi) si gira da qui;
             // a z +1,2 così, attraversato (entro 0,8 m), la linea verso ogni scaffale è già libera
             Varco("Varco_ScaffaliEst", shelfC + new Vector3(4.4f, 0, 1.2f), 90, 1.6f, 5);
+            // #256 (condizione GD, review #270): tappa intermedia oltre il vaso sull'angolo nord-ovest della Cassa. Dalla Cassaforte verso i pad
+            // la mano passa di qui invece di scivolare lungo la Cassa verso l'UscitaOvest (il trigger va lasciato ad almeno 0,30 m)
+            Varco("Varco_AngoloCassa", banPos + new Vector3(-0.52f, 0, 6.54f), 45, 1.2f, 6);
             Debug.Log("[Kit] gameplay dressing: " + _parent.childCount + " pieces");
         }
 
