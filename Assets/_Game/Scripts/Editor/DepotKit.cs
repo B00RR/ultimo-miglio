@@ -9,6 +9,12 @@ namespace UltimoMiglio.EditorTools
     public static class DepotKit
     {
         const string Root = "Assets/_Game/Art/Environment/";
+        /// <summary>#256/#262: segnaposto di un varco (asse destro = attraverso il varco), per i test e per la revisione.</summary>
+        static void Varco(string name, Vector3 pos, float yaw, float larghezza, int ordine)
+        {
+            var g = new GameObject(name); g.transform.SetParent(_parent, false); g.transform.SetPositionAndRotation(pos, Quaternion.Euler(0, yaw, 0));
+            var m = g.AddComponent<UltimoMiglio.Gameplay.VarcoMarker>(); m.larghezza = larghezza; m.ordine = ordine; // #268: attraversato entro larghezza/2; ordine più basso preferito (0 = arco della Cassa)
+        }
         static Transform _parent; static Material _mat, _emi;
 
         public static bool Build(Material world)
@@ -50,8 +56,8 @@ namespace UltimoMiglio.EditorTools
             if (!Place("Kit/prop_parcel_stack_a", _parent, new Vector3(-3.0f, 0, 7.5f), 5, true)) Place("Kit/prop_box_m", _parent, new Vector3(-3.0f, 0, 7.5f), 5, true);
             Place("Kit/prop_lemontree_pot", _parent, new Vector3(-6.9f, 0, 7.4f), 0, true);
             Place("Kit/prop_lemontree_pot", _parent, new Vector3(-3.1f, 0, 7.4f) + new Vector3(1.4f, 0, 0), 0, true);
-            Place("Kit/prop_lemontree_pot", _parent, new Vector3(6.9f, 0, -3.3f), 0, true);
-            Place("Kit/prop_lemontree_pot", _parent, new Vector3(6.9f, 0, 1.3f), 0, true);
+            // #256/#262: niente vaso di limoni nella striscia est fra arco del Bancone e muro E (lasciava 0,45 m all'arco)
+            Place("Kit/prop_lemontree_pot", _parent, new Vector3(1.6f, 0, 7.4f), 0, true); // #256: era (6.9; 1.3), dritto sulla linea guida Ada → Cassaforte (Kaia ci sbatteva)
             Place("Kit/prop_plant_pot_tall", _parent, new Vector3(3.1f, 0, 7.5f), 0, true);
             Place("Kit/prop_plant_pot_round", _parent, new Vector3(5.4f, 0, 7.5f), 0, true);
             Place("Kit/prop_planter_box", _parent, new Vector3(0, 0, 7.7f), 0, true);
@@ -61,8 +67,9 @@ namespace UltimoMiglio.EditorTools
             if (Place("Kit/prop_streetlamp", _parent, new Vector3(-8.4f, 0, -10.2f), 45, false)) PoleCollider(_parent.GetChild(_parent.childCount - 1), new Vector3(-8.62f, 0, -10.62f));
             Place("ThirdParty/Props/prop_tp_crate_open", _parent, new Vector3(-8.2f, 0, 6.8f), 0, true);
             Place("ThirdParty/Props/prop_tp_barrel", _parent, new Vector3(5.5f, 0, 7.5f), 0, true);
-            Place("ThirdParty/Props/prop_tp_bench", _parent, new Vector3(6.9f, 0, -4f), 90, true);
-            Place("ThirdParty/Props/prop_tp_plant_potted", _parent, new Vector3(6.9f, 0, -7.5f), 0, true);
+            // #256/#262: panca e pianta spostate dalla striscia est (0,74/0,75 m dall'arco: Kaia si incastrava) a ridosso della staccionata O, a contatto fra loro
+            Place("ThirdParty/Props/prop_tp_bench", _parent, new Vector3(-8.6f, 0, -9.0f), 90, true);
+            Place("ThirdParty/Props/prop_tp_plant_potted", _parent, new Vector3(-8.6f, 0, -9.6f), 0, true);
             Place("ThirdParty/Props/prop_tp_lamp_wall", _parent, new Vector3(7.4f, 1.9f, 0f), -90, false);
             Place("ThirdParty/Props/prop_tp_basket", _parent, new Vector3(-8.2f, 0, -6f), 0, true);
             Place("ThirdParty/Props/prop_tp_bucket", _parent, new Vector3(-8.3f, 0, -8.5f), 0, true);
@@ -103,17 +110,31 @@ namespace UltimoMiglio.EditorTools
             Place("../Props/prop_parcel_box_flat", _parent, shelfC + new Vector3(1.2f, 0, -1.4f), 30, false, true);
             // Bancone: limoni e pila ai lati, lavagna e lampione lungo la coda (lato -x, la coda va verso +x)
             Place("Kit/prop_lemontree_pot", _parent, banPos + new Vector3(-2.5f, 0, -1.6f), 0, true); // #82 (Game Designer): varco ovest riaperto, il giro da est costava fino a +6,8 m dai pad (detour_82.py)
-            Place("Kit/prop_parcel_stack_a", _parent, banPos + new Vector3(-2.2f, 0, 0.9f), 25, true); // #82: varco ovest di 1,26 m fra pila e angolo del banco
+            // #262: la pila e il vaso tondo all'imbocco ovest del corridoio lasciavano 0,6 m fra angolo del muro e scatole (Kaia incastrata): spostati contro la staccionata O
+            Place("Kit/prop_parcel_stack_a", _parent, new Vector3(-8.4f, 0, -6.2f), 25, true);
             Place("Kit/prop_sign_board_aperto", _parent, banPos + new Vector3(-1.2f, 0, -2.4f), 30, true);
             Place("Kit/prop_streetlamp", _parent, banPos + new Vector3(-1.9f, 0, -3.4f), 0, true);
-            Place("Kit/prop_plant_pot_round", _parent, banPos + new Vector3(-2.4f, 0, 1.6f), 0, true); // #187: spostato a ovest, fra Bancone e Cassa non c'era spazio con anello = trigger
+            Place("Kit/prop_plant_pot_round", _parent, new Vector3(-8.6f, 0, -7.0f), 0, true);
             // Concept: pezzo di muro/arco visibile dietro il Bancone (beauty shot)
-            Place("Kit/env_wall_2m_a", _parent, banPos + new Vector3(-0.2f, 0, 1.45f), 0, false, false, true); // #82 opzione A: muro a ridosso, niente sacca
-            Place("Kit/env_wall_2m_b", _parent, banPos + new Vector3(2.0f, 0, 1.45f), 0, false, false, true);
+            // #256/#259: arco da 4 m al posto di env_wall_2m_a/b (stessa linea +1,45): apertura di 2,4 m dal corridoio del Bancone alla Cassa, che sta proprio dietro
+            bool archBan = AssetDatabase.LoadAssetAtPath<GameObject>(Root + "Kit/env_wall_arch_4m.fbx");
+            if (archBan) Place("Kit/env_wall_arch_4m", _parent, banPos + new Vector3(0.9f, 0, 1.45f), 0, false, false, true);
+            else
+            {
+                Place("Kit/env_wall_2m_a", _parent, banPos + new Vector3(-0.2f, 0, 1.45f), 0, false, false, true); // #82 opzione A: muro a ridosso, niente sacca
+                Place("Kit/env_wall_2m_b", _parent, banPos + new Vector3(2.0f, 0, 1.45f), 0, false, false, true);
+            }
             if (AssetDatabase.LoadAssetAtPath<GameObject>(Root + "Kit/env_wall_arch_4m.fbx"))
                 Place("Kit/env_wall_arch_4m", _parent, banPos + new Vector3(3.2f, 0, -0.3f), -90, false, false, true); // #97: a 3.6 restava una fessura di ~0.45 m tra muro_b e arco: i clienti (r 0.3) ci si incastravano e non arrivavano al Bancone
-            Place("Kit/prop_sign_sunn_depot", _parent, banPos + new Vector3(0.6f, 2.0f, 1.2f), 0, false); DressSignFace();
-            Place("Kit/prop_lantern_wall", _parent, banPos + new Vector3(-1.4f, 1.85f, 1.2f), 0, false);
+            Place("Kit/prop_sign_sunn_depot", _parent, banPos + new Vector3(0.9f, archBan ? 2.75f : 2.0f, 1.2f), 0, false); // #256: sull'architrave (da 2,4 m), non nell'apertura DressSignFace();
+            Place("Kit/prop_lantern_wall", _parent, banPos + new Vector3(archBan ? -0.7f : -1.4f, 1.85f, 1.2f), 0, false); // #256: sul pilastro ovest dell'arco
+            // #256/#262: varchi sui percorsi di Kaia (larghezza nominale, misurata nei test con i collider veri: tutti ≥ 1,2 m)
+            Varco("Varco_ArcoBancone", banPos + new Vector3(0.9f, 0, 1.45f), 0, 2.4f, 0); // 0 = arco della Cassa
+            Varco("Varco_CorridoioOvest", banPos + new Vector3(-1.0f, 0, 0.33f), 90, 1.76f, 1);
+            Varco("Varco_ArcoEst", banPos + new Vector3(3.2f, 0, -0.3f), 90, 2.4f, 2);
+            Varco("Varco_StrisciaEst", new Vector3((banPos.x + 3.45f + 7.36f) * 0.5f, 0, banPos.z + 0.64f), 0, 7.36f - (banPos.x + 3.45f), 3); // striscia fra il pilastro N dell'arco (x 5,97) e il muro E (x 7,36): marker appena a sud del pilastro, così da Nonna Ada la guida ci arriva dritta dall'apertura dell'arco
+            Varco("Varco_UscitaOvest", banPos + new Vector3(-2.0f, 0, 0.74f), 0, 1.6f, 4); // tappa intermedia: fuori dall'imbocco ovest prima di girare a nord (dritti dal centro dell'imbocco si striscia lo spigolo dell'arco)
+            Varco("Varco_ScaffaliEst", shelfC + new Vector3(4.4f, 0, 1.2f), 90, 1.6f, 5); // davanti agli scaffali, a est del vaso tondo: dal Bancone la fila (vasi ai due capi) si gira da qui; a z +1,2 così, attraversato (entro 0,8 m), la linea verso ogni scaffale è già libera
             Debug.Log("[Kit] gameplay dressing: " + _parent.childCount + " pieces");
         }
 

@@ -153,7 +153,7 @@ namespace UltimoMiglio.EditorTools
             queue.CounterSlot = new GameObject("CounterSlot").transform; queue.CounterSlot.position = banPos + new Vector3(0, 0, -1.8f);
             queue.Door = new GameObject("Door").transform; queue.Door.position = new Vector3(8.5f, 0, -10.5f); queue.LineStep = new Vector3(0.7f, 0, -0.7f);
             bancone.Queue = queue;
-            var cassa = Zone<CassaZone>("Zona_Cassa", banPos + new Vector3(2.8f, 0, 2.8f), new Vector3(1.2f, 1, 1.2f), UM_Palette.TealOmni, props); cassa.Coins = coins; // #82+#187: oltre il muro del set (z +1.45), gap ≥ 0,4 m da muro, arco, pad e vasi (layout_187.py)
+            var cassa = Zone<CassaZone>("Zona_Cassa", banPos + new Vector3(0.9f, 0, 2.8f), new Vector3(1.2f, 1, 1.2f), UM_Palette.TealOmni, props); cassa.Coins = coins; // #256: dritta dietro l'apertura dell'arco del Bancone (banPos+0,9), niente pilastri sul percorso. Prima: #82+#187: oltre il muro del set (z +1.45), gap ≥ 0,4 m da muro, arco, pad e vasi (layout_187.py)
 
             // --- pads (near the Cassa, 01 §3)
             // #224: colonna lungo z sul lato camera a ovest del Bancone (proposta GD 0,5 m più a ovest, layout_224.py): fuori dall'ombra del muro

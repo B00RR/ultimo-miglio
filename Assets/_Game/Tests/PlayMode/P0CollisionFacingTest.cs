@@ -213,7 +213,7 @@ public class P0CollisionFacingTest
         float face = 99f;
         foreach (var bc in Object.FindObjectsByType<BoxCollider>(FindObjectsSortMode.None))
         {
-            if (!bc.name.StartsWith("env_wall_2m")) continue; var b = bc.bounds;
+            if (!bc.name.StartsWith("env_wall_2m") && !bc.name.StartsWith("env_wall_arch_4m")) continue; var b = bc.bounds; // #256: arco da 4 m sulla stessa linea
             if (b.max.x < ban.x - 1.2f || b.min.x > ban.x + 1.2f || b.center.z < ban.z || b.center.z > ban.z + 4f) continue;
             face = Mathf.Min(face, b.min.z - ban.z);
         }
@@ -255,8 +255,8 @@ public class P0CollisionFacingTest
             var b = bc.bounds; var r = b.center - ban; if (r.x > -0.9f || r.x < -2.6f || r.z < -2f || r.z > 1.5f) { if (bc.name.StartsWith("prop_counter_2m") && Mathf.Abs(r.x) < 0.5f) counter = b; continue; }
             if (bc.name.StartsWith("prop_lemontree_pot")) lemon = b; else if (bc.name.StartsWith("prop_parcel_stack_a")) stack = b;
         }
-        Assert.IsTrue(lemon.HasValue && stack.HasValue && counter.HasValue, "vaso/pila/Bancone non trovati");
-        float gapZ = stack.Value.min.z - lemon.Value.max.z;           // vaso <-> pila
+        Assert.IsTrue(lemon.HasValue && counter.HasValue, "vaso/Bancone non trovati");
+        float gapZ = stack.HasValue ? stack.Value.min.z - lemon.Value.max.z : 99f; // vaso <-> pila (#256: pila spostata, varco libero)
         float gapX = lemon.Value.min.z < counter.Value.max.z ? counter.Value.min.x - lemon.Value.max.x : 99f; // vaso <-> Bancone
         float gap = Mathf.Min(gapZ, gapX);
         Debug.Log($"[#97] varco ovest: vaso-pila {gapZ:F2} vaso-Bancone {gapX:F2}");
@@ -270,7 +270,7 @@ public class P0CollisionFacingTest
             Assert.Less(nina.transform.position.x - ban.x, -1.2f, "varco ovest dichiarato chiuso ma Nina passa");
             yield break;
         }
-        Teleport(nina, ban + new Vector3(-3.0f, 0.05f, (lemon.Value.max.z + stack.Value.min.z) * 0.5f - ban.z)); yield return null;
+        Teleport(nina, ban + new Vector3(-3.0f, 0.05f, stack.HasValue ? (lemon.Value.max.z + stack.Value.min.z) * 0.5f - ban.z : counter.Value.max.z + 0.6f - ban.z)); // #256: senza pila si entra dal corridoio dietro il banco yield return null;
         nina.ScriptedInput = Vector3.right; for (float t = 0; t < 4f && nina.transform.position.x < ban.x; t += Time.deltaTime) yield return null; nina.ScriptedInput = Vector3.zero;
         Assert.Greater(nina.transform.position.x - ban.x, -0.6f, "Nina non entra da ovest: " + nina.transform.position);
     }
