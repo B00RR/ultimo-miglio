@@ -49,7 +49,8 @@ public class ManoVarcoCassaTest
             // Kaia dalla parte opposta: punto libero a 1,5-3 m dall'arco, dall'altro lato rispetto alla Cassa, con la linea retta verso la Cassa chiusa
             var fwd = arco.forward; fwd.y = 0; fwd.Normalize(); float lato = Mathf.Sign(Vector3.Dot(cassa.position - varco, fwd));
             Vector3 start = Vector3.zero; bool trovato = false; float bestAng = 0f;
-            for (float dz = 1.0f; dz <= 4.01f; dz += 0.25f)
+            // #256/#262 (layout 3D Artist): la Cassa ora sta 1,35 m dritta dietro l'arco del Bancone; da 1 m l'angolo arco/Cassa resta sotto i 25°, si parte da 0,6 m (a ridosso del pilastro)
+            for (float dz = 0.6f; dz <= 4.01f; dz += 0.2f)
                 for (float dx = -3f; dx <= 3.01f; dx += 0.25f)
                 {
                     var p = varco - fwd * lato * dz + arco.right * dx; p.y = nina.transform.position.y;

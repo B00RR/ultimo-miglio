@@ -142,7 +142,9 @@ public class Camera205Test
                         frecce++;
                     }
                     // freccia a bordo: Nina lontana dal bersaglio, così il bersaglio esce dallo schermo (zoom 0,7)
-                    var far = g.Target.position.x < 0f ? new Vector3(6f, nina.transform.position.y, -9f) : new Vector3(-8f, nina.transform.position.y, 6f);
+                    // #224: dei due angoli si prende il più lontano dal bersaglio (con i pad in colonna a x −2 l'angolo SE lasciava Insegna dentro lo schermo)
+                    var se = new Vector3(6f, nina.transform.position.y, -9f); var nw = new Vector3(-8f, nina.transform.position.y, 6f);
+                    var far = Vector3.Distance(se, g.Target.position) >= Vector3.Distance(nw, g.Target.position) ? se : nw;
                     Teleport(nina, far); edgeArrow.SetTarget(g.Target, s.ToString());
                     t0 = Time.unscaledTime; while (Time.unscaledTime - t0 < 0.4f) yield return null;
                     if (edge != null && head != null && edge.style.display.value == DisplayStyle.Flex)

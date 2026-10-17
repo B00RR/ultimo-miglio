@@ -1,0 +1,16 @@
+PAD;pr224;bancone;Zaino;-1.98;-3.74;disc_px;-293;-161;287;388;pill_px;-227;246;low=False;occl;0/17
+PAD;pr224;bancone;Scarpe;-1.98;-5.64;disc_px;-293;-161;424;524;pill_px;-227;382;low=False;occl;0/17
+PAD;pr224;bancone;Insegna;-1.98;-7.54;disc_px;-293;-161;560;661;pill_px;-227;519;low=False;occl;0/17
+KAIA;pr224;bancone;195;447;occl;0/3
+PAD;pr224;suZaino;Zaino;-1.98;-3.74;disc_px;129;261;400;501;pill_px;195;359;low=False;occl;0/17
+PAD;pr224;suZaino;Scarpe;-1.98;-5.64;disc_px;129;261;537;637;pill_px;195;495;low=False;occl;0/17
+PAD;pr224;suZaino;Insegna;-1.98;-7.54;disc_px;129;261;673;774;pill_px;195;632;low=False;occl;0/17
+KAIA;pr224;suZaino;195;447;occl;0/3
+PAD;pr224;suScarpe;Zaino;-1.98;-3.74;disc_px;129;261;264;364;pill_px;195;252;low=True;occl;0/17
+PAD;pr224;suScarpe;Scarpe;-1.98;-5.64;disc_px;129;261;400;501;pill_px;195;359;low=False;occl;0/17
+PAD;pr224;suScarpe;Insegna;-1.98;-7.54;disc_px;129;261;537;637;pill_px;195;495;low=False;occl;0/17
+KAIA;pr224;suScarpe;195;447;occl;0/3
+PAD;pr224;suInsegna;Zaino;-1.98;-3.74;disc_px;129;261;127;228;pill_px;195;116;low=True;occl;0/17
+PAD;pr224;suInsegna;Scarpe;-1.98;-5.64;disc_px;129;261;264;364;pill_px;195;252;low=True;occl;0/17
+PAD;pr224;suInsegna;Insegna;-1.98;-7.54;disc_px;129;261;400;501;pill_px;195;359;low=False;occl;0/17
+KAIA;pr224;suInsegna;195;447;occl;0/3

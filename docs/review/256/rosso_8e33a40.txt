@@ -1,0 +1,16 @@
+Test di questa PR eseguiti su main 8e33a40 (Unity 6000.3.26f1, batchmode, Ch1_Deposito, joystick simulato + CharacterController vero). VarcoMarker copiato da main 96ea4df; su 8e33a40 non ci sono marker, quindi la guida punta dritta.
+
+FAILED CassaJoystick256Test.DalloSpawnAllaCassa_ColJoystick_PassoCassaPass
+  [#256] Kaia bloccata in (x 6.35, z -4.13) andando verso tappa 6 (x 6.34, z -3.30): distanza dal centro di Zona_Cassa (x 5.32, z -2.84) = 1.65 m. Collider a contatto: prop_lemontree_pot [x 6.42..7.38, z -3.76..-2.84], env_wall_arch_4m [x 5.47..5.97, z -4.74..-3.94], prop_tp_bench [x 6.71..7.09, z -4.38..-3.62].
+
+FAILED CassaJoystick256Test.DalloSpawnAllaCassa_SottoArcoBancone_ColJoystick
+  [#256] Kaia bloccata in (x 3.42, z -4.75) andando verso tappa 5 (x 3.42, z -4.19): distanza dal centro di Zona_Cassa (x 5.32, z -2.84) = 2.70 m. Collider a contatto: env_wall_2m_b [x 3.52..5.52, z -4.43..-3.95], env_wall_2m_a [x 1.32..3.32, z -4.43..-3.95].
+
+FAILED PercorsoJoystick256Test.Joystick_DalloSpawn_BanconeCassaAdaCassaforteEPad
+  percorsi principali dentro l'area estesa (#266) di pad non bersaglio: Pad_Zaino: [percorso calcolato] Ada → Cassaforte ci entra di 0.57 m a (1.29; -1.11); Pad_Scarpe: [percorso calcolato] Pad Insegna → Bancone ci entra di 0.11 m a (3.70; -1.83)
+    Expected: <empty>
+    But was:  < "Pad_Zaino: [percorso calcolato] Ada → Cassaforte ci entra di 0.57 m a (1.29; -1.11)", "Pad_Scarpe: [percorso calcolato] Pad Insegna → Bancone ci entra di 0.11 m a (3.70; -1.83)" >
+
+FAILED PercorsoJoystick256Test.SeguiLaGuida_DalloSpawn_BanconeCassaAdaCassaforteEPad
+  [segui la guida] spawn → Bancone: Kaia BLOCCATA a (2.49; -3.58) puntando verso la meta (2.52; -5.31), mancano 1.73 m in linea d'aria. Vicino: DepotKit/env_wall_2m_a . Mano: ; catena del layout: meta; passati=0x0; linea retta chiusa=True
+
