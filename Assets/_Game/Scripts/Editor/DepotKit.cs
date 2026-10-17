@@ -126,15 +126,24 @@ namespace UltimoMiglio.EditorTools
             }
             if (AssetDatabase.LoadAssetAtPath<GameObject>(Root + "Kit/env_wall_arch_4m.fbx"))
                 Place("Kit/env_wall_arch_4m", _parent, banPos + new Vector3(3.2f, 0, -0.3f), -90, false, false, true); // #97: a 3.6 restava una fessura di ~0.45 m tra muro_b e arco: i clienti (r 0.3) ci si incastravano e non arrivavano al Bancone
-            Place("Kit/prop_sign_sunn_depot", _parent, banPos + new Vector3(0.9f, archBan ? 2.75f : 2.0f, 1.2f), 0, false); // #256: sull'architrave (da 2,4 m), non nell'apertura DressSignFace();
-            Place("Kit/prop_lantern_wall", _parent, banPos + new Vector3(archBan ? -0.7f : -1.4f, 1.85f, 1.2f), 0, false); // #256: sul pilastro ovest dell'arco
+            // #256 (condizione GD, review #270): con l'arco l'insegna sta sopra il pilastro ovest, ridotta al 55 % (1,34 m), fuori dalla linea
+            // camera → Kaia sulla Cassa: torso, pila in mano e anello restano visibili (VisibilitaCassa256Test). Senza arco resta sul muro come prima.
+            Place("Kit/prop_sign_sunn_depot", _parent, banPos + new Vector3(archBan ? -0.7f : 0.6f, archBan ? 2.75f : 2.0f, 1.2f), 0, false); DressSignFace();
+            if (archBan) { var sg = _parent.GetChild(_parent.childCount - 1); if (sg.name.Contains("prop_sign_sunn_depot")) sg.localScale *= 0.55f; }
+            // #256: lanterna sul pilastro est dell'arco (quello ovest ha l'insegna)
+            Place("Kit/prop_lantern_wall", _parent, banPos + new Vector3(archBan ? 2.5f : -1.4f, 1.85f, 1.2f), 0, false);
             // #256/#262: varchi sui percorsi di Kaia (larghezza nominale, misurata nei test con i collider veri: tutti ≥ 1,2 m)
             Varco("Varco_ArcoBancone", banPos + new Vector3(0.9f, 0, 1.45f), 0, 2.4f, 0); // 0 = arco della Cassa
-            Varco("Varco_CorridoioOvest", banPos + new Vector3(-1.0f, 0, 0.33f), 90, 1.76f, 1);
+            Varco("Varco_CorridoioOvest", banPos + new Vector3(-1.0f, 0, 0.37f), 90, 1.66f, 1); // centro e larghezza misurati sui collider (review Tech Lead #270)
             Varco("Varco_ArcoEst", banPos + new Vector3(3.2f, 0, -0.3f), 90, 2.4f, 2);
-            Varco("Varco_StrisciaEst", new Vector3((banPos.x + 3.45f + 7.36f) * 0.5f, 0, banPos.z + 0.64f), 0, 7.36f - (banPos.x + 3.45f), 3); // striscia fra il pilastro N dell'arco (x 5,97) e il muro E (x 7,36): marker appena a sud del pilastro, così da Nonna Ada la guida ci arriva dritta dall'apertura dell'arco
-            Varco("Varco_UscitaOvest", banPos + new Vector3(-2.0f, 0, 0.74f), 0, 1.6f, 4); // tappa intermedia: fuori dall'imbocco ovest prima di girare a nord (dritti dal centro dell'imbocco si striscia lo spigolo dell'arco)
-            Varco("Varco_ScaffaliEst", shelfC + new Vector3(4.4f, 0, 1.2f), 90, 1.6f, 5); // davanti agli scaffali, a est del vaso tondo: dal Bancone la fila (vasi ai due capi) si gira da qui; a z +1,2 così, attraversato (entro 0,8 m), la linea verso ogni scaffale è già libera
+            // striscia fra il pilastro N dell'arco est (x 5,97; z −4,74…−3,94) e il muro E (x 7,36): centro reale della strettoia
+            Varco("Varco_StrisciaEst", new Vector3((banPos.x + 3.45f + 7.36f) * 0.5f, 0, banPos.z + 1.30f), 0, 7.36f - (banPos.x + 3.45f), 3);
+            // tappa intermedia (campo aperto): fuori dall'imbocco ovest prima di girare a nord; dritti dal centro dell'imbocco si striscia lo spigolo dell'arco.
+            // Raggio di passaggio 0,6 m lontano da quello di CorridoioOvest (0,83 m): le due zone non si sovrappongono, la mano non oscilla
+            Varco("Varco_UscitaOvest", banPos + new Vector3(-2.32f, 0, 1.04f), 0, 1.2f, 4);
+            // tappa intermedia (campo aperto) davanti agli scaffali, a est del vaso tondo: dal Bancone la fila (vasi ai due capi) si gira da qui;
+            // a z +1,2 così, attraversato (entro 0,8 m), la linea verso ogni scaffale è già libera
+            Varco("Varco_ScaffaliEst", shelfC + new Vector3(4.4f, 0, 1.2f), 90, 1.6f, 5);
             Debug.Log("[Kit] gameplay dressing: " + _parent.childCount + " pieces");
         }
 

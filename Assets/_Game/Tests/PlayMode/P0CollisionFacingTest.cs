@@ -270,7 +270,8 @@ public class P0CollisionFacingTest
             Assert.Less(nina.transform.position.x - ban.x, -1.2f, "varco ovest dichiarato chiuso ma Nina passa");
             yield break;
         }
-        Teleport(nina, ban + new Vector3(-3.0f, 0.05f, stack.HasValue ? (lemon.Value.max.z + stack.Value.min.z) * 0.5f - ban.z : counter.Value.max.z + 0.6f - ban.z)); // #256: senza pila si entra dal corridoio dietro il banco yield return null;
+        // #256: senza pila si entra dal corridoio dietro il banco
+        Teleport(nina, ban + new Vector3(-3.0f, 0.05f, stack.HasValue ? (lemon.Value.max.z + stack.Value.min.z) * 0.5f - ban.z : counter.Value.max.z + 0.6f - ban.z)); yield return null;
         nina.ScriptedInput = Vector3.right; for (float t = 0; t < 4f && nina.transform.position.x < ban.x; t += Time.deltaTime) yield return null; nina.ScriptedInput = Vector3.zero;
         Assert.Greater(nina.transform.position.x - ban.x, -0.6f, "Nina non entra da ovest: " + nina.transform.position);
     }

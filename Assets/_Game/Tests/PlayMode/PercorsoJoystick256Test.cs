@@ -110,24 +110,30 @@ public class PercorsoJoystick256Test
 
     /// <summary>Segmento dritto libero per Kaia (capsula r 0,3, solo collider statici; gli ultimi <paramref name="margine"/> m non contano:
     /// il bersaglio stesso, es. la Cassaforte, ha un collider).</summary>
+    /// <summary>Tappe intermedie in campo aperto (non varchi fra due solidi): solo larghezza ≤ spazio libero.</summary>
+    static readonly HashSet<string> TappeIntermedie = new() { "Varco_UscitaOvest", "Varco_ScaffaliEst" };
     static float Larg(VarcoMarker v) => v.larghezza;
     static int Ord(VarcoMarker v) => v.ordine;
 
     // ---- #266 (Animator) + condizione GD: nessun percorso principale dentro l'area estesa di un pad che non è la meta ----
-    /// <summary>Area d'attivazione di #266: disco 0,70 m, verso la camera fino a +0,30 m (× cos dell'angolo dalla direzione della camera,
-    /// −forward della camera proiettato su XZ). Il rilevamento di #266 è sul pivot di Kaia (FeetOnDisc), quindi niente raggio di Kaia in più.</summary>
-    const float TolleranzaCamera266 = 0.30f;
+    /// <summary>Area d'attivazione di #266 nel caso peggiore (review Tech Lead #270): disco 0,70 m; verso la camera fino a +0,30 m di tolleranza
+    /// +0,05 m di isteresi d'uscita (× cos dell'angolo dalla direzione della camera, −forward proiettato su XZ), con la camera ruotata di ±45°
+    /// (rotazione #205): l'angolo conta solo oltre i 45°. Il rilevamento di #266 è sul pivot di Kaia (FeetOnDisc): niente raggio di Kaia in più.</summary>
+    const float TolleranzaCamera266 = 0.30f, Isteresi266 = 0.05f, RotazioneCamera266 = 45f;
     static float RaggioArea(UpgradePad pad, Vector3 q)
     {
-        var c = pad.DiscCenter; float dx = q.x - c.x, dz = q.z - c.z, d = Mathf.Sqrt(dx * dx + dz * dz); if (d < 1e-4f) return pad.DiscRadius + TolleranzaCamera266;
+        var c = pad.DiscCenter; float dx = q.x - c.x, dz = q.z - c.z, d = Mathf.Sqrt(dx * dx + dz * dz); float extra = TolleranzaCamera266 + Isteresi266;
+        if (d < 1e-4f) return pad.DiscRadius + extra;
         var cam = Camera.main; var f = cam ? cam.transform.forward : Vector3.forward; f.y = 0; if (f.sqrMagnitude < 1e-4f) f = Vector3.forward; f.Normalize();
-        float verso = -(dx / d * f.x + dz / d * f.z);
-        return pad.DiscRadius + (verso > 0f ? TolleranzaCamera266 * verso : 0f);
+        float ang = Vector3.Angle(new Vector3(dx / d, 0, dz / d), -f); // 0 = dritto verso la camera
+        float a = Mathf.Max(0f, ang - RotazioneCamera266);
+        return pad.DiscRadius + (a < 90f ? extra * Mathf.Cos(a * Mathf.Deg2Rad) : 0f);
     }
     static UpgradePad[] _pads; static Component _metaAttuale, _partenza;
     static void Meta(Component m) { _partenza = _metaAttuale; _metaAttuale = m; } static string _modo = "";
     /// <summary>pad → (margine minimo = distanza − raggio area, percorso, punto)</summary>
     static readonly Dictionary<string, (float margine, string rotta, Vector3 punto)> _minPad = new();
+    static bool TappaPad(string cosa) => cosa.Contains("Pad ");
     static void ControllaPad(Vector3 p, string cosa)
     {
         if (_pads == null) return;
@@ -135,7 +141,8 @@ public class PercorsoJoystick256Test
         {
             if (!pad || pad == _metaAttuale || pad == _partenza) continue; // la meta e il pad da cui si parte non contano
             var c = pad.DiscCenter; float d = Vector2.Distance(new Vector2(p.x, p.z), new Vector2(c.x, c.z)); float m = d - RaggioArea(pad, p);
-            if (!_minPad.TryGetValue(pad.name, out var x) || m < x.margine) _minPad[pad.name] = (m, _modo + cosa, p);
+            var key = pad.name + (TappaPad(cosa) ? " (tappe da/verso i pad)" : " (percorsi principali)");
+            if (!_minPad.TryGetValue(key, out var x) || m < x.margine) _minPad[key] = (m, _modo + cosa, p);
         }
     }
     static string _ultimoOstacolo = "";
@@ -252,8 +259,16 @@ public class PercorsoJoystick256Test
                 float dl = 3f, dr = 3f;
                 foreach (var h in Physics.RaycastAll(o, r, 3f, ~0, QueryTriggerInteraction.Ignore)) if (!Mobile(h.collider)) dr = Mathf.Min(dr, h.distance);
                 foreach (var h in Physics.RaycastAll(o, -r, 3f, ~0, QueryTriggerInteraction.Ignore)) if (!Mobile(h.collider)) dl = Mathf.Min(dl, h.distance);
-                log.AppendLine($"varco {v.name} (ordine {Ord(v)}): nominale {Larg(v):0.00} m, misurato {dl + dr:0.00} m");
+                log.AppendLine($"varco {v.name} (ordine {Ord(v)}): nominale {Larg(v):0.00} m, misurato {dl + dr:0.00} m (sx {dl:0.00}, dx {dr:0.00})");
                 Assert.GreaterOrEqual(dl + dr, Minimo, $"varco {v.name}: {dl + dr:0.00} m < {Minimo} m");
+                if (TappeIntermedie.Contains(v.name))
+                    Assert.LessOrEqual(Larg(v), dl + dr + 0.05f, $"tappa {v.name}: larghezza {Larg(v):0.00} m oltre lo spazio libero {dl + dr:0.00} m");
+                else
+                {   // review Tech Lead #270: marker al centro reale dell'apertura e larghezza = misura (tolleranza 5 cm)
+                    Assert.Less(dl, 2.99f, $"varco {v.name}: nessun collider a sinistra entro 3 m"); Assert.Less(dr, 2.99f, $"varco {v.name}: nessun collider a destra entro 3 m");
+                    Assert.LessOrEqual(Mathf.Abs(dr - dl) * 0.5f, 0.05f, $"varco {v.name}: fuori centro di {(dr - dl) * 0.5f:0.00} m (sx {dl:0.00}, dx {dr:0.00})");
+                    Assert.AreEqual(dl + dr, Larg(v), 0.05f, $"varco {v.name}: larghezza {Larg(v):0.00} m ≠ misurata {dl + dr:0.00} m");
+                }
             }
 
             var cassa = Object.FindAnyObjectByType<CassaZone>(); Assert.IsNotNull(cassa, "Cassa mancante");
@@ -283,7 +298,19 @@ public class PercorsoJoystick256Test
             Meta(scaffA); yield return Guida(nina, scaffA.transform.position, () => scaffA.Occupied, "Bancone → Scaffale A", log, scaffA.transform);
             Meta(prendiA); yield return Guida(nina, prendiA.transform.position, () => prendiA.Occupied, "Scaffale A → Prendi A", log, prendiA.transform);
             Meta(bancone); yield return Guida(nina, bancone.transform.position, () => bancone.Occupied, "Prendi A → varco → Bancone", log, bancone.transform);
+            var monete = bancone.transform.position + Vector3.right * 0.8f; // dove Kaia raccoglie le monete dei clienti (come LoopAutoTest)
+            Meta(null); yield return Guida(nina, monete, () => Oriz(nina.transform.position, monete) <= 0.35f, "Bancone → monete della coda", log);
             Meta(null);
+            // coda clienti (informativo: i pad li attiva solo Kaia): margine degli slot e del tratto porta → coda dall'area estesa dei pad
+            var coda = Object.FindAnyObjectByType<CustomerQueue>();
+            if (coda)
+                foreach (var pad in _pads)
+                {
+                    float mm = float.MaxValue; Vector3 pp = Vector3.zero;
+                    var pts = new List<Vector3> { coda.SpawnPoint }; for (int i = 0; i < coda.MaxLine; i++) pts.Add(coda.Slot(i));
+                    for (int i = 0; i + 1 < pts.Count; i++) for (float t = 0; t <= 1f; t += 0.05f) { var q = Vector3.Lerp(pts[i], pts[i + 1], t); var c = pad.DiscCenter; float m = Vector2.Distance(new Vector2(q.x, q.z), new Vector2(c.x, c.z)) - RaggioArea(pad, q); if (m < mm) { mm = m; pp = q; } }
+                    log.AppendLine($"coda {pad.name}: margine minimo {mm:0.00} m dall'area estesa (a ({pp.x:0.00}; {pp.z:0.00}))");
+                }
             // condizione GD (#266): nessun percorso principale nell'area estesa di un pad che non è la meta della tappa
             var fuori = new List<string>();
             foreach (var kv in _minPad)
