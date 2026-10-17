@@ -47,7 +47,31 @@ namespace UltimoMiglio.Gameplay
         {
             if (!_col || !_col.enabled) return false; // pad non disponibile (costo infinito / non sbloccato): mai dentro
             var c = DiscCenter; float dx = p.x - c.x, dz = p.z - c.z;
-            float r = DiscRadius; return dx * dx + dz * dz <= r * r;
+            float d2 = dx * dx + dz * dz, d = Mathf.Sqrt(d2);
+            float r = RaggioVerso(d > 1e-4f ? dx / d : 0f, d > 1e-4f ? dz / d : 0f, Occupied); // Occupied: isteresi d'uscita sul lato camera
+            return d2 <= r * r;
+        }
+        /// <summary>#171 (Producer): conta ciò che vede il giocatore. Con la camera da sud il corpo di Kaia copre l'anello a schermo anche con i
+        /// piedi appena fuori, quindi verso la camera il raggio cresce fino a <see cref="TolleranzaCamera"/> (pieno nella direzione della camera,
+        /// 0 di lato e sul lato opposto). La direzione è la camera proiettata sul piano: nessun lato fisso. Zaino–Scarpe a 1,85 m: l'allargamento
+        /// è verso sud, non verso il pad vicino.</summary>
+        [Tooltip("#171: metri in più verso la camera (corpo di Kaia sopra l'anello a schermo)")] public float TolleranzaCamera = 0.3f;
+        [Tooltip("#171: metri in più per uscire, solo sul lato camera (isteresi); negli altri lati resta il disco")] public float IsteresiUscita = 0.05f;
+        static Transform _cam;
+        /// <summary>#171: raggio d'attivazione nella direzione orizzontale (ux, uz) dal centro del disco. Lato camera: r + (TolleranzaCamera
+        /// [+ IsteresiUscita se in uscita]) × cos(angolo dalla camera); di lato e sul lato opposto resta il raggio del disco (0,70). La camera è quella
+        /// reale (Camera.main, rotazione #205 compresa), letta a ogni chiamata dal transform in cache.</summary>
+        public float RaggioVerso(float ux, float uz, bool inUscita = false)
+        {
+            float r = DiscRadius;
+            if (TolleranzaCamera <= 0f) return r;
+            if (!_cam) { var cm = Camera.main; if (!cm) return r; _cam = cm.transform; } // in cache: Camera.main solo se manca
+            var f = _cam.forward; f.y = 0f;
+            if (f.sqrMagnitude < 1e-4f) { f = _cam.up; f.y = 0f; } // camera a picco: l'alto dello schermo
+            if (f.sqrMagnitude < 1e-4f) return r;
+            f.Normalize();
+            float verso = -(ux * f.x + uz * f.z); // 1 = dritto verso la camera
+            return verso > 0f ? r + (TolleranzaCamera + (inUscita ? IsteresiUscita : 0f)) * verso : r;
         }
         InteractionPoint _ip; bool _ipCercato; Transform _disc;
         InteractionPoint Ip { get { if (!_ipCercato) { _ipCercato = true; _ip = GetComponent<InteractionPoint>(); } return _ip; } }

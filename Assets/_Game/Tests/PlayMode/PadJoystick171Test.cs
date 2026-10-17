@@ -41,10 +41,17 @@ public class PadJoystick171Test
             Assert.Less(GameRoot.I.Eco.S.NonnoLevel, 0, "partita non nuova: NONNO già assunto");
 
             yield return Porta(TutorialManager.Step.HireNonno); // Zaino e OLDO visibili
-            yield return Prova(Pad("Pad_AssumiNonno"), new Vector3(1, 0, -1).normalized, "SE", null);
-            yield return Prova(Pad("Pad_Zaino"), Vector3.back, "S", new[] { new Vector3(0.3f, 0, 3.5f), new Vector3(0.3f, 0, -2.8f) });
+            // lati del QA riferiti alla camera reale (rotazione #205 compresa), non al sud del mondo
+            var vc0 = VersoCamera(); var se = Quaternion.Euler(0, -45f, 0) * vc0;
+            yield return Prova(Pad("Pad_AssumiNonno"), se, "lato camera +45°", null);
+            yield return Prova(Pad("Pad_Zaino"), vc0, "lato camera", new[] { new Vector3(0.3f, 0, 3.5f), new Vector3(0.3f, 0, -2.8f) });
             yield return Porta(TutorialManager.Step.PadNuovi); // Scarpe visibile
-            yield return Prova(Pad("Pad_Scarpe"), Vector3.back, "S", new[] { new Vector3(2.55f, 0, -2.8f) });
+            yield return Prova(Pad("Pad_Scarpe"), vc0, "lato camera", new[] { new Vector3(2.55f, 0, -2.8f) });
+            // #171 (Producer): conta ciò che vede il giocatore. Zaino: piedi a 0,85 m dal centro verso la camera (corpo sopra l'anello) = si attiva;
+            // a 0,85 m sul lato opposto alla camera = non si attiva.
+            var zaino = Pad("Pad_Zaino"); var versoCam = VersoCamera();
+            yield return Fermo(zaino, versoCam, 0.85f, true, new[] { new Vector3(2.55f, 0, -2.8f), zaino.DiscCenter + versoCam * 1.6f });
+            yield return Fermo(zaino, -versoCam, 0.85f, false, new[] { zaino.DiscCenter + versoCam * 1.6f + new Vector3(-1.4f, 0, 0), zaino.DiscCenter - versoCam * 1.6f + new Vector3(-1.4f, 0, 0), zaino.DiscCenter - versoCam * 1.6f });
 
             if (_errori.Length > 0) Assert.Fail(_errori.ToString());
         }
@@ -53,6 +60,45 @@ public class PadJoystick171Test
             if (_joy) _joy.TestValue = null;
             TutorialManager.TestBloccaPassi = false; TutorialManager.TestAccelera = false; Time.timeScale = 1f;
         }
+    }
+
+    /// <summary>#171 (review Tech Lead): con la tolleranza verso la camera le aree attive (isteresi compresa) dei pad della scena reale non si
+    /// sovrappongono, in particolare Zaino e OLDO; e la colonna della #263 (pad a 1,9 m lungo la direzione della camera) resta separata.</summary>
+    [UnityTest, Timeout(60000)]
+    public IEnumerator AreeAttive_ConTolleranza_NonSiSovrappongono()
+    {
+        PlayerPrefs.DeleteAll(); var save = System.IO.Path.Combine(Application.persistentDataPath, "save_v1.json"); if (System.IO.File.Exists(save)) System.IO.File.Delete(save);
+        yield return SceneManager.LoadSceneAsync("Ch1_Deposito");
+        for (int i = 0; i < 300 && !GameRoot.Ready; i++) yield return null;
+        Assert.IsTrue(GameRoot.Ready, "GameRoot non pronto");
+        yield return null;
+        var pads = new[] { Pad("Pad_Zaino"), Pad("Pad_Scarpe"), Pad("Pad_Insegna"), Pad("Pad_AssumiNonno") };
+        for (int a = 0; a < pads.Length; a++)
+            for (int b = a + 1; b < pads.Length; b++)
+            {
+                var ca = pads[a].DiscCenter; float ra = pads[a].DiscRadius + pads[a].TolleranzaCamera + pads[a].IsteresiUscita;
+                int comuni = 0; Vector3 primo = Vector3.zero;
+                for (float x = -ra; x <= ra; x += 0.05f)
+                    for (float z = -ra; z <= ra; z += 0.05f)
+                    {
+                        var q = ca + new Vector3(x, 0, z);
+                        if (DentroArea(pads[a], q) && DentroArea(pads[b], q)) { if (comuni++ == 0) primo = q; }
+                    }
+                Assert.AreEqual(0, comuni, $"[#171] aree attive sovrapposte: {pads[a].name} e {pads[b].name} (es. {P(primo)}, {comuni} punti su griglia 5 cm)");
+            }
+        // #263: colonna Zaino/Scarpe/Insegna a 1,9 m; nel caso peggiore la colonna è allineata alla camera: lato camera del pad lontano + lato opposto del vicino
+        var z0 = pads[0];
+        float peggiore = z0.DiscRadius + z0.TolleranzaCamera + z0.IsteresiUscita + z0.DiscRadius;
+        Assert.Less(peggiore, 1.9f, $"[#171] colonna #263: aree attive a contatto ({peggiore:0.00} m su 1,90)");
+        Debug.Log($"[#171] aree attive separate; colonna #263: {peggiore:0.00} m su 1,90");
+    }
+
+    /// <summary>Dentro l'area attiva (isteresi d'uscita compresa, caso più largo).</summary>
+    static bool DentroArea(UpgradePad p, Vector3 q)
+    {
+        var c = p.DiscCenter; float dx = q.x - c.x, dz = q.z - c.z, d = Mathf.Sqrt(dx * dx + dz * dz);
+        float r = p.RaggioVerso(d > 1e-4f ? dx / d : 0f, d > 1e-4f ? dz / d : 0f, true);
+        return d <= r;
     }
 
     static UpgradePad Pad(string nome) { var g = GameObject.Find(nome); Assert.IsNotNull(g, nome + " non in scena"); var p = g.GetComponent<UpgradePad>(); Assert.IsNotNull(p, nome + " senza UpgradePad"); return p; }
@@ -94,6 +140,42 @@ public class PadJoystick171Test
         }
         // esce dal lato da cui è entrata, per non tenere il pad occupato
         yield return Vai(nina, partenza, 0.2f, pad.name + " uscita", v => { });
+        _joy.TestValue = Vector2.zero; yield return Attendi(0.3f);
+    }
+
+    /// <summary>Direzione orizzontale dal pad verso la camera (camera proiettata sul piano, come UpgradePad.RaggioVerso).</summary>
+    static Vector3 VersoCamera()
+    {
+        var cam = Camera.main; Assert.IsNotNull(cam, "Camera.main mancante");
+        var f = cam.transform.forward; f.y = 0; if (f.sqrMagnitude < 1e-4f) { f = cam.transform.up; f.y = 0; }
+        return -f.normalized;
+    }
+
+    /// <summary>Kaia col joystick (rallentando) fino ai piedi a <paramref name="dist"/> m dal centro sul lato <paramref name="lato"/>, poi ferma 1,5 s.</summary>
+    IEnumerator Fermo(UpgradePad pad, Vector3 lato, float dist, bool attesoAttivo, Vector3[] tappe)
+    {
+        var nina = GameRoot.I.Nina; var eco = GameRoot.I.Eco; string esito = null;
+        string nome = $"{pad.name} piedi a {dist:0.00} m {(attesoAttivo ? "verso la camera" : "lato opposto alla camera")}";
+        foreach (var t in tappe) { yield return Vai(nina, t, 0.2f, nome + " tappa", v => esito = v); if (esito != null) { _errori.AppendLine("[#171] " + esito); yield break; } }
+        _joy.TestValue = Vector2.zero; yield return Attendi(0.4f);
+        eco.S.Wallet = 1e6; eco.S.PadPaid[(int)pad.Kind] = 0; double prima = eco.S.Wallet;
+        var punto = pad.DiscCenter + lato * dist; float t0 = Time.time;
+        while (Time.time - t0 < 10f)
+        {
+            var d = punto - nina.transform.position; d.y = 0; float m = d.magnitude;
+            if (m < 0.03f) break;
+            float yaw = _camT ? _camT.eulerAngles.y : _yaw; var loc = Quaternion.Euler(0, -yaw, 0) * (d / m);
+            float k = Mathf.Clamp(m * 1.5f, 0.12f, 1f); _joy.TestValue = new Vector2(loc.x, loc.z) * k;
+            yield return null;
+        }
+        _joy.TestValue = Vector2.zero;
+        float t1 = Time.time; while (Time.time - t1 < 1.5f) yield return null;
+        var p = nina.transform.position; float dd = Oriz(p - pad.DiscCenter); bool carica = eco.S.Wallet < prima;
+        var cam = Camera.main; var sp = cam.WorldToScreenPoint(p + Vector3.up * 1.2f); var sc = cam.WorldToScreenPoint(pad.DiscCenter);
+        Debug.Log($"[#171] {nome}: piedi {P(p)} a {dd:0.00} m, carica={carica} occupato={pad.Occupied}; schermo petto=({sp.x:0},{sp.y:0}) centro anello=({sc.x:0},{sc.y:0})");
+        if (Mathf.Abs(dd - dist) > 0.08f) _errori.AppendLine($"[#171] {nome}: Kaia ferma a {dd:0.00} m invece di {dist:0.00} ({P(p)}).");
+        else if (carica != attesoAttivo) _errori.AppendLine($"[#171] {nome}: atteso {(attesoAttivo ? "attivo" : "NON attivo")}, invece carica={carica} occupato={pad.Occupied} (piedi {P(p)}).");
+        yield return Vai(nina, pad.DiscCenter + lato * 1.6f, 0.2f, nome + " uscita", v => { });
         _joy.TestValue = Vector2.zero; yield return Attendi(0.3f);
     }
 
