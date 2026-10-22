@@ -12,6 +12,12 @@ public class SaldoCompatto254Tests
     [TestCase(1000000d, "1M")]
     [TestCase(1999999d, "1,9M")]
     [TestCase(999999999d, "999,9M")]
+    [TestCase(0d, "0")]
+    [TestCase(999950d, "999,9K")]
+    [TestCase(-999999d, "-999,9K")]
+    [TestCase(-9.99d, "-9,9")]
+    [TestCase(9.99d, "9,9")]
+    [TestCase(-0.05d, "0")]
     public void NonSuperaIlSaldoReale(double saldo, string atteso) =>
         Assert.AreEqual(atteso, HudFormat.Amount(saldo));
 }

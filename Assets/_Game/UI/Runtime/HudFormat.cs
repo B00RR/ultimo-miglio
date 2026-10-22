@@ -2,7 +2,7 @@ using System.Globalization;
 
 namespace UltimoMiglio.UI
 {
-    /// <summary>Italian number formatting: 1.240 / 8,5 / 1,2K / 3,4M. Tabular digits come from the USS font settings.</summary>
+    /// <summary>Numeri in italiano: 1.240 / 8,5 / 1,2K / 3,4M. Le cifre tabulari arrivano dalle impostazioni del font nella USS.</summary>
     public static class HudFormat
     {
         // WebGL/IL2CPP (invariant globalization) may not ship it-IT: a throwing static ctor would kill the whole HUD.
@@ -19,21 +19,26 @@ namespace UltimoMiglio.UI
             }
         }
 
-        /// <summary>Taglia alla precisione già mostrata, verso il basso: il saldo in pillola non supera mai il reale.</summary>
+        /// <summary>Taglia alla precisione già mostrata, verso lo zero.</summary>
         static double Taglia(double v, int decimali)
         {
             double f = System.Math.Pow(10, decimali);
-            return System.Math.Floor(v * f) / f;
+            return System.Math.Truncate(v * f) / f;
         }
 
         public static string Amount(double v)
         {
-            double a = System.Math.Abs(v);
-            if (a < 10 && a != System.Math.Floor(a)) return Taglia(v, 1).ToString("0.#", It);
-            if (a < 100000) return Taglia(v, 0).ToString("#,0", It);
-            if (a < 1e6) return Taglia(v / 1e3, 1).ToString("0.#", It) + "K";
-            if (a < 1e9) return Taglia(v / 1e6, 1).ToString("0.#", It) + "M";
-            if (a < 1e12) return Taglia(v / 1e9, 1).ToString("0.#", It) + "B";
+            // Segno a parte: si tronca il valore assoluto, e un negativo che arriva a zero resta «0».
+            if (v < 0)
+            {
+                string s = Amount(-v);
+                return s == "0" ? s : "-" + s;
+            }
+            if (v < 10 && v != System.Math.Floor(v)) return Taglia(v, 1).ToString("0.#", It);
+            if (v < 100000) return Taglia(v, 0).ToString("#,0", It);
+            if (v < 1e6) return Taglia(v / 1e3, 1).ToString("0.#", It) + "K";
+            if (v < 1e9) return Taglia(v / 1e6, 1).ToString("0.#", It) + "M";
+            if (v < 1e12) return Taglia(v / 1e9, 1).ToString("0.#", It) + "B";
             return Taglia(v / 1e12, 1).ToString("0.#", It) + "T";
         }
 
