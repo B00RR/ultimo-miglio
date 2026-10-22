@@ -103,7 +103,7 @@ namespace UltimoMiglio.EditorTools
 
             // --- Nina
             var nina = new GameObject("Nina"); nina.transform.position = new Vector3(0, 0, -1f); // #60: spawn sicuro nell'area giocabile
-            var cc = nina.AddComponent<CharacterController>(); cc.center = new Vector3(0, 0.8f, 0); cc.height = 1.6f; cc.radius = 0.3f;
+            var cc = nina.AddComponent<CharacterController>(); cc.center = new Vector3(0, 0.8f, 0); cc.height = 1.6f; cc.radius = NinaRadius;
             var ninaAnim = Rig(nina.transform, "chr_nina_vela", 0f);
             if (!ninaAnim)
             {
@@ -125,7 +125,7 @@ namespace UltimoMiglio.EditorTools
 
             // --- zones
             var arrPos = new Vector3(-5, 0, 6);
-            var arrivals = Zone<ArrivalsZone>("Zona_Arrivi", arrPos, new Vector3(2.6f, 1, 2.6f), UM_Palette.GialloSole, props);
+            var arrivals = Zone<ArrivalsZone>("Zona_Arrivi", arrPos, new Vector3(1.8f, 1, 1.8f), UM_Palette.GialloSole, props);
             var shelves = new Shelf[3]; var cols = new[] { UM_Palette.Terracotta, UM_Palette.Menta, UM_Palette.Limone };
             for (int i = 0; i < 3; i++)
             {
@@ -134,11 +134,11 @@ namespace UltimoMiglio.EditorTools
                 body.AddComponent<NavMeshObstacle>().carving = true;
                 // #58: BoxCollider semplice (il CharacterController scivola sui box, B5)
                 // #47: scaffale caricato se presente
-                if (kitOk && DepotKit.Place(AssetDatabase.LoadAssetAtPath<GameObject>("Assets/_Game/Art/Environment/Kit/prop_shelf_2m_loaded.fbx") ? "Kit/prop_shelf_2m_loaded" : "Kit/prop_shelf_2m", null, body.transform.position - new Vector3(0, 0.9f, 0), 0, false)) body.GetComponent<Renderer>().enabled = false;
+                if (kitOk && DepotKit.Place(AssetDatabase.LoadAssetAtPath<GameObject>("Assets/_Game/Art/Environment/Kit/prop_shelf_2m_loaded.fbx") ? "Kit/prop_shelf_2m_loaded" : "Kit/prop_shelf_2m", null, body.transform.position - new Vector3(0, 0.9f, 0), 0, false)) body.GetComponent<Renderer>().enabled = false; // #58: il BoxCollider del box resta (secondo collider voluto)
                 Box("Code", body.transform, new Vector3(0, 0.55f, 0.52f), new Vector3(0.9f, 0.08f, 0.1f), world, cols[i]);
-                shelves[i] = Zone<Shelf>($"Zona_Scaffale_{(char)('A' + i)}", p + new Vector3(0, 0, 0.6f), new Vector3(1.8f, 1, 1.2f), cols[i], props);
+                shelves[i] = Zone<Shelf>($"Zona_Scaffale_{(char)('A' + i)}", p + new Vector3(0, 0, 0.65f), new Vector3(1.8f, 1, 1.2f), cols[i], props);
                 shelves[i].Color = (ParcelColor)i; shelves[i].Count = 4;
-                var pick = Zone<ShelfPickup>($"Zona_Prendi_{(char)('A' + i)}", p + new Vector3(0, 0, 1.6f), new Vector3(1.8f, 1, 0.7f), UM_Palette.Crema, props); pick.Shelf = shelves[i];
+                var pick = Zone<ShelfPickup>($"Zona_Prendi_{(char)('A' + i)}", p + new Vector3(0, 0, 2.0f), new Vector3(1.8f, 1, 0.7f), UM_Palette.Crema, props); pick.Shelf = shelves[i];
             }
             var shelfC = arrPos + new Vector3(0, 0, -dArr);
             var banPos = shelfC + new Vector3(dBan * 0.8f, 0, -dBan * 0.6f); // 9.4 m
@@ -146,19 +146,27 @@ namespace UltimoMiglio.EditorTools
             var banMesh = Box("Bancone_Mesh", null, banPos + new Vector3(0, 0.5f, -0.9f), new Vector3(2.4f, 1f, 0.7f), world, UM_Palette.Terracotta); banMesh.AddComponent<NavMeshObstacle>().carving = true;
            // #58: BoxCollider solido
             // #47: counter + Carico0 + rug
-            if (kitOk && DepotKit.Place("Kit/prop_counter_2m", null, banPos + new Vector3(0, 0, -0.9f), 0, false)) { banMesh.GetComponent<Renderer>().enabled = false; DepotKit.Place("Kit/prop_register", null, banPos + new Vector3(0.6f, 1.0f, -0.9f), 0, false, true); DepotKit.Place("Kit/prop_carico0", null, banPos + new Vector3(-0.15f, 1.0f, -0.9f), 8, false, true); DepotKit.Place("ThirdParty/Props/prop_tp_lemon", null, banPos + new Vector3(-0.8f, 1.0f, -0.9f), 0, false, true); DepotKit.Place("Kit/prop_rug_bancone", null, banPos + new Vector3(0, 0.005f, 0.2f), 0, false); }
-            var bancone = Zone<Bancone>("Zona_Bancone", banPos, new Vector3(2.4f, 1, 1.2f), UM_Palette.Terracotta, props);
+            if (kitOk && DepotKit.Place("Kit/prop_counter_2m", null, banPos + new Vector3(0, 0, -0.9f), 0, false)) { banMesh.GetComponent<Renderer>().enabled = false; /* #58: il BoxCollider di Bancone_Mesh resta */ DepotKit.Place("Kit/prop_register", null, banPos + new Vector3(0.6f, 1.0f, -0.9f), 0, false, true); DepotKit.Place("Kit/prop_carico0", null, banPos + new Vector3(-0.15f, 1.0f, -0.9f), 8, false, true); DepotKit.Place("ThirdParty/Props/prop_tp_lemon", null, banPos + new Vector3(-0.8f, 1.0f, -0.9f), 0, false, true); DepotKit.Place("Kit/prop_rug_bancone", null, banPos + new Vector3(0, 0.005f, 0.2f), 0, false); }
+            var bancone = Zone<Bancone>("Zona_Bancone", banPos + new Vector3(0, 0, 0.33f), new Vector3(2.4f, 1, 1.2f), UM_Palette.Terracotta, props); // #82+#187: centrata fra banco (faccia -0.55) e muro (faccia +1.21), 0,28 m per lato
             var coins = new GameObject("Coins").AddComponent<CoinSpawner>(); coins.CoinPrefab = coin; bancone.Coins = coins;
             var queue = new GameObject("CustomerQueue").AddComponent<CustomerQueue>(); queue.Prefab = cust; queue.Variants = custVariants.ToArray();
             queue.CounterSlot = new GameObject("CounterSlot").transform; queue.CounterSlot.position = banPos + new Vector3(0, 0, -1.8f);
             queue.Door = new GameObject("Door").transform; queue.Door.position = new Vector3(8.5f, 0, -10.5f); queue.LineStep = new Vector3(0.7f, 0, -0.7f);
             bancone.Queue = queue;
-            var cassa = Zone<CassaZone>("Zona_Cassa", banPos + new Vector3(3.2f, 0, 1.5f), new Vector3(1.4f, 1, 1.4f), UM_Palette.TealOmni, props); cassa.Coins = coins;
+            // #256: Cassa dritta a nord dell'apertura dell'arco del Bancone (banPos + 0,9), niente pilastri sul percorso. A z −0,74 (4,9 m dietro il Bancone)
+            // con la camera a 50° Kaia sull'anello, la pila in mano e l'anello si vedono sopra l'architrave (a −2,84 l'architrave le copriva il torso;
+            // VisibilitaCassa256Test). Prima: #82+#187, oltre il muro del set (z +1.45), gap ≥ 0,4 m da muro, arco, pad e vasi (layout_187.py)
+            var cassa = Zone<CassaZone>("Zona_Cassa", banPos + new Vector3(0.9f, 0, 4.9f), new Vector3(1.2f, 1, 1.2f), UM_Palette.TealOmni, props); cassa.Coins = coins;
 
             // --- pads (near the Cassa, 01 §3)
-            var padRow = banPos + new Vector3(-1.5f, 0, 4.5f);
-            Pad("Pad_Zaino", UpgradeKind.Zaino, padRow, 0, props);
-            Pad("Pad_AssumiNonno", UpgradeKind.NonnoHire, arrPos + new Vector3(3.2f, 0, 0.5f), 0, props); // onboarding: last step
+            // #224: colonna lungo z sul lato camera a ovest del Bancone (proposta GD 0,5 m più a ovest, layout_224.py): fuori dall'ombra del muro
+            // beauty shot, pillole separate in verticale (1,9 m = 137 px a 390x844), golden path scaffali→varco ovest a ≥ 1 m dai dischi
+            var padRow = banPos + new Vector3(-4.5f, 0, 0f);
+            Pad("Pad_Zaino", UpgradeKind.Zaino, padRow + new Vector3(0, 0, 1.9f), 0, props);
+            // #101: passo padNuovi (onboarding.json: gate padPurchasedAny su scarpe/insegna). Senza questi pad il tutorial si bloccava al passo 11.
+            Pad("Pad_Scarpe", UpgradeKind.Scarpe, padRow, 0, props);
+            Pad("Pad_Insegna", UpgradeKind.Insegna, padRow + new Vector3(0, 0, -1.9f), 0, props);
+            Pad("Pad_AssumiNonno", UpgradeKind.NonnoHire, arrPos + new Vector3(3.2f, 0, -0.3f), 0, props); // onboarding: last step (#187: fuori dal vaso di limoni)
 
             // --- NONNO
             var nonno = new GameObject("NONNO"); nonno.transform.position = arrPos + new Vector3(2.5f, 0, -2);
@@ -197,10 +205,11 @@ namespace UltimoMiglio.EditorTools
             // --- onboarding (Nonna Ada)
             var tut = new GameObject("Tutorial").AddComponent<TutorialManager>(); tut.transform.SetParent(root.transform);
             var tj = AssetDatabase.LoadAssetAtPath<TextAsset>("Assets/_Game/Data/ch1/onboarding_testi.json");
-            if (tj) { var td = JsonUtility.FromJson<TutTexts>(tj.text); tut.Speaker = td.speaker; tut.Texts = td.steps.Select(x => x.text).ToArray(); tut.EndText = td.fine; tut.TestiJson = tj; }
+            if (tj) { var td = JsonUtility.FromJson<TutTexts>(tj.text); tut.Speaker = td.speaker; tut.Texts = TutorialManager.TextsById(td.steps.Select(x => (x.id, x.text))); tut.EndText = td.fine; tut.TestiJson = tj; }
             tut.Arrivi = arrivals.transform; tut.Scaffale = shelves[0].transform; tut.Bancone = bancone.transform;
             tut.Monete = new GameObject("Tut_Monete").transform; tut.Monete.position = banPos + Vector3.right * 0.8f;
             foreach (var pz in Object.FindObjectsByType<UpgradePad>(FindObjectsSortMode.None)) { if (pz.Kind == UpgradeKind.Zaino) tut.PadZaino = pz.transform; if (pz.Kind == UpgradeKind.NonnoHire) tut.PadNonno = pz.transform; }
+            AdaScenePlacement.Place(banPos, root.transform); // #118: Nonna Ada 3D a fianco del Bancone (null-safe)
             TryRun("UltimoMiglio.VFX.EditorTools.UM_TutorialMarkerSetup", "Setup"); // #4: marker tutorial con materiali assegnati (in build Shader.Find non trova shader non referenziati)
 
             TryRun("UltimoMiglio.VFX.EditorTools.UM_FxPrefabBuilder", "BuildAll");
@@ -209,10 +218,12 @@ namespace UltimoMiglio.EditorTools
                 Texture2D I(string n) => AssetDatabase.LoadAssetAtPath<Texture2D>($"Assets/_Game/UI/Icons/{n}.png");
                 var font = AssetDatabase.LoadAssetAtPath<Font>("Assets/_Game/UI/Fonts/Fredoka-Bold.ttf");
                 var ringPf = AssetDatabase.LoadAssetAtPath<GameObject>("Assets/_Game/VFX/Prefabs/fx_pad_fill_ring.prefab");
+                var ringModel = AssetDatabase.LoadAssetAtPath<GameObject>(ZoneRingPath);
+                var atlasMat = AssetDatabase.LoadAssetAtPath<Material>("Assets/_Game/VFX/Materials/M_Diorama_Atlas.mat");
                 foreach (var z in Object.FindObjectsByType<ProximityZone>(FindObjectsSortMode.None))
                 {
                     var ip = z.gameObject.AddComponent<InteractionPoint>(); ip.LabelFont = font;
-                    var bc = z.GetComponent<BoxCollider>(); ip.Radius = bc ? Mathf.Clamp(Mathf.Min(bc.size.x, bc.size.z) * 0.5f, 0.45f, 1.2f) : 0.9f;
+                    var bc = z.GetComponent<BoxCollider>(); ip.Radius = bc ? Mathf.Min(bc.size.x, bc.size.z) * 0.5f : 0.6f; // #187 (Game Designer): anello = trigger, diametro esterno = lato minore del BoxCollider
                     switch (z)
                     {
                         case ArrivalsZone _: ip.Kind = PoiKind.Prendi; ip.Label = "Pacchi"; ip.Icon = I("ic_box"); break;
@@ -221,17 +232,19 @@ namespace UltimoMiglio.EditorTools
                         case Bancone _: ip.Kind = PoiKind.Consegna; ip.Label = "Bancone"; ip.Icon = I("ic_customer"); break;
                         case CassaZone _: ip.Kind = PoiKind.Prendi; ip.Label = "Monete"; ip.Icon = I("ic_coin"); ip.HasCard = true; break;
                         case UpgradePad up:
-                            ip.Kind = PoiKind.Acquisto; ip.Label = "0"; ip.Icon = I("ic_coin"); ip.HasCard = true; ip.Pad = up; ip.Radius = 0.95f;
-                            if (ringPf) { var rg = (GameObject)PrefabUtility.InstantiatePrefab(ringPf); rg.transform.SetParent(up.transform, false); rg.transform.localPosition = new Vector3(0, 0.1f, 0); up.FillRing = rg.GetComponent<UltimoMiglio.VFX.UM_PadFillRing>(); }
+                            ip.Kind = PoiKind.Acquisto; ip.Label = "0"; ip.Icon = I("ic_coin"); ip.HasCard = true; ip.Pad = up; ip.Radius = bc ? Mathf.Min(bc.size.x, bc.size.z) * 0.5f : 0.7f; // #187: anello = trigger 1,4 m (era 0,95 → cerchi da 2 m che si toccavano)
+                            if (ringPf) { var rg = (GameObject)PrefabUtility.InstantiatePrefab(ringPf); rg.transform.SetParent(up.transform, false); rg.transform.localPosition = new Vector3(0, 0.1f, 0); rg.transform.localScale = Vector3.one * (ip.Radius / FillRingRadius); up.FillRing = rg.GetComponent<UltimoMiglio.VFX.UM_PadFillRing>(); } // #171: anello di riempimento = cerchio (era a scala 1, Ø ~1,9 m)
+                            PadTriggerTondo(up, ip.Radius * InteractionPoint.VisualScale);
                             break;
                         default: ip.Kind = PoiKind.Prendi; ip.Label = z.name.Replace("Zona_", ""); break;
                     }
                     if (ringPf && !(z is UpgradePad))
                     {
                         var rg = (GameObject)PrefabUtility.InstantiatePrefab(ringPf); rg.transform.SetParent(z.transform, false); rg.transform.localPosition = new Vector3(0, 0.1f, 0);
-                        rg.transform.localScale = Vector3.one * (ip.Radius / 0.95f);
+                        rg.transform.localScale = Vector3.one * (ip.Radius / FillRingRadius);
                         var fr = rg.GetComponent<UltimoMiglio.VFX.UM_PadFillRing>(); if (fr) { fr.playCompleteBurst = false; fr.kind = ip.Kind == PoiKind.Consegna ? UltimoMiglio.VFX.UM_PadFillRing.Kind.Delivery : UltimoMiglio.VFX.UM_PadFillRing.Kind.Pickup; ip.Ring = fr; }
                     }
+                    BuildZoneVisual(ip, ringModel, atlasMat); // #187: anello in edit time, salvato in scena
                     // QA #41: no PadTag / floating chips — ground pads only (InteractionPoint discs)
                     var padIcon = z.gameObject.AddComponent<UltimoMiglio.VFX.UM_PadIcon>();
                     padIcon.kindFromRing = true;
@@ -311,6 +324,21 @@ namespace UltimoMiglio.EditorTools
         {
             var pad = Zone<UpgradePad>(name, pos, new Vector3(1.4f, 1, 1.4f), UM_Palette.Crema, m); pad.Kind = k; pad.UnlockAtActiveSec = unlock; pad.Priority = 1;
         }
+        /// <summary>Raggio del CharacterController di Kaia (Nina), usato anche per i trigger dei pad.</summary>
+        public const float NinaRadius = 0.3f;
+        /// <summary>Raggio nativo (m, a scala 1) dell'anello fx_pad_fill_ring.</summary>
+        const float FillRingRadius = 0.95f;
+        /// <summary>#171 + #187 («anello = trigger»): il BoxCollider quadrato del pad rispondeva anche fuori dal cerchio sulle diagonali.
+        /// Ora è un cilindro centrato sul cerchio con raggio = raggio del cerchio - raggio di Kaia: il pad si attiva quando il centro di Kaia entra nel cerchio.</summary>
+        static void PadTriggerTondo(UpgradePad up, float raggioCerchio)
+        {
+            var box = up.GetComponent<BoxCollider>();
+            var cap = up.GetComponent<CapsuleCollider>(); if (!cap) cap = up.gameObject.AddComponent<CapsuleCollider>(); // prima il nuovo: ProximityZone richiede un Collider
+            float h = box ? box.size.y : 1f, y = box ? box.center.y : 0.5f;
+            if (box) Object.DestroyImmediate(box);
+            float rt = Mathf.Max(0.1f, raggioCerchio - NinaRadius);
+            cap.isTrigger = true; cap.direction = 1; cap.radius = rt; cap.height = Mathf.Max(h, 2f * rt); cap.center = new Vector3(0, Mathf.Max(y, cap.height * 0.5f), 0);
+        }
         static T Zone<T>(string name, Vector3 pos, Vector3 size, Color c, Material m) where T : ProximityZone
         {
             var go = new GameObject(name); go.transform.position = pos;
@@ -354,6 +382,50 @@ namespace UltimoMiglio.EditorTools
             return AssetDatabase.FindAssets("t:Prefab", new[] { dir }).Select(AssetDatabase.GUIDToAssetPath)
                 .Where(p => Path.GetFileName(p).ToLowerInvariant().Contains(contains)).Select(AssetDatabase.LoadAssetAtPath<GameObject>).FirstOrDefault();
         }
+        // ---------- #187: zone a terra eleganti (anello inset in edit time + materiali condivisi) ----------
+        const string ZoneRingPath = "Assets/_Game/Art/Environment/Kit/zone_inset_ring.fbx";
+        const string ZoneMatDir = "Assets/_Game/VFX/Materials/Zone";
+
+        /// <summary>Materiale condiviso (asset) per tipo di zona: creato una volta, poi riusato da tutte le zone. Tinte di stato via MaterialPropertyBlock.</summary>
+        static Material ZoneMat(string name, Color c)
+        {
+            string path = $"{ZoneMatDir}/{name}.mat";
+            var m = AssetDatabase.LoadAssetAtPath<Material>(path);
+            if (m) return m;
+            if (!AssetDatabase.IsValidFolder(ZoneMatDir)) AssetDatabase.CreateFolder("Assets/_Game/VFX/Materials", "Zone");
+            m = new Material(Shader.Find("Universal Render Pipeline/Unlit")) { name = name, enableInstancing = true };
+            m.SetColor("_BaseColor", c); if (m.HasProperty("_Color")) m.SetColor("_Color", c);
+            AssetDatabase.CreateAsset(m, path);
+            return m;
+        }
+
+        static void BuildZoneVisual(InteractionPoint ip, GameObject ringModel, Material atlasMat)
+        {
+            string k = ip.Kind.ToString();
+            var fill = ZoneMat("M_ZoneFill_" + k, ip.KindColor);
+            var beaconMat = ZoneMat("M_ZoneBeacon_" + k, Color.Lerp(ip.KindColor, new Color(0.953f, 0.890f, 0.765f), 0.35f));
+            Transform ring = null;
+            if (ringModel)
+            {
+                var go = (GameObject)PrefabUtility.InstantiatePrefab(ringModel);
+                go.name = "POI_Ring"; ring = go.transform; ring.SetParent(ip.transform, false);
+                ring.localPosition = Vector3.zero; ring.localRotation = Quaternion.identity;
+                float d = ip.Radius * 2f * InteractionPoint.VisualScale; ring.localScale = new Vector3(d, 1f, d);
+                foreach (var r in go.GetComponentsInChildren<Renderer>())
+                {
+                    r.sharedMaterials = new[] { atlasMat, fill };
+                    r.shadowCastingMode = UnityEngine.Rendering.ShadowCastingMode.Off; r.receiveShadows = false;
+                }
+                foreach (var c in go.GetComponentsInChildren<Collider>()) Object.DestroyImmediate(c);
+            }
+            else Debug.LogWarning("[#187] zone_inset_ring.fbx mancante: zona senza anello");
+            var b = GameObject.CreatePrimitive(PrimitiveType.Cylinder); b.name = "POI_Beacon"; Object.DestroyImmediate(b.GetComponent<Collider>());
+            b.transform.SetParent(ip.transform, false); b.transform.localPosition = new Vector3(0, 1.6f, 0); b.transform.localScale = new Vector3(0.14f, 1.6f, 0.14f);
+            var br = b.GetComponent<Renderer>(); br.sharedMaterial = beaconMat; br.shadowCastingMode = UnityEngine.Rendering.ShadowCastingMode.Off;
+            b.SetActive(false);
+            ip.BindVisuals(ring, b.transform);
+        }
+
         static void TryRun(string type, string method)
         {
             var t = System.AppDomain.CurrentDomain.GetAssemblies().Select(a => a.GetType(type)).FirstOrDefault(x => x != null);
@@ -379,7 +451,7 @@ namespace UltimoMiglio.EditorTools
             am.UiTap = R("sfx_ui_tap", 2); am.TutorialArrow = C("sfx_ui_arrow_appear"); am.TutorialStep = C("sfx_ui_step_complete");
             am.StackMax = C("sfx_stack_max"); am.Bell = C("sfx_customer_bell"); am.Served = C("sfx_customer_served");
             am.UpgradeLoop = C("sfx_upgrade_tick_loop"); am.UpgradeComplete = C("sfx_upgrade_complete");
-            am.ComboX15 = C("sfx_combo_x1_5"); am.ComboX2 = C("sfx_combo_x2"); am.NonnoStart = C("sfx_nonno_start");
+            am.DebtStamp = R("sfx_debt_stamp", 3); am.ComboX15 = C("sfx_combo_x1_5"); am.ComboX2 = C("sfx_combo_x2"); am.NonnoStart = C("sfx_nonno_start");
         }
     }
 

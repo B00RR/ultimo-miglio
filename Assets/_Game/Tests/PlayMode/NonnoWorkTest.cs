@@ -11,7 +11,10 @@ public class NonnoWorkTest
 {
     [UnityTest] public IEnumerator HireNonno_StartsWorkingWithin10Seconds()
     {
-        PlayerPrefs.DeleteAll();
+        PlayerPrefs.DeleteKey(UltimoMiglio.Gameplay.TutorialManager.PrefKey); PlayerPrefs.DeleteKey("um_save_v1"); PlayerPrefs.DeleteKey(UltimoMiglio.UI.CameraView.PrefZoom); UltimoMiglio.Gameplay.TutorialManager.TestSenzaComparse = true; UltimoMiglio.Gameplay.TutorialManager.TestAccelera = true; /* #101: niente comparse graduali, tempi corti */ // solo chiavi di gioco: vol_music e vol_sfx restano (come #88)
+        // instabile da solo: un save_v1.json di un run precedente (NONNO già assunto) dava NonnoLevel 0 invece di -1
+        var save = System.IO.Path.Combine(Application.persistentDataPath, "save_v1.json");
+        if (System.IO.File.Exists(save)) System.IO.File.Delete(save);
         var navMeshErrors = new List<string>();
         Application.LogCallback onLog = (cond, stack, type) =>
         {
@@ -66,7 +69,7 @@ public class NonnoWorkTest
     [UnityTest, Timeout(120000)]
     public IEnumerator HireNonno_RestocksShelfWithin20Seconds()
     {
-        PlayerPrefs.DeleteAll();
+        PlayerPrefs.DeleteKey(UltimoMiglio.Gameplay.TutorialManager.PrefKey); PlayerPrefs.DeleteKey("um_save_v1"); PlayerPrefs.DeleteKey(UltimoMiglio.UI.CameraView.PrefZoom); UltimoMiglio.Gameplay.TutorialManager.TestSenzaComparse = true; UltimoMiglio.Gameplay.TutorialManager.TestAccelera = true; /* #101: niente comparse graduali, tempi corti */ // solo chiavi di gioco: vol_music e vol_sfx restano (come #88)
         var save = System.IO.Path.Combine(Application.persistentDataPath, "save_v1.json");
         if (System.IO.File.Exists(save)) System.IO.File.Delete(save);
 

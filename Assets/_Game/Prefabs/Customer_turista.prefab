@@ -9,8 +9,8 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 1667180066207613260}
-  - component: {fileID: 2013402844404579214}
-  - component: {fileID: 1515874149608701047}
+  - component: {fileID: 7321101583326561530}
+  - component: {fileID: 8331280088642441459}
   m_Layer: 0
   m_Name: Customer_turista
   m_TagString: Untagged
@@ -34,7 +34,7 @@ Transform:
   - {fileID: 1335686952997770698}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!136 &2013402844404579214
+--- !u!136 &7321101583326561530
 CapsuleCollider:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -57,7 +57,7 @@ CapsuleCollider:
   m_Height: 1.6
   m_Direction: 1
   m_Center: {x: 0, y: 0.8, z: 0}
---- !u!114 &1515874149608701047
+--- !u!114 &8331280088642441459
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}

@@ -63,3 +63,10 @@ Nota: sulla box c'è solo una licenza *entitlement* legata alla macchina (`Unity
 - [ ] `tools/deploy_pages.sh` e verifica nel browser (desktop + telefono).
 - [ ] `tools/pr_comment.sh` sulla PR della pipeline.
 - [ ] Decidere se attivare la CI (licenza nei secret).
+
+## Preview live /dev/ (issue #179)
+A ogni push su `main` il job `deploy-dev` di `unity-ci.yml` pubblica la build WebGL in `dev/` del repo
+`B00RR/ultimo-miglio-web` (https://b00rr.github.io/ultimo-miglio-web/dev/) con `tools/deploy_dev.sh`:
+patch mobile, DPR max 1.25, etichetta in basso a destra "dev <sha corto> - gg/mm HH:MM" (Europe/Rome) e `dev/VERSIONE.txt`.
+La radice (link stabile) e `prova/` non vengono mai toccate: la radice si aggiorna solo con l'avvio manuale dopo il VIA QA.
+Prova in locale: `tools/deploy_dev.sh <cartella_build> <clone_sito> [sha]` (non fa commit ne' push).

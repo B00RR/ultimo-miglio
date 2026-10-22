@@ -26,6 +26,10 @@
         </ui:VisualElement>
         <ui:VisualElement name="target-marker" picking-mode="Ignore" style="display: none;" />
         <ui:VisualElement name="safe-root" picking-mode="Ignore">
+            <ui:VisualElement class="top-bar" picking-mode="Ignore">
+                <ui:Button name="skip-tutorial" text="Salta tutorial" class="skip-tut" />
+                <ui:VisualElement name="settings-button" class="settings-btn" picking-mode="Position"><ui:VisualElement class="icon icon-gear" picking-mode="Ignore" /></ui:VisualElement>
+            </ui:VisualElement>
             <ui:VisualElement name="currency-pill" class="walnut-sign" picking-mode="Position">
                 <ui:VisualElement class="sign-cord sign-cord--l" picking-mode="Ignore" />
                 <ui:VisualElement class="sign-cord sign-cord--r" picking-mode="Ignore" />
@@ -38,7 +42,6 @@
                     <ui:Label name="ln-value" class="currency-value" text="0" picking-mode="Ignore" />
                     <ui:Label name="ln-unit" class="ln-unit" text="LN" picking-mode="Ignore" />
                 </ui:VisualElement>
-                <ui:VisualElement name="settings-button" class="settings-btn" picking-mode="Position"><ui:VisualElement class="icon icon-gear" picking-mode="Ignore" /></ui:VisualElement>
                 <ui:VisualElement class="currency bolt-group" style="display: none;" picking-mode="Ignore"><ui:VisualElement class="icon icon-bolt" picking-mode="Ignore" /><ui:Label name="bolt-value" class="currency-value" text="0" picking-mode="Ignore" /></ui:VisualElement>
                 <ui:VisualElement name="token-group" class="currency" style="display: none;" picking-mode="Ignore"><ui:VisualElement class="icon icon-token" picking-mode="Ignore" /><ui:Label name="token-value" class="currency-value" text="0" picking-mode="Ignore" /></ui:VisualElement>
             </ui:VisualElement>
@@ -78,14 +81,29 @@
             <ui:VisualElement name="settings-scrim" class="settings-scrim">
                 <ui:VisualElement name="settings-panel" class="settings-panel" picking-mode="Position">
                     <ui:Label name="settings-title" class="settings-title" text="Impostazioni" picking-mode="Ignore" />
-                    <ui:VisualElement class="settings-row" picking-mode="Ignore">
-                        <ui:Label class="settings-label" text="Zoom" picking-mode="Ignore" />
-                        <ui:VisualElement class="settings-zoom-group" picking-mode="Ignore">
-                            <ui:Button name="zoom-minus" class="settings-zoom-btn" text="−" />
-                            <ui:Label name="zoom-value" class="settings-zoom-value" text="—" picking-mode="Ignore" />
-                            <ui:Button name="zoom-plus" class="settings-zoom-btn" text="+" />
+                    <ui:Label name="settings-cam-title" class="settings-section" text="Visuale" picking-mode="Ignore" />
+                    <ui:VisualElement class="settings-cam-row" picking-mode="Ignore">
+                        <ui:VisualElement class="settings-cam-head" picking-mode="Ignore">
+                            <ui:Label class="settings-label" text="Zoom" picking-mode="Ignore" />
+                            <ui:Label name="cam-zoom-value" class="settings-cam-value" text="—" picking-mode="Ignore" />
                         </ui:VisualElement>
+                        <ui:Slider name="slider-cam-zoom" class="settings-slider settings-slider--full" low-value="0.7" high-value="1.4" value="1" />
                     </ui:VisualElement>
+                    <ui:VisualElement class="settings-cam-row" picking-mode="Ignore">
+                        <ui:VisualElement class="settings-cam-head" picking-mode="Ignore">
+                            <ui:Label class="settings-label" text="Rotazione" picking-mode="Ignore" />
+                            <ui:Label name="cam-rot-value" class="settings-cam-value" text="—" picking-mode="Ignore" />
+                        </ui:VisualElement>
+                        <ui:Slider name="slider-cam-rot" class="settings-slider settings-slider--full" low-value="-45" high-value="45" value="0" />
+                    </ui:VisualElement>
+                    <ui:VisualElement class="settings-cam-row" picking-mode="Ignore">
+                        <ui:VisualElement class="settings-cam-head" picking-mode="Ignore">
+                            <ui:Label class="settings-label" text="Inclinazione" picking-mode="Ignore" />
+                            <ui:Label name="cam-tilt-value" class="settings-cam-value" text="—" picking-mode="Ignore" />
+                        </ui:VisualElement>
+                        <ui:Slider name="slider-cam-tilt" class="settings-slider settings-slider--full" low-value="35" high-value="60" value="50" />
+                    </ui:VisualElement>
+                    <ui:Button name="cam-reset" class="settings-btn-reset" text="Ripristina vista" />
                     <ui:VisualElement class="settings-row" picking-mode="Ignore">
                         <ui:Label class="settings-label" text="Musica" picking-mode="Ignore" />
                         <ui:Slider name="slider-music" class="settings-slider" low-value="0" high-value="1" value="0.6" />

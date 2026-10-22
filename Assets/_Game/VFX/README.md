@@ -85,7 +85,7 @@ Moneta: lira/gettone di Solara con faro inciso, oro `#F2B53A`, bordo `#3B2A20`. 
 ## Tier di qualità
 | | Base | Standard | Alto | **Web** |
 |---|---|---|---|---|
-| Render scale | 0.6 | 0.75 | 1.0 | 0.9 + cap devicePixelRatio ≤ 1.5 nel template (`config.devicePixelRatio = Math.min(window.devicePixelRatio, 1.5)`) |
+| Render scale | 0.6 | 0.75 | 1.0 | 0.9 + cap devicePixelRatio ≤ 1.25 nel template (`config.devicePixelRatio = Math.min(window.devicePixelRatio, 1.25)`) |
 | Ombre | no | no | soft (Low, 4 tap), 26 m, 2048, 1 cascata | soft (Low), 24 m, 1024, 1 cascata |
 | Outline | no | no | solo `_OutlineOn=1` | solo `_OutlineOn=1` |
 | Post-process | sì | sì | sì | **OFF** (opt-in `UM_QualityTier.AllowPostOnWeb`, solo dopo verifica in build) |

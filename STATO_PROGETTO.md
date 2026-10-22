@@ -1,7 +1,7 @@
 # STATO PROGETTO — Ultimo Miglio
 
 > Punto di ingresso unico per chiunque (persona o agente) lavori su questo repo. Aggiornalo **nella stessa PR** in cui completi qualcosa.
-> Ultimo aggiornamento: 2026-10-16 14:39 (Europe/Rome).
+> Ultimo aggiornamento: 2026-10-16 16:25 (Europe/Rome).
 
 ## 1. Il gioco
 - **Ultimo Miglio**: gioco mobile **Android**, **Unity 6 (6000.3) URP**.
@@ -16,6 +16,8 @@
 4. **Originali**: Nina, Nonno, robot, logo e tema non devono copiare altri giochi.
 5. **Profondità gestionale**: energia/corrente, contratti, rotte, officina, OmniFreight (rivale).
 6. **Longevità lunga**: progressione a capitoli + post‑game.
+7. **Autore dei commit**: `git config user.name "<Ruolo>"` e `user.email "<ruolo-in-minuscolo-con-trattini>@bokobay.invalid"` (es. `ui-ux@bokobay.invalid`, `producer@bokobay.invalid`). VIETATI `@users.noreply.github.com` e `@ultimo-miglio.local`. Niente riscritture della storia già pushata.
+8. **Merge su main**: lo fanno SOLO il Code Reviewer, DevOn e Lorenzo. Nessun altro agente unisce, né via API né via gh. `main` è protetto: si entra solo con PR, force push e cancellazione bloccati.
 
 ## 3. Team
 - **Direttore**: DevOn (coordina, decide priorità).
@@ -23,7 +25,9 @@
 - **In pausa**: QA, Sound Designer, Narrative, LiveOps, Concept Artist (i loro documenti restano validi).
 
 ## 4. FATTO
-- **UI #110 pad Zaino (PR ui/110-pad-zaino, in revisione)**: dopo un acquisto il pad non paga il livello successivo finché Nina non esce e rientra (niente più portafoglio prosciugato); la pillola col prezzo resta visibile anche con Nina sul pad. Costi Zaino invariati, già allineati a #75 (40, 80, 160…; `upgrades.json` non toccato). Da verificare in Unity.
+- **UI #71 telefono (PR ui/71-telefono-contrasto, in revisione)**: testi della home in bruno #3B2A20 (10,8:1 su crema) e noce per le righe secondarie, schede vuote (notifica, obiettivo) e riga rata nascoste finché non hanno testo. Il telefono resta fuori dall'HUD di gioco (DevOn #64).
+- **3D #118 Nonna Ada in scena (PR #169, su main `2993e96`)**: prefab riggato a fianco del Bancone (lato est), scala 0.88, Talk ai passi tutorial. PlayMode AdaSceneTest incluso.
+- **UI #110 pad Zaino (PR #174, su main `61054bc`)**: dopo un acquisto la sosta sul pad si chiude, il livello successivo si paga solo uscendo e rientrando; pillola prezzo sempre visibile. 3 test EditMode.
 - **UI #94 onboarding graduale (PR #100, in revisione; allineata a main dopo #78/#106/#135)**: `HudReveal` (nascosto/visibile + comparsa scala+dissolvenza 250 ms, HUD e mondo), **attivo di default per le partite nuove** (`RivelaGraduale`; salvataggi esistenti o tutorial finito = tutto visibile); barra LN pagato/totale sui pad + pillola residuo; aiuti come PR #90 (`OnboardingHints`: 10 s biglietto ripetuto + pulsazione, 20 s freccia a bordo o mano fantasma se il bersaglio è a schermo, 40 s camera ≤1,5 s una volta per passo); camera 2,75 s solo per elementi nuovi (`CameraPeek`); badge NONNO "x pacchi/min"; combo = `ComboPopup` solo "+N" sopra Nina (clienti di fila, 1,5 s; moltiplicatore solo soglia del passo 7, mai a schermo), niente contatore HUD; log `[Onb]` dietro `OnbLog` (spenti in rilascio); "Salta tutorial". Niente telefono né barra debito (DevOn). Compila con le DLL Unity 6000.3. **I test playmode del tutorial possono cambiare** (elementi nascosti all'avvio, freccia dopo 20 s).
 - **UI #142 anteprime `tutorial_hud_77` (PR ui/142-anteprime-nonno, in revisione)**: anteprime 360/390/412 rigenerate con il costo reale del pad NONNO (50 LN, non 10) e LN in tasca reali; solo documentazione QA, nessun C#.
 - **UI #77 + #5 (PR ui/77-tutorial-hud, in revisione)**: fumetto di Nonna Ada compatto (ritratto 36 dp + testo 14 dp, 1–2 righe senza ellissi per testi fino a 70 caratteri, sotto la riga LN/obiettivo); obiettivo spostato a destra della pillola LN nella stessa riga; suggerimenti `onb.*` come pillola terracotta sopra il joystick; freccia ▼ sopra la pillola prezzo dei pad di acquisto (colonna 3D rimossa, ribaltamento se il pad è in alto). Nuovo `UI/USS/TutorialHud.uss` (HudV2.uss non toccato). Testi passi letti per id dalla PR #62. QA anteprima 360/390/412 in `docs/qa/tutorial_hud_77/`. Da verificare in Unity.
@@ -38,7 +42,12 @@
 - Documentazione di design: bibbia, core loop, tech, UI, retention, sprint 1, gestionale, longevità, cap. 1 completo, protocollo Unity.
 
 ## 5. IN CORSO (oggi 16/10)
-- **UI #172 HUD direzione C, insegna di noce (PR #175, milestone Gioco completo, fuori dalla build del capitolo 1)**: insegna appesa, cartellino GIORNO, ordine che si ritrae a icona dopo 3 s, joystick e pad PRENDI in terracotta. Debito e telefono fuori dall'HUD. Font Baloo 2 (OFL). Via visivo già dato dal Concept Artist sul mockup C v2. Tavola `docs/qa/hud_insegna_c/confronto_390_icona.png`.
+- **Fix cap. 1 dal test di Lorenzo (build 7011805), obiettivo: tutto su main entro le 19:30, build entro le 20:00**:
+  - Tech Lead: PR della CI veloce (circa 17:00), #188 vendite fantasma (17:45), #189 frecce del tutorial (18:45), #170 da verificare (19:00).
+  - UI/UX: #185 angoli bianchi (PR entro le 17:00), #186 font e cartellini (PR entro le 18:45), #171 da verificare (19:00).
+  - 3D Artist: #187 zone a terra (18:15). VFX: #191 scatti (PR entro le 18:45). Narrative: PR #192 testi (19:00), poi in pausa.
+  - Build & Release: #184 cap DPR (19:00), build unica (19:30), #179 dopo.
+  - Dopo la build: #125, #168, #165, #97. La #175 resta fuori. La #190 è chiusa (Kaia è giusto).
 - **main @ 7dd1767** — QA live **v5 VIA** (PR #55: #47 deposito + #48 luce/camera). Build QA su `build/WebGL` :8777; art night su `build/WebGL_next` :8778 (non toccare).
 - P2 aperti da QA v5: camera follow (Nina esce/coperta), pillola prezzo LN sotto riga obiettivo.
 - **Merge del ramo `animator`** (fix camminata): conflitto su `chr_nina_vela.fbx` e `bot_nonno.fbx`.
@@ -149,12 +158,51 @@ Ogni ruolo lavora solo sulle issue con la propria etichetta `ruolo:*`, sempre co
 
 Voci più recenti in alto. Formato: `AAAA-MM-GG HH:MM` (Europe/Rome) — [commit] — descrizione.
 
-- 2026-10-16 14:39 — UI/UX — [8b8d9bd](https://github.com/B00RR/ultimo-miglio/commit/8b8d9bd5ec48d34fb666857482f55bc8d5daa81b) — merge di main nel ramo `ui/172-hud-insegna-noce` (niente force-push). La #172 e la PR #175 stanno nella milestone Gioco completo, fuori dalla build del capitolo 1 (nessuna data fissa). Tavola `docs/qa/hud_insegna_c/confronto_390_icona.png`: cattura 390 a icona con i righelli 117/140 del mockup C v2. Il PNG allegato non è nel workspace.
-- 2026-10-16 14:23 — UI/UX — catture Unity 390×844 e 360×800 in `docs/qa/hud_insegna_c/` (CI verde, run 38897133634). Via visivo già dato dal Concept Artist sul mockup C v2. Responsabile: UI/UX Designer. Scadenza: milestone Gioco completo (nessuna data fissa).
+- **17/10/2026 05:25 (Europe/Rome)**: unita in squash la #266 (Animator, Refs #171: pad tolleranti verso la camera e test joystick; ramo aggiornato con main tramite update-branch dopo la #270). Commit [06adb3e](https://github.com/B00RR/ultimo-miglio/commit/06adb3e964b1e230b389b1091d4bc458dadaa7e4).
+- **17/10/2026 05:06 (Europe/Rome)**: unita in squash la #270 (3D Artist, Refs #256, #262, #224, #259: Cassa aperta, varchi da 1,2 m e pad visibili; PercorsoJoystick256Test controlla anche la Cassa → Nonna Ada e la coda senza salti silenziosi). Commit [704c754](https://github.com/B00RR/ultimo-miglio/commit/704c754dfe15d021a5503f56da8ea812f6567484).
+- **17/10/2026 02:30 (Europe/Rome)**: unita in squash la #268 (Tech Lead, Refs #256: VarcoMarker con i campi larghezza, default 1,6 m, e ordine al posto di RaggioPassaggio). Commit [96ea4df](https://github.com/B00RR/ultimo-miglio/commit/96ea4dff98aed81c9aac150cb6d74cab70a3b518).
+- **17/10/2026 02:01 (Europe/Rome)**: unita in squash la #265 (Tech Lead, Refs #256: la mano del tutorial guida verso i varchi tramite VarcoMarker). Commit [71c288b](https://github.com/B00RR/ultimo-miglio/commit/71c288b4023610d796d5149fb18c052417ad92f0).
+- **17/10/2026 00:29 (Europe/Rome)**: unita in squash la #261 (Animator, Refs #223: test PlayMode PrimoVersamento223Test). Commit [5eb9f71](https://github.com/B00RR/ultimo-miglio/commit/5eb9f714d7f41274f99a0731819cd285fa56608b).
+- **17/10/2026 00:09 (Europe/Rome)**: unita in squash la #97 (3D Artist, Closes #82 e #256: collider di archi e Bancone, varco ovest a 1,26 m approvato dal Game Designer, Cassa non più chiusa tra i muri, test di regressione PassoCassa256Test). Commit [8e33a40](https://github.com/B00RR/ultimo-miglio/commit/8e33a401f41601d839af5eee15166b9174163d3d).
+- **16/10/2026 23:17 (Europe/Rome)**: unita in squash la #251 (Animator, Refs #223: il primo versamento alla Cassaforte prende il 60% del portafoglio, poi parte la divisione 40/60). Commit [e5e77c8](https://github.com/B00RR/ultimo-miglio/commit/e5e77c8e549ba48fcd1a575af7fd7a31a66d4eca).
+- **16/10/2026 22:59 (Europe/Rome)**: unita in squash la #237 (UI/UX, Closes #235: la pillola LN non copre più G4, catture 390×844 e 1080×1920 con saldo 999999 verificate; il formato «1000K» è a parte nella #254). Commit [5cf919c](https://github.com/B00RR/ultimo-miglio/commit/5cf919c3dc87afc9916e3fec794a024ca22ea657).
+- **16/10/2026 22:29 (Europe/Rome)**: unita in squash la #241 (VFX, Closes #240: il pad si spegne dopo l'acquisto e torna attivo con un pop). Commit [e91892f](https://github.com/B00RR/ultimo-miglio/commit/e91892f2fc15ce274078b89d032bfdf6228ea046).
+- **16/10/2026 22:29 (Europe/Rome)**: unita in squash la #239 (Tech Lead, Closes #188: il banco self-service di NONNO vende solo togliendo un pacco vero). Main verde su 9446c59 prima del merge. Commit [9635a1f](https://github.com/B00RR/ultimo-miglio/commit/9635a1fc3ae8c312c97b0d4f37b27fd4f0a04d8d).
+- **16/10/2026 22:04 (Europe/Rome)**: unita in squash la #249 (Tech Lead, Closes #171 e #243: il pad si attiva quando i piedi di Kaia sono entro il raggio del disco, test PadTriggerCerchioTest sulla scena reale). Main verde su e763480 prima del merge. Commit [9446c59](https://github.com/B00RR/ultimo-miglio/commit/9446c597196ac47b53cfcf488ce8fb2041c883eb).
+- **16/10/2026 21:37 (Europe/Rome)**: unita in squash la #229 (Animator, Closes #223: il debito parte solo dopo la carta e un versamento vero). Commit [e763480](https://github.com/B00RR/ultimo-miglio/commit/e7634804a587123921096509d797446e1e05f8d8).
+- **16/10/2026 21:17 (Europe/Rome)**: main di nuovo verde su 2515ee0 (#242). Unita in squash la #238 (Animator, Closes #222: il gate dello scaffale nel tutorial aspetta un deposito vero). Commit [27003ef](https://github.com/B00RR/ultimo-miglio/commit/27003ef45612d277089433d71be2fee409e1ea03).
+- **16/10/2026 21:05 (Europe/Rome)**: unita in squash la #242 (Tech Lead, Closes #226: NONNO tiene 0,20 m di margine da Nina agli Arrivi, distanza minima da 0,69 a 0,96 m, soglia del test invariata). Corregge il main rosso su 2150050. Commit [2515ee0](https://github.com/B00RR/ultimo-miglio/commit/2515ee0d10bb30a3be78a252486a81f208746783).
+- **16/10/2026 20:08 (Europe/Rome)**: unita in squash la #232 (Tech Lead, Closes #221: NONNO carica solo quanto entra negli scaffali, salta quelli pieni e non butta più il carico). Commit [2150050](https://github.com/B00RR/ultimo-miglio/commit/2150050f972ea47052030b6c601f5e933870ec01). Dato il via a Build & Release per la build in radice.
+- **16/10/2026 20:04 (Europe/Rome)**: unita in squash la #230 (UI/UX, Closes #224: il pulsante Salta tutorial non copre più l'ingranaggio). Commit [9f35fca](https://github.com/B00RR/ultimo-miglio/commit/9f35fca).
+- **16/10/2026 19:57 (Europe/Rome)**: unita in squash la #227 (Build & Release: cache-bust `?v=<sha>` negli index, deploy-dev solo con test e build verdi, `keep_files` al posto di `force_orphan`; Refs #179, #185). Commit [d5789d5](https://github.com/B00RR/ultimo-miglio/commit/d5789d59201e1a445f45ebf6fb5c0ee29c1bd492).
+- 2026-10-16 19:53 — Code Reviewer — [454eb61](https://github.com/B00RR/ultimo-miglio/commit/454eb61) — unita #228 (chiude #185, VFX): margine trasparente di 2 px sui pannelli 9-slice, angoli arrotondati senza bianco; manca l'ok della UI/UX sul telefono dopo il deploy.
+- 2026-10-16 19:32 — Code Reviewer — [a91d6d3](https://github.com/B00RR/ultimo-miglio/commit/a91d6d3e02d68960b79abd2e295e6a69e06d21f1) — unita #217 (chiude #205, Tech Lead): telecamera regolabile con zoom, rotazione e inclinazione (pinch, slider, reset, salvataggio). Milestone «Gioco completo», entra nella prossima build.
+- 2026-10-16 19:18 — Code Reviewer — [3e810ea](https://github.com/B00RR/ultimo-miglio/commit/3e810ea) — unita #219 (chiude #136 e #203, Animator): tappe del debito 25/50/75% con frase di Oma Tilde, sfx e ricompensa; la bitmask delle tappe sta nel salvataggio.
+- 2026-10-16 18:46 — Code Reviewer — [31c33cb](https://github.com/B00RR/ultimo-miglio/commit/31c33cb) — unita #214 (chiude #171): il trigger dei pad d'acquisto è tondo e coincide con il cerchio visibile (raggio del cerchio meno quello di Kaia); test PlayMode in 8 direzioni.
+- 2026-10-16 18:27 — Code Reviewer — [5b07b83](https://github.com/B00RR/ultimo-miglio/commit/5b07b83e2a1cab85941a77e0b0a4028d929fc598) — unita #211 (chiude #210): la guida del tutorial usa una cache di scaffali, pad e personaggi invece di FindObjectsByType a ogni frame. Su main ci sono #207 e #211: dato il via a Build & Release. Unite anche #125, #209, #207, #208, #213 e #215.
+- 2026-10-16 18:10 — Producer — **punto Cap. 1 (18:10 Europe/Rome)**, main a [ee59380](https://github.com/B00RR/ultimo-miglio/commit/ee59380fdab2bb148e8515eeff2d2aa2c51ecc84):
+  - **#157** (tutorial 16 passi), **#174** (Zaino liv. 2, chiude #110) e **#169** (Ada in scena): unite.
+  - **#175** (HUD insegna di noce): ancora aperta, **in conflitto** con main, ferma dalle 15:49. Anche **#214** (trigger pad = cerchio, #171) e **#202** (fumetto HUD, #186) sono in conflitto: serve rebase.
+  - **Build**: su main `build` e `deploy-dev` verdi (link dev: https://b00rr.github.io/ultimo-miglio-web/dev/); il job `test` è **fallito per la licenza Unity** (0 entitlement, immagine `unityci/editor:ubuntu-6000.3.26f1-webgl-3` non trovata), non per il codice. Stesso errore su **#211**. Rilanciati i job falliti alle 18:10.
+  - **QA**: nessuna issue `ruolo:qa` aperta; il test lo fa Lorenzo sul link.
+- 2026-10-16 16:25 — UI/UX — [aa5f033](https://github.com/B00RR/ultimo-miglio/commit/aa5f033c699f420dfd939519cc67dc485bc3b2af) — fix #185 (ramo `ui/185-angoli-9slice`): gli angoli bianchi dei riquadri arrotondati venivano dal 9-slice di `tex_cardboard_panel.png` e `tex_wood_panel.png`, PNG RGB senza alpha (angoli opachi) più il bordo sprite a 0 e, sui Button, lo sprite bianco del tema. Ora i pannelli sono RGBA con angoli trasparenti, mesh Full Rect, RGBA32 su WebGL; test EditMode `UiTextureAlpha185Tests`.
+- 2026-10-16 16:15 — Producer — Responsabili e scadenze per #185-#191, #170, #171, #179, #192, #168, #165, #125, #97. Assignee su GitHub non usabili (un solo account B00RR): il responsabile è scritto in un commento su ogni issue.
+- 2026-10-16 15:22 — Producer — Regola di Lorenzo (vincolo 8): merge su main solo Code Reviewer, DevOn, Lorenzo; main protetto. Avvisati tutti.
+- 2026-10-16 15:20 — Producer — Regola nuova di Lorenzo sull'autore dei commit (vincolo 7): ruolo + `@bokobay.invalid`, avvisati tutti gli agenti attivi.
+- 2026-10-16 15:12 — Producer — #174 unita (`61054bc`, chiude #110). Per la build manca solo **#157**: Zaino fermo al liv. 7, IdToStep con i 16 id (testi Narrative in `proposte/ONB16_TESTI_TILDE.md`), CI verde. QA in pausa: il test lo fa Lorenzo sul link.
+- 2026-10-16 15:08 — Producer — **punto Cap. 1 (15:08 Europe/Rome)**:
+  - **#169** unita (Ada in scena, `2993e96` su main).
+  - **#157** (tutorial 16 passi, `tech/101-tutorial-16`): MERGEABLE dopo rebase (`904869b`); job `test` **cancellato** sull'ultimo run — serve CI verde. **Blocco Code Reviewer**: Zaino cap. 1 deve fermarsi al **livello 7** (+ test). Responsabile Tech Lead.
+  - **#174** (fix Zaino liv.2 / #110, `ui/110-zaino-prezzo-liv2`): MERGEABLE dopo rebase (`c7084d2`); job **`test` verde**. Pronta per merge del Code Reviewer.
+  - **#175** (HUD insegna noce / #172): `test` verde, job **`catture` rosso**; fuori dalla build Cap. 1 (milestone Gioco completo). Code Reviewer non unisce (catture/CI licenza, STATO, conferma tempi).
+  - **QA**: in pausa; checklist LIVE #66 ancora aperta. **Build** WebGL Cap. 1 (#6/#179): dopo #157+#174 verdi → VIA Build & Release.
+  - **Rischio scadenza**: milestone Capitolo 1 → **17/10 10:00**; niente link pronto. Critico Cap. 1 ora: #157 (limite Zaino 7 + CI) e #174 (CI → merge).
+- 2026-10-16 14:59 — UI/UX — [PR #174](https://github.com/B00RR/ultimo-miglio/pull/174) (`ui/110-zaino-prezzo-liv2`) — merge di main dopo #169 e #154 (niente force-push). Conflitto solo su questo file: scena, SliceSceneBuilder e gameplay arrivano da main senza altre modifiche nostre.
 - 2026-10-16 14:19 — Regola fissa di Lorenzo: nessun agente gli scrive; tutto passa dal Producer a DevOn.
+- 2026-10-16 14:06 — UI/UX — [PR #174](https://github.com/B00RR/ultimo-miglio/pull/174) (`ui/110-zaino-prezzo-liv2`) — CI verde sul pad Zaino. Merge di main (niente force-push): #162, #132, #176. Conflitto solo su questo file.
 - 2026-10-16 14:01 — Regole di consumo approvate da Lorenzo: coordinamento al Producer, pausa per chi ha finito, Sound, LiveOps e Concept in pausa fino al capitolo 2, CI esclusa per le PR di soli documenti.
-- 2026-10-16 13:56 — UI/UX — [fea37a1](https://github.com/B00RR/ultimo-miglio/commit/fea37a10208476a591e4d105de9060ae45976519) — cattura HUD: /root scrivibile così la licenza Unity resta nel container (il job precedente usciva 198). Main allineato dopo #162, senza force-push.
-- 2026-10-16 13:32 — UI/UX — [05c97af](https://github.com/B00RR/ultimo-miglio/commit/05c97afc8cc50a6a84284fce4316c22de8145855) — HUD direzione C (issue #172): insegna di noce appesa, cartellino GIORNO, ordine che si ritrae a icona dopo 3 s, pad PRENDI e joystick a 24 dp. Combo solo +N sopra Kaia. Font Baloo 2 (OFL). Non tocca il telefono di capitolo 1 né i nomi Bokobay.
+- 2026-10-16 13:55 — UI/UX — [PR #174](https://github.com/B00RR/ultimo-miglio/pull/174) (`ui/110-zaino-prezzo-liv2`) — il test della pillola aggiunge prima il BoxCollider (ProximityZone lo richiede). I due test sul pagamento erano già verdi.
+- 2026-10-16 13:41 — UI/UX — [PR #174](https://github.com/B00RR/ultimo-miglio/pull/174) (`ui/110-zaino-prezzo-liv2`) — merge di main (niente force-push): #110, lo Zaino 2 non prosciuga più gli LN dopo l'acquisto. Test EditMode `ZainoPad110Tests`.
 - 2026-10-16 13:28 — Regole di lavoro approvate da Lorenzo: etichette e milestone obbligatorie, niente segreti nel repo, PR piccole, test veloci prima della CI, responsabile e scadenza per ogni via, meno messaggi, pausa per chi non ha issue.
 - 2026-10-16 11:54 — Tech Lead — [c859f94](https://github.com/B00RR/ultimo-miglio/commit/c859f94ea08537f7a4d55aa3b9ba418f1202c3de) — PR #103 rewards: soglie pacchi 100/250/450, traguardi debito 25/50/75%, mancia Cassa 30 LN, freccia prossimo pad da 480 s; test EditMode EconomyRewardsTests.
 - 2026-10-16 12:12 — Code Reviewer — [4a1b26b](https://github.com/B00RR/ultimo-miglio/commit/4a1b26b6256d5f16153e713698f1ac4d3cfd5b72) — unita in squash la [PR #153](https://github.com/B00RR/ultimo-miglio/pull/153) (Audio: sfx combo +N e timbro del debito per la #137). Job `test` verde, asset OGG + README/licenze. Refs #136.

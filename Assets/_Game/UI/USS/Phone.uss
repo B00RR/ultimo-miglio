@@ -4,24 +4,24 @@
 #phone {
     border-width: 4px;
     border-color: #3B2F2A;
-    border-radius: 24px;
-    background-color: #74503A;
+    border-radius: 16px; /* #185: uguale al raggio alpha del 9-slice */
+    background-color: rgba(0, 0, 0, 0);
     background-image: url("project://database/Assets/_Game/UI/Textures/tex_wood_panel.png");
     -unity-background-scale-mode: stretch-to-fill;
-    -unity-slice-left: 16px;
-    -unity-slice-top: 16px;
-    -unity-slice-right: 16px;
-    -unity-slice-bottom: 16px;
+    -unity-slice-left: 18px; /* #185: 16 + 2 px di margine trasparente */
+    -unity-slice-top: 18px; /* #185: 16 + 2 px di margine trasparente */
+    -unity-slice-right: 18px; /* #185: 16 + 2 px di margine trasparente */
+    -unity-slice-bottom: 18px; /* #185: 16 + 2 px di margine trasparente */
 }
 #phone-screen {
-    border-radius: 18px;
-    background-color: #F3E3C3;
+    border-radius: 16px; /* #185: uguale al raggio alpha del 9-slice */
+    background-color: rgba(0, 0, 0, 0);
     background-image: url("project://database/Assets/_Game/UI/Textures/tex_cardboard_panel.png");
     -unity-background-scale-mode: stretch-to-fill;
-    -unity-slice-left: 16px;
-    -unity-slice-top: 16px;
-    -unity-slice-right: 16px;
-    -unity-slice-bottom: 16px;
+    -unity-slice-left: 18px; /* #185: 16 + 2 px di margine trasparente */
+    -unity-slice-top: 18px; /* #185: 16 + 2 px di margine trasparente */
+    -unity-slice-right: 18px; /* #185: 16 + 2 px di margine trasparente */
+    -unity-slice-bottom: 18px; /* #185: 16 + 2 px di margine trasparente */
     border-width: 3px;
     border-color: #3B2F2A;
 }
@@ -54,3 +54,12 @@
     color: #FFF9EE;
     -unity-font-definition: url("project://database/Assets/_Game/UI/Fonts/Fredoka-Bold.ttf");
 }
+
+/* #71: schermo crema → testi bruno #3B2A20 (contrasto 10,8:1 su #F3E3C3, 9,3:1 su #E8D3AC; prima crema su crema 1,2:1).
+   Sovrascrive i colori "notte" di DioramaSolare.uss (Phone.uss è caricato dopo, stessa specificità). */
+#home-day, #home-time, #home-installment, #messaggi-contact, #flotta-cassa, #flotta-nextpad, .phone-text { color: #3B2A20; }
+#home-installment, #flotta-nextpad { color: #7A4A2E; } /* noce: secondario, 5,8:1 su crema */
+.phone-card Label { color: #3B2A20; }
+.bubble--them { background-color: #E8D3AC; color: #3B2A20; }
+.chip { background-color: #E8D3AC; color: #3B2A20; }
+#phone-back .icon { -unity-background-image-tint-color: #3B2A20; }

@@ -12,6 +12,10 @@ namespace UltimoMiglio.Gameplay
     {
         public static string Result; public static readonly System.Collections.Generic.List<int> TutSteps = new(); public float TimeoutSec = 900f; public int Teleports;
         NinaController N; EconomyCore E;
+        static System.Action<TutorialManager.Step> _onStep;
+        /// <summary>Scollega il contatore dei passi da TutorialManager.StepChanged (TearDown dei test, OnDestroy).</summary>
+        public static void Stacca() { if (_onStep != null) TutorialManager.StepChanged -= _onStep; _onStep = null; }
+        void OnDestroy() => Stacca();
 
 #if !UNITY_EDITOR
         [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.AfterSceneLoad)]
@@ -37,7 +41,7 @@ namespace UltimoMiglio.Gameplay
             N = GameRoot.I.Nina; E = GameRoot.I.Eco;
             if (E.S.Zaino > 0) { Log("save already has Zaino>0: resetting test target to next level"); }
             int zainoStart = E.S.Zaino;
-            TutSteps.Clear(); if (TutorialManager.I) TutSteps.Add((int)TutorialManager.I.Current); TutorialManager.StepChanged += s => { TutSteps.Add((int)s); Log("TUTORIAL -> " + s); };
+            TutSteps.Clear(); if (TutorialManager.I) TutSteps.Add((int)TutorialManager.I.Current); _onStep = s => { TutSteps.Add((int)s); Log("TUTORIAL -> " + s); }; TutorialManager.StepChanged += _onStep;
             Log("START");
             var arr = FindAnyObjectByType<ArrivalsZone>(); var shelves = FindObjectsByType<Shelf>(FindObjectsSortMode.None).OrderBy(s => s.Color).ToArray();
             var picks = FindObjectsByType<ShelfPickup>(FindObjectsSortMode.None); var ban = FindAnyObjectByType<Bancone>();
@@ -49,7 +53,7 @@ namespace UltimoMiglio.Gameplay
             {
                 cycle++;
                 var kind = E.S.Zaino == zainoStart ? UpgradeKind.Zaino : UpgradeKind.NonnoHire; var pad = kind == UpgradeKind.Zaino ? padZ : padN;
-                if (E.S.Wallet + E.S.PadPaid[(int)kind] >= E.Cost(kind) || (cycle > 1 && E.S.Wallet > 0))
+                if (pad.gameObject.activeInHierarchy && (E.S.Wallet + E.S.PadPaid[(int)kind] >= E.Cost(kind) || (cycle > 1 && E.S.Wallet > 0))) // #101: pad nascosto dal tutorial graduale = non ancora comprabile
                 {
                     yield return Go(pad.transform.position, kind + " pad");
                     float w = Time.time; while (!Goal() && E.S.Wallet > 0.001 && Time.time - w < 20) { if (kind == UpgradeKind.Zaino && E.S.Zaino > zainoStart) break; yield return null; }
@@ -70,7 +74,33 @@ namespace UltimoMiglio.Gameplay
                 double w0 = E.S.Wallet; yield return Go(ban.transform.position + Vector3.right * 0.8f, "Coins"); yield return Wait(2.5f);
                 Log($"coins collected, wallet +{E.S.Wallet - w0:0.##}");
             }
-            if (TutorialManager.I) { float te = Time.time; while (TutorialManager.I.Current != TutorialManager.Step.Chiuso && Time.time - te < 15) yield return null; }
+            // #101: passi 11-15 dopo NONNO (pad nuovi, Cassa, debito, muro, gioco libero)
+            if (TutorialManager.I)
+            {
+                float te = Time.time;
+                while (TutorialManager.I.Current != TutorialManager.Step.Chiuso && Time.time - te < 120)
+                {
+                    var st = TutorialManager.I.Current;
+                    if (st == TutorialManager.Step.PadNuovi)
+                    {
+                        // pad cercati di nuovo: con il tutorial graduale Scarpe/Insegna compaiono solo qui (FindObjectsByType salta gli inattivi)
+                        var np = FindObjectsByType<UpgradePad>(FindObjectsSortMode.None).Where(p => (p.Kind == UpgradeKind.Scarpe || p.Kind == UpgradeKind.Insegna) && p.gameObject.activeInHierarchy && !double.IsInfinity(E.Cost(p.Kind)))
+                                     .OrderBy(p => E.Cost(p.Kind)).FirstOrDefault();
+                        if (np) { if (E.S.Wallet < E.Cost(np.Kind)) { E.S.Wallet = E.Cost(np.Kind); Log("test: LN per " + np.Kind); } yield return Go(np.transform.position, np.Kind + " pad"); yield return Wait(8f); continue; }
+                    }
+                    if (st == TutorialManager.Step.DebtCard)
+                    {
+                        // #223 (regole GD): il passo si chiude solo con il primo versamento alla Cassaforte, fatto DOPO il suo inizio:
+                        // il test fa come un giocatore e porta Nina sul bersaglio del passo (la Cassaforte).
+                        var safe = TutorialManager.I.CurrentTarget; double d0 = E.S.DebtPaid;
+                        // #256: con la Cassa vicina il giro arriva qui anche col portafoglio a 0 (nessun cliente servito mentre Kaia è alla Cassaforte): come per i pad, il test mette le LN del versamento
+                        if (E.S.Wallet < 1) { E.S.Wallet = 10; Log("test: LN per il versamento"); }
+                        if (safe) { yield return Go(safe.position, "Cassaforte"); yield return Wait(1.5f); Log($"versamento debito +{E.S.DebtPaid - d0:0.##}"); continue; }
+                    }
+                    if (st == TutorialManager.Step.CassaPass) { var cz = FindAnyObjectByType<CassaZone>(); if (cz) { yield return Go(cz.transform.position, "Cassa"); yield return Wait(1.5f); continue; } }
+                    yield return null;
+                }
+            }
             Result = Goal() ? "PASS" : "FAIL";
             Log("tutorial steps: " + string.Join(",", TutSteps));
             Log($"{Result} cycles={cycle} teleports={Teleports}");

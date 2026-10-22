@@ -39,7 +39,7 @@
 .sign-recess {
     position: absolute; left: 58px; right: 48px; top: 10px; bottom: 10px;
     flex-direction: row; align-items: center; padding-left: 8px; padding-right: 6px;
-    background-color: #3A2416; border-radius: 8px;
+    background-color: #3A2416; border-radius: 8px; overflow: hidden;
 }
 #hud-root #ln-value {
     font-size: 26px; margin: 0; padding: 0; letter-spacing: 0; color: #F3E3C3;
@@ -51,8 +51,14 @@
     -unity-font-definition: url("project://database/Assets/_Game/UI/Fonts/Baloo2-Bold.ttf");
     -unity-font-style: normal;
 }
+/* La riga alta è il riferimento del Salta tutorial (#224): stesso genitore dell'ingranaggio, così seguono il notch insieme. */
+#hud-root .top-bar {
+    position: absolute; left: 0; right: 0; top: 0; bottom: 0;
+    margin: 0; padding: 0;
+}
+/* Ingranaggio sul bordo destro dell'insegna (right 92 + 4). Il Salta tutorial sta subito a sinistra. */
 #hud-root #settings-button {
-    position: absolute; right: 4px; top: 8px; width: 40px; height: 40px;
+    position: absolute; right: 96px; top: 38px; width: 40px; height: 40px;
     margin: 0; padding: 0; border-width: 0; border-radius: 20px;
     background-color: rgba(0, 0, 0, 0); opacity: 1;
     align-items: center; justify-content: center;
@@ -197,8 +203,8 @@
 
 /* Suggerimento sopra il joystick fermo (122 + 24) e fuori dal pad. */
 #hud-root .tut-hint { bottom: 160px; right: 154px; }
-#hud-root .skip-tut { top: 128px; right: 12px; left: auto; }
-#hud-root.hud--skip #order-row { right: 128px; }
+/* #224: accanto all'ingranaggio, non sotto la fascia. right = 96 + 40 + 8. */
+#hud-root #skip-tutorial.skip-tut { top: 36px; right: 144px; left: auto; }
 #hud-root.hud--skip #order-ticket .tutorial-objective { left: auto; right: auto; }
 
 /* Debito e telefono restano fuori dall'HUD minimo. */

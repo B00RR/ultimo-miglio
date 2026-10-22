@@ -6,7 +6,7 @@ namespace UltimoMiglio.Gameplay
 {
     public enum PoiKind { Prendi, Consegna, Acquisto }
 
-    /// <summary>My Little Universe-style interaction point: raised rounded ground pad with a thick ink rim that pulses
+    /// <summary>My Little Universe-style interaction point: flat inset ground ring (#187, tufo + tinted fill, no ink rim) that pulses
     /// (scale + emission), coloured by kind (prendi = blu, consegna = verde, acquisto = giallo), plus a floating billboard
     /// chip (icon + max 2 words, Fredoka) drawn in the HUD world layer. The current tutorial target gets a bigger,
     /// brighter pad and a vertical beacon; the others stay calm. Purely visual: gameplay stays in ProximityZone.</summary>
@@ -19,7 +19,23 @@ namespace UltimoMiglio.Gameplay
         public static readonly Color Blu = new(0.784f, 0.388f, 0.231f), Verde = new(0.561f, 0.788f, 0.659f), Giallo = new(0.957f, 0.769f, 0.188f), Ink = new(0.231f, 0.184f, 0.165f);
         static readonly Color Crema = new(0.953f, 0.890f, 0.765f); // #F3E3C3: schiarimenti caldi (mai verso il bianco/grigio freddo)
 
-        Transform _rim, _fill, _beacon; Material _fillMat, _beaconMat; Color _col;
+        // #187: visuale creata in edit time dallo SliceSceneBuilder e salvata in scena (anello zone_inset_ring + colonna faro).
+        // Materiali condivisi (asset, uno per tipo); le tinte di stato/pulse passano da MaterialPropertyBlock: niente new Material / renderer.material a runtime.
+        [SerializeField] Transform _ring; [SerializeField] Renderer _ringR; [SerializeField] Transform _beacon; [SerializeField] Renderer _beaconR;
+        /// <summary>Indice della submesh di riempimento in zone_inset_ring.fbx (0 = anello tufo, 1 = disco tingibile).</summary>
+        public const int FillSubmesh = 1;
+        public static readonly int BaseColorId = Shader.PropertyToID("_BaseColor"), ColorId = Shader.PropertyToID("_Color");
+        MaterialPropertyBlock _mpb, _beaconMpb; Color _col; Transform _fill;
+        public Transform RingVisual => _ring;
+        /// <summary>#187 (Game Designer): il bordo esterno dell'anello coincide con Radius = metà del lato minore del trigger.</summary>
+        public const float VisualScale = 1f;
+
+        /// <summary>Chiamato SOLO in edit time dallo scene builder: collega anello e faro già creati e salvati in scena.</summary>
+        public void BindVisuals(Transform ring, Transform beacon)
+        {
+            _ring = ring; _ringR = ring ? ring.GetComponentInChildren<Renderer>() : null;
+            _beacon = beacon; _beaconR = beacon ? beacon.GetComponent<Renderer>() : null;
+        }
         VisualElement _chip, _chipCol, _chevron, _bar, _barFill; Label _text, _barLabel;
         /// <summary>#94: aiuto livello 1 (10 s fermo): il bersaglio pulsa più forte (pad a terra + pillola).</summary>
         public bool HintPulse { get; set; }
@@ -54,21 +70,14 @@ namespace UltimoMiglio.Gameplay
 
         void Start()
         {
+            if (!Ring && !Pad && (Ring = GetComponentInChildren<UltimoMiglio.VFX.UM_PadFillRing>(true))) // ricollega se la scena ha perso il riferimento (anello rotto in batchmode)
+            { Ring.playCompleteBurst = false; Ring.SetKind(Kind == PoiKind.Consegna ? UltimoMiglio.VFX.UM_PadFillRing.Kind.Delivery : UltimoMiglio.VFX.UM_PadFillRing.Kind.Pickup); } // come SliceSceneBuilder
             HideFloatingChips();
             HideLegacyZoneSquare();
             _col = KindColor; _phase = Random.value * 6f;
-            var sh = Shader.Find("Universal Render Pipeline/Unlit");
-            Material M(Color c) { var m = new Material(sh); m.SetColor("_BaseColor", c); if (m.HasProperty("_Color")) m.SetColor("_Color", c); return m; }
-            // Bordo bruno sottile (non disco pieno scuro)
-            _rim = Disc("POI_Rim", M(Ink), new Vector3(Radius * 2.15f, 0.06f, Radius * 2.15f), 0.035f);
-            _fillMat = M(_col);
-            // Riempimento saturo leggibile (Purchase = sole pieno; pickup/consegna teal/menta)
-            float fillA = Kind == PoiKind.Acquisto ? 0.92f : 0.78f;
-            _fillMat.color = new Color(_col.r, _col.g, _col.b, fillA);
-            _fill = Disc("POI_Fill", _fillMat, new Vector3(Radius * 1.95f, 0.08f, Radius * 1.95f), 0.05f);
-            _beaconMat = M(Color.Lerp(_col, Crema, 0.35f));
-            _beacon = Disc("POI_Beacon", _beaconMat, new Vector3(0.14f, 1.6f, 0.14f), 1.6f);
-            _beacon.gameObject.SetActive(false);
+            _mpb = new MaterialPropertyBlock(); _beaconMpb = new MaterialPropertyBlock();
+            _fill = _ring; // compat: LateUpdate esce se la scena non ha la visuale (es. test che aggiungono il componente a mano)
+            if (_beacon) _beacon.gameObject.SetActive(false);
             _tut = FindAnyObjectByType<TutorialManager>();
             if (PadIcon) PadIcon.SetVisible(false);
             var pt = GetComponent<UltimoMiglio.UI.World.PadTag>(); if (pt) pt.enabled = false;
@@ -78,14 +87,6 @@ namespace UltimoMiglio.Gameplay
         {
             Color.RGBToHSV(c, out float h, out float sat, out float v);
             return Color.HSVToRGB(h, Mathf.Clamp01(sat * k), Mathf.Clamp01(v * 1.05f));
-        }
-
-        Transform Disc(string n, Material m, Vector3 s, float y)
-        {
-            var g = GameObject.CreatePrimitive(PrimitiveType.Cylinder); g.name = n; Destroy(g.GetComponent<Collider>());
-            g.transform.SetParent(transform, false); g.transform.localPosition = new Vector3(0, y, 0); g.transform.localScale = s;
-            var r = g.GetComponent<Renderer>(); r.sharedMaterial = m; r.shadowCastingMode = UnityEngine.Rendering.ShadowCastingMode.Off;
-            return g.transform;
         }
 
         bool Available() => !Pad || (GameRoot.Ready && !double.IsInfinity(GameRoot.I.Eco.Cost(Pad.Kind)) && GameRoot.I.ActiveTime >= Pad.UnlockAtActiveSec);
@@ -127,28 +128,54 @@ namespace UltimoMiglio.Gameplay
             _barLabel = new Label { pickingMode = PickingMode.Ignore }; _barLabel.AddToClassList("poi-bar__label");
             _bar.Add(track); _bar.Add(_barLabel);
             _chipCol.Add(_chevron); _chipCol.Add(_bar); _chipCol.Add(_chip); layer.Add(_chipCol);
+            SetPadOff(PadOff); // #240: la pillola creata dopo l'acquisto nasce già spenta
             var arrow = _hud.Root.Q("edge-arrow"); arrow?.BringToFront(); // the off-screen arrow is never under a chip/card
         }
+
+        /// #240: pad spento dopo l'acquisto. Prezzo grigio (UM_PadOffStyle.Price) e freccia #9E8F7E rivolta verso l'esterno.
+        public bool PadOff { get; private set; }
+        public void SetPadOff(bool off)
+        {
+            PadOff = off;
+            if (_text != null) _text.style.color = off ? UltimoMiglio.VFX.UM_PadOffStyle.Price : Ink;
+            if (_chevron != null)
+            {
+                _chevron.style.unityBackgroundImageTintColor = off ? UltimoMiglio.VFX.UM_PadOffStyle.Arrow : Color.white;
+                _chevron.EnableInClassList("poi-chevron--off", off);
+            }
+        }
+        public Color PriceColor => PadOff ? UltimoMiglio.VFX.UM_PadOffStyle.Price : Ink;
+
+        int _shownLeft = int.MinValue, _shownPaid = int.MinValue, _shownCost = int.MinValue;
+        UltimoMiglio.UI.World.PadTag _tag; bool _tagLooked;
 
         void LateUpdate()
         {
             if (!_fill) return;
             bool avail = Available();
-            if (_rim.gameObject.activeSelf != avail) { _rim.gameObject.SetActive(avail); _fill.gameObject.SetActive(avail); }
+            if (_ring.gameObject.activeSelf != avail) _ring.gameObject.SetActive(avail);
             var target = _tut ? _tut.CurrentTarget : null;
             _active = avail && target && (target.position - transform.position).sqrMagnitude < 9f;
-            _beacon.gameObject.SetActive(_active);
+            bool beaconOn = _active && Kind != PoiKind.Acquisto && _beacon; // la colonna 3D attraversava la pillola prezzo: niente faro sui pad acquisto
+            if (_beacon && _beacon.gameObject.activeSelf != beaconOn) _beacon.gameObject.SetActive(beaconOn);
             float t = Time.time * (_active ? 4.5f : 2.2f) + _phase, k = 0.5f + 0.5f * Mathf.Sin(t);
-            float big = _active ? 1.12f : 1f, amp = HintPulse ? 0.16f : _active ? 0.07f : 0.04f; // #94: pulsazione forte all'aiuto 10 s
-            float sc = big * (1f + amp * k);
-            _rim.localScale = new Vector3(Radius * 2.15f * sc, 0.06f, Radius * 2.15f * sc);
-            _fill.localScale = new Vector3(Radius * 1.95f * sc, 0.08f, Radius * 1.95f * sc);
-            float baseA = Kind == PoiKind.Acquisto ? 0.92f : 0.78f;
-            var fill = Color.Lerp(_col, Crema, (_active ? 0.22f : 0.08f) * k);
-            fill.a = baseA * (0.88f + 0.12f * k); // pulse leggibile
-            _fillMat.SetColor("_BaseColor", fill); if (_fillMat.HasProperty("_Color")) _fillMat.SetColor("_Color", fill);
-            if (Kind == PoiKind.Acquisto) _beacon.gameObject.SetActive(false); // la colonna 3D attraversava la pillola prezzo: ora freccia UI sopra la pillola
-            if (_active && _beacon.gameObject.activeSelf) { _beacon.localScale = new Vector3(0.18f, 2.2f + 0.3f * k, 0.18f); _beaconMat.SetColor("_BaseColor", Color.Lerp(_col, Crema, 0.3f + 0.4f * k)); }
+            // #187 (Game Designer): l'anello resta esattamente grande quanto il trigger, niente scala in pulsazione;
+            // il pulse (anche quello forte dell'aiuto 10 s, #94) passa solo dalla tinta del disco.
+            float amp = HintPulse ? 0.45f : _active ? 0.22f : 0.08f;
+            float d = Radius * 2f * VisualScale; // mesh Ø 1 m a scala 1
+            if (_ring.localScale.x != d) _ring.localScale = new Vector3(d, 1f, d);
+            if (_ringR)
+            {
+                float baseA = Kind == PoiKind.Acquisto ? 0.92f : 0.78f;
+                var fill = Color.Lerp(_col, Crema, amp * k);
+                fill.a = baseA * (0.88f + 0.12f * k); // pulse leggibile
+                _ringR.GetPropertyBlock(_mpb, FillSubmesh); _mpb.SetColor(BaseColorId, fill); _mpb.SetColor(ColorId, fill); _ringR.SetPropertyBlock(_mpb, FillSubmesh);
+            }
+            if (beaconOn)
+            {
+                _beacon.localScale = new Vector3(0.18f, 2.2f + 0.3f * k, 0.18f);
+                if (_beaconR) { var bc = Color.Lerp(_col, Crema, 0.3f + 0.4f * k); _beaconMpb.SetColor(BaseColorId, bc); _beaconMpb.SetColor(ColorId, bc); _beaconR.SetPropertyBlock(_beaconMpb); }
+            }
 
             EnsureChip();
             if (_chip == null || !_cam) return;
@@ -158,9 +185,12 @@ namespace UltimoMiglio.Gameplay
                 var eco = GameRoot.I.Eco; double cost = eco.Cost(Pad.Kind), paid = eco.S.PadPaid[(int)Pad.Kind];
                 if (!double.IsInfinity(cost))
                 {
-                    _text.text = Mathf.CeilToInt((float)Mathf.Max(0, (float)(cost - paid))) + " LN"; // pillola = quanto manca
+                    // #191: stringhe ricostruite solo quando cambiano i numeri (prima: allocazioni a ogni frame per pad → picchi GC su WebGL)
+                    int left = Mathf.CeilToInt((float)Mathf.Max(0, (float)(cost - paid)));
+                    if (left != _shownLeft) { _shownLeft = left; _text.text = left + " LN"; } // pillola = quanto manca
                     int pd = Mathf.FloorToInt((float)paid), c = Mathf.CeilToInt((float)cost);
-                    _barLabel.text = pd + "/" + c; _barFill.style.width = Length.Percent(c > 0 ? Mathf.Clamp01((float)(paid / cost)) * 100f : 0f);
+                    if (pd != _shownPaid || c != _shownCost) { _shownPaid = pd; _shownCost = c; _barLabel.text = pd + "/" + c; }
+                    _barFill.style.width = Length.Percent(c > 0 ? Mathf.Clamp01((float)(paid / cost)) * 100f : 0f);
                     var n = GameRoot.I.Nina; bool close = n && (n.transform.position - transform.position).sqrMagnitude < 9f;
                     barOn = ForceBar || paid > 0.01 || close;
                 }
@@ -170,7 +200,8 @@ namespace UltimoMiglio.Gameplay
             bool near = nina && (nina.transform.position - transform.position).sqrMagnitude < 9f;
             if (Ring && !Pad) Ring.SetProgress(near ? 1f : 0f);
             if (PadIcon) { PadIcon.SetVisible(false); PadIcon.SetPlayerNear(near); }
-            var tag = GetComponent<UltimoMiglio.UI.World.PadTag>(); if (tag) tag.enabled = false;
+            if (!_tagLooked) { _tagLooked = true; _tag = GetComponent<UltimoMiglio.UI.World.PadTag>(); } // #191: cache
+            if (_tag && _tag.enabled) _tag.enabled = false;
             // Offset mondo: più basso se il pad è in alto nello schermo, così la pillola non finisce sotto l'obiettivo
             float bob = 0.12f * Mathf.Sin(Time.time * 2.4f + _phase);
             Vector3 world = transform.position + Vector3.up * (1.55f + bob);

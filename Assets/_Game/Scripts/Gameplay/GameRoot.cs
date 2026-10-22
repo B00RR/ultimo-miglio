@@ -44,6 +44,7 @@ namespace UltimoMiglio.Gameplay
             Eco.ApplyOffline(DateTimeOffset.UtcNow.ToUnixTimeSeconds());
             Eco.RewardGranted += (k, i, ln) => Debug.Log($"[REWARD] kind={k} i={i} ln={ln:0.#}");
             if (!GetComponent<NextPadArrow>()) gameObject.AddComponent<NextPadArrow>();
+            if (!GetComponent<DebtMilestoneFeedback>()) gameObject.AddComponent<DebtMilestoneFeedback>(); // #136
         }
 
         void OpenQaLog()
