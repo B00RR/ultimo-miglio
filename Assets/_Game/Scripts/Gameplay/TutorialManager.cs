@@ -201,12 +201,13 @@ namespace UltimoMiglio.Gameplay
             foreach (var kv in HintsFrom(j)) _hints[kv.Key] = kv.Value;
         }
 
-        /// <summary>Suggerimenti onb.* (chiave → testo) letti da onboarding_testi.json. Statico per i test EditMode (#275).</summary>
+        /// <summary>Suggerimenti onb.* (chiave → testo) letti da onboarding_testi.json. Statico per i test EditMode (#275).
+        /// #275: la chiave ammette le cifre (onb.viktor.call1/2, onb.debt.milestone1-3): prima la regex [a-zA-Z.] le scartava.</summary>
         public static System.Collections.Generic.Dictionary<string, string> HintsFrom(string json)
         {
             var d = new System.Collections.Generic.Dictionary<string, string>();
             if (string.IsNullOrEmpty(json)) return d;
-            foreach (System.Text.RegularExpressions.Match m in System.Text.RegularExpressions.Regex.Matches(json, "\"(onb\\.[a-zA-Z.]+)\"\\s*:\\s*\"((?:[^\"\\\\]|\\\\.)*)\""))
+            foreach (System.Text.RegularExpressions.Match m in System.Text.RegularExpressions.Regex.Matches(json, "\"(onb\\.[a-zA-Z0-9.]+)\"\\s*:\\s*\"((?:[^\"\\\\]|\\\\.)*)\""))
                 d[m.Groups[1].Value] = System.Text.RegularExpressions.Regex.Unescape(m.Groups[2].Value);
             return d;
         }

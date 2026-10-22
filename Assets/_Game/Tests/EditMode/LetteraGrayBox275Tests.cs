@@ -51,4 +51,13 @@ public class LetteraGrayBox275Tests
             Assert.LessOrEqual(h[k].Length, 70, $"{k} oltre 70 caratteri");
         }
     }
+
+    [Test] public void HintsFrom_ChiaviConCifre_Lette()
+    {
+        var h = Hints(); // prima della #275 la regex [a-zA-Z.] scartava le chiavi con cifre: call1/2 e milestone1-3 restavano senza testo
+        foreach (var k in new[] { "onb.viktor.call1", "onb.viktor.call2", "onb.debt.milestone1", "onb.debt.milestone2", "onb.debt.milestone3" })
+            Assert.IsTrue(h.ContainsKey(k), $"{k} non letta da onboarding_testi.json");
+        StringAssert.StartsWith("Busta GrayBox sulla Cassaforte", h["onb.viktor.call1"]);
+        StringAssert.Contains("M. Vane", h["onb.viktor.call2"]);
+    }
 }
