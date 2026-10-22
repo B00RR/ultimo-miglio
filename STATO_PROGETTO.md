@@ -158,6 +158,7 @@ Ogni ruolo lavora solo sulle issue con la propria etichetta `ruolo:*`, sempre co
 
 Voci più recenti in alto. Formato: `AAAA-MM-GG HH:MM` (Europe/Rome) — [commit] — descrizione.
 
+- **22/10/2026 10:36 (Europe/Rome)**: unita in squash la #277 (UI/UX Designer, Closes #254: il saldo compatto si tronca verso lo zero, 999999 → «999,9K», −999999 → «-999,9K», nessun «-0»; SaldoCompatto254Tests con 13 casi limite). Commit [aec4a36](https://github.com/B00RR/ultimo-miglio/commit/aec4a36902980ebab838d63d9d03911d99961d77).
 - **17/10/2026 05:25 (Europe/Rome)**: unita in squash la #266 (Animator, Refs #171: pad tolleranti verso la camera e test joystick; ramo aggiornato con main tramite update-branch dopo la #270). Commit [06adb3e](https://github.com/B00RR/ultimo-miglio/commit/06adb3e964b1e230b389b1091d4bc458dadaa7e4).
 - **17/10/2026 05:06 (Europe/Rome)**: unita in squash la #270 (3D Artist, Refs #256, #262, #224, #259: Cassa aperta, varchi da 1,2 m e pad visibili; PercorsoJoystick256Test controlla anche la Cassa → Nonna Ada e la coda senza salti silenziosi). Commit [704c754](https://github.com/B00RR/ultimo-miglio/commit/704c754dfe15d021a5503f56da8ea812f6567484).
 - **17/10/2026 02:30 (Europe/Rome)**: unita in squash la #268 (Tech Lead, Refs #256: VarcoMarker con i campi larghezza, default 1,6 m, e ordine al posto di RaggioPassaggio). Commit [96ea4df](https://github.com/B00RR/ultimo-miglio/commit/96ea4dff98aed81c9aac150cb6d74cab70a3b518).
