@@ -9,7 +9,7 @@ namespace UltimoMiglio.Gameplay
     public sealed class AudioManager : MonoBehaviour
     {
         public static AudioManager I { get; private set; }
-        public enum Sfx { StackMax, Deposit, CoinDrop, CoinPickup, Bell, Served, UpgradeComplete, ComboX15, ComboX2, NonnoStart, NonnoMumble, Step, UiTap, TutorialArrow, TutorialStep }
+        public enum Sfx { StackMax, Deposit, CoinDrop, CoinPickup, Bell, Served, UpgradeComplete, ComboX15, ComboX2, NonnoStart, NonnoMumble, Step, UiTap, TutorialArrow, TutorialStep, ComboPlus }
         public const string PrefMusic = "vol_music", PrefSfx = "vol_sfx"; // stesse chiavi di SettingsPanel
 
         [Header("Music")] public AudioClip[] MusicStems = new AudioClip[3]; public AudioClip MusicFull; public bool UseStems = true;
@@ -19,6 +19,7 @@ namespace UltimoMiglio.Gameplay
         [Header("Passi")] public float StepDistance = 0.85f;
         public AudioClip StackMax, Bell, Served, UpgradeLoop, UpgradeComplete, ComboX15, ComboX2, NonnoStart;
         [Header("Tappe del debito (#136)")] public AudioClip[] DebtStamp = new AudioClip[3]; // sfx_debt_stamp_01..03
+        [Header("Combo +N (#159, asset #153)")] public AudioClip[] ComboPlus = new AudioClip[8]; // sfx_combo_plus_01..08
         public AudioMixerGroup MusicGroup, SfxGroup;
         public int MaxVoices = 6;
 
@@ -122,11 +123,15 @@ namespace UltimoMiglio.Gameplay
                 case Sfx.UiTap: One(Pick(UiTap), 0.8f, 0.02f); break;
                 case Sfx.TutorialArrow: One(TutorialArrow, 0.7f, 0f); break;
                 case Sfx.TutorialStep: One(TutorialStep, 0.9f, 0f); break;
+                case Sfx.ComboPlus: PlayComboPlus(1); break;
             }
         }
         public void StartUpgradeLoop() { if (Unlocked && _loop.clip && !_loop.isPlaying) { _loop.volume = _sfxMul; _loop.Play(); } }
         public void StopUpgradeLoop() { if (_loop.isPlaying) _loop.Stop(); }
 
+        /// <summary>#159: combo +N (1..8): clip N, oltre l'ottava resta l'ultima.</summary>
+        public void PlayComboPlus(int n) { One(At(ComboPlus, n - 1), 0.9f, 0f); }
+        public static AudioClip At(AudioClip[] a, int i) => a == null || a.Length == 0 ? null : a[Mathf.Clamp(i, 0, a.Length - 1)];
         static AudioClip Pick(AudioClip[] a) => a == null || a.Length == 0 ? null : a[Random.Range(0, a.Length)];
         void One(AudioClip c, float vol = 1f, float pitchJitter = 0.05f)
         {
