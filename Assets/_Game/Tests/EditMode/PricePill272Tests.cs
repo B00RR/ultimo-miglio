@@ -53,11 +53,7 @@ public class PricePill272Tests
             float scale = PricePillLayout.ScaleOf(w, h);
             Verifica(cam, pad, Vector3.zero, others, scale, w, h, "centro");
             for (int deg = 0; deg < 360; deg += 45)
-            {
-                float a = deg * Mathf.Deg2Rad;
-                var feet = new Vector3(Mathf.Cos(a) * Radius, 0f, Mathf.Sin(a) * Radius);
-                Verifica(cam, pad, feet, others, scale, w, h, "bordo " + deg);
-            }
+                Verifica(cam, pad, PiediSulBordo(deg), others, scale, w, h, "bordo " + deg);
         }
         finally
         {
@@ -81,6 +77,26 @@ public class PricePill272Tests
             var altra = PricePillLayout.ColumnRect(others[i], scale);
             Assert.IsFalse(pill.Overlaps(altra), nome + ": pillola sopra l'altra a " + others[i]);
         }
+    }
+
+    /// <summary>Bordo del disco. I cardinali sono esatti: Mathf.Sin(90°) supera 1 e
+    /// Cos·r, Sin·r finisce fuori da r², quindi WithinRadius (&lt;=) rifiutava un bordo vero.</summary>
+    static Vector3 PiediSulBordo(int deg)
+    {
+        if (deg == 0) return new Vector3(Radius, 0f, 0f);
+        if (deg == 90) return new Vector3(0f, 0f, Radius);
+        if (deg == 180) return new Vector3(-Radius, 0f, 0f);
+        if (deg == 270) return new Vector3(0f, 0f, -Radius);
+        float a = deg * Mathf.Deg2Rad;
+        float x = Mathf.Cos(a), z = Mathf.Sin(a);
+        float l2 = x * x + z * z;
+        if (l2 > 1f)
+        {
+            float inv = 1f / Mathf.Sqrt(l2);
+            x *= inv;
+            z *= inv;
+        }
+        return new Vector3(x * Radius, 0f, z * Radius);
     }
 
     static Vector2 Ancora(Camera cam, Vector3 pad, int h)

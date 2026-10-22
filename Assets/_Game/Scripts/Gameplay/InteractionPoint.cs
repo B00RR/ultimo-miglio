@@ -224,6 +224,8 @@ namespace UltimoMiglio.Gameplay
             if (_tag && _tag.enabled) _tag.enabled = false;
             // #272: Kaia sul pad → la colonna va oltre il bordo, lato opposto alla camera, in 0,15 s.
             // Il bob si spegne insieme allo spostamento, così a regime il rettangolo non rientra su di lei.
+            // A riposo resta la proiezione storica: durante il ricentro NonnoIntro Kaia è lontana dal pad
+            // e il solver non deve aggiungere WorldToScreenPoint nello stesso LateUpdate della camera.
             var feet = nina ? nina.transform.position : transform.position;
             bool onPad = nina && PricePillLayout.WithinRadius(transform.position, feet, Radius);
             float goal = onPad ? 1f : 0f;
@@ -234,13 +236,24 @@ namespace UltimoMiglio.Gameplay
                 _dodge = Mathf.Lerp(_dodgeFrom, _dodgeGoal, PricePillLayout.Smooth(_dodgeT / PricePillLayout.DodgeSeconds));
             }
             float bob = (1f - _dodge) * 0.12f * Mathf.Sin(Time.time * 2.4f + _phase);
-            int sw = Screen.width > 1 ? Screen.width : _cam.pixelWidth;
-            int sh = Screen.height > 1 ? Screen.height : _cam.pixelHeight;
-            Vector3 restSp = PricePillLayout.ProjectRest(_cam, transform.position, bob, sh);
-            _restScreen.x = restSp.x; _restScreen.y = restSp.y; _restValid = restSp.z > 0f;
-            int othersN = 0;
-            if (_dodge > 0.0001f)
+            int sw, sh;
+            Vector3 sp;
+            if (_dodge <= 0.0001f)
             {
+                sp = _cam.WorldToScreenPoint(transform.position + Vector3.up * (PricePillLayout.RestHeight + bob));
+                if (sp.z > 0f && sp.y > Screen.height * PricePillLayout.HighScreenFrac)
+                    sp = _cam.WorldToScreenPoint(transform.position + Vector3.up * (PricePillLayout.HighHeight + bob * 0.5f));
+                sw = Screen.width;
+                sh = Screen.height;
+                _restScreen.x = sp.x; _restScreen.y = sp.y; _restValid = sp.z > 0f;
+            }
+            else
+            {
+                sw = Screen.width > 1 ? Screen.width : _cam.pixelWidth;
+                sh = Screen.height > 1 ? Screen.height : _cam.pixelHeight;
+                Vector3 restSp = PricePillLayout.ProjectRest(_cam, transform.position, 0f, sh);
+                _restScreen.x = restSp.x; _restScreen.y = restSp.y; _restValid = restSp.z > 0f;
+                int othersN = 0;
                 for (int i = 0; i < _liveN; i++)
                 {
                     var o = _live[i];
@@ -248,8 +261,8 @@ namespace UltimoMiglio.Gameplay
                     _otherBuf[othersN++] = o._restScreen;
                     if (othersN == _otherBuf.Length) break;
                 }
+                sp = PricePillLayout.AnchorScreen(_cam, transform.position, Radius, feet, _dodge, bob, sw, sh, _otherBuf, othersN);
             }
-            Vector3 sp = PricePillLayout.AnchorScreen(_cam, transform.position, Radius, feet, _dodge, bob, sw, sh, _otherBuf, othersN);
             bool show = avail && !(HasCard && near) && sp.z > 0 && sp.x > 0 && sp.x < sw && sp.y > 0 && sp.y < sh;
             _chipCol.style.display = show ? DisplayStyle.Flex : DisplayStyle.None;
             if (!show || _chip.panel == null) return;
