@@ -118,9 +118,27 @@ namespace UltimoMiglio.UI
             if (TestValue.HasValue) { Value = TestValue.Value; KeyboardActive = Value != Vector2.zero; }
             else PollDesktop();
             if (IsActive) Moved?.Invoke(Value);
-            float target = fingerId != -1 ? 1f : 0f; // la tastiera non ha uno stick a schermo
-            alpha = Mathf.MoveTowards(alpha, target, fadeSeconds > 0 ? Time.unscaledDeltaTime / fadeSeconds : 1f);
-            if (baseEl != null) { baseEl.style.opacity = alpha; baseEl.style.display = alpha > 0.001f ? DisplayStyle.Flex : DisplayStyle.None; }
+            if (baseEl == null) return;
+            if (fingerId == -1)
+                Dock();
+            else
+            {
+                baseEl.style.opacity = 1f;
+                baseEl.style.display = DisplayStyle.Flex;
+            }
+        }
+
+        /// <summary>A riposo il joystick sta in basso a sinistra, margine 24 dp (direzione C). Trascinato, segue il dito.</summary>
+        void Dock()
+        {
+            alpha = Mathf.MoveTowards(alpha, 1f, fadeSeconds > 0f ? Time.unscaledDeltaTime / fadeSeconds : 1f);
+            baseEl.style.opacity = alpha;
+            baseEl.style.display = DisplayStyle.Flex;
+            baseEl.style.top = StyleKeyword.Null;
+            baseEl.style.right = StyleKeyword.Null;
+            baseEl.style.left = 24f;
+            baseEl.style.bottom = 24f;
+            if (knobEl != null) knobEl.style.translate = new Translate(0, 0, 0);
         }
 
         void PollDesktop()
@@ -151,6 +169,7 @@ namespace UltimoMiglio.UI
             var p = SafeAreaUtil.ScreenToPanel(baseEl.panel, basePx);
             var k = SafeAreaUtil.ScreenToPanel(baseEl.panel, fingerPx);
             float w = baseEl.resolvedStyle.width;
+            baseEl.style.bottom = StyleKeyword.Null;
             baseEl.style.left = p.x - w * 0.5f; baseEl.style.top = p.y - w * 0.5f;
             if (knobEl != null) knobEl.style.translate = new Translate(k.x - p.x, k.y - p.y, 0);
         }

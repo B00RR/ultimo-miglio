@@ -1,12 +1,25 @@
 <ui:UXML xmlns:ui="UnityEngine.UIElements" editor-extension-mode="False">
-    <Style src="project://database/Assets/_Game/UI/USS/DioramaSolare.uss" /><Style src="project://database/Assets/_Game/UI/Tokens.uss" /><Style src="project://database/Assets/_Game/UI/USS/HudV2.uss" /><Style src="project://database/Assets/_Game/UI/USS/Settings.uss" />
+    <Style src="project://database/Assets/_Game/UI/USS/DioramaSolare.uss" />
+    <Style src="project://database/Assets/_Game/UI/Tokens.uss" />
+    <Style src="project://database/Assets/_Game/UI/USS/HudV2.uss" />
+    <Style src="project://database/Assets/_Game/UI/USS/Settings.uss" />
     <Style src="project://database/Assets/_Game/UI/USS/LegnoCartone.uss" />
     <Style src="project://database/Assets/_Game/UI/USS/TutorialHud.uss" />
     <Style src="project://database/Assets/_Game/UI/USS/Onboarding.uss" />
+    <Style src="project://database/Assets/_Game/UI/USS/InsegnaNoce.uss" />
     <ui:VisualElement name="hud-root" class="fill hud--minimal" picking-mode="Ignore">
         <ui:VisualElement name="world-layer" class="layer" picking-mode="Ignore" />
         <ui:VisualElement name="popup-layer" class="layer" picking-mode="Ignore" />
         <ui:VisualElement name="joystick-base" picking-mode="Ignore"><ui:VisualElement name="joystick-knob" picking-mode="Ignore" /></ui:VisualElement>
+        <ui:VisualElement name="action-pad" class="action-pad" picking-mode="Position">
+            <ui:VisualElement class="action-pad__btn" picking-mode="Ignore">
+                <ui:VisualElement name="action-sun" class="action-pad__sun" picking-mode="Ignore" />
+            </ui:VisualElement>
+            <ui:VisualElement class="action-pad__plate" picking-mode="Ignore">
+                <ui:Label name="action-title" class="action-pad__title" text="PRENDI" picking-mode="Ignore" />
+                <ui:Label name="cargo-label" class="action-pad__cargo" text="CARICO 0/4" picking-mode="Ignore" />
+            </ui:VisualElement>
+        </ui:VisualElement>
         <ui:VisualElement name="edge-arrow" picking-mode="Ignore" style="display: none;">
             <ui:VisualElement name="edge-arrow-head" picking-mode="Ignore"><ui:VisualElement class="icon icon-arrow" picking-mode="Ignore" /></ui:VisualElement>
             <ui:Label name="edge-arrow-label" class="pill" text="Cliente al Bancone · 12 m" picking-mode="Ignore" />
@@ -14,21 +27,44 @@
         <ui:VisualElement name="target-marker" picking-mode="Ignore" style="display: none;" />
         <ui:VisualElement name="safe-root" picking-mode="Ignore">
             <ui:VisualElement class="top-bar" picking-mode="Ignore">
-                <ui:VisualElement class="top-left" picking-mode="Ignore">
-                    <ui:VisualElement name="currency-pill" class="pill">
-                        <ui:VisualElement class="currency"><ui:VisualElement class="icon icon-coin" /><ui:Label name="ln-value" class="currency-value" text="0" /></ui:VisualElement>
-                        <ui:VisualElement name="day-group" class="currency day-group"><ui:Label name="day-value" class="day-value" text="G1" /></ui:VisualElement>
-                        <ui:VisualElement class="currency bolt-group" style="display: none;"><ui:VisualElement class="icon icon-bolt" /><ui:Label name="bolt-value" class="currency-value" text="0" /></ui:VisualElement>
-                        <ui:VisualElement name="token-group" class="currency" style="display: none;"><ui:VisualElement class="icon icon-token" /><ui:Label name="token-value" class="currency-value" text="0" /></ui:VisualElement>
-                    </ui:VisualElement>
-                    <ui:VisualElement name="toll-chip" style="display: none;" class="pill hud-hide"><ui:VisualElement class="icon icon--sm icon-toll" /><ui:Label name="toll-value" text="Pedaggio" /></ui:VisualElement>
-                    <ui:VisualElement name="toast" style="display: none;" class="pill" picking-mode="Ignore"><ui:Label name="toast-text" text="La Cassa ha 0 LN" picking-mode="Ignore" /></ui:VisualElement>
-                </ui:VisualElement>
                 <ui:Button name="skip-tutorial" text="Salta tutorial" class="skip-tut" />
-                <ui:VisualElement name="settings-button" class="settings-btn" picking-mode="Position"><ui:VisualElement class="icon icon-gear" /></ui:VisualElement>
-                <ui:VisualElement name="phone-button"><ui:VisualElement class="icon icon-phone" /><ui:Label name="phone-key-hint" class="key-hint" text="TAB" picking-mode="Ignore" /><ui:Label name="phone-badge" class="badge" text="" style="display: none;" /></ui:VisualElement>
+                <ui:VisualElement name="settings-button" class="settings-btn" picking-mode="Position"><ui:VisualElement class="icon icon-gear" picking-mode="Ignore" /></ui:VisualElement>
             </ui:VisualElement>
-            <ui:Label name="tutorial-objective" class="tutorial-objective" text="Muoviti" picking-mode="Ignore" />
+            <ui:VisualElement name="currency-pill" class="walnut-sign" picking-mode="Position">
+                <ui:VisualElement class="sign-cord sign-cord--l" picking-mode="Ignore" />
+                <ui:VisualElement class="sign-cord sign-cord--r" picking-mode="Ignore" />
+                <ui:VisualElement class="sign-nail sign-nail--l" picking-mode="Ignore" />
+                <ui:VisualElement class="sign-nail sign-nail--r" picking-mode="Ignore" />
+                <ui:VisualElement name="sign-coin" class="sign-coin" picking-mode="Ignore" />
+                <ui:VisualElement name="sign-spark-a" class="sign-spark sign-spark--a" picking-mode="Ignore" />
+                <ui:VisualElement name="sign-spark-b" class="sign-spark sign-spark--b" picking-mode="Ignore" />
+                <ui:VisualElement class="sign-recess" picking-mode="Ignore">
+                    <ui:Label name="ln-value" class="currency-value" text="0" picking-mode="Ignore" />
+                    <ui:Label name="ln-unit" class="ln-unit" text="LN" picking-mode="Ignore" />
+                </ui:VisualElement>
+                <ui:VisualElement class="currency bolt-group" style="display: none;" picking-mode="Ignore"><ui:VisualElement class="icon icon-bolt" picking-mode="Ignore" /><ui:Label name="bolt-value" class="currency-value" text="0" picking-mode="Ignore" /></ui:VisualElement>
+                <ui:VisualElement name="token-group" class="currency" style="display: none;" picking-mode="Ignore"><ui:VisualElement class="icon icon-token" picking-mode="Ignore" /><ui:Label name="token-value" class="currency-value" text="0" picking-mode="Ignore" /></ui:VisualElement>
+            </ui:VisualElement>
+            <ui:VisualElement name="day-group" class="day-tag" picking-mode="Ignore">
+                <ui:VisualElement class="day-string" picking-mode="Ignore" />
+                <ui:Label name="day-kicker" class="day-kicker" text="GIORNO" picking-mode="Ignore" />
+                <ui:Label name="day-value" class="day-value" text="1" picking-mode="Ignore" />
+            </ui:VisualElement>
+            <ui:VisualElement name="order-row" class="order-row order--open" picking-mode="Ignore">
+                <ui:VisualElement name="order-ticket" class="order-ticket" picking-mode="Ignore">
+                    <ui:VisualElement class="order-pin" picking-mode="Ignore" />
+                    <ui:Label name="order-kicker" class="order-kicker" text="ORDINE" picking-mode="Ignore" />
+                    <ui:Label name="tutorial-objective" class="tutorial-objective" text="Muoviti" picking-mode="Ignore" />
+                    <ui:Label name="order-count" class="order-count" text="0/3" picking-mode="Ignore" />
+                </ui:VisualElement>
+                <ui:VisualElement name="order-chip" class="order-chip" picking-mode="Ignore">
+                    <ui:VisualElement class="order-box" picking-mode="Ignore" />
+                    <ui:Label name="order-chip-count" class="order-count" text="0/3" picking-mode="Ignore" />
+                </ui:VisualElement>
+            </ui:VisualElement>
+            <ui:VisualElement name="toll-chip" style="display: none;" class="pill hud-hide" picking-mode="Ignore"><ui:VisualElement class="icon icon--sm icon-toll" picking-mode="Ignore" /><ui:Label name="toll-value" text="Pedaggio" picking-mode="Ignore" /></ui:VisualElement>
+            <ui:VisualElement name="toast" style="display: none;" class="pill" picking-mode="Ignore"><ui:Label name="toast-text" text="La Cassa ha 0 LN" picking-mode="Ignore" /></ui:VisualElement>
+            <ui:VisualElement name="phone-button" style="display: none;"><ui:VisualElement class="icon icon-phone" /><ui:Label name="phone-key-hint" class="key-hint" text="TAB" picking-mode="Ignore" /><ui:Label name="phone-badge" class="badge" text="" style="display: none;" /></ui:VisualElement>
             <ui:VisualElement class="top-center" picking-mode="Ignore"><ui:VisualElement name="room-pill" style="display: none;" class="pill hud-hide" picking-mode="Ignore"><ui:VisualElement class="icon icon--sm icon-door" picking-mode="Ignore" /><ui:Label name="room-name" text="Magazzino" picking-mode="Ignore" /></ui:VisualElement></ui:VisualElement>
             <ui:VisualElement class="bottom-dock" picking-mode="Ignore"><ui:VisualElement name="safe-card" style="display: none;" class="panel">
                 <ui:VisualElement name="safe-toll"><ui:Label name="safe-toll-text" text="PEDAGGIO OMNIFREIGHT" /></ui:VisualElement>
