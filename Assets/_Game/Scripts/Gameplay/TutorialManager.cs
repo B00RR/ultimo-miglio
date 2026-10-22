@@ -198,8 +198,29 @@ namespace UltimoMiglio.Gameplay
             string j = TestiJson.text;
             foreach (System.Text.RegularExpressions.Match m in System.Text.RegularExpressions.Regex.Matches(j, "\\{\\s*\"id\"\\s*:\\s*\"([^\"]+)\"\\s*,\\s*\"text\"\\s*:\\s*\"((?:[^\"\\\\]|\\\\.)*)\""))
                 if (IdToStep.TryGetValue(m.Groups[1].Value, out var st) && (int)st < Texts.Length) Texts[(int)st] = System.Text.RegularExpressions.Regex.Unescape(m.Groups[2].Value);
-            foreach (System.Text.RegularExpressions.Match m in System.Text.RegularExpressions.Regex.Matches(j, "\"(onb\\.[a-zA-Z.]+)\"\\s*:\\s*\"((?:[^\"\\\\]|\\\\.)*)\""))
-                _hints[m.Groups[1].Value] = System.Text.RegularExpressions.Regex.Unescape(m.Groups[2].Value);
+            foreach (var kv in HintsFrom(j)) _hints[kv.Key] = kv.Value;
+        }
+
+        /// <summary>Suggerimenti onb.* (chiave → testo) letti da onboarding_testi.json. Statico per i test EditMode (#275).</summary>
+        public static System.Collections.Generic.Dictionary<string, string> HintsFrom(string json)
+        {
+            var d = new System.Collections.Generic.Dictionary<string, string>();
+            if (string.IsNullOrEmpty(json)) return d;
+            foreach (System.Text.RegularExpressions.Match m in System.Text.RegularExpressions.Regex.Matches(json, "\"(onb\\.[a-zA-Z.]+)\"\\s*:\\s*\"((?:[^\"\\\\]|\\\\.)*)\""))
+                d[m.Groups[1].Value] = System.Text.RegularExpressions.Regex.Unescape(m.Groups[2].Value);
+            return d;
+        }
+
+        /// <summary>#275: lettera GrayBox sulla Cassaforte (onboarding.json, debtCard.delivery.lettera): righe nella barra del passo debtCard.</summary>
+        public static readonly string[] LetteraGrayBox = { "onb.viktor.call1", "onb.viktor.call2" };
+        /// <summary>#275: secondi per riga nella barra di debtCard.</summary>
+        public const float DebtCardRigaSec = 5f;
+        /// <summary>#275: chiave della barra di debtCard dopo t s dall'inizio del passo: onb.debt.adaExplain, poi la lettera GrayBox (call1, call2), a giro.
+        /// Prima CurrentHint dava solo onb.debt.adaExplain e la lettera non compariva mai.</summary>
+        public static string DebtCardHintKey(float t)
+        {
+            int i = (int)(Mathf.Max(0f, t) / DebtCardRigaSec) % (LetteraGrayBox.Length + 1);
+            return i == 0 ? "onb.debt.adaExplain" : LetteraGrayBox[i - 1];
         }
 
         /// <summary>Suggerimento onb.* del passo (CTA/hint terracotta in alto nella fascia bassa). null = nessuno.</summary>
@@ -211,7 +232,7 @@ namespace UltimoMiglio.Gameplay
                 Step.PickUp => GameRoot.I && GameRoot.I.Nina && GameRoot.I.Nina.Stack.Count >= GameRoot.I.Nina.Stack.Capacity ? "onb.pick.max" : null,
                 Step.Shelve => "onb.deposit.hint", Step.Serve => "onb.cust.first", Step.Coins => "onb.coins.walk",
                 Step.ZainoPad => "onb.zaino.hint", Step.Combo => "onb.combo", Step.NonnoIntro => "onb.nonno.intro", Step.HireNonno => "onb.nonno.cost",
-                Step.NonnoConfirm => "onb.nonno.working", Step.PadNuovi => "onb.pads.new", Step.CassaPass => "onb.cassa.tip", Step.DebtCard => "onb.debt.adaExplain",
+                Step.NonnoConfirm => "onb.nonno.working", Step.PadNuovi => "onb.pads.new", Step.CassaPass => "onb.cassa.tip", Step.DebtCard => DebtCardHintKey(Time.time - _stepStart), // #275: anche la lettera GrayBox
                 Step.WallPad => "onb.wall.goal", _ => null
             };
             return k != null && _hints.TryGetValue(k, out var v) ? v : null;
