@@ -67,7 +67,19 @@ namespace UltimoMiglio.UI
             Vector2 edge = c + dir * Mathf.Min(tx, ty);
             var p = SafeAreaUtil.ScreenToPanel(arrow.panel, edge);
             arrow.style.left = p.x; arrow.style.top = p.y;
-            float ang = Mathf.Atan2(-dir.y, dir.x) * Mathf.Rad2Deg; // panel y is down
+            // #205: l'angolo è la direzione sullo schermo da Kaia al bersaglio (la rotazione della camera
+            // è già dentro WorldToScreenPoint). Il centro dell'area sicura, mentre la camera sta ancora
+            // scorrendo, non coincide con Kaia e girava la freccia (NonnoIntro, −22° invece di −134°).
+            Vector2 aim = dir;
+            if (!nina) { var who = GameObject.Find("Nina"); if (who) nina = who.transform; }
+            if (nina)
+            {
+                Vector3 ns = cam.WorldToScreenPoint(nina.position);
+                Vector3 ts = cam.WorldToScreenPoint(target.position);
+                aim = new Vector2(ts.x - ns.x, ts.y - ns.y);
+                if (aim.sqrMagnitude < 1e-4f) aim = dir;
+            }
+            float ang = Mathf.Atan2(-aim.y, aim.x) * Mathf.Rad2Deg; // panel y is down
             if (arrowHead != null) arrowHead.style.rotate = new Rotate(new Angle(ang));
             if (arrowLabel != null) arrowLabel.style.display = DisplayStyle.None; // QA v2: arrow only, no ARRIVI/BANCONE · Xm chip
             Show(arrow, true);
