@@ -19,15 +19,22 @@ namespace UltimoMiglio.UI
             }
         }
 
+        /// <summary>Taglia alla precisione già mostrata, verso il basso: il saldo in pillola non supera mai il reale.</summary>
+        static double Taglia(double v, int decimali)
+        {
+            double f = System.Math.Pow(10, decimali);
+            return System.Math.Floor(v * f) / f;
+        }
+
         public static string Amount(double v)
         {
             double a = System.Math.Abs(v);
-            if (a < 10 && a != System.Math.Floor(a)) return v.ToString("0.#", It);
-            if (a < 100000) return v.ToString("#,0", It);
-            if (a < 1e6) return (v / 1e3).ToString("0.#", It) + "K";
-            if (a < 1e9) return (v / 1e6).ToString("0.#", It) + "M";
-            if (a < 1e12) return (v / 1e9).ToString("0.#", It) + "B";
-            return (v / 1e12).ToString("0.#", It) + "T";
+            if (a < 10 && a != System.Math.Floor(a)) return Taglia(v, 1).ToString("0.#", It);
+            if (a < 100000) return Taglia(v, 0).ToString("#,0", It);
+            if (a < 1e6) return Taglia(v / 1e3, 1).ToString("0.#", It) + "K";
+            if (a < 1e9) return Taglia(v / 1e6, 1).ToString("0.#", It) + "M";
+            if (a < 1e12) return Taglia(v / 1e9, 1).ToString("0.#", It) + "B";
+            return Taglia(v / 1e12, 1).ToString("0.#", It) + "T";
         }
 
         public static string Percent(float fraction) =>
