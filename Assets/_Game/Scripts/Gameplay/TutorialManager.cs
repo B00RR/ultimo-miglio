@@ -408,6 +408,31 @@ namespace UltimoMiglio.Gameplay
         };
 
         Transform _guidaT; Step _guidaS = Step.Chiuso;
+
+        // ---------------- #273: una sola tappa per mano, freccia a terra e freccia a bordo schermo ----------------
+        /// <summary>#256/#273: prossima tappa della guida verso il bersaglio del passo (varco da attraversare o il bersaglio stesso), ricalcolata ogni
+        /// <see cref="TappaSec"/> o al cambio di bersaglio. La usano la mano fantasma (OnboardingHints), la freccia a terra (UM_TutorialMarker) e la
+        /// freccia a bordo schermo (EdgeArrow): prima solo la mano girava dai varchi e freccia e chevron puntavano dritti attraverso gli scaffali.</summary>
+        public Vector3 TappaGuida { get; private set; }
+        public const float TappaSec = 0.2f;
+        float _tappaT = -1f; Transform _tappaPer; int _passati; System.Func<Vector3> _viaGuida;
+        /// <summary>Tappa verso <paramref name="target"/> dalla posizione attuale di Kaia. Più chiamate nello stesso intervallo restituiscono la stessa
+        /// tappa; i varchi già passati restano ricordati finché il bersaglio non cambia. Nessuna allocazione.</summary>
+        public Vector3 TappaVerso(Transform target)
+        {
+            var nina = GameRoot.I ? GameRoot.I.Nina : null;
+            if (!target) return TappaGuida = nina ? nina.transform.position : Vector3.zero;
+            if (!nina) return target.position;
+            if (target != _tappaPer || Time.time - _tappaT >= TappaSec)
+            {
+                if (target != _tappaPer) _passati = 0;
+                _tappaPer = target; _tappaT = Time.time;
+                TappaGuida = VarcoMarker.ProssimaTappa(nina.transform.position, target.position, target, ref _passati, out _);
+            }
+            return TappaGuida;
+        }
+        /// <summary>Punto verso cui puntano freccia a terra e freccia a bordo schermo (delegato creato una volta sola).</summary>
+        System.Func<Vector3> ViaGuida => _viaGuida ??= () => _guidaT ? TappaVerso(_guidaT) : TappaGuida;
         /// <summary>#189: freccia a terra, anello e freccia a bordo schermo seguono il bersaglio del passo corrente (anche se cambia o compare dopo).</summary>
         void AggiornaGuida(bool forza)
         {
@@ -415,14 +440,17 @@ namespace UltimoMiglio.Gameplay
             if (!forza && g.Target == _guidaT && _guidaS == Current) return;
             _guidaT = g.Target; _guidaS = Current;
             var nina = GameRoot.I && GameRoot.I.Nina ? GameRoot.I.Nina.transform : null;
-            if (g.Target && g.Anello) UltimoMiglio.VFX.UM_TutorialMarker.Show(g.Target, nina, g.Freccia, g.FrecciaOltre); else UltimoMiglio.VFX.UM_TutorialMarker.Hide();
+            // #273: la freccia a terra punta alla tappa della guida (varco), l'anello resta sul bersaglio
+            if (g.Target && g.Anello) UltimoMiglio.VFX.UM_TutorialMarker.Show(g.Target, nina, g.Freccia, g.FrecciaOltre, ViaGuida); else UltimoMiglio.VFX.UM_TutorialMarker.Hide();
             // #94: con gli aiuti progressivi la freccia a bordo schermo arriva solo dopo 20 s di inattività (OnboardingHints)
-            if (_edge) { if (g.Target && g.Freccia && !OnboardingHints.Active) _edge.SetTarget(g.Target, Current.ToString().ToUpper()); else if (!OnboardingHints.Active) _edge.Clear(); }
+            if (_edge) { if (g.Target && g.Freccia && !OnboardingHints.Active) _edge.SetTarget(g.Target, Current.ToString().ToUpper(), null, ViaGuida); else if (!OnboardingHints.Active) _edge.Clear(); }
         }
         /// <summary>Solo test #189: i passi non avanzano da soli (si entra con <see cref="TestEntraNelPasso"/>).</summary>
         public static bool TestBloccaPassi;
         /// <summary>Solo test: entra direttamente nel passo s.</summary>
         public void TestEntraNelPasso(Step s) => Enter(s);
+        /// <summary>#273: punto verso cui la guida manda Kaia (per OnboardingHints e per la freccia a bordo schermo).</summary>
+        public System.Func<Vector3> Via => ViaGuida;
 
         Transform NearestFreeShelf()
         {

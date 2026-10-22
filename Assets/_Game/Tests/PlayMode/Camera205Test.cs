@@ -138,7 +138,8 @@ public class Camera205Test
                     var arrow = UM_TutorialMarker.ArrowTransform;
                     if (g.Freccia && d.magnitude > g.FrecciaOltre + 0.5f && arrow && arrow.gameObject.activeInHierarchy)
                     {
-                        Assert.Greater(Vector3.Dot(arrow.forward, d.normalized), 0.95f, $"rot {rot} passo {s}: freccia a terra non punta al bersaglio");
+                        var dv = tm.Via() - nina.transform.position; dv.y = 0; if (dv.sqrMagnitude < 1e-4f) dv = d; // #273: verso la tappa della guida
+                        Assert.Greater(Vector3.Dot(arrow.forward, dv.normalized), 0.95f, $"rot {rot} passo {s}: freccia a terra non punta alla tappa della guida");
                         frecce++;
                     }
                     // freccia a bordo: Nina lontana dal bersaglio, così il bersaglio esce dallo schermo (zoom 0,7)
