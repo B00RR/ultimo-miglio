@@ -308,12 +308,36 @@ namespace UltimoMiglio.Gameplay
         public string CurrentText => Current < Step.Fine ? (Texts != null && (int)Current < Texts.Length ? Texts[(int)Current] : CurrentHintText()) : Current == Step.Fine ? EndText : null;
         string CurrentHintText() { var h = CurrentHint(); return string.IsNullOrEmpty(h) ? null : h; }
 
+        /// <summary>#223: oggetto della Cassaforte nella scena (prop). Nina entro <see cref="SafeRadius"/> m durante debtCard = primo versamento.</summary>
+        public const string SafeObjectName = "prop_safe"; public const float SafeRadius = 1.6f;
+        Transform _safe;
+        /// <summary>#223: la trattenuta sul debito resta spenta prima della carta del debito (passo debtCard).</summary>
+        public static bool DebtSplitLockedAt(Step s) => s < Step.DebtCard;
+        /// <summary>#223: il passo debtCard si chiude solo con un versamento fatto DOPO l'inizio del passo (non basta DebtPaid &gt; 0 da prima).</summary>
+        public static bool DebtCardGate(double debtPaid, double debtBaseAtStepStart) => debtPaid > debtBaseAtStepStart + 1e-9;
+
+        /// <summary>#223: distanza orizzontale entro <see cref="SafeRadius"/> m dalla Cassaforte.</summary>
+        public static bool VicinoAllaCassaforte(Vector3 kaia, Vector3 cassaforte) { var d = kaia - cassaforte; d.y = 0; return d.sqrMagnitude <= SafeRadius * SafeRadius; }
+        /// <summary>#223: Nina sulla Cassaforte durante debtCard → primo versamento (60% del portafoglio). Senza prop nella scena vale la posizione di Oma Tilde.</summary>
+        bool VersaSeAllaCassaforte(EconomyCore eco, NinaController nina)
+        {
+            var t = _safe ? _safe : Ada();
+            if (eco.S.DebtSplitLocked && nina && t)
+            {
+                if (VicinoAllaCassaforte(nina.transform.position, t.position)) eco.FirstDebtDeposit();
+            }
+            return true;
+        }
+
         void Enter(Step s)
         {
             Current = s; PlayerPrefs.SetInt(PrefKey, (int)s); PlayerPrefs.SetInt(PrefVer, Versione); PlayerPrefs.Save();
             var eco = GameRoot.Ready ? GameRoot.I.Eco : null;
+            // #223: prima di debtCard niente trattenuta; durante debtCard resta bloccata fino al versamento alla Cassaforte; dopo (o tutorial saltato) sbloccata
+            if (eco != null) { if (DebtSplitLockedAt(s)) eco.S.DebtSplitLocked = true; else if (s > Step.DebtCard) eco.S.DebtSplitLocked = false; }
+            if (s == Step.DebtCard && !_safe) { var g = GameObject.Find(SafeObjectName); _safe = g ? g.transform : null; } // una volta sola, non a ogni frame
             if (GameRoot.I && GameRoot.I.Nina) _startPos = GameRoot.I.Nina.transform.position;
-            AggiornaCache(true); _shelfBase = ShelfTotal(); _servedBase = eco?.S.CustomersServed ?? 0; _walletBase = eco?.S.Wallet ?? 0; _endT = 0; _stepStart = Time.time;
+            _servedBase = eco?.S.CustomersServed ?? 0; _walletBase = eco?.S.Wallet ?? 0; _endT = 0; _stepStart = Time.time;
             _debtBase = eco?.S.DebtPaid ?? 0; _padBase = eco == null ? 0 : eco.S.Scarpe + eco.S.Insegna; _cassaSeen = false; _coinBase = CoinSpawner.Raccolte;
             // QA #42 → GD 16/10: niente LN regalate nel gioco vero; restano solo dietro il flag dei test (TestAccelera)
             if (TestAccelera && eco != null && (s == Step.ZainoPad || s == Step.HireNonno))
@@ -329,13 +353,21 @@ namespace UltimoMiglio.Gameplay
             if (s == Step.FreePlay) Onb("end", s, "total", OnbTime, "hints", _hintCount, "lvl3", _lvl3, "ln", Ln(eco), "spent", Spent(eco));
             Debug.Log($"[Tutorial] step {(int)s} {s}: {CurrentText}");
             StepChanged?.Invoke(s);
-            RevealFor(s);
-            AggiornaCache(true); // i pad appena rivelati entrano subito nella guida
+            // #222: base del gate shelve DOPO il reveal e la cache (i pad appena rivelati entrano subito nella guida)
+            _shelfBase = BaseScaffaliDopoComparsa(() => { RevealFor(s); AggiornaCache(true); }, _shelves);
             AggiornaGuida(true);
             if (_marker) _marker.gameObject.SetActive(false); // QA v2: no world waypoint if edge arrow exists
         }
 
-        int ShelfTotal() { AggiornaCache(false); int n = 0; for (int i = 0; i < _shelves.Count; i++) { var sh = _shelves[i]; if (sh) n += sh.Count; } return n; }
+        int ShelfTotal() { AggiornaCache(false); return ShelfTotal(_shelves); }
+        public static int ShelfTotal(System.Collections.Generic.List<Shelf> shelves) { int n = 0; for (int i = 0; i < shelves.Count; i++) { var sh = shelves[i]; if (sh) n += sh.Count; } return n; }
+        /// <summary>#222 (regole GD): la base del gate shelve si calcola DOPO il reveal del passo e la cache degli scaffali.
+        /// Prima si contava prima di RevealFor: lo scaffale terracotta compariva con i suoi 4 pacchi iniziali e il gate passava in 0,1-0,2 s.</summary>
+        public static int BaseScaffaliDopoComparsa(System.Action revealECache, System.Collections.Generic.List<Shelf> cache)
+        {
+            revealECache?.Invoke();
+            return ShelfTotal(cache);
+        }
 
         // #191: cache di scaffali, pad, NONNO, Ada e Cassa. Niente FindObjectsByType a ogni frame (un array nuovo ogni volta = GC e scatti su WebGL):
         // ricerca al massimo ogni CacheSec (pad che compaiono/si sbloccano entrano entro 0,2 s) e forzata a ogni cambio di passo; liste riusate.
@@ -371,7 +403,7 @@ namespace UltimoMiglio.Gameplay
         {
             Step.PickUp => Arrivi, Step.Shelve => NearestFreeShelf() ?? Scaffale, Step.Serve => Bancone, Step.Coins => Monete ? Monete : Bancone, Step.Combo => Bancone,
             Step.ZainoPad => PadZaino, Step.NonnoIntro => PadNonno, Step.HireNonno => PadNonno, Step.NonnoConfirm => Nonno() ?? PadNonno,
-            Step.PadNuovi => NearestNewPad() ?? CheapestNewPad(), Step.CassaPass => Cassa(), Step.DebtCard => Ada() ?? Bancone,
+            Step.PadNuovi => NearestNewPad() ?? CheapestNewPad(), Step.CassaPass => Cassa(), Step.DebtCard => (_safe ? _safe : null) ?? Ada() ?? Bancone,
             Step.WallPad => NearestNewPad() ?? Cassa(), // la slice non ha ancora il pad muro: anello sul prossimo pad (o Cassa), vedi PR #189
             _ => null
         };
@@ -475,7 +507,7 @@ namespace UltimoMiglio.Gameplay
                 Step.NonnoConfirm => (NonnoWorking() && inStep >= NonnoConfirmCamSec) || inStep >= NonnoConfirmMaxSec ? "nonnoFirstRestock" : null,
                 Step.PadNuovi => eco.S.Scarpe + eco.S.Insegna > _padBase || (double.IsInfinity(eco.Cost(UpgradeKind.Scarpe)) && double.IsInfinity(eco.Cost(UpgradeKind.Insegna))) ? "padPurchasedAny" : null,
                 Step.CassaPass => _cassaSeen || !Cassa() ? "cassaPassed" : null,
-                Step.DebtCard => eco.S.DebtPaid > _debtBase || eco.S.DebtPaid > 0 ? "firstDebtDeposit" : null,
+                Step.DebtCard => VersaSeAllaCassaforte(eco, nina) && DebtCardGate(eco.S.DebtPaid, _debtBase) ? "firstDebtDeposit" : null,
                 Step.WallPad => inStep >= WallPadSec ? "goalSeen" : null,
                 Step.FreePlay => (_endT += Time.deltaTime) > EndSeconds ? "freePlayShown" : null,
                 _ => null

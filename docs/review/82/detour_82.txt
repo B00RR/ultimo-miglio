@@ -1,0 +1,5 @@
+varco pila-angolo banco: 1.26 m
+Pad_Zaino: chiuso 15.12 m, varco aperto 8.28 m, in più +6.84 m
+Pad_Scarpe: chiuso 14.63 m, varco aperto 9.80 m, in più +4.82 m
+Pad_Insegna: chiuso 13.77 m, varco aperto 11.65 m, in più +2.12 m
+Pad_AssumiNonno: chiuso 21.47 m, varco aperto 14.63 m, in più +6.84 m

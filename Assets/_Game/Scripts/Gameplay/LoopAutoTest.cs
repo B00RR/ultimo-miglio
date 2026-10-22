@@ -88,6 +88,15 @@ namespace UltimoMiglio.Gameplay
                                      .OrderBy(p => E.Cost(p.Kind)).FirstOrDefault();
                         if (np) { if (E.S.Wallet < E.Cost(np.Kind)) { E.S.Wallet = E.Cost(np.Kind); Log("test: LN per " + np.Kind); } yield return Go(np.transform.position, np.Kind + " pad"); yield return Wait(8f); continue; }
                     }
+                    if (st == TutorialManager.Step.DebtCard)
+                    {
+                        // #223 (regole GD): il passo si chiude solo con il primo versamento alla Cassaforte, fatto DOPO il suo inizio:
+                        // il test fa come un giocatore e porta Nina sul bersaglio del passo (la Cassaforte).
+                        var safe = TutorialManager.I.CurrentTarget; double d0 = E.S.DebtPaid;
+                        // #256: con la Cassa vicina il giro arriva qui anche col portafoglio a 0 (nessun cliente servito mentre Kaia è alla Cassaforte): come per i pad, il test mette le LN del versamento
+                        if (E.S.Wallet < 1) { E.S.Wallet = 10; Log("test: LN per il versamento"); }
+                        if (safe) { yield return Go(safe.position, "Cassaforte"); yield return Wait(1.5f); Log($"versamento debito +{E.S.DebtPaid - d0:0.##}"); continue; }
+                    }
                     if (st == TutorialManager.Step.CassaPass) { var cz = FindAnyObjectByType<CassaZone>(); if (cz) { yield return Go(cz.transform.position, "Cassa"); yield return Wait(1.5f); continue; } }
                     yield return null;
                 }

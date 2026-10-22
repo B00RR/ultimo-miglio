@@ -9,6 +9,12 @@ namespace UltimoMiglio.EditorTools
     public static class DepotKit
     {
         const string Root = "Assets/_Game/Art/Environment/";
+        /// <summary>#256/#262: segnaposto di un varco (asse destro = attraverso il varco), per i test e per la revisione.</summary>
+        static void Varco(string name, Vector3 pos, float yaw, float larghezza, int ordine)
+        {
+            var g = new GameObject(name); g.transform.SetParent(_parent, false); g.transform.SetPositionAndRotation(pos, Quaternion.Euler(0, yaw, 0));
+            var m = g.AddComponent<UltimoMiglio.Gameplay.VarcoMarker>(); m.larghezza = larghezza; m.ordine = ordine; // #268: attraversato entro larghezza/2; ordine più basso preferito (0 = arco della Cassa)
+        }
         static Transform _parent; static Material _mat, _emi;
 
         public static bool Build(Material world)
@@ -22,18 +28,18 @@ namespace UltimoMiglio.EditorTools
             bool arch = AssetDatabase.LoadAssetAtPath<GameObject>(Root + "Kit/env_wall_arch_4m.fbx");
             for (int i = 0; i < 9; i++)
             {
-                if (arch && (i == 1 || i == 2 || i == 6 || i == 7)) { if (i == 1 || i == 6) Place("Kit/env_wall_arch_4m", _parent, new Vector3(-8 + i * 2 + 1, 0, 8.35f), 0, false, false, 4f, true); continue; }
-                Place(i == 4 ? "Kit/env_wall_2m_b" : "Kit/env_wall_2m_a", _parent, new Vector3(-8 + i * 2, 0, 8.35f), 0, false, false, 2f, true);
+                if (arch && (i == 1 || i == 2 || i == 6 || i == 7)) { if (i == 1 || i == 6) Place("Kit/env_wall_arch_4m", _parent, new Vector3(-8 + i * 2 + 1, 0, 8.35f), 0, false, false, true); continue; }
+                Place(i == 4 ? "Kit/env_wall_2m_b" : "Kit/env_wall_2m_a", _parent, new Vector3(-8 + i * 2, 0, 8.35f), 0, false, false, true);
             }
             for (int i = 0; i < 11; i++)
             {
                 // Concept PR#55: muro E più vicino all'area di gioco (camera ortho ~6.5)
-                if (arch && (i == 4 || i == 5)) { if (i == 4) Place("Kit/env_wall_arch_4m", _parent, new Vector3(7.6f, 0, -10 + i * 2 + 1), 90, false, false, 4f, true); continue; }
-                Place(i % 3 == 1 ? "Kit/env_wall_2m_b" : "Kit/env_wall_2m_a", _parent, new Vector3(7.6f, 0, -10 + i * 2), 90, false, false, 2f, true);
+                if (arch && (i == 4 || i == 5)) { if (i == 4) Place("Kit/env_wall_arch_4m", _parent, new Vector3(7.6f, 0, -10 + i * 2 + 1), 90, false, false, true); continue; }
+                Place(i % 3 == 1 ? "Kit/env_wall_2m_b" : "Kit/env_wall_2m_a", _parent, new Vector3(7.6f, 0, -10 + i * 2), 90, false, false, true);
             }
             Place("Kit/env_wall_corner", _parent, new Vector3(7.6f, 0, 8.35f), 0, false);
-            for (int i = 0; i < 9; i++) Place("Kit/env_plinth_edge_2m", _parent, new Vector3(-8 + i * 2, 0, -11.15f), 0, false, false, 2f, true);
-            for (int i = 0; i < 11; i++) Place("Kit/env_plinth_edge_2m", _parent, new Vector3(-9.15f, 0, -10 + i * 2), 90, false, false, 2f, true);
+            for (int i = 0; i < 9; i++) Place("Kit/env_plinth_edge_2m", _parent, new Vector3(-8 + i * 2, 0, -11.15f), 0, false, false, true);
+            for (int i = 0; i < 11; i++) Place("Kit/env_plinth_edge_2m", _parent, new Vector3(-9.15f, 0, -10 + i * 2), 90, false, false, true);
             // wall dressing (N wall), sign and lanterns
             Place("Kit/prop_sign_sunn_depot", _parent, new Vector3(0, 1.95f, 8.08f), 0, false); DressSignFace(); // faro + Vela & Figli (piu basso, in camera)
             foreach (var x in new[] { -6f, 3f, 7f }) Place("Kit/prop_lantern_wall", _parent, new Vector3(x, 1.9f, 8.1f), 0, false);
@@ -50,8 +56,8 @@ namespace UltimoMiglio.EditorTools
             if (!Place("Kit/prop_parcel_stack_a", _parent, new Vector3(-3.0f, 0, 7.5f), 5, true)) Place("Kit/prop_box_m", _parent, new Vector3(-3.0f, 0, 7.5f), 5, true);
             Place("Kit/prop_lemontree_pot", _parent, new Vector3(-6.9f, 0, 7.4f), 0, true);
             Place("Kit/prop_lemontree_pot", _parent, new Vector3(-3.1f, 0, 7.4f) + new Vector3(1.4f, 0, 0), 0, true);
-            Place("Kit/prop_lemontree_pot", _parent, new Vector3(6.9f, 0, -3.3f), 0, true);
-            Place("Kit/prop_lemontree_pot", _parent, new Vector3(6.9f, 0, 1.3f), 0, true);
+            // #256/#262: niente vaso di limoni nella striscia est fra arco del Bancone e muro E (lasciava 0,45 m all'arco)
+            Place("Kit/prop_lemontree_pot", _parent, new Vector3(1.6f, 0, 7.4f), 0, true); // #256: era (6.9; 1.3), dritto sulla linea guida Ada → Cassaforte (Kaia ci sbatteva)
             Place("Kit/prop_plant_pot_tall", _parent, new Vector3(3.1f, 0, 7.5f), 0, true);
             Place("Kit/prop_plant_pot_round", _parent, new Vector3(5.4f, 0, 7.5f), 0, true);
             Place("Kit/prop_planter_box", _parent, new Vector3(0, 0, 7.7f), 0, true);
@@ -61,8 +67,9 @@ namespace UltimoMiglio.EditorTools
             if (Place("Kit/prop_streetlamp", _parent, new Vector3(-8.4f, 0, -10.2f), 45, false)) PoleCollider(_parent.GetChild(_parent.childCount - 1), new Vector3(-8.62f, 0, -10.62f));
             Place("ThirdParty/Props/prop_tp_crate_open", _parent, new Vector3(-8.2f, 0, 6.8f), 0, true);
             Place("ThirdParty/Props/prop_tp_barrel", _parent, new Vector3(5.5f, 0, 7.5f), 0, true);
-            Place("ThirdParty/Props/prop_tp_bench", _parent, new Vector3(6.9f, 0, -4f), 90, true);
-            Place("ThirdParty/Props/prop_tp_plant_potted", _parent, new Vector3(6.9f, 0, -7.5f), 0, true);
+            // #256/#262: panca e pianta spostate dalla striscia est (0,74/0,75 m dall'arco: Kaia si incastrava) a ridosso della staccionata O, a contatto fra loro
+            Place("ThirdParty/Props/prop_tp_bench", _parent, new Vector3(-8.6f, 0, -9.0f), 90, true);
+            Place("ThirdParty/Props/prop_tp_plant_potted", _parent, new Vector3(-8.6f, 0, -9.6f), 0, true);
             Place("ThirdParty/Props/prop_tp_lamp_wall", _parent, new Vector3(7.4f, 1.9f, 0f), -90, false);
             Place("ThirdParty/Props/prop_tp_basket", _parent, new Vector3(-8.2f, 0, -6f), 0, true);
             Place("ThirdParty/Props/prop_tp_bucket", _parent, new Vector3(-8.3f, 0, -8.5f), 0, true);
@@ -102,40 +109,95 @@ namespace UltimoMiglio.EditorTools
             Place("../Props/prop_parcel_box_cube", _parent, shelfC + new Vector3(1.2f, 0, -1.4f), -25, true);
             Place("../Props/prop_parcel_box_flat", _parent, shelfC + new Vector3(1.2f, 0, -1.4f), 30, false, true);
             // Bancone: limoni e pila ai lati, lavagna e lampione lungo la coda (lato -x, la coda va verso +x)
-            Place("Kit/prop_lemontree_pot", _parent, banPos + new Vector3(-1.75f, 0, -0.9f), 0, true);
-            Place("Kit/prop_parcel_stack_a", _parent, banPos + new Vector3(-1.8f, 0, 0.6f), 25, true);
+            Place("Kit/prop_lemontree_pot", _parent, banPos + new Vector3(-2.5f, 0, -1.6f), 0, true); // #82 (Game Designer): varco ovest riaperto, il giro da est costava fino a +6,8 m dai pad (detour_82.py)
+            // #262: la pila e il vaso tondo all'imbocco ovest del corridoio lasciavano 0,6 m fra angolo del muro e scatole (Kaia incastrata): spostati contro la staccionata O
+            Place("Kit/prop_parcel_stack_a", _parent, new Vector3(-8.4f, 0, -6.2f), 25, true);
             Place("Kit/prop_sign_board_aperto", _parent, banPos + new Vector3(-1.2f, 0, -2.4f), 30, true);
             Place("Kit/prop_streetlamp", _parent, banPos + new Vector3(-1.9f, 0, -3.4f), 0, true);
-            Place("Kit/prop_plant_pot_round", _parent, banPos + new Vector3(-2.4f, 0, 1.6f), 0, true); // #187: spostato a ovest, fra Bancone e Cassa non c'era spazio con anello = trigger
+            Place("Kit/prop_plant_pot_round", _parent, new Vector3(-8.6f, 0, -7.0f), 0, true);
             // Concept: pezzo di muro/arco visibile dietro il Bancone (beauty shot)
-            Place("Kit/env_wall_2m_a", _parent, banPos + new Vector3(-0.2f, 0, 2.8f), 0, false, false, 2f, true);
-            Place("Kit/env_wall_2m_b", _parent, banPos + new Vector3(1.8f, 0, 2.8f), 0, false, false, 2f, true);
+            // #256/#259: arco da 4 m al posto di env_wall_2m_a/b (stessa linea +1,45): apertura di 2,4 m dal corridoio del Bancone alla Cassa, che sta proprio dietro
+            bool archBan = AssetDatabase.LoadAssetAtPath<GameObject>(Root + "Kit/env_wall_arch_4m.fbx");
+            if (archBan) Place("Kit/env_wall_arch_4m", _parent, banPos + new Vector3(0.9f, 0, 1.45f), 0, false, false, true);
+            else
+            {
+                Place("Kit/env_wall_2m_a", _parent, banPos + new Vector3(-0.2f, 0, 1.45f), 0, false, false, true); // #82 opzione A: muro a ridosso, niente sacca
+                Place("Kit/env_wall_2m_b", _parent, banPos + new Vector3(2.0f, 0, 1.45f), 0, false, false, true);
+            }
             if (AssetDatabase.LoadAssetAtPath<GameObject>(Root + "Kit/env_wall_arch_4m.fbx"))
-                Place("Kit/env_wall_arch_4m", _parent, banPos + new Vector3(3.6f, 0, 1.2f), -90, false, false, 4f, true);
-            Place("Kit/prop_sign_sunn_depot", _parent, banPos + new Vector3(0.6f, 2.0f, 2.55f), 0, false); DressSignFace();
-            Place("Kit/prop_lantern_wall", _parent, banPos + new Vector3(-1.4f, 1.85f, 2.55f), 0, false);
+                Place("Kit/env_wall_arch_4m", _parent, banPos + new Vector3(3.2f, 0, -0.3f), -90, false, false, true); // #97: a 3.6 restava una fessura di ~0.45 m tra muro_b e arco: i clienti (r 0.3) ci si incastravano e non arrivavano al Bancone
+            // #256 (condizione GD, review #270): con l'arco l'insegna sta sopra il pilastro ovest, ridotta al 55 % (1,34 m), fuori dalla linea
+            // camera → Kaia sulla Cassa: torso, pila in mano e anello restano visibili (VisibilitaCassa256Test). Senza arco resta sul muro come prima.
+            Place("Kit/prop_sign_sunn_depot", _parent, banPos + new Vector3(archBan ? -0.7f : 0.6f, archBan ? 2.75f : 2.0f, 1.2f), 0, false); DressSignFace();
+            if (archBan) { var sg = _parent.GetChild(_parent.childCount - 1); if (sg.name.Contains("prop_sign_sunn_depot")) sg.localScale *= 0.55f; }
+            // #256: lanterna sul pilastro est dell'arco (quello ovest ha l'insegna)
+            Place("Kit/prop_lantern_wall", _parent, banPos + new Vector3(archBan ? 2.5f : -1.4f, 1.85f, 1.2f), 0, false);
+            // #256 (condizione GD, review #270): vaso tondo sull'angolo nord-ovest della Cassa. La linea guida Cassaforte → Pad Zaino
+            // tagliava l'angolo del trigger (bordo di Kaia a -0,07 m): col vaso la mano gira larga e Kaia resta ad almeno 0,30 m (PercorsoJoystick256Test)
+            Place("Kit/prop_plant_pot_round", _parent, banPos + new Vector3(0f, 0, 5.85f), 0, true);
+            // #256/#262: varchi sui percorsi di Kaia (larghezza nominale, misurata nei test con i collider veri: tutti ≥ 1,2 m)
+            Varco("Varco_ArcoBancone", banPos + new Vector3(0.9f, 0, 1.45f), 0, 2.4f, 0); // 0 = arco della Cassa
+            Varco("Varco_CorridoioOvest", banPos + new Vector3(-1.0f, 0, 0.37f), 90, 1.66f, 1); // centro e larghezza misurati sui collider (review Tech Lead #270)
+            Varco("Varco_ArcoEst", banPos + new Vector3(3.2f, 0, -0.3f), 90, 2.4f, 2);
+            // striscia fra il pilastro N dell'arco est (x 5,97; z −4,74…−3,94) e il muro E (x 7,36): centro reale della strettoia
+            Varco("Varco_StrisciaEst", new Vector3((banPos.x + 3.45f + 7.36f) * 0.5f, 0, banPos.z + 1.30f), 0, 7.36f - (banPos.x + 3.45f), 3);
+            // tappa intermedia (campo aperto): fuori dall'imbocco ovest prima di girare a nord; dritti dal centro dell'imbocco si striscia lo spigolo dell'arco.
+            // Raggio di passaggio 0,6 m lontano da quello di CorridoioOvest (0,83 m): le due zone non si sovrappongono, la mano non oscilla
+            Varco("Varco_UscitaOvest", banPos + new Vector3(-2.32f, 0, 1.04f), 0, 1.2f, 4);
+            // tappa intermedia (campo aperto) davanti agli scaffali, a est del vaso tondo: dal Bancone la fila (vasi ai due capi) si gira da qui;
+            // a z +1,2 così, attraversato (entro 0,8 m), la linea verso ogni scaffale è già libera
+            Varco("Varco_ScaffaliEst", shelfC + new Vector3(4.4f, 0, 1.2f), 90, 1.6f, 5);
+            // #256 (condizione GD, review #270): tappa intermedia oltre il vaso sull'angolo nord-ovest della Cassa. Dalla Cassaforte verso i pad
+            // la mano passa di qui invece di scivolare lungo la Cassa verso l'UscitaOvest (il trigger va lasciato ad almeno 0,30 m)
+            Varco("Varco_AngoloCassa", banPos + new Vector3(-0.52f, 0, 6.54f), 45, 1.2f, 6);
             Debug.Log("[Kit] gameplay dressing: " + _parent.childCount + " pieces");
         }
 
-        /// <summary>Instantiates Root+rel+".fbx". fitLen>0 + alongX: rotate so the long side is along X (or Z when yaw=90).</summary>
-        public static bool Place(string rel, Transform parent, Vector3 pos, float yaw, bool solid, bool onTop = false, float fitLen = 0, bool wall = false)
+        /// <summary>Instantiates Root+rel+".fbx". wall: ruota di 90 se serve perché il lato lungo segua X (o Z con yaw=90).
+        /// #82: bounds calcolati a yaw 0 (locali), yaw applicato dopo, così i collider non si gonfiano; gli archi hanno 3 collider (pilastri + architrave).</summary>
+        public static bool Place(string rel, Transform parent, Vector3 pos, float yaw, bool solid, bool onTop = false, bool wall = false)
         {
             var src = AssetDatabase.LoadAssetAtPath<GameObject>(Root + rel + ".fbx");
             if (!src) { Debug.LogWarning("[Kit] missing " + rel); return false; }
             var go = (GameObject)PrefabUtility.InstantiatePrefab(src);
             if (parent || _parent) go.transform.SetParent(parent ? parent : _parent, true);
-            go.transform.rotation = Quaternion.Euler(0, yaw, 0); go.transform.position = Vector3.zero;
+            foreach (var c in go.GetComponentsInChildren<Collider>()) Object.DestroyImmediate(c);
+            go.transform.rotation = Quaternion.identity; go.transform.position = Vector3.zero;
             var b = Bounds(go); if (b.size == Vector3.zero) { Object.DestroyImmediate(go); return false; }
-            if (wall) { bool wantX = Mathf.Abs(Mathf.DeltaAngle(yaw, 90)) > 45; bool isX = b.size.x >= b.size.z; if (wantX != isX) { go.transform.rotation = Quaternion.Euler(0, yaw + 90, 0); b = Bounds(go); } }
-            go.transform.position += new Vector3(pos.x - b.center.x, pos.y - b.min.y, pos.z - b.center.z);
+            bool localX = b.size.x >= b.size.z;
+            if (wall)
+            {
+                bool wantX = Mathf.Abs(Mathf.Sin(yaw * Mathf.Deg2Rad)) < 0.7071f; // #82: anche yaw -90 vuol dire lato lungo su Z (arco del set a fianco del Bancone)
+                bool side = Mathf.Abs(Mathf.DeltaAngle(yaw, 90)) <= 45 || Mathf.Abs(Mathf.DeltaAngle(yaw, -90)) <= 45;
+                bool worldX = localX != side;
+                if (wantX != worldX) yaw += 90;
+            }
+            var rot = Quaternion.Euler(0, yaw, 0);
+            var off = rot * new Vector3(b.center.x, 0, b.center.z);
+            go.transform.rotation = rot; go.transform.position = new Vector3(pos.x - off.x, pos.y - b.min.y, pos.z - off.z);
             go.isStatic = true;
             if (_mat) foreach (var r in go.GetComponentsInChildren<Renderer>()) r.sharedMaterials = System.Array.ConvertAll(r.sharedMaterials, m => m && m.name.Contains("Emissive") && _emi ? _emi : _mat);
-            foreach (var c in go.GetComponentsInChildren<Collider>()) Object.DestroyImmediate(c);
-            b = Bounds(go);
             // #58: muri/archi sempre solidi; prop a terra alti >25cm (vasi, casse, set) solidi; tappeti/decal no
-            if (!solid && (wall || (!onTop && b.min.y < 0.3f && b.size.y > 0.25f && Mathf.Max(b.size.x, b.size.z) < 6f))) solid = true;
-            if (solid) { var bc = go.AddComponent<BoxCollider>(); bc.center = go.transform.InverseTransformPoint(b.center); var ls = go.transform.lossyScale; var sz = Quaternion.Inverse(go.transform.rotation) * b.size; bc.size = new Vector3(Mathf.Abs(sz.x / ls.x), Mathf.Abs(sz.y / ls.y), Mathf.Abs(sz.z / ls.z)); }
+            float minY = pos.y;
+            if (!solid && (wall || (!onTop && minY < 0.3f && b.size.y > 0.25f && Mathf.Max(b.size.x, b.size.z) < 6f))) solid = true;
+            if (!solid) return true;
+            var ls = go.transform.lossyScale; var inv = new Vector3(1f / ls.x, 1f / ls.y, 1f / ls.z);
+            if (rel.Contains("wall_arch"))
+            {
+                // pilastri 0-0.2L e 0.8L-L a tutta altezza, architrave 0.2L-0.8L da 0.75H (2.4 su 3.2) in su
+                float L = localX ? b.size.x : b.size.z, H = b.size.y;
+                Vector3 ax = localX ? Vector3.right : Vector3.forward, th = localX ? new Vector3(0, 0, b.size.z) : new Vector3(b.size.x, 0, 0);
+                AddBox(go, b.center - ax * (0.4f * L), ax * (0.2f * L) + Vector3.up * H + th, inv);
+                AddBox(go, b.center + ax * (0.4f * L), ax * (0.2f * L) + Vector3.up * H + th, inv);
+                AddBox(go, new Vector3(b.center.x, b.min.y + 0.875f * H, b.center.z), ax * (0.6f * L) + Vector3.up * (0.25f * H) + th, inv);
+            }
+            else AddBox(go, b.center, b.size, inv);
             return true;
+        }
+
+        static void AddBox(GameObject go, Vector3 localCenter, Vector3 localSize, Vector3 inv)
+        {
+            var bc = go.AddComponent<BoxCollider>(); bc.center = Vector3.Scale(localCenter, inv); bc.size = Vector3.Scale(localSize, inv);
         }
 
         /// <summary>#65: lampione. Il pivot dell'FBX è alla base del palo (mesh: palo r 0.146 all'origine, braccio +X 0.62 a 2.3-2.6 m).

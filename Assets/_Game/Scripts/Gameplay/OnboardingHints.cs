@@ -18,6 +18,12 @@ namespace UltimoMiglio.Gameplay
         [Tooltip("Camera breve sugli elementi rivelati (s, 2,5–3)")] public float RevealPeekSec = 2.75f;
 
         TutorialManager _tut; EdgeArrow _edge; HudController _hud; InteractionPoint _ip;
+        /// <summary>#256: prossima tappa della guida (varco da attraversare o bersaglio), ricalcolata ogni <see cref="TappaSec"/>.</summary>
+        public Vector3 Tappa { get; private set; }
+        /// <summary>#256: direzione della mano nel pannello (x a destra, y in basso), dalla posizione di Kaia verso <see cref="Tappa"/> sullo schermo.</summary>
+        public Vector2 DirezioneMano { get; private set; }
+        public const float TappaSec = 0.2f; // stesso ritmo di TutorialManager.AggiornaCache
+        float _tappaT = -1f; Transform _tappaPer; int _passati;
         VisualElement _hand; float _idle, _best = float.MaxValue; int _level; bool _handOn, _peekDone; Vector3 _lastNina; bool _hasLast;
 
         void OnEnable() { Active = true; TutorialManager.StepChanged += OnStep; HudReveal.Revealed += OnRevealed; }
@@ -51,11 +57,12 @@ namespace UltimoMiglio.Gameplay
 
             var nina = GameRoot.I.Nina; if (!nina) return;
             var target = _tut.CurrentTarget; var np = nina.transform.position;
+            AggiornaTappa(target, np);
             bool moved = _hasLast && (np - _lastNina).sqrMagnitude > 0.0004f; _lastNina = np; _hasLast = true;
             bool progress;
             if (target)
             {
-                float d = Vector3.Distance(np, target.position);
+                float d = Vector3.Distance(np, Tappa) + Vector3.Distance(Tappa, target.position); // #256: progresso lungo il giro dal varco, non in linea retta
                 progress = d < _best - ProgressMeters; if (progress || _best == float.MaxValue) _best = d;
             }
             else progress = moved;
@@ -82,6 +89,21 @@ namespace UltimoMiglio.Gameplay
             if (_handOn) AnimateHand(target, np);
         }
 
+        /// <summary>#256: tappa (varco o bersaglio) ogni 0,2 s o al cambio di bersaglio; direzione schermo a ogni frame (la camera ruota, #205). Nessuna allocazione.</summary>
+        void AggiornaTappa(Transform target, Vector3 np)
+        {
+            if (!target) { Tappa = np; DirezioneMano = new Vector2(0f, -1f); return; }
+            if (target != _tappaPer || Time.time - _tappaT >= TappaSec) { if (target != _tappaPer) _passati = 0; _tappaPer = target; _tappaT = Time.time; Tappa = VarcoMarker.ProssimaTappa(np, target.position, target, ref _passati, out _); }
+            var cam = Camera.main; var dir = DirezioneMano.sqrMagnitude > 0f ? DirezioneMano : Vector2.up;
+            if (cam)
+            {
+                Vector3 a = cam.WorldToScreenPoint(np), b = cam.WorldToScreenPoint(Tappa);
+                var d = new Vector2(b.x - a.x, -(b.y - a.y)); // schermo → pannello (y verso il basso)
+                if (d.sqrMagnitude > 1f) dir = d.normalized;
+            }
+            DirezioneMano = dir;
+        }
+
         void Log(string what = null) => OnbLog.Write($"hint step={_tut.Current} level={_level}{(what != null ? " " + what : "")} idle={_idle:0.0}s");
 
         static bool OnScreen(Vector3 w)
@@ -105,15 +127,7 @@ namespace UltimoMiglio.Gameplay
             var joy = _hud.Root.Q("joystick-base");
             bool touching = joy != null && joy.resolvedStyle.display == DisplayStyle.Flex && joy.resolvedStyle.opacity > 0.05f;
             _hand.EnableInClassList("ghost-hand--on", !touching);
-            Vector2 dir = Vector2.up;
-            var cam = Camera.main;
-            if (target && cam)
-            {
-                Vector3 a = cam.WorldToScreenPoint(ninaPos), b = cam.WorldToScreenPoint(target.position);
-                var d = new Vector2(b.x - a.x, -(b.y - a.y)); // schermo → pannello (y verso il basso)
-                if (d.sqrMagnitude > 1f) dir = d.normalized;
-            }
-            else dir = new Vector2(0f, -1f);
+            Vector2 dir = target ? DirezioneMano : new Vector2(0f, -1f); // #256: verso la prossima tappa (varco), non dritto al bersaglio
             float t = Mathf.Repeat(Time.unscaledTime, 1.4f) / 1.4f, k = Mathf.SmoothStep(0f, 1f, Mathf.Clamp01((t - 0.15f) / 0.6f));
             _hand.style.translate = new Translate(dir.x * 56f * k, dir.y * 56f * k, 0);
             _hand.style.opacity = t < 0.85f ? 0.9f : 0.9f * (1f - (t - 0.85f) / 0.15f);

@@ -2,6 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using NUnit.Framework;
 using UnityEngine;
+using UnityEngine.AI;
 using UnityEngine.SceneManagement;
 using UnityEngine.TestTools;
 using UltimoMiglio.Core;
@@ -12,7 +13,7 @@ public class P0CollisionFacingTest
 {
     static IEnumerator Load()
     {
-        PlayerPrefs.DeleteAll(); UltimoMiglio.Gameplay.TutorialManager.TestSenzaComparse = true; UltimoMiglio.Gameplay.TutorialManager.TestAccelera = true; /* #101: niente comparse graduali, tempi corti */
+        PlayerPrefs.DeleteKey(UltimoMiglio.Gameplay.TutorialManager.PrefKey); PlayerPrefs.DeleteKey("um_save_v1"); PlayerPrefs.DeleteKey(UltimoMiglio.UI.CameraView.PrefZoom); UltimoMiglio.Gameplay.TutorialManager.TestSenzaComparse = true; UltimoMiglio.Gameplay.TutorialManager.TestAccelera = true; /* #101: niente comparse graduali, tempi corti */ // solo chiavi di gioco: vol_music e vol_sfx restano (come #88)
         var save = System.IO.Path.Combine(Application.persistentDataPath, "save_v1.json");
         if (System.IO.File.Exists(save)) System.IO.File.Delete(save);
         PlayerPrefs.SetInt(UltimoMiglio.Gameplay.TutorialManager.PrefGraduale, 0); // #94: test non di onboarding → niente rivelazione graduale
@@ -147,5 +148,152 @@ public class P0CollisionFacingTest
         }
         AssertFacing("NONNO", bd);
         AssertFacing("Clienti", cd);
+    }
+
+    // ---------- #82 ----------
+    static Bounds RendBounds(GameObject go)
+    {
+        var rs = go.GetComponentsInChildren<Renderer>(true); var b = new Bounds(go.transform.position, Vector3.zero); bool first = true;
+        foreach (var r in rs) { if (r.name == "SignFaceDecal") continue; if (first) { b = r.bounds; first = false; } else b.Encapsulate(r.bounds); }
+        return b;
+    }
+
+    [UnityTest, Timeout(120000)]
+    public IEnumerator Kit_CollidersInsideMeshBounds_NoDoubleColliders()
+    {
+        yield return Load();
+        var kit = GameObject.Find("DepotKit"); Assert.IsNotNull(kit, "DepotKit assente");
+        var fails = new List<string>(); int n = 0;
+        foreach (var bc in Object.FindObjectsByType<BoxCollider>(FindObjectsSortMode.None))
+        {
+            var t = bc.transform; if (!t.name.StartsWith("env_") && !t.name.StartsWith("prop_")) continue;
+            if (t.name.EndsWith("_col")) continue; // #65/#124: collider dedicato del palo del lampione, voluto più grande della mesh del pivot
+            // tolleranza 10 cm per lato: l'AABB dei renderer figli ruotati non coincide al cm con l'OBB, ma il gonfiaggio da yaw (#82) era del 20-35%
+            var rb = RendBounds(t.gameObject); rb.Expand(0.2f); var cb = bc.bounds; n++;
+            if (!rb.Contains(cb.min) || !rb.Contains(cb.max)) fails.Add($"{t.name} col={cb.size} mesh={rb.size}");
+        }
+        Assert.GreaterOrEqual(n, 10, "pochi collider kit: " + n);
+        Assert.IsEmpty(fails, "collider fuori dai bounds della mesh: " + string.Join(" | ", fails));
+        var ban = GameObject.Find("Bancone_Mesh"); Assert.IsNotNull(ban);
+        Assert.IsNotNull(ban.GetComponent<Collider>(), "Bancone_Mesh: il secondo collider resta (regressione #58)");
+        Assert.IsNotNull(ban.GetComponent<NavMeshObstacle>(), "Bancone_Mesh: NavMeshObstacle da mantenere");
+        foreach (var name in new[] { "Scaffale_A", "Scaffale_B" })
+        {
+            var sc = GameObject.Find(name); if (!sc) continue;
+            Assert.IsNotNull(sc.GetComponent<Collider>(), name + ": il secondo collider resta (regressione #58)");
+            Assert.IsNotNull(sc.GetComponent<NavMeshObstacle>(), name + ": NavMeshObstacle da mantenere");
+        }
+    }
+
+    [UnityTest, Timeout(120000)]
+    public IEnumerator Nina_PassesThroughArches()
+    {
+        yield return Load();
+        var nina = GameRoot.I.Nina; Teleport(nina, new Vector3(6, 0.05f, -9)); yield return null;
+        int arches = 0;
+        foreach (var t in Object.FindObjectsByType<Transform>(FindObjectsSortMode.None))
+        {
+            if (!t.name.StartsWith("env_wall_arch_4m")) continue;
+            var cols = t.GetComponents<BoxCollider>(); Assert.AreEqual(3, cols.Length, t.name + ": servono 3 BoxCollider (pilastri + architrave)");
+            var rb = RendBounds(t.gameObject); bool alongX = rb.size.x >= rb.size.z; arches++;
+            var dir = alongX ? Vector3.forward : Vector3.right; float th = alongX ? rb.extents.z : rb.extents.x;
+            var start = new Vector3(rb.center.x, 0.05f, rb.center.z) - dir * (th + 1.0f);
+            var hits = Physics.CapsuleCastAll(start + Vector3.up * 0.35f, start + Vector3.up * 1.4f, 0.3f, dir, 2f * (th + 1.0f), ~0, QueryTriggerInteraction.Ignore);
+            foreach (var h in hits) Assert.IsFalse(h.collider.transform == t, $"{t.name} @ {rb.center}: Nina (r=0.3) non passa sotto l'arco");
+        }
+        Assert.GreaterOrEqual(arches, 1, "nessun arco in scena");
+    }
+
+    [UnityTest, Timeout(180000)]
+    public IEnumerator Nina_ReachesZonaBancone_NoPocketBehind()
+    {
+        yield return Load();
+        var zone = GameObject.Find("Zona_Bancone"); Assert.IsNotNull(zone); var ban = zone.transform.position;
+        // faccia del muro dietro il Bancone a >= +1.06 (Nina r=0.3 entra nella zona) e a ridosso (nessuna sacca oltre)
+        float face = 99f;
+        foreach (var bc in Object.FindObjectsByType<BoxCollider>(FindObjectsSortMode.None))
+        {
+            if (!bc.name.StartsWith("env_wall_2m") && !bc.name.StartsWith("env_wall_arch_4m")) continue; var b = bc.bounds; // #256: arco da 4 m sulla stessa linea
+            if (b.max.x < ban.x - 1.2f || b.min.x > ban.x + 1.2f || b.center.z < ban.z || b.center.z > ban.z + 4f) continue;
+            face = Mathf.Min(face, b.min.z - ban.z);
+        }
+        // #187 ha spostato Zona_Bancone di +0,33 m verso il muro: la misura è fra il retro del banco (Bancone_Mesh) e la faccia del muro
+        var counter = GameObject.Find("Bancone_Mesh"); Assert.IsNotNull(counter, "Bancone_Mesh");
+        float depth = face + ban.z - counter.GetComponent<Collider>().bounds.max.z;
+        Debug.Log($"[#82] corridoio dietro il Bancone: {depth:F2} m (faccia muro {face:F2} dal centro zona)");
+        Assert.GreaterOrEqual(depth, 1.70f, "muro dietro il Bancone troppo vicino: " + depth);
+        Assert.LessOrEqual(depth, 1.85f, "sacca dietro il Bancone: corridoio di " + depth);
+        // Nina arriva in Zona_Bancone seguendo il NavMesh
+        var nina = GameRoot.I.Nina; Teleport(nina, ban + new Vector3(2.2f, 0.05f, -2.4f)); yield return null; var from = nina.transform.position;
+        var path = new NavMeshPath();
+        bool okA = NavMesh.SamplePosition(from, out var a, 2f, NavMesh.AllAreas), okZ = NavMesh.SamplePosition(ban, out var z, 1f, NavMesh.AllAreas);
+        Assert.IsTrue(okA && okZ, "NavMesh assente");
+        Assert.IsTrue(NavMesh.CalculatePath(a.position, z.position, NavMesh.AllAreas, path) && path.status == NavMeshPathStatus.PathComplete, "Zona_Bancone non raggiungibile: " + path.status);
+        // poi a piedi (CharacterController r=0.3): dal corridoio tra Bancone e arco del set, passando tra Bancone e vaso
+        var wps = new[] { ban + new Vector3(2.2f, 0, -0.1f), ban };
+        int k = 0;
+        for (float t = 0; t < 15f && k < wps.Length; t += Time.deltaTime)
+        {
+            var d = wps[k] - nina.transform.position; d.y = 0;
+            if (d.magnitude < 0.15f) { k++; continue; }
+            nina.ScriptedInput = d.normalized; yield return null;
+        }
+        nina.ScriptedInput = Vector3.zero;
+        var p = nina.transform.position;
+        Assert.Less(new Vector2(p.x - ban.x, p.z - ban.z).magnitude, 0.6f, "Nina bloccata prima di Zona_Bancone: " + p + " da " + from + " waypoint " + k);
+    }
+
+    // #97: varco ovest del Bancone (tra vaso di limoni e pila di pacchi / Bancone): chiuso (<0.6, Nina non entra) oppure aperto >= 0.8 m
+    [UnityTest, Timeout(180000)]
+    public IEnumerator BanconeWestGap_ClosedOrWide_NinaFromWest()
+    {
+        yield return Load();
+        var ban = GameObject.Find("Zona_Bancone").transform.position;
+        Bounds? lemon = null, stack = null, counter = null;
+        foreach (var bc in Object.FindObjectsByType<BoxCollider>(FindObjectsSortMode.None))
+        {
+            var b = bc.bounds; var r = b.center - ban; if (r.x > -0.9f || r.x < -2.6f || r.z < -2f || r.z > 1.5f) { if (bc.name.StartsWith("prop_counter_2m") && Mathf.Abs(r.x) < 0.5f) counter = b; continue; }
+            if (bc.name.StartsWith("prop_lemontree_pot")) lemon = b; else if (bc.name.StartsWith("prop_parcel_stack_a")) stack = b;
+        }
+        Assert.IsTrue(lemon.HasValue && counter.HasValue, "vaso/Bancone non trovati");
+        float gapZ = stack.HasValue ? stack.Value.min.z - lemon.Value.max.z : 99f; // vaso <-> pila (#256: pila spostata, varco libero)
+        float gapX = lemon.Value.min.z < counter.Value.max.z ? counter.Value.min.x - lemon.Value.max.x : 99f; // vaso <-> Bancone
+        float gap = Mathf.Min(gapZ, gapX);
+        Debug.Log($"[#97] varco ovest: vaso-pila {gapZ:F2} vaso-Bancone {gapX:F2}");
+        Assert.IsTrue(gap < 0.6f || gap >= 0.8f, $"varco ovest ambiguo {gap:F2} m: chiuso (<0.6) o aperto (>=0.8)");
+        var nina = GameRoot.I.Nina;
+        if (gap < 0.6f)
+        {
+            // chiuso davvero: Nina spinta da ovest non entra nella zona
+            Teleport(nina, ban + new Vector3(-3.0f, 0.05f, -0.15f)); yield return null;
+            nina.ScriptedInput = Vector3.right; for (float t = 0; t < 2.5f; t += Time.deltaTime) yield return null; nina.ScriptedInput = Vector3.zero;
+            Assert.Less(nina.transform.position.x - ban.x, -1.2f, "varco ovest dichiarato chiuso ma Nina passa");
+            yield break;
+        }
+        // #256: senza pila si entra dal corridoio dietro il banco
+        Teleport(nina, ban + new Vector3(-3.0f, 0.05f, stack.HasValue ? (lemon.Value.max.z + stack.Value.min.z) * 0.5f - ban.z : counter.Value.max.z + 0.6f - ban.z)); yield return null;
+        nina.ScriptedInput = Vector3.right; for (float t = 0; t < 4f && nina.transform.position.x < ban.x; t += Time.deltaTime) yield return null; nina.ScriptedInput = Vector3.zero;
+        Assert.Greater(nina.transform.position.x - ban.x, -0.6f, "Nina non entra da ovest: " + nina.transform.position);
+    }
+
+    // #82 + #187: nessun collider solido (muri, archi, Bancone, prop) dentro l'anello di una zona: dove vedi l'anello, Nina ci può stare
+    [UnityTest, Timeout(120000)]
+    public IEnumerator Zone187_NessunColliderSolidoDentroAnello()
+    {
+        yield return Load();
+        var bad = new List<string>();
+        foreach (var z in Object.FindObjectsByType<ProximityZone>(FindObjectsSortMode.None))
+        {
+            var ip = z.GetComponent<InteractionPoint>(); if (!ip) continue;
+            float r = ip.Radius * InteractionPoint.VisualScale - 0.05f; // tolleranza 5 cm sul bordo esterno
+            var c = z.transform.position;
+            foreach (var h in Physics.OverlapCapsule(new Vector3(c.x, r + 0.15f, c.z), new Vector3(c.x, r + 1.5f, c.z), r, ~0, QueryTriggerInteraction.Ignore))
+            {
+                if (h.name == "Floor") continue; // pavimento: la capsula parte 15 cm sopra
+                if (h is CharacterController || h.GetComponentInParent<NinaController>() || h.attachedRigidbody) continue; // agenti e oggetti mobili
+                bad.Add($"{z.name} ∩ {h.name}");
+            }
+        }
+        Assert.IsEmpty(bad, "collider solidi dentro gli anelli delle zone: " + string.Join(", ", bad));
     }
 }
