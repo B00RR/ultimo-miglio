@@ -52,6 +52,9 @@ namespace UltimoMiglio.Gameplay
             Vector3 kp = nina ? nina.transform.position : Vector3.zero;
             var target = tut ? tut.CurrentTarget : null;
             Vector3 tp = target ? target.position : Vector3.zero;
+            // La freccia del tutorial non va dritta: punta al prossimo varco (TappaGuida).
+            Vector3 via = tut && target ? tut.TappaVerso(target) : tp;
+            if (via.sqrMagnitude < 1e-6f) via = tp;
             var set = FindAnyObjectByType<SettingsController>();
             var coda = FindAnyObjectByType<CustomerQueue>();
             _sb.Clear();
@@ -75,6 +78,9 @@ namespace UltimoMiglio.Gameplay
             _sb.Append(",\"target\":{\"name\":");
             Quote(target ? target.name : "");
             _sb.Append(",\"x\":").Append(F(tp.x)).Append(",\"z\":").Append(F(tp.z)).Append('}');
+            _sb.Append(",\"tappa\":{\"name\":");
+            Quote(target ? "tappa" : "");
+            _sb.Append(",\"x\":").Append(F(via.x)).Append(",\"z\":").Append(F(via.z)).Append('}');
             _sb.Append('}');
             return _sb.ToString();
         }

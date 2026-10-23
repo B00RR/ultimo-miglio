@@ -74,18 +74,141 @@ def scatta(page, nome, fatto, atteso, successo, stato):
 
 
 def verso_schermo(stato, tx, tz, raggio=48):
-    """Da un punto mondo al trascinamento del dito. Value.y positivo = su dello schermo = dy Playwright negativo."""
+    """Da un punto mondo al trascinamento del dito. Stessa inversa dei test: Quaternion.Euler(0, -yaw, 0) * direzione.
+    Value.y positivo = su dello schermo = dy Playwright negativo."""
     k = stato.get("kaia") or {"x": 0, "z": 0}
     dx, dz = tx - k["x"], tz - k["z"]
     dist = math.hypot(dx, dz)
     if dist < 1e-4:
         return 0, 0, dist
     yaw = math.radians(stato.get("yaw") or 45)
-    # inverso di Quaternion.Euler(0, yaw, 0) * (vx, 0, vz)
-    lx = dx * math.cos(yaw) - dz * math.sin(yaw)
-    lz = dx * math.sin(yaw) + dz * math.cos(yaw)
+    c, s = math.cos(yaw), math.sin(yaw)
+    # Unity, rotazione Y di -yaw (sistema sinistrorso): x' = x c - z s, z' = x s + z c
+    lx = dx * c - dz * s
+    lz = dx * s + dz * c
     m = math.hypot(lx, lz) or 1
     return lx / m * raggio, -lz / m * raggio, dist
+
+
+def ruota(ox, oy, gradi):
+    a = math.radians(gradi)
+    c, s = math.cos(a), math.sin(a)
+    return ox * c - oy * s, ox * s + oy * c
+
+
+# Quanto si sposta Kaia tenendo il dito 50 px in su e a destra. Si misura una volta, a inizio gioco.
+BASE_N = None
+BASE_E = None
+
+# Varchi del layout (DepotKit, distanze di zones.json: Arrivi −5,6; scaffali a 6 m; Bancone a 9,4 m).
+# Il giocatore segue la freccia che passa di qui. Il ponte, se pubblica "tappa", ha la precedenza.
+VARCHI = (
+    ("ScaffaliEst", -0.6, 1.2, 0.9),
+    ("UscitaOvest", 0.2, -4.6, 0.7),
+    ("CorridoioOvest", 1.52, -5.27, 0.9),
+    ("ArcoBancone", 3.42, -4.19, 1.2),
+    ("ArcoEst", 5.72, -5.94, 1.2),
+    ("StrisciaEst", 6.67, -4.34, 2.0),
+    ("AngoloCassa", 2.0, 0.9, 0.7),
+)
+
+
+def scegli_meta(st, bloccata):
+    """Punto verso cui spingere il dito: la tappa del ponte, oppure un varco se la retta non fa avvicinare."""
+    tappa = st.get("tappa") or {}
+    if tappa.get("x") is not None and tappa.get("name"):
+        return tappa.get("x"), tappa.get("z"), tappa.get("name")
+    tgt = st.get("target") or {}
+    if not tgt.get("name") or tgt.get("x") is None:
+        return None
+    k = st.get("kaia") or {}
+    kx, kz = k.get("x") or 0, k.get("z") or 0
+    tx, tz = tgt["x"], tgt["z"]
+    diretta = math.hypot(tx - kx, tz - kz)
+    if diretta < 3.5 and not bloccata:
+        return tx, tz, tgt["name"]
+    scelta = (tx, tz, tgt["name"])
+    best = 1e9
+    for nome, x, z, raggio in VARCHI:
+        if math.hypot(x - kx, z - kz) < raggio:
+            continue
+        if math.hypot(tx - x, tz - z) > diretta - 1.2:
+            continue
+        giro = math.hypot(x - kx, z - kz) + math.hypot(tx - x, tz - z)
+        if giro < best:
+            best = giro
+            scelta = (x, z, nome)
+    return scelta
+
+
+def campione_dito(page, ox, oy, ms=700):
+    origine = (200, 700)
+    st = leggi(page) or {}
+    k0 = st.get("kaia") or {"x": 0, "z": 0}
+    page.mouse.move(*origine)
+    page.mouse.down()
+    page.mouse.move(origine[0] + ox, origine[1] + oy)
+    page.wait_for_timeout(ms)
+    page.mouse.up()
+    page.wait_for_timeout(80)
+    st2 = leggi(page) or {}
+    k1 = st2.get("kaia") or k0
+    return (k1["x"] - k0["x"], k1["z"] - k0["z"])
+
+
+def calibra(page):
+    """Spinte in otto direzioni: due che muovono Kaia e non sono parallele diventano la bussola del dito."""
+    global BASE_N, BASE_E
+    direzioni = [(0, -50), (50, 0), (0, 50), (-50, 0), (35, -35), (35, 35), (-35, 35), (-35, -35)]
+    utili = []
+    for ox, oy in direzioni:
+        d = campione_dito(page, ox, oy, 450)
+        print(f"  dito ({ox},{oy}) -> {tuple(round(v, 2) for v in d)}")
+        if math.hypot(*d) > 0.25:
+            utili.append((ox, oy, d))
+        if len(utili) >= 2:
+            det = utili[0][2][0] * utili[1][2][1] - utili[0][2][1] * utili[1][2][0]
+            if abs(det) > 0.15:
+                break
+            utili.pop()
+    if len(utili) < 2:
+        print("calibrazione ferma")
+        return False
+    # base_n è la spinta «su» (oy negativo), base_e la spinta «destra», ricostruite dal campione.
+    (ox1, oy1, (wx1, wz1)), (ox2, oy2, (wx2, wz2)) = utili[0], utili[1]
+    # [wx] = M * [ox, oy]. Risolvi le due colonne con i due campioni.
+    det = ox1 * oy2 - oy1 * ox2
+    if abs(det) < 1:
+        print("calibrazione degenere", utili)
+        return False
+    # colonna ox: mondo prodotto da (1, 0) in pixel del campione
+    ex = (wx1 * oy2 - wx2 * oy1) / det
+    ez = (wz1 * oy2 - wz2 * oy1) / det
+    nx = (ox1 * wx2 - ox2 * wx1) / det
+    nz = (ox1 * wz2 - ox2 * wz1) / det
+    # verso_empirico si aspetta il mondo di una spinta su (oy=-50) e di una spinta destra (ox=50)
+    BASE_E = (ex * 50, ez * 50)
+    BASE_N = (nx * -50, nz * -50)
+    print(f"calibrazione su={tuple(round(v, 2) for v in BASE_N)} destra={tuple(round(v, 2) for v in BASE_E)}")
+    return True
+
+
+def verso_empirico(stato, tx, tz, raggio=48):
+    k = stato.get("kaia") or {"x": 0, "z": 0}
+    dx, dz = tx - k["x"], tz - k["z"]
+    dist = math.hypot(dx, dz)
+    if BASE_N is None or dist < 1e-4:
+        return verso_schermo(stato, tx, tz, raggio)
+    nx, nz = BASE_N
+    ex, ez = BASE_E
+    det = nx * ez - nz * ex
+    if abs(det) < 1e-4:
+        return verso_schermo(stato, tx, tz, raggio)
+    a = (dx * ez - dz * ex) / det
+    b = (nx * dz - nz * dx) / det
+    ox, oy = b * raggio, -a * raggio
+    m = math.hypot(ox, oy) or 1
+    return ox / m * raggio, oy / m * raggio, dist
 
 
 def stato_ok(page, timeout_s=90):
@@ -146,12 +269,16 @@ def gioca_passi(page):
     t0 = time.time()
     reload_fatto = False
     blocco = None
+    blocchi_visti = set()
     fermo_da = time.time()
     pos_ferma = None
-    origine = (200, 700)
+    origine = (180, 620)
     dito = False
-    invertito = False
-    while time.time() - t0 < 540:
+    # Gradi aggiunti al dito quando Kaia non si avvicina (scaffale in mezzo). Si tiene finché avvicina.
+    sbandata = 0
+    dist_migliore = None
+    ultimo_stampa = 0
+    while time.time() - t0 < 720:
         st = leggi(page)
         if not st or not st.get("ready"):
             page.wait_for_timeout(300)
@@ -166,12 +293,14 @@ def gioca_passi(page):
             atteso = "Il passo cambia da solo quando il gate è soddisfatto. Il testo è quello del design."
             fatto = f"Arrivata al passo {step}. Obiettivo «{st.get('objective')}». Fumetto «{st.get('text')}»."
             scatta(page, step, fatto, atteso, f"Passo {step}, portafoglio {st.get('wallet')} LN, zaino {st.get('zaino')}, OLDO {st.get('nonno')}, coda {st.get('coda')}.", st)
-            if step == "coldOpen":
+            if step == "ColdOpen":
                 scatta(page, "coldopen_skip", "Controllo se «Salta tutorial» è acceso al cold open.",
                        "Il design (ONB-15, onboarding.json) lo tiene spento fino alla combo.",
                        "Acceso." if st.get("skip") else "Spento, come da design.", st)
             fermo_da = time.time()
             pos_ferma = st.get("kaia")
+            dist_migliore = None
+            sbandata = 0
         if step in ("Chiuso", "FreePlay") and "FreePlay" in visti:
             # un giro sul free play e poi si esce dal ciclo di guida
             if time.time() - t0 > 5 and step == "Chiuso":
@@ -179,49 +308,64 @@ def gioca_passi(page):
             if step == "FreePlay" and time.time() - fermo_da > 3:
                 break
         tgt = st.get("target") or {}
-        if tgt.get("name"):
+        bloccata = time.time() - fermo_da > 1.1 and step not in ("ColdOpen", "Combo", "NonnoIntro", "NonnoConfirm", "WallPad", "FreePlay", "Chiuso")
+        scelto = scegli_meta(st, bloccata)
+        if scelto:
+            ox, oy, dist = verso_schermo(st, scelto[0], scelto[1])
+            meta_nome = scelto[2]
+        elif step == "Move":
+            ox, oy, dist = 0.0, -48.0, 9.0
+            meta_nome = "avanti"
+        else:
+            ox, oy, dist = 0.0, 0.0, 0.0
+            meta_nome = ""
+        if scelto or step == "Move":
             if not dito:
                 page.mouse.move(*origine)
                 page.mouse.down()
                 dito = True
-            ox, oy, dist = verso_schermo(st, tgt.get("x") or 0, tgt.get("z") or 0)
-            if invertito:
-                oy = -oy
-            if dist < 0.4:
+            ox, oy = ruota(ox, oy, sbandata)
+            sul_bersaglio = bool(scelto) and scelto[2] == (tgt.get("name") or "")
+            # Sul pad e sul bancone si resta fermi: è così che si paga e si serve.
+            if dist < 0.55 and sul_bersaglio and step != "Move":
                 page.mouse.move(*origine)
             else:
                 page.mouse.move(origine[0] + ox, origine[1] + oy)
         page.wait_for_timeout(180)
         st2 = leggi(page) or st
         k = st2.get("kaia") or {}
-        if pos_ferma and k:
-            mosso = math.hypot((k.get("x") or 0) - (pos_ferma.get("x") or 0), (k.get("z") or 0) - (pos_ferma.get("z") or 0))
-            if mosso > 0.08:
+        if scelto and k:
+            dist_ora = math.hypot(scelto[0] - (k.get("x") or 0), scelto[1] - (k.get("z") or 0))
+        elif tgt.get("x") is not None and k:
+            dist_ora = math.hypot((tgt.get("x") or 0) - (k.get("x") or 0), (tgt.get("z") or 0) - (k.get("z") or 0))
+        else:
+            dist_ora = dist
+        if time.time() - ultimo_stampa > 3 and k:
+            ultimo_stampa = time.time()
+            print(f"  {step} via {meta_nome} kaia=({k.get('x')},{k.get('z')}) dist {dist_ora:.1f} LN {st2.get('wallet')} stack {st2.get('stack')}")
+        if k and pos_ferma:
+            if dist_ora < (dist_migliore if dist_migliore is not None else 1e9) - 0.25:
                 pos_ferma = k
+                dist_migliore = dist_ora
                 fermo_da = time.time()
-            elif time.time() - fermo_da > 8 and step not in ("coldOpen", "NonnoIntro", "NonnoConfirm", "WallPad", "FreePlay", "Chiuso"):
-                if not invertito:
-                    invertito = True
-                    fermo_da = time.time()
-                    print("  Kaia ferma: provo l'asse Y invertito")
-                else:
+                sbandata = 0
+            elif time.time() - fermo_da > 1.6 and step not in ("ColdOpen", "NonnoIntro", "NonnoConfirm", "WallPad", "FreePlay", "Chiuso", "Combo"):
+                ciclo = (0, 40, -40, 80, -80)
+                try:
+                    i = ciclo.index(sbandata)
+                except ValueError:
+                    i = -1
+                sbandata = ciclo[(i + 1) % len(ciclo)]
+                fermo_da = time.time()
+                print(f"  sbandata {sbandata}° dist {dist_ora:.2f} via {meta_nome} da ({k.get('x')},{k.get('z')})")
+                if sbandata == -80 and step not in blocchi_visti:
+                    blocchi_visti.add(step)
                     blocco = step
-                    if dito:
-                        page.mouse.up()
-                        dito = False
                     scatta(page, "blocco_" + step,
-                           f"Tengo il dito verso {tgt.get('name')} da 8 secondi.",
-                           "Kaia si avvicina al bersaglio.",
-                           f"Resta a ({k.get('x')},{k.get('z')}), distante dal bersaglio. Passo bloccato.",
+                           f"Kaia non si avvicina a {tgt.get('name')} nemmeno passando dai varchi.",
+                           "La freccia del tutorial la porta al bersaglio.",
+                           f"Resta a ({k.get('x')},{k.get('z')}), a {dist_ora:.1f} m. Passo bloccato.",
                            st2)
-                    # slitta di lato per 2 s e riprende
-                    page.mouse.move(*origine)
-                    page.mouse.down()
-                    dito = True
-                    page.mouse.move(origine[0] + 46, origine[1])
-                    page.wait_for_timeout(2000)
-                    fermo_da = time.time()
-                    pos_ferma = (leggi(page) or st2).get("kaia")
         # un reload a metà, dopo lo Zaino o dopo OLDO
         if not reload_fatto and st2.get("zaino", 0) >= 1:
             if dito:
@@ -232,8 +376,16 @@ def gioca_passi(page):
                    "Passo, LN, Zaino e OLDO restano quelli di prima.",
                    f"Prima: passo {prima.get('step')} LN {prima.get('wallet')} zaino {prima.get('zaino')} OLDO {prima.get('nonno')}.",
                    prima)
+            # Il salvataggio WebGL parte quando la pagina perde il focus (GameRoot.OnApplicationFocus).
+            pagina2 = page.context.new_page()
+            pagina2.goto("about:blank")
+            page.wait_for_timeout(800)
+            page.bring_to_front()
+            pagina2.close()
+            page.wait_for_timeout(400)
             page.reload(wait_until="domcontentloaded")
             page.wait_for_selector("canvas")
+            page.wait_for_function("() => !document.getElementById('l')", timeout=90000)
             dopo = stato_ok(page, 90)
             if dopo:
                 uguale = dopo.get("step") == prima.get("step") and abs((dopo.get("wallet") or 0) - (prima.get("wallet") or 0)) < 1 and dopo.get("zaino") == prima.get("zaino")
@@ -322,12 +474,16 @@ def main():
     with sync_playwright() as p:
         browser = p.chromium.launch(channel="chrome", headless=True, args=[
             "--use-gl=angle", "--use-angle=swiftshader", "--enable-webgl", "--ignore-gpu-blocklist"])
-        ctx = browser.new_context(viewport={"width": 390, "height": 844}, is_mobile=True, has_touch=True, device_scale_factor=1)
+        # Viewport da telefono. Il dito è il trascinamento del mouse: su WebGL lo stick legge il mouse,
+        # e due tocchi insieme lo sospendono (issue #205).
+        ctx = browser.new_context(viewport={"width": 390, "height": 844}, device_scale_factor=1)
         page = ctx.new_page()
         errori = []
         page.on("console", lambda m: errori.append(m.type + ": " + m.text[:180]) if m.type in ("error", "warning") else None)
         page.goto(URL, wait_until="domcontentloaded")
         page.wait_for_selector("canvas")
+        page.wait_for_function("() => !document.getElementById('l')", timeout=90000)
+        page.wait_for_timeout(1500)
         st = stato_ok(page, 90)
         if not st:
             scatta(page, "boot_fallito", "Apro la build e aspetto il ponte.",

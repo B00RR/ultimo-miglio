@@ -374,6 +374,7 @@ namespace UltimoMiglio.Gameplay
             if (TestAccelera && s == Step.Coins && eco != null && eco.S.Wallet < 4)
                 eco.S.Wallet = System.Math.Max(eco.S.Wallet, 4);
             if (s < Step.Chiuso) Onb("start", s, "reveals", RevealsOf(s).Length, "ln", Ln(eco));
+            if (eco != null && GameRoot.I) GameRoot.I.Save(); // il ricarico della pagina tiene passo, LN e acquisti
             // onboarding.json nonnoConfirm.camera: 3 s su NONNO (input libero)
             if (s == Step.NonnoConfirm) { var nr = FindAnyObjectByType<NonnoRobot>(); if (nr) CameraPeek.Request(nr.transform.position, NonnoConfirmCamSec); }
             if (s == Step.FreePlay) Onb("end", s, "total", OnbTime, "hints", _hintCount, "lvl3", _lvl3, "ln", Ln(eco), "spent", Spent(eco));
@@ -431,14 +432,20 @@ namespace UltimoMiglio.Gameplay
             return PuoFinireIlPad(eco.S.Wallet, eco.Cost(k), gia);
         }
 
-        /// <summary>Sotto i 40 LN il pad Zaino non esiste ancora (onboarding.json revealWhen). Appena il portafoglio basta, compare.</summary>
+        /// <summary>Sotto i 40 LN il pad Zaino non esiste ancora (onboarding.json revealWhen). Appena il portafoglio basta, compare.
+        /// Fuori da quel passo il pad torna visibile: la regola non deve lasciarlo spento per il resto del capitolo.</summary>
+        bool _padZainoRitirato;
         void SincronizzaPadZaino()
         {
-            if (Current != Step.ZainoPad) return;
+            if (Current != Step.ZainoPad)
+            {
+                if (_padZainoRitirato) { UltimoMiglio.UI.HudReveal.Show("pad.zaino"); _padZainoRitirato = false; }
+                return;
+            }
             bool manca = !PuoFinire(UpgradeKind.Zaino);
             bool nascosto = UltimoMiglio.UI.HudReveal.IsHidden("pad.zaino");
-            if (manca && !nascosto) UltimoMiglio.UI.HudReveal.Hide("pad.zaino");
-            else if (!manca && nascosto) UltimoMiglio.UI.HudReveal.Show("pad.zaino");
+            if (manca && !nascosto) { UltimoMiglio.UI.HudReveal.Hide("pad.zaino"); _padZainoRitirato = true; }
+            else if (!manca && _padZainoRitirato) { UltimoMiglio.UI.HudReveal.Show("pad.zaino"); _padZainoRitirato = false; }
         }
 
         /// <summary>Giro per fare LN: con pacchi in mano il Bancone, altrimenti uno scaffale pieno, altrimenti gli Arrivi.</summary>
