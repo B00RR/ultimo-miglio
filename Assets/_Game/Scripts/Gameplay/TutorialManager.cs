@@ -243,10 +243,11 @@ namespace UltimoMiglio.Gameplay
         {
             if (_hint != null || !_hud || _hud.Root == null) return;
             _hint = new VisualElement { name = "tut-hint", pickingMode = PickingMode.Ignore }; _hint.AddToClassList("tut-hint");
+            var slot = new VisualElement { pickingMode = PickingMode.Ignore }; slot.AddToClassList("tut-hint__slot");
             var pill = new VisualElement { pickingMode = PickingMode.Ignore }; pill.AddToClassList("tut-hint__pill");
             var go = new VisualElement { pickingMode = PickingMode.Ignore }; go.AddToClassList("tut-hint__go");
             _hintText = new Label { pickingMode = PickingMode.Ignore }; _hintSrc = null; _hintText.AddToClassList("tut-hint__text");
-            pill.Add(go); pill.Add(_hintText); _hint.Add(pill);
+            pill.Add(go); pill.Add(_hintText); slot.Add(pill); _hint.Add(slot);
             (_hud.SafeRoot ?? _hud.Root).Add(_hint);
         }
 
@@ -283,7 +284,7 @@ namespace UltimoMiglio.Gameplay
         {
             if (_uiRegistered || !_hud || _hud.Root == null) return;
             _uiRegistered = true;
-            UltimoMiglio.UI.HudReveal.Register("hud.pillolaValute", _hud.Root.Q("currency-pill"));
+            UltimoMiglio.UI.HudReveal.Register("hud.pillolaValute", _hud.Root.Q("currency-slot") ?? _hud.Root.Q("currency-pill"));
         }
 
         /// <summary>Soglia del gate combo (onboarding.json: comboReached ≥ 1,2). Il moltiplicatore è interno: non si mostra mai.</summary>

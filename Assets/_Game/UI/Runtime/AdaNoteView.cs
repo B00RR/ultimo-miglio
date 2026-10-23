@@ -12,7 +12,7 @@ namespace UltimoMiglio.UI
     public sealed class AdaNoteView
     {
         public const int MaxChars = 70; // testi Narrative (PR #62): max 70 caratteri, mai ellissi
-        public const float MinVisibleSec = 1.5f, FadeSec = 0.25f, MinBodyDp = 14f, MinTitleDp = 12f, MaxHeightDp = 52f, TopDp = 54f;
+        public const float MinVisibleSec = 1.5f, FadeSec = 0.25f, MinBodyDp = 14f, MinTitleDp = 12f, TopDp = 68f;
 
         struct Item { public string text; public float seconds; public bool sticky; }
         readonly Queue<Item> queue = new Queue<Item>();
@@ -25,6 +25,7 @@ namespace UltimoMiglio.UI
         {
             root = hudRoot;
             band = new VisualElement { name = "ada-band", pickingMode = PickingMode.Ignore }; band.AddToClassList("ada-band");
+            var wrap = new VisualElement { name = "ada-wrap", pickingMode = PickingMode.Ignore }; wrap.AddToClassList("ada-wrap");
             note = new VisualElement { name = "ada-note", pickingMode = PickingMode.Ignore }; note.AddToClassList("ada-note");
             var face = new VisualElement { name = "ada-face", pickingMode = PickingMode.Ignore };
             face.AddToClassList("ada-face"); face.AddToClassList("ada-face--portrait"); // ritratto tex_ada_portrait.png via USS
@@ -32,7 +33,8 @@ namespace UltimoMiglio.UI
             who = new Label(UltimoMiglio.Core.DisplayNames.Apply(speaker)) { pickingMode = PickingMode.Ignore }; who.AddToClassList("ada-name");
             body = new Label { pickingMode = PickingMode.Ignore }; body.AddToClassList("ada-text");
             who.style.display = DisplayStyle.None;
-            note.Add(face); col.Add(body); note.Add(col); band.Add(note);
+            // L'ombra è nel PNG del fumetto: un figlio si disegnerebbe sopra il crema.
+            note.Add(face); col.Add(body); note.Add(col); wrap.Add(note); band.Add(wrap);
             band.style.display = DisplayStyle.None;
             root.Add(band);
         }
@@ -81,16 +83,22 @@ namespace UltimoMiglio.UI
 
         void Next() { if (queue.Count > 0) Present(queue.Dequeue()); }
 
-        /// <summary>Fumetto compatto (issue tutorial-HUD): fascia alta sotto la riga LN/giorno/obiettivo.
-        /// top = safe area + 54 dp; altezza 36–52 dp (1 riga, al massimo 2 righe senza ellissi a 360 dp);
-        /// la fascia alta resta entro ~117 dp (350 px su 1170×2532). Stili in TutorialHud.uss.</summary>
+        /// <summary>Fumetto sotto la riga alta (safe area + 68 dp). Crema opaco nello sprite, alto quanto le righe, senza tetto. Stili in Etichette.uss.</summary>
         void Layout(float scale)
         {
             var safe = root.Q("safe-root");
             float safeTop = safe != null ? safe.resolvedStyle.paddingTop : 0f;
             band.style.position = Position.Absolute;
-            band.style.left = 8; band.style.right = 8; band.style.top = safeTop + TopDp;
-            band.style.maxHeight = MaxHeightDp; band.style.overflow = Overflow.Hidden;
+            band.style.left = 12; band.style.right = 12; band.style.top = safeTop + TopDp;
+            band.style.height = StyleKeyword.Auto;
+            band.style.maxHeight = StyleKeyword.None;
+            band.style.overflow = Overflow.Visible;
+            note.style.height = StyleKeyword.Auto;
+            note.style.maxHeight = StyleKeyword.None;
+            note.style.overflow = Overflow.Visible;
+            body.style.height = StyleKeyword.Auto;
+            body.style.maxHeight = StyleKeyword.None;
+            body.style.overflow = Overflow.Visible;
             if (who != null) who.style.display = DisplayStyle.None;
         }
     }

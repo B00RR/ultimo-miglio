@@ -1,7 +1,7 @@
 # STATO PROGETTO — Ultimo Miglio
 
 > Punto di ingresso unico per chiunque (persona o agente) lavori su questo repo. Aggiornalo **nella stessa PR** in cui completi qualcosa.
-> Ultimo aggiornamento: 2026-10-16 16:25 (Europe/Rome).
+> Ultimo aggiornamento: 2026-10-23 (Europe/Rome). Vedi la voce in cima alla Cronologia.
 
 ## 1. Il gioco
 - **Ultimo Miglio**: gioco mobile **Android**, **Unity 6 (6000.3) URP**.
@@ -55,6 +55,14 @@
 - Rifinitura tutorial Nonna Ada e game feel; resto cap. 1.
 
 - **#59 NONNO all'indietro (Animator, PR anim-59-nonno-verso)**: causa doppia. (1) `Rig(nonno,"bot_nonno")` usava yaw 180° ma il modello ha le forche su +Z come Nina → forche dietro rispetto alla marcia (misurato in Play Mode: dot(forche, velocità) = -0,97, ora +0,97). (2) Ruote di Drive in retromarcia (`um_bind_bot.py` x=-a) e Drive mai in riproduzione: Lift (bool tenuto per tutto il trasporto) e Happy sostituivano la Locomotion → NONNO scivolava a ruote ferme. Nuovo `bot_nonno.controller` a 2 layer (Base Idle/Drive + Happy interrompibile; layer «Forche» con maschera mast+forks per Lift/Drop). Scena rigenerata: il riferimento `CustomerQueue.Prefab` era rotto nella scena di main (0 clienti in gioco). Test PlayMode `AnimFacingTest` (Nina 4 direzioni, clienti, NONNO: forward, posa visiva, piede d'appoggio, verso ruote). Checklist A01/A03/A05: VIA in Play Mode.
+
+## 5b. Stato al 23/10/2026 (Tech Lead)
+
+Il capitolo 1 non è su un solo commit giocabile aggiornato. L'ultimo `deploy-dev` verde è il push di `21055fc` (run 39751620862: licenza, test, build e deploy-dev verdi). I due push successivi su main (`417093f` guida #273, `796b01a` audio #159) hanno la run annullata prima dei job: il link https://b00rr.github.io/ultimo-miglio-web/dev/ resta quindi su `21055fc` (`dev/VERSIONE.txt`) finché qualcuno non rilancia il workflow su quel commit, oppure finché un merge nuovo fa partire `deploy-dev`. Il commit `e088939` è solo documentazione e non avvia la CI (`paths-ignore`).
+
+La licenza Unity nei secret c'è: il job `licenza` è verde e l'immagine `unityci/editor:ubuntu-6000.3.26f1-webgl-3` si scarica. Il fallimento di metà ottobre (0 entitlement / immagine assente) non è lo stato del 22/10.
+
+Chiusura in questa PR: #272 pillola prezzo, #186 etichette insegna di noce, #274 scivolamento sul vaso, #282 questo quadro UI. La build WebGL in CI parte anche sulle PR il cui ramo contiene `verifica-webgl` (artefatto, niente publish). `deploy-dev` pubblica `dev/` solo al push su main, dopo test e build verdi. La radice del sito resta l'avvio manuale (`workflow_dispatch`).
 
 ## 6. DA FARE
 - Resto del gioco in **3–4 giorni**: capitoli 2+ con **un sistema gestionale per capitolo** (energia/corrente, contratti, rotte, officina, OmniFreight).
@@ -158,6 +166,12 @@ Ogni ruolo lavora solo sulle issue con la propria etichetta `ruolo:*`, sempre co
 
 Voci più recenti in alto. Formato: `AAAA-MM-GG HH:MM` (Europe/Rome) — [commit] — descrizione.
 
+- **23/10/2026 12:17 (Europe/Rome)**: Tech Lead — il commento CI non segna più rosso il PlayMode se l'unico scarto è un test saltato di proposito (`Cattura205` senza `UM_CATTURA205`). Sulla run 39935828921: EditMode 123/123, PlayMode 49 passati e 1 saltato, zero falliti; build WebGL verde.
+- **23/10/2026 12:15 (Europe/Rome)**: QA Tester — checklist **NO-VIA**. Build dev `21055fc` e, in locale, l'artefatto WebGL della run 39935828921 (codice della #285, non pubblicato). L'ingranaggio apre e chiude Impostazioni. Il fumetto della #285 non tronca il cold open. Il giro completo (muri a 3 punti, Zaino, OLDO, reload, altri viewport) non è stato eseguito. La cifra «40» sulla testa non è confermata dall'OCR di questo giro. Report `qa/playtest_web_live_chiusura23.md`.
+- **23/10/2026 (Europe/Rome)**: Tech Lead — chiusura cap. 1 sul ramo `cursor/cap1-chiusura-verifica-webgl-efbb`. #274 Kaia scivola sullo spigolo del vaso (`NinaController.Sblocca`). Merge di #272 (pillola prezzo fuori da Kaia) e di #186 (insegna di noce, Baloo 2, Fredoka Medium; freccia a bordo da Kaia, anche con la tappa #273). Documentazione UI in `docs/ui/CHIUSURA_CAP1.md`. Build WebGL sulle PR `verifica-webgl` senza publish.
+- **22/10/2026 11:15 (Europe/Rome)**: unita in squash la #165 (audio combo +N collegato all'AudioManager). Commit [796b01a](https://github.com/B00RR/ultimo-miglio/commit/796b01a3ae88f1146a54e033ef1aa25b0d1c159c). La CI di questo push è stata annullata prima dei job: non è arrivata su `/dev/`.
+- **22/10/2026 11:14 (Europe/Rome)**: unita in squash la #280 (guida #273: frecce che aggirano gli scaffali fino al pad OLDO). Commit [417093f](https://github.com/B00RR/ultimo-miglio/commit/417093ff869ac1c9232548c29980ca8360d77c8d). CI annullata prima dei job, come la #165.
+- **22/10/2026 10:57 (Europe/Rome)**: unita in squash la #276 (lettera GrayBox al passo debtCard, #275). Commit [21055fc](https://github.com/B00RR/ultimo-miglio/commit/21055fc06f26faebd19e11349ea645dff9364115). Ultimo `deploy-dev` verde.
 - **22/10/2026 10:36 (Europe/Rome)**: unita in squash la #277 (UI/UX Designer, Closes #254: il saldo compatto si tronca verso lo zero, 999999 → «999,9K», −999999 → «-999,9K», nessun «-0»; SaldoCompatto254Tests con 13 casi limite). Commit [aec4a36](https://github.com/B00RR/ultimo-miglio/commit/aec4a36902980ebab838d63d9d03911d99961d77).
 - **17/10/2026 05:25 (Europe/Rome)**: unita in squash la #266 (Animator, Refs #171: pad tolleranti verso la camera e test joystick; ramo aggiornato con main tramite update-branch dopo la #270). Commit [06adb3e](https://github.com/B00RR/ultimo-miglio/commit/06adb3e964b1e230b389b1091d4bc458dadaa7e4).
 - **17/10/2026 05:06 (Europe/Rome)**: unita in squash la #270 (3D Artist, Refs #256, #262, #224, #259: Cassa aperta, varchi da 1,2 m e pad visibili; PercorsoJoystick256Test controlla anche la Cassa → Nonna Ada e la coda senza salti silenziosi). Commit [704c754](https://github.com/B00RR/ultimo-miglio/commit/704c754dfe15d021a5503f56da8ea812f6567484).

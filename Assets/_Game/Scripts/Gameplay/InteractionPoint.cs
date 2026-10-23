@@ -6,13 +6,14 @@ namespace UltimoMiglio.Gameplay
 {
     public enum PoiKind { Prendi, Consegna, Acquisto }
 
-    /// <summary>My Little Universe-style interaction point: flat inset ground ring (#187, tufo + tinted fill, no ink rim) that pulses
-    /// (scale + emission), coloured by kind (prendi = blu, consegna = verde, acquisto = giallo), plus a floating billboard
-    /// chip (icon + max 2 words, Fredoka) drawn in the HUD world layer. The current tutorial target gets a bigger,
-    /// brighter pad and a vertical beacon; the others stay calm. Purely visual: gameplay stays in ProximityZone.</summary>
+    /// <summary>Punto di interazione. Il disco a terra è l'anello #187 (tufo e riempimento per tipo, salvato in scena, niente new Material a runtime).
+    /// Sul pad di acquisto il prezzo sta sull'insegna di noce (#186, Font Asset Baloo 2 in Etichette.uss): niente pillola gialla e niente font dinamico.
+    /// Solo visuale: il gioco resta in ProximityZone.</summary>
     public sealed class InteractionPoint : MonoBehaviour
     {
-        public PoiKind Kind; public string Label; public Texture2D Icon; public Font LabelFont;
+        public PoiKind Kind; public string Label; public Texture2D Icon;
+        /// <summary>Non disegna più il cartellino (#186): il Font Asset è in Etichette.uss. Il campo resta per le scene già salvate.</summary>
+        public Font LabelFont;
         public float Radius = 1.1f; public bool HasCard; public UpgradePad Pad; public UltimoMiglio.VFX.UM_PadFillRing Ring; public UltimoMiglio.VFX.UM_PadIcon PadIcon;
         // #69 (guida §2: niente blu/grigi freddi): Prendi = terracotta #C8633B, Consegna = menta #8FC9A8, Acquisto/upgrade = giallo sole #F4C430 (Concept, #69); bordo outline #3B2F2A.
         // Il nome "Blu" resta per compatibilità API, ma ora vale terracotta.
@@ -102,25 +103,20 @@ namespace UltimoMiglio.Gameplay
             _cam = Camera.main;
             var layer = _hud.Root.Q("world-layer") ?? _hud.Root;
             _chip = new VisualElement { name = "poi-chip", pickingMode = PickingMode.Ignore };
-            // Colonna: freccia ▼ terracotta SOPRA la pillola (mai sovrapposta al prezzo), centrata sullo stesso asse; ancora = fondo pillola
+            _chip.AddToClassList("poi-chip"); _chip.AddToClassList("insegna-noce");
+            // Colonna: freccia ▼ terracotta SOPRA l'insegna (mai sul prezzo), stesso asse; ancora = fondo insegna
             _chipCol = new VisualElement { name = "poi-chip-col", pickingMode = PickingMode.Ignore }; _chipCol.AddToClassList("poi-chip-col");
             _chevron = new VisualElement { name = "poi-chevron", pickingMode = PickingMode.Ignore }; _chevron.AddToClassList("poi-chevron");
-            var s = _chip.style; s.flexDirection = FlexDirection.Row; s.alignItems = Align.Center; s.alignSelf = Align.Center;
-            s.paddingLeft = 8; s.paddingRight = 12; s.paddingTop = 4; s.paddingBottom = 4;
-            s.backgroundColor = Kind == PoiKind.Acquisto ? Giallo : new Color(1f, 0.976f, 0.933f);
-            s.borderTopLeftRadius = s.borderTopRightRadius = s.borderBottomLeftRadius = s.borderBottomRightRadius = 999;
-            s.borderLeftWidth = s.borderRightWidth = s.borderTopWidth = s.borderBottomWidth = 3; // bordo 3–4 px (GUIDA §10)
-            s.borderLeftColor = s.borderRightColor = s.borderTopColor = s.borderBottomColor = Ink;
-            var ic = new VisualElement { pickingMode = PickingMode.Ignore };
-            var i = ic.style; i.width = 28; i.height = 28; i.borderTopLeftRadius = i.borderTopRightRadius = i.borderBottomLeftRadius = i.borderBottomRightRadius = 36;
-            i.backgroundColor = Kind == PoiKind.Acquisto ? Ink : _col; i.alignItems = Align.Center; i.justifyContent = Justify.Center; i.marginRight = 12;
-            var img = new VisualElement { pickingMode = PickingMode.Ignore }; img.style.width = 18; img.style.height = 18;
-            if (Icon) { img.style.backgroundImage = Icon; img.style.unityBackgroundImageTintColor = new Color(1f, 0.976f, 0.933f); }
-            ic.Add(img);
+            if (Icon)
+            {
+                var img = new VisualElement { pickingMode = PickingMode.Ignore };
+                img.AddToClassList("poi-chip__icon");
+                img.style.backgroundImage = Icon;
+                _chip.Add(img);
+            }
             _text = new Label(Label) { pickingMode = PickingMode.Ignore };
-            var t = _text.style; t.fontSize = Kind == PoiKind.Acquisto ? 18 : 16; t.color = Ink; t.unityFontStyleAndWeight = FontStyle.Bold; t.whiteSpace = WhiteSpace.NoWrap;
-            if (LabelFont) t.unityFontDefinition = FontDefinition.FromFont(LabelFont);
-            _chip.Add(ic); _chip.Add(_text);
+            _text.AddToClassList("poi-chip__valore");
+            _chip.Add(_text);
             // #94: barra LN "32/50" fra la freccia e la pillola: freccia ▼ → barra → pillola, stesso asse
             _bar = new VisualElement { name = "poi-bar", pickingMode = PickingMode.Ignore }; _bar.AddToClassList("poi-bar");
             var track = new VisualElement { pickingMode = PickingMode.Ignore }; track.AddToClassList("poi-bar__track");
@@ -148,6 +144,26 @@ namespace UltimoMiglio.Gameplay
 
         int _shownLeft = int.MinValue, _shownPaid = int.MinValue, _shownCost = int.MinValue;
         UltimoMiglio.UI.World.PadTag _tag; bool _tagLooked;
+        // #272: 0 = pillola a riposo, 1 = oltre il bordo sul lato opposto alla camera. Transizione 0,15 s.
+        float _dodge, _dodgeFrom, _dodgeT, _dodgeGoal;
+        Vector2 _restScreen; bool _restValid;
+        static readonly InteractionPoint[] _live = new InteractionPoint[12];
+        static int _liveN;
+        static readonly Vector2[] _otherBuf = new Vector2[12];
+
+        void OnEnable()
+        {
+            for (int i = 0; i < _liveN; i++) if (_live[i] == this) return;
+            if (_liveN < _live.Length) _live[_liveN++] = this;
+        }
+
+        void OnDisable()
+        {
+            for (int i = 0; i < _liveN; i++) if (_live[i] == this)
+            {
+                _live[i] = _live[--_liveN]; _live[_liveN] = null; _restValid = false; return;
+            }
+        }
 
         void LateUpdate()
         {
@@ -187,7 +203,7 @@ namespace UltimoMiglio.Gameplay
                 {
                     // #191: stringhe ricostruite solo quando cambiano i numeri (prima: allocazioni a ogni frame per pad → picchi GC su WebGL)
                     int left = Mathf.CeilToInt((float)Mathf.Max(0, (float)(cost - paid)));
-                    if (left != _shownLeft) { _shownLeft = left; _text.text = left + " LN"; } // pillola = quanto manca
+                    if (left != _shownLeft) { _shownLeft = left; _text.text = left + " LN"; } // insegna = quanto manca
                     int pd = Mathf.FloorToInt((float)paid), c = Mathf.CeilToInt((float)cost);
                     if (pd != _shownPaid || c != _shownCost) { _shownPaid = pd; _shownCost = c; _barLabel.text = pd + "/" + c; }
                     _barFill.style.width = Length.Percent(c > 0 ? Mathf.Clamp01((float)(paid / cost)) * 100f : 0f);
@@ -202,13 +218,48 @@ namespace UltimoMiglio.Gameplay
             if (PadIcon) { PadIcon.SetVisible(false); PadIcon.SetPlayerNear(near); }
             if (!_tagLooked) { _tagLooked = true; _tag = GetComponent<UltimoMiglio.UI.World.PadTag>(); } // #191: cache
             if (_tag && _tag.enabled) _tag.enabled = false;
-            // Offset mondo: più basso se il pad è in alto nello schermo, così la pillola non finisce sotto l'obiettivo
-            float bob = 0.12f * Mathf.Sin(Time.time * 2.4f + _phase);
-            Vector3 world = transform.position + Vector3.up * (1.55f + bob);
-            Vector3 sp = _cam.WorldToScreenPoint(world);
-            if (sp.z > 0 && sp.y > Screen.height * 0.72f)
-                sp = _cam.WorldToScreenPoint(transform.position + Vector3.up * (1.05f + bob * 0.5f));
-            bool show = avail && !(HasCard && near) && sp.z > 0 && sp.x > 0 && sp.x < Screen.width && sp.y > 0 && sp.y < Screen.height;
+            // #272: Kaia sul pad → la colonna va oltre il bordo, lato opposto alla camera, in 0,15 s.
+            // Il bob si spegne insieme allo spostamento, così a regime il rettangolo non rientra su di lei.
+            // A riposo resta la proiezione storica: durante il ricentro NonnoIntro Kaia è lontana dal pad
+            // e il solver non deve aggiungere WorldToScreenPoint nello stesso LateUpdate della camera.
+            var feet = nina ? nina.transform.position : transform.position;
+            bool onPad = nina && PricePillLayout.WithinRadius(transform.position, feet, Radius);
+            float goal = onPad ? 1f : 0f;
+            if (goal != _dodgeGoal) { _dodgeFrom = _dodge; _dodgeT = 0f; _dodgeGoal = goal; }
+            if (_dodge != _dodgeGoal)
+            {
+                _dodgeT += Time.deltaTime;
+                _dodge = Mathf.Lerp(_dodgeFrom, _dodgeGoal, PricePillLayout.Smooth(_dodgeT / PricePillLayout.DodgeSeconds));
+            }
+            float bob = (1f - _dodge) * 0.12f * Mathf.Sin(Time.time * 2.4f + _phase);
+            int sw, sh;
+            Vector3 sp;
+            if (_dodge <= 0.0001f)
+            {
+                sp = _cam.WorldToScreenPoint(transform.position + Vector3.up * (PricePillLayout.RestHeight + bob));
+                if (sp.z > 0f && sp.y > Screen.height * PricePillLayout.HighScreenFrac)
+                    sp = _cam.WorldToScreenPoint(transform.position + Vector3.up * (PricePillLayout.HighHeight + bob * 0.5f));
+                sw = Screen.width;
+                sh = Screen.height;
+                _restScreen.x = sp.x; _restScreen.y = sp.y; _restValid = sp.z > 0f;
+            }
+            else
+            {
+                sw = Screen.width > 1 ? Screen.width : _cam.pixelWidth;
+                sh = Screen.height > 1 ? Screen.height : _cam.pixelHeight;
+                Vector3 restSp = PricePillLayout.ProjectRest(_cam, transform.position, 0f, sh);
+                _restScreen.x = restSp.x; _restScreen.y = restSp.y; _restValid = restSp.z > 0f;
+                int othersN = 0;
+                for (int i = 0; i < _liveN; i++)
+                {
+                    var o = _live[i];
+                    if (!o || o == this || !o._restValid) continue;
+                    _otherBuf[othersN++] = o._restScreen;
+                    if (othersN == _otherBuf.Length) break;
+                }
+                sp = PricePillLayout.AnchorScreen(_cam, transform.position, Radius, feet, _dodge, bob, sw, sh, _otherBuf, othersN);
+            }
+            bool show = avail && !(HasCard && near) && sp.z > 0 && sp.x > 0 && sp.x < sw && sp.y > 0 && sp.y < sh;
             _chipCol.style.display = show ? DisplayStyle.Flex : DisplayStyle.None;
             if (!show || _chip.panel == null) return;
             _chevron.EnableInClassList("poi-chevron--on", _active);
@@ -219,15 +270,20 @@ namespace UltimoMiglio.Gameplay
             const float hudTopReserve = 206f; // fondo fumetto Ada (106 dp) + 8 + pillola 44 + barra LN 22 (#94) + freccia 26: la colonna non entra mai nella fascia alta HUD
             // Pad alto sullo schermo: niente clamp che stacca la pillola dal pad. La colonna si ribalta SOTTO il pad
             // (freccia ▲ verso il pad, pillola sotto), così indica sempre il pad e non entra nella fascia alta.
-            bool flip = p.y < hudTopReserve;
-            if (flip) { var pad = UltimoMiglio.UI.SafeAreaUtil.ScreenToPanel(_chip.panel, _cam.WorldToScreenPoint(transform.position)); p.y = Mathf.Max(pad.y + 10f, hudTopReserve - 70f); }
+            // #272: durante lo spostamento la colonna resta sopra l'ancora (niente ribaltamento sulla testa di Kaia).
+            bool dodgeOn = _dodge > 0.001f;
+            bool flip = !dodgeOn && p.y < hudTopReserve;
+            if (flip) { var padPt = UltimoMiglio.UI.SafeAreaUtil.ScreenToPanel(_chip.panel, _cam.WorldToScreenPoint(transform.position)); p.y = Mathf.Max(padPt.y + 10f, hudTopReserve - 70f); }
             _chipCol.EnableInClassList("poi-chip-col--flip", flip);
             float panelW = _chip.panel.visualTree.worldBound.width;
-            if (panelW < 1f) panelW = Screen.width;
-            float halfChip = 70f; // pillola ~140px, anchor al centro (translate -50%)
+            if (panelW < 1f) panelW = sw;
+            float halfChip = 70f; // insegna ~140 px, ancora al centro (translate -50%)
             const float edgePad = 10f;
-            if (p.x < halfChip + edgePad) p.x = halfChip + edgePad;
-            if (p.x > panelW - halfChip - edgePad) p.x = panelW - halfChip - edgePad;
+            if (!dodgeOn)
+            {
+                if (p.x < halfChip + edgePad) p.x = halfChip + edgePad;
+                if (p.x > panelW - halfChip - edgePad) p.x = panelW - halfChip - edgePad;
+            }
             _chipCol.style.left = p.x; _chipCol.style.top = p.y;
             _chip.style.scale = new Scale(Vector3.one * (_active ? 1.08f : 1f));
             // Chip sopra il world-layer ma sotto i controlli: porta in cima al world-layer

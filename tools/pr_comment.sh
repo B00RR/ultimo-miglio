@@ -15,17 +15,24 @@ except Exception: sha = "?"
 L = ["<!-- um-ci -->", f"## Esito pipeline — commit `{sha}` ({ora} Europe/Rome)", "",
      "| Suite | Esito | Superati | Falliti | Saltati |", "|---|---|---|---|---|"]
 falliti = []
+saltati = []
 for p in ("editmode", "playmode"):
     f = f"Logs/{p}-results.xml"
     if not os.path.exists(f):
         L.append(f"| {p} | ⚪ non eseguito | – | – | – |"); continue
     r = ET.parse(f).getroot()
-    ok = r.get("result","").startswith("Passed")
+    # NUnit marca l'intera suite «Skipped:Ignored» se un test è saltato di proposito
+    # (es. Cattura205 senza UM_CATTURA205), anche con zero falliti. Rosso solo se qualcosa fallisce.
+    failed_n = int(r.get("failed") or 0)
+    ok = failed_n == 0 and not r.get("result", "").startswith("Failed")
     L.append(f"| {p} | {'✅ verde' if ok else '❌ rosso'} | {r.get('passed')} | {r.get('failed')} | {r.get('skipped')} |")
     for tc in r.iter("test-case"):
         if tc.get("result") == "Failed":
             m = tc.find("failure/message")
             falliti.append(f"- `{tc.get('fullname')}`: {(m.text or '').strip()[:300] if m is not None else ''}")
+        elif tc.get("result") not in ("Passed", None):
+            msg = tc.findtext("reason/message") or tc.findtext("properties/property") or ""
+            saltati.append(f"- `{tc.get('fullname')}`: {msg.strip()[:200]}")
 log = "Logs/webgl_build.log"
 if os.path.exists(log):
     riga = [l for l in open(log, errors="ignore") if "[WebGLBuild] esito=" in l or "[WebGLMin] " in l and "errors=" in l]
@@ -35,6 +42,7 @@ if url: L += ["", f"**Link giocabile:** {url}"]
 if os.environ.get("UM_RUN"): L += ["", f"**Run:** {os.environ['UM_RUN']}"]
 if os.environ.get("UM_NOTA"): L += ["", os.environ["UM_NOTA"]]
 if falliti: L += ["", "### Test falliti", *falliti]
+if saltati: L += ["", "### Test saltati", *saltati]
 print("\n".join(L))
 PY
 )
