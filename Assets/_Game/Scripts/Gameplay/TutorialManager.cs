@@ -43,7 +43,9 @@ namespace UltimoMiglio.Gameplay
         public static bool TestSenzaComparse;
         [Tooltip("Aiuti a 10/20/40 s di inattività (OnboardingHints). La freccia a bordo schermo parte solo al livello 2.")]
         public bool AiutiProgressivi = true;
-        [Tooltip("'Salta tutorial' compare dopo questo passo o alla prima combo (NotifyCombo)")]
+        // Design: il tasto non c'è al cold open. ONB-01 (la scena non si salta), ONB-15 (prima del passo 8 il tasto non c'è),
+        // onboarding.json skipTutorial.availableAfterStep = combo, 04_UI.md «Salta tutorial dopo il passo 6».
+        [Tooltip("'Salta tutorial' compare dopo questo passo o alla prima combo (NotifyCombo). Non al cold open: lo vieta il design.")]
         public Step SaltaDopo = Step.Combo;
 
         public Step Current { get; private set; }
@@ -232,7 +234,9 @@ namespace UltimoMiglio.Gameplay
                 Step.Move => "onb.move.card",
                 Step.PickUp => GameRoot.I && GameRoot.I.Nina && GameRoot.I.Nina.Stack.Count >= GameRoot.I.Nina.Stack.Capacity ? "onb.pick.max" : null,
                 Step.Shelve => "onb.deposit.hint", Step.Serve => "onb.cust.first", Step.Coins => "onb.coins.walk",
-                Step.ZainoPad => "onb.zaino.hint", Step.Combo => "onb.combo", Step.NonnoIntro => "onb.nonno.intro", Step.HireNonno => "onb.nonno.cost",
+                Step.ZainoPad => PuoFinire(UpgradeKind.Zaino) ? "onb.zaino.hint" : "onb.zaino.notEnough",
+                Step.Combo => "onb.combo", Step.NonnoIntro => "onb.nonno.intro",
+                Step.HireNonno => PuoFinire(UpgradeKind.NonnoHire) ? "onb.nonno.cost" : "onb.nonno.notEnough",
                 Step.NonnoConfirm => "onb.nonno.working", Step.PadNuovi => "onb.pads.new", Step.CassaPass => "onb.cassa.tip", Step.DebtCard => DebtCardHintKey(Time.time - _stepStart), // #275: anche la lettera GrayBox
                 Step.WallPad => "onb.wall.goal", _ => null
             };
@@ -370,6 +374,7 @@ namespace UltimoMiglio.Gameplay
             if (TestAccelera && s == Step.Coins && eco != null && eco.S.Wallet < 4)
                 eco.S.Wallet = System.Math.Max(eco.S.Wallet, 4);
             if (s < Step.Chiuso) Onb("start", s, "reveals", RevealsOf(s).Length, "ln", Ln(eco));
+            if (eco != null && GameRoot.I) GameRoot.I.Save(); // il ricarico della pagina tiene passo, LN e acquisti
             // onboarding.json nonnoConfirm.camera: 3 s su NONNO (input libero)
             if (s == Step.NonnoConfirm) { var nr = FindAnyObjectByType<NonnoRobot>(); if (nr) CameraPeek.Request(nr.transform.position, NonnoConfirmCamSec); }
             if (s == Step.FreePlay) Onb("end", s, "total", OnbTime, "hints", _hintCount, "lvl3", _lvl3, "ln", Ln(eco), "spent", Spent(eco));
@@ -411,6 +416,52 @@ namespace UltimoMiglio.Gameplay
         public Transform CurrentTarget => Target();
         Transform Target() => TargetOf(Current);
 
+        /// <summary>Portafoglio abbastanza per chiudere il pad (costo meno quanto già versato). Infinito = pad assente.</summary>
+        public static bool PuoFinireIlPad(double portafoglio, double costo, double giaPagato)
+        {
+            if (double.IsInfinity(costo) || double.IsNaN(costo)) return false;
+            return portafoglio + 1e-6 >= costo - giaPagato;
+        }
+
+        bool PuoFinire(UpgradeKind k)
+        {
+            var eco = GameRoot.Ready ? GameRoot.I.Eco : null;
+            if (eco == null) return false;
+            int i = (int)k;
+            double gia = eco.S.PadPaid != null && i >= 0 && i < eco.S.PadPaid.Length ? eco.S.PadPaid[i] : 0;
+            return PuoFinireIlPad(eco.S.Wallet, eco.Cost(k), gia);
+        }
+
+        /// <summary>Sotto i 40 LN il pad Zaino non esiste ancora (onboarding.json revealWhen). Appena il portafoglio basta, compare.
+        /// Fuori da quel passo il pad torna visibile: la regola non deve lasciarlo spento per il resto del capitolo.</summary>
+        bool _padZainoRitirato;
+        void SincronizzaPadZaino()
+        {
+            if (Current != Step.ZainoPad)
+            {
+                if (_padZainoRitirato) { UltimoMiglio.UI.HudReveal.Show("pad.zaino"); _padZainoRitirato = false; }
+                return;
+            }
+            bool manca = !PuoFinire(UpgradeKind.Zaino);
+            bool nascosto = UltimoMiglio.UI.HudReveal.IsHidden("pad.zaino");
+            if (manca && !nascosto) { UltimoMiglio.UI.HudReveal.Hide("pad.zaino"); _padZainoRitirato = true; }
+            else if (!manca && _padZainoRitirato) { UltimoMiglio.UI.HudReveal.Show("pad.zaino"); _padZainoRitirato = false; }
+        }
+
+        /// <summary>Giro per fare LN: con pacchi in mano il Bancone, altrimenti uno scaffale pieno, altrimenti gli Arrivi.</summary>
+        Transform PerGuadagnare()
+        {
+            var nina = GameRoot.I && GameRoot.I.Nina ? GameRoot.I.Nina : null;
+            if (nina && nina.Stack.Count > 0) return Bancone ? Bancone : Arrivi;
+            AggiornaCache(false);
+            for (int i = 0; i < _shelves.Count; i++)
+            {
+                var sh = _shelves[i];
+                if (sh && sh.isActiveAndEnabled && sh.Count > 0) return sh.transform;
+            }
+            return Arrivi ? Arrivi : Bancone;
+        }
+
         /// <summary>#189 (spec GD 16/10): come si indica il bersaglio di un passo. Freccia = chevron a terra da Nina al bersaglio;
         /// FrecciaOltre = la freccia sparisce sotto questa distanza (m); Anello = anello pulsante sotto il bersaglio.</summary>
         public struct Guida { public Transform Target; public bool Freccia, Anello; public float FrecciaOltre; }
@@ -424,7 +475,12 @@ namespace UltimoMiglio.Gameplay
         public Transform TargetOf(Step s) => s switch
         {
             Step.PickUp => Arrivi, Step.Shelve => NearestFreeShelf() ?? Scaffale, Step.Serve => Bancone, Step.Coins => Monete ? Monete : Bancone, Step.Combo => Bancone,
-            Step.ZainoPad => PadZaino, Step.NonnoIntro => PadNonno, Step.HireNonno => PadNonno, Step.NonnoConfirm => Nonno() ?? PadNonno,
+            // onboarding.json zainoPad.revealWhen walletLn>=40: sotto i 40 LN il pad resta nascosto e la guida torna al giro clienti.
+            // ONB-09b: sul pad di OLDO, se mancano LN la freccia va al Bancone (il pad resta visibile).
+            Step.ZainoPad => PuoFinire(UpgradeKind.Zaino) ? PadZaino : PerGuadagnare(),
+            Step.NonnoIntro => PadNonno,
+            Step.HireNonno => PuoFinire(UpgradeKind.NonnoHire) ? PadNonno : PerGuadagnare(),
+            Step.NonnoConfirm => Nonno() ?? PadNonno,
             Step.PadNuovi => NearestNewPad() ?? CheapestNewPad(), Step.CassaPass => Cassa(), Step.DebtCard => (_safe ? _safe : null) ?? Ada() ?? Bancone,
             Step.WallPad => NearestNewPad() ?? Cassa(), // la slice non ha ancora il pad muro: anello sul prossimo pad (o Cassa), vedi PR #189
             _ => null
@@ -535,6 +591,7 @@ namespace UltimoMiglio.Gameplay
                 _banner.style.display = show ? DisplayStyle.Flex : DisplayStyle.None;
                 if (show && _bannerText != null) _bannerText.text = txt;
             }
+            SincronizzaPadZaino();
             AggiornaGuida(false);
             if (_marker) _marker.gameObject.SetActive(false);
             if (TestBloccaPassi) return;

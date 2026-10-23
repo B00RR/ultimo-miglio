@@ -42,12 +42,12 @@ public class GuidaOldo273Test
             Assert.Greater(VarcoMarker.Tutti.Count, 0, "nessun VarcoMarker in scena (layout #270)");
             for (var s = tut.Current + 1; s <= TutorialManager.Step.HireNonno; s++) { tut.TestEntraNelPasso(s); yield return null; }
             Assert.AreEqual(TutorialManager.Step.HireNonno, tut.Current);
+            GameRoot.I.Eco.S.Wallet = 1000; // OLDO pagabile: sotto i 50 LN la freccia torna al giro clienti (ONB-09b)
             var bersaglio = tut.CurrentTarget; Assert.IsNotNull(bersaglio, "nessun bersaglio al passo hireNonno");
             var pad = bersaglio.GetComponent<UpgradePad>(); Assert.IsNotNull(pad, "il bersaglio di hireNonno non è un pad");
             Assert.AreEqual(UpgradeKind.NonnoHire, pad.Kind, "il bersaglio di hireNonno non è il pad OLDO");
             var hints = tut.GetComponent<OnboardingHints>(); Assert.IsNotNull(hints, "OnboardingHints mancante");
             hints.Level1Sec = 0.05f; hints.Level2Sec = 0.1f; hints.Level3Sec = 1e6f; // freccia a bordo / mano subito, niente camera breve
-            GameRoot.I.Eco.S.Wallet = 1000; // OLDO pagabile: si misura solo la strada
 
             Vector3 start;
             if (partenza == "Bancone") { var b = Object.FindAnyObjectByType<Bancone>(); Assert.IsNotNull(b, "Bancone mancante"); start = b.transform.position; }
