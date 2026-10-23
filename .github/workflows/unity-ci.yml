@@ -144,8 +144,10 @@ jobs:
 
   build:
     needs: licenza
-    # Sulle PR niente build WebGL (solo test): build su push a main e avvio manuale
-    if: needs.licenza.outputs.ok == 'true' && github.event_name != 'pull_request'
+    # Sulle PR niente build WebGL, salvo i rami il cui nome contiene "verifica-webgl":
+    # lì la build compila e resta un artefatto, senza publish (il deploy in radice è solo manuale,
+    # deploy-dev solo sul push di main). I rami normali restano solo con i test.
+    if: needs.licenza.outputs.ok == 'true' && (github.event_name != 'pull_request' || contains(github.head_ref, 'verifica-webgl'))
     runs-on: ubuntu-24.04
     steps:
       # ubuntu-24.04 ha già ~86 GB liberi (run 38908075647): free-disk-space (1-2,5 min) non serve più
