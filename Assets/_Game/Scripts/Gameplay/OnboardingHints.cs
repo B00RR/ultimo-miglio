@@ -18,12 +18,12 @@ namespace UltimoMiglio.Gameplay
         [Tooltip("Camera breve sugli elementi rivelati (s, 2,5–3)")] public float RevealPeekSec = 2.75f;
 
         TutorialManager _tut; EdgeArrow _edge; HudController _hud; InteractionPoint _ip;
-        /// <summary>#256: prossima tappa della guida (varco da attraversare o bersaglio), ricalcolata ogni <see cref="TappaSec"/>.</summary>
+        /// <summary>#256: prossima tappa della guida (varco da attraversare o bersaglio), ricalcolata ogni <see cref="TappaSec"/>.
+        /// #273: è la stessa di TutorialManager.TappaGuida, usata anche da freccia a terra e freccia a bordo schermo.</summary>
         public Vector3 Tappa { get; private set; }
         /// <summary>#256: direzione della mano nel pannello (x a destra, y in basso), dalla posizione di Kaia verso <see cref="Tappa"/> sullo schermo.</summary>
         public Vector2 DirezioneMano { get; private set; }
-        public const float TappaSec = 0.2f; // stesso ritmo di TutorialManager.AggiornaCache
-        float _tappaT = -1f; Transform _tappaPer; int _passati;
+        public const float TappaSec = TutorialManager.TappaSec; // stesso ritmo di TutorialManager.AggiornaCache
         VisualElement _hand; float _idle, _best = float.MaxValue; int _level; bool _handOn, _peekDone; Vector3 _lastNina; bool _hasLast;
 
         void OnEnable() { Active = true; TutorialManager.StepChanged += OnStep; HudReveal.Revealed += OnRevealed; }
@@ -78,7 +78,7 @@ namespace UltimoMiglio.Gameplay
             if (_level < 2 && _idle >= Level2Sec)
             {
                 _level = 2;
-                if (target && !OnScreen(target.position)) { if (_edge) _edge.SetTarget(target, _tut.CurrentObjectiveText); Log("freccia"); _tut.NotifyHint(2, _idle, "freccia"); }
+                if (target && !OnScreen(target.position)) { if (_edge) _edge.SetTarget(target, _tut.CurrentObjectiveText, null, _tut.Via); Log("freccia"); _tut.NotifyHint(2, _idle, "freccia"); } // #273: verso la tappa della mano
                 else { EnsureHand(); _handOn = _hand != null; if (_handOn && _hud) _hud.Root.AddToClassList("onb-hand"); Log("mano"); _tut.NotifyHint(2, _idle, "manoFantasma"); }
             }
             if (_level < 3 && _idle >= Level3Sec)
@@ -89,11 +89,12 @@ namespace UltimoMiglio.Gameplay
             if (_handOn) AnimateHand(target, np);
         }
 
-        /// <summary>#256: tappa (varco o bersaglio) ogni 0,2 s o al cambio di bersaglio; direzione schermo a ogni frame (la camera ruota, #205). Nessuna allocazione.</summary>
+        /// <summary>#256: tappa (varco o bersaglio) ogni 0,2 s o al cambio di bersaglio; direzione schermo a ogni frame (la camera ruota, #205). Nessuna allocazione.
+        /// #273: la tappa la calcola TutorialManager.TappaVerso, la stessa della freccia a terra e della freccia a bordo schermo.</summary>
         void AggiornaTappa(Transform target, Vector3 np)
         {
             if (!target) { Tappa = np; DirezioneMano = new Vector2(0f, -1f); return; }
-            if (target != _tappaPer || Time.time - _tappaT >= TappaSec) { if (target != _tappaPer) _passati = 0; _tappaPer = target; _tappaT = Time.time; Tappa = VarcoMarker.ProssimaTappa(np, target.position, target, ref _passati, out _); }
+            Tappa = _tut.TappaVerso(target);
             var cam = Camera.main; var dir = DirezioneMano.sqrMagnitude > 0f ? DirezioneMano : Vector2.up;
             if (cam)
             {

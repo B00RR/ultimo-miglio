@@ -198,8 +198,30 @@ namespace UltimoMiglio.Gameplay
             string j = TestiJson.text;
             foreach (System.Text.RegularExpressions.Match m in System.Text.RegularExpressions.Regex.Matches(j, "\\{\\s*\"id\"\\s*:\\s*\"([^\"]+)\"\\s*,\\s*\"text\"\\s*:\\s*\"((?:[^\"\\\\]|\\\\.)*)\""))
                 if (IdToStep.TryGetValue(m.Groups[1].Value, out var st) && (int)st < Texts.Length) Texts[(int)st] = System.Text.RegularExpressions.Regex.Unescape(m.Groups[2].Value);
-            foreach (System.Text.RegularExpressions.Match m in System.Text.RegularExpressions.Regex.Matches(j, "\"(onb\\.[a-zA-Z.]+)\"\\s*:\\s*\"((?:[^\"\\\\]|\\\\.)*)\""))
-                _hints[m.Groups[1].Value] = System.Text.RegularExpressions.Regex.Unescape(m.Groups[2].Value);
+            foreach (var kv in HintsFrom(j)) _hints[kv.Key] = kv.Value;
+        }
+
+        /// <summary>Suggerimenti onb.* (chiave → testo) letti da onboarding_testi.json. Statico per i test EditMode (#275).
+        /// #275: la chiave ammette le cifre (onb.viktor.call1/2, onb.debt.milestone1-3): prima la regex [a-zA-Z.] le scartava.</summary>
+        public static System.Collections.Generic.Dictionary<string, string> HintsFrom(string json)
+        {
+            var d = new System.Collections.Generic.Dictionary<string, string>();
+            if (string.IsNullOrEmpty(json)) return d;
+            foreach (System.Text.RegularExpressions.Match m in System.Text.RegularExpressions.Regex.Matches(json, "\"(onb\\.[a-zA-Z0-9.]+)\"\\s*:\\s*\"((?:[^\"\\\\]|\\\\.)*)\""))
+                d[m.Groups[1].Value] = System.Text.RegularExpressions.Regex.Unescape(m.Groups[2].Value);
+            return d;
+        }
+
+        /// <summary>#275: lettera GrayBox sulla Cassaforte (onboarding.json, debtCard.delivery.lettera): righe nella barra del passo debtCard.</summary>
+        public static readonly string[] LetteraGrayBox = { "onb.viktor.call1", "onb.viktor.call2" };
+        /// <summary>#275: secondi per riga nella barra di debtCard.</summary>
+        public const float DebtCardRigaSec = 5f;
+        /// <summary>#275: chiave della barra di debtCard dopo t s dall'inizio del passo: onb.debt.adaExplain, poi la lettera GrayBox (call1, call2), a giro.
+        /// Prima CurrentHint dava solo onb.debt.adaExplain e la lettera non compariva mai.</summary>
+        public static string DebtCardHintKey(float t)
+        {
+            int i = (int)(Mathf.Max(0f, t) / DebtCardRigaSec) % (LetteraGrayBox.Length + 1);
+            return i == 0 ? "onb.debt.adaExplain" : LetteraGrayBox[i - 1];
         }
 
         /// <summary>Suggerimento onb.* del passo (CTA/hint terracotta in alto nella fascia bassa). null = nessuno.</summary>
@@ -211,7 +233,7 @@ namespace UltimoMiglio.Gameplay
                 Step.PickUp => GameRoot.I && GameRoot.I.Nina && GameRoot.I.Nina.Stack.Count >= GameRoot.I.Nina.Stack.Capacity ? "onb.pick.max" : null,
                 Step.Shelve => "onb.deposit.hint", Step.Serve => "onb.cust.first", Step.Coins => "onb.coins.walk",
                 Step.ZainoPad => "onb.zaino.hint", Step.Combo => "onb.combo", Step.NonnoIntro => "onb.nonno.intro", Step.HireNonno => "onb.nonno.cost",
-                Step.NonnoConfirm => "onb.nonno.working", Step.PadNuovi => "onb.pads.new", Step.CassaPass => "onb.cassa.tip", Step.DebtCard => "onb.debt.adaExplain",
+                Step.NonnoConfirm => "onb.nonno.working", Step.PadNuovi => "onb.pads.new", Step.CassaPass => "onb.cassa.tip", Step.DebtCard => DebtCardHintKey(Time.time - _stepStart), // #275: anche la lettera GrayBox
                 Step.WallPad => "onb.wall.goal", _ => null
             };
             return k != null && _hints.TryGetValue(k, out var v) ? v : null;
@@ -408,6 +430,31 @@ namespace UltimoMiglio.Gameplay
         };
 
         Transform _guidaT; Step _guidaS = Step.Chiuso;
+
+        // ---------------- #273: una sola tappa per mano, freccia a terra e freccia a bordo schermo ----------------
+        /// <summary>#256/#273: prossima tappa della guida verso il bersaglio del passo (varco da attraversare o il bersaglio stesso), ricalcolata ogni
+        /// <see cref="TappaSec"/> o al cambio di bersaglio. La usano la mano fantasma (OnboardingHints), la freccia a terra (UM_TutorialMarker) e la
+        /// freccia a bordo schermo (EdgeArrow): prima solo la mano girava dai varchi e freccia e chevron puntavano dritti attraverso gli scaffali.</summary>
+        public Vector3 TappaGuida { get; private set; }
+        public const float TappaSec = 0.2f;
+        float _tappaT = -1f; Transform _tappaPer; int _passati; System.Func<Vector3> _viaGuida;
+        /// <summary>Tappa verso <paramref name="target"/> dalla posizione attuale di Kaia. Più chiamate nello stesso intervallo restituiscono la stessa
+        /// tappa; i varchi già passati restano ricordati finché il bersaglio non cambia. Nessuna allocazione.</summary>
+        public Vector3 TappaVerso(Transform target)
+        {
+            var nina = GameRoot.I ? GameRoot.I.Nina : null;
+            if (!target) return TappaGuida = nina ? nina.transform.position : Vector3.zero;
+            if (!nina) return target.position;
+            if (target != _tappaPer || Time.time - _tappaT >= TappaSec)
+            {
+                if (target != _tappaPer) _passati = 0;
+                _tappaPer = target; _tappaT = Time.time;
+                TappaGuida = VarcoMarker.ProssimaTappa(nina.transform.position, target.position, target, ref _passati, out _);
+            }
+            return TappaGuida;
+        }
+        /// <summary>Punto verso cui puntano freccia a terra e freccia a bordo schermo (delegato creato una volta sola).</summary>
+        System.Func<Vector3> ViaGuida => _viaGuida ??= () => _guidaT ? TappaVerso(_guidaT) : TappaGuida;
         /// <summary>#189: freccia a terra, anello e freccia a bordo schermo seguono il bersaglio del passo corrente (anche se cambia o compare dopo).</summary>
         void AggiornaGuida(bool forza)
         {
@@ -415,14 +462,17 @@ namespace UltimoMiglio.Gameplay
             if (!forza && g.Target == _guidaT && _guidaS == Current) return;
             _guidaT = g.Target; _guidaS = Current;
             var nina = GameRoot.I && GameRoot.I.Nina ? GameRoot.I.Nina.transform : null;
-            if (g.Target && g.Anello) UltimoMiglio.VFX.UM_TutorialMarker.Show(g.Target, nina, g.Freccia, g.FrecciaOltre); else UltimoMiglio.VFX.UM_TutorialMarker.Hide();
+            // #273: la freccia a terra punta alla tappa della guida (varco), l'anello resta sul bersaglio
+            if (g.Target && g.Anello) UltimoMiglio.VFX.UM_TutorialMarker.Show(g.Target, nina, g.Freccia, g.FrecciaOltre, ViaGuida); else UltimoMiglio.VFX.UM_TutorialMarker.Hide();
             // #94: con gli aiuti progressivi la freccia a bordo schermo arriva solo dopo 20 s di inattività (OnboardingHints)
-            if (_edge) { if (g.Target && g.Freccia && !OnboardingHints.Active) _edge.SetTarget(g.Target, Current.ToString().ToUpper()); else if (!OnboardingHints.Active) _edge.Clear(); }
+            if (_edge) { if (g.Target && g.Freccia && !OnboardingHints.Active) _edge.SetTarget(g.Target, Current.ToString().ToUpper(), null, ViaGuida); else if (!OnboardingHints.Active) _edge.Clear(); }
         }
         /// <summary>Solo test #189: i passi non avanzano da soli (si entra con <see cref="TestEntraNelPasso"/>).</summary>
         public static bool TestBloccaPassi;
         /// <summary>Solo test: entra direttamente nel passo s.</summary>
         public void TestEntraNelPasso(Step s) => Enter(s);
+        /// <summary>#273: punto verso cui la guida manda Kaia (per OnboardingHints e per la freccia a bordo schermo).</summary>
+        public System.Func<Vector3> Via => ViaGuida;
 
         Transform NearestFreeShelf()
         {

@@ -31,7 +31,7 @@ namespace UltimoMiglio.VFX
 
         static readonly int SpeedId = Shader.PropertyToID("_Speed"), PulseId = Shader.PropertyToID("_Pulse"), AlphaId = Shader.PropertyToID("_Alpha"), ColorId = Shader.PropertyToID("_Color");
         Transform _ring, _arrow, _target; Vector3 _point; bool _visible, _usePoint, _arrowOn = true; float _arrowWithin = -1; float _alpha, _arrowAlpha;
-        Renderer _ringR, _arrowR; MaterialPropertyBlock _mpb;
+        Renderer _ringR, _arrowR; MaterialPropertyBlock _mpb; System.Func<Vector3> _via; // #273
 
         public static UM_TutorialMarker Ensure()
         {
@@ -40,14 +40,15 @@ namespace UltimoMiglio.VFX
             if (!Instance) Instance = new GameObject("UM_TutorialMarker").AddComponent<UM_TutorialMarker>();
             return Instance;
         }
-        /// <summary>#189: anello sul bersaglio; freccia a terra solo se arrow e Nina è oltre arrowWithin metri.</summary>
-        public static void Show(Transform target, Transform player, bool arrow, float arrowWithin) { Show(target, player); var m = Instance; m._arrowOn = arrow; m._arrowWithin = arrowWithin; }
+        /// <summary>#189: anello sul bersaglio; freccia a terra solo se arrow e Nina è oltre arrowWithin metri.
+        /// #273: via (facoltativo) = punto verso cui punta la freccia (la tappa della guida: un varco se la linea retta è chiusa); l'anello resta sul bersaglio.</summary>
+        public static void Show(Transform target, Transform player, bool arrow, float arrowWithin, System.Func<Vector3> via = null) { Show(target, player); var m = Instance; m._arrowOn = arrow; m._arrowWithin = arrowWithin; m._via = via; }
         public static string Stato => Instance ? $"on={Instance.isActiveAndEnabled} player={(Instance.player ? Instance.player.name : "-")} a={Instance._alpha:0.00} fa={Instance._arrowAlpha:0.00} arrowOn={Instance._arrowOn} within={Instance._arrowWithin} mat={(Instance.arrowMaterial ? 1 : 0)}" : "nessun marker";
         public static Transform Target => Instance ? Instance._target : null;
         /// <summary>Freccia a terra (test #189): attiva e trasform del quad.</summary>
         public static Transform ArrowTransform => Instance ? Instance._arrow : null;
-        public static void Show(Transform target, Transform player = null) { var m = Ensure(); m._arrowOn = true; m._arrowWithin = -1; m._target = target; m._usePoint = false; if (player) m.player = player; m._visible = target; m.SnapIfHidden(); }
-        public static void Show(Vector3 point, Transform player = null) { var m = Ensure(); m._arrowOn = true; m._arrowWithin = -1; m._target = null; m._usePoint = true; m._point = point; if (player) m.player = player; m._visible = true; m.SnapIfHidden(); }
+        public static void Show(Transform target, Transform player = null) { var m = Ensure(); m._arrowOn = true; m._arrowWithin = -1; m._via = null; m._target = target; m._usePoint = false; if (player) m.player = player; m._visible = target; m.SnapIfHidden(); }
+        public static void Show(Vector3 point, Transform player = null) { var m = Ensure(); m._arrowOn = true; m._arrowWithin = -1; m._via = null; m._target = null; m._usePoint = true; m._point = point; if (player) m.player = player; m._visible = true; m.SnapIfHidden(); }
         public static void Hide() { if (Instance) Instance._visible = false; }
         public static bool Visible => Instance && Instance._visible;
 
@@ -113,7 +114,9 @@ namespace UltimoMiglio.VFX
             _ring.position = new Vector3(tp.x, groundY, tp.z); _ring.localScale = new Vector3(s, 1, s); _ring.rotation = Quaternion.identity;
             if (_ringR) { _ringR.GetPropertyBlock(_mpb); _mpb.SetFloat(PulseId, pulse); var c = RingColor; c.a = _alpha; _mpb.SetColor(ColorId, c); _ringR.SetPropertyBlock(_mpb); }
             if (!player || !_arrow) return;
-            var d = Flat(tp - player.position); if (d.sqrMagnitude < 1e-4f) return;
+            var d = Flat((_via != null ? _via() : tp) - player.position); // #273: verso la tappa della guida (varco), non dritta attraverso gli scaffali
+            if (d.sqrMagnitude < 1e-4f) d = Flat(tp - player.position);
+            if (d.sqrMagnitude < 1e-4f) return;
             d.Normalize();
             float bob = Mathf.Sin(t * bobSpeed * Mathf.PI * 2f) * bobAmplitude;
             var p = player.position + d * (arrowDistance + bob);

@@ -8,7 +8,8 @@ using UltimoMiglio.Gameplay;
 using UltimoMiglio.VFX;
 
 /// <summary>#189 (criterio QA del Game Designer): ogni passo con obiettivo ha un bersaglio non nullo, l'anello compare entro 0,5 s
-/// e la freccia a terra punta al bersaglio e si muove (chevron/bob). Vale anche per cassaPass.</summary>
+/// e la freccia a terra punta al bersaglio e si muove (chevron/bob). Vale anche per cassaPass. #273: con la linea retta chiusa (scaffali, muri)
+/// la freccia punta alla tappa della guida, cioè al varco indicato anche dalla mano.</summary>
 public class TutorialGuidaTest
 {
     [UnityTest, Timeout(180000)]
@@ -43,7 +44,9 @@ public class TutorialGuidaTest
                     Assert.IsNotNull(arrow);
                     for (float tw = Time.unscaledTime; !arrow.gameObject.activeInHierarchy && Time.unscaledTime - tw < 1f;) yield return null; // fade-in della freccia (runner CI carico)
                     Assert.IsTrue(arrow.gameObject.activeInHierarchy, $"passo {s}: freccia a terra assente ({UM_TutorialMarker.Stato}, d={d.magnitude:0.0})");
-                    Assert.Greater(Vector3.Dot(arrow.forward, d.normalized), 0.95f, $"passo {s}: la freccia non punta al bersaglio");
+                    // #273: la freccia punta alla tappa della guida (il bersaglio se la linea retta è libera, altrimenti il varco della mano)
+                    var dv = tm.Via() - nina.transform.position; dv.y = 0; if (dv.sqrMagnitude < 1e-4f) dv = d;
+                    Assert.Greater(Vector3.Dot(arrow.forward, dv.normalized), 0.95f, $"passo {s}: la freccia non punta alla tappa della guida");
                     // bob con periodo 0,8 s: due soli campioni a 0,2 s possono cadere su valori uguali (sin x = cos x), quindi si prende lo spostamento massimo su 0,4 s
                     var p0 = arrow.position; float tm0 = Time.time, mov = 0f; while (Time.time - tm0 < 0.4f) { yield return null; mov = Mathf.Max(mov, (arrow.position - p0).sqrMagnitude); }
                     Assert.Greater(mov, 1e-6f, $"passo {s}: freccia a terra statica");

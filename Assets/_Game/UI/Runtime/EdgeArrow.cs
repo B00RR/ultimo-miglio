@@ -17,7 +17,7 @@ namespace UltimoMiglio.UI
         [SerializeField] float markerHeight = 2.2f;
         [SerializeField] bool showMarkerWhenVisible = false; // QA #44: objective only in HUD top line
 
-        Transform target; string targetName; string iconClass;
+        Transform target; string targetName; string iconClass; System.Func<Vector3> via;
         VisualElement arrow, marker, arrowHead; Label arrowLabel;
 
         public Transform Target => target;
@@ -31,16 +31,19 @@ namespace UltimoMiglio.UI
             arrowLabel = hud.Root.Q<Label>("edge-arrow-label"); marker = hud.Root.Q("target-marker");
         }
 
-        /// <summary>Point at a world target. iconClass: e.g. "icon-customer", "icon-van", "icon-safe", "icon-pad".</summary>
-        public void SetTarget(Transform t, string displayName, string icon = null)
+        /// <summary>Point at a world target. iconClass: e.g. "icon-customer", "icon-van", "icon-safe", "icon-pad".
+        /// #273: via (facoltativo) = tappa della guida del tutorial; la freccia compare se il bersaglio è fuori schermo ma punta
+        /// da Kaia alla tappa sullo schermo (stessa direzione della mano e della freccia a terra), così aggira gli scaffali.</summary>
+        public void SetTarget(Transform t, string displayName, string icon = null, System.Func<Vector3> via = null)
         {
+            this.via = via;
             if (arrow == null) Bind();
             if (arrow != null && iconClass != null) arrow.RemoveFromClassList(iconClass);
             target = t; targetName = displayName; iconClass = icon;
             if (arrow != null && icon != null) arrow.AddToClassList(icon);
         }
 
-        public void Clear() { target = null; Show(arrow, false); Show(marker, false); }
+        public void Clear() { target = null; via = null; Show(arrow, false); Show(marker, false); }
 
         void LateUpdate()
         {
@@ -61,6 +64,11 @@ namespace UltimoMiglio.UI
             Show(marker, false);
             Vector2 c = inner.center;
             Vector2 dir = new Vector2(sp.x, sp.y) - c;
+            if (via != null && nina)
+            {   // #273: direzione sullo schermo da Kaia alla tappa (la camera ruota, #205)
+                Vector3 a = cam.WorldToScreenPoint(nina.position), b = cam.WorldToScreenPoint(via());
+                var dv = new Vector2(b.x - a.x, b.y - a.y); if (a.z > 0 && b.z > 0 && dv.sqrMagnitude > 1f) dir = dv;
+            }
             if (dir.sqrMagnitude < 1e-4f) dir = Vector2.up;
             float tx = Mathf.Abs(dir.x) > 1e-4f ? (inner.width * 0.5f) / Mathf.Abs(dir.x) : float.MaxValue;
             float ty = Mathf.Abs(dir.y) > 1e-4f ? (inner.height * 0.5f) / Mathf.Abs(dir.y) : float.MaxValue;
