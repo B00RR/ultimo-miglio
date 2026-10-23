@@ -26,6 +26,7 @@ namespace UltimoMiglio.Gameplay
         void Awake()
         {
             I = this;
+            if (!GetComponent<QaBridge>()) gameObject.AddComponent<QaBridge>();
             // WebGL: nessun NavMesh bake runtime → elimina ogni NavMeshAgent subito
             NonnoRobot.StripAllNavMeshAgentsInScene();
 #if UNITY_WEBGL && !UNITY_EDITOR
