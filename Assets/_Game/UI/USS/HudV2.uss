@@ -87,10 +87,11 @@
 .hud--minimal #cassa-x2 { display: none; }
 .hud--minimal .top-center { display: none; }
 
-/* QA #41: Ada max 36dp one line */
-.ada-band { top: 48px !important; height: 36px !important; max-height: 36px !important; overflow: hidden; }
-.ada-note { height: 36px !important; max-height: 36px !important; padding: 2px 10px !important; overflow: hidden; }
-.ada-text { font-size: 14px !important; white-space: nowrap !important; max-height: 36px !important; }
+/* #186: il fumetto va a capo (max 2 righe). Niente nowrap che forza i puntini.
+   Il top lo scrive AdaNoteView: safe area + sotto l'ingranaggio. */
+.ada-band { overflow: visible; }
+.ada-note { overflow: visible; }
+.ada-text { font-size: 14px; white-space: normal; text-overflow: clip; }
 .ada-face, .ada-name { display: none !important; }
 .pad-tag, .pad-card, .cassa-card { display: none !important; }
 #target-marker { display: none !important; }

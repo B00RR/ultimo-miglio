@@ -81,7 +81,7 @@ namespace UltimoMiglio.UI
             Vector2 edge = c + dir * Mathf.Min(tx, ty);
             var p = SafeAreaUtil.ScreenToPanel(arrow.panel, edge);
             arrow.style.left = p.x; arrow.style.top = p.y;
-            float ang = Mathf.Atan2(-dir.y, dir.x) * Mathf.Rad2Deg; // panel y is down
+            float ang = Mathf.Atan2(-dir.y, dir.x) * Mathf.Rad2Deg; // panel y is down; dir è già Kaia → tappa
             if (arrowHead != null) arrowHead.style.rotate = new Rotate(new Angle(ang));
             if (arrowLabel != null) arrowLabel.style.display = DisplayStyle.None; // QA v2: arrow only, no ARRIVI/BANCONE · Xm chip
             Show(arrow, true);
