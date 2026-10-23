@@ -166,6 +166,7 @@ Ogni ruolo lavora solo sulle issue con la propria etichetta `ruolo:*`, sempre co
 
 Voci più recenti in alto. Formato: `AAAA-MM-GG HH:MM` (Europe/Rome) — [commit] — descrizione.
 
+- **23/10/2026 12:05 (Europe/Rome)**: QA Tester — checklist sulla build dev `21055fc` (non sulla #285): **NO-VIA**. La pillola «40» copre la testa di Kaia sul pad (`qa/playtest_shots/chiusura23_pillola.png`, #272). Report `qa/playtest_web_live_chiusura23.md`. Il giro completo (muri a 3 punti, Zaino, OLDO, reload, altri viewport) non è stato eseguito.
 - **23/10/2026 (Europe/Rome)**: Tech Lead — chiusura cap. 1 sul ramo `cursor/cap1-chiusura-verifica-webgl-efbb`. #274 Kaia scivola sullo spigolo del vaso (`NinaController.Sblocca`). Merge di #272 (pillola prezzo fuori da Kaia) e di #186 (insegna di noce, Baloo 2, Fredoka Medium; freccia a bordo da Kaia, anche con la tappa #273). Documentazione UI in `docs/ui/CHIUSURA_CAP1.md`. Build WebGL sulle PR `verifica-webgl` senza publish.
 - **22/10/2026 11:15 (Europe/Rome)**: unita in squash la #165 (audio combo +N collegato all'AudioManager). Commit [796b01a](https://github.com/B00RR/ultimo-miglio/commit/796b01a3ae88f1146a54e033ef1aa25b0d1c159c). La CI di questo push è stata annullata prima dei job: non è arrivata su `/dev/`.
 - **22/10/2026 11:14 (Europe/Rome)**: unita in squash la #280 (guida #273: frecce che aggirano gli scaffali fino al pad OLDO). Commit [417093f](https://github.com/B00RR/ultimo-miglio/commit/417093ff869ac1c9232548c29980ca8360d77c8d). CI annullata prima dei job, come la #165.
