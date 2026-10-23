@@ -148,6 +148,26 @@ namespace UltimoMiglio.Gameplay
 
         int _shownLeft = int.MinValue, _shownPaid = int.MinValue, _shownCost = int.MinValue;
         UltimoMiglio.UI.World.PadTag _tag; bool _tagLooked;
+        // #272: 0 = pillola a riposo, 1 = oltre il bordo sul lato opposto alla camera. Transizione 0,15 s.
+        float _dodge, _dodgeFrom, _dodgeT, _dodgeGoal;
+        Vector2 _restScreen; bool _restValid;
+        static readonly InteractionPoint[] _live = new InteractionPoint[12];
+        static int _liveN;
+        static readonly Vector2[] _otherBuf = new Vector2[12];
+
+        void OnEnable()
+        {
+            for (int i = 0; i < _liveN; i++) if (_live[i] == this) return;
+            if (_liveN < _live.Length) _live[_liveN++] = this;
+        }
+
+        void OnDisable()
+        {
+            for (int i = 0; i < _liveN; i++) if (_live[i] == this)
+            {
+                _live[i] = _live[--_liveN]; _live[_liveN] = null; _restValid = false; return;
+            }
+        }
 
         void LateUpdate()
         {
@@ -202,13 +222,48 @@ namespace UltimoMiglio.Gameplay
             if (PadIcon) { PadIcon.SetVisible(false); PadIcon.SetPlayerNear(near); }
             if (!_tagLooked) { _tagLooked = true; _tag = GetComponent<UltimoMiglio.UI.World.PadTag>(); } // #191: cache
             if (_tag && _tag.enabled) _tag.enabled = false;
-            // Offset mondo: più basso se il pad è in alto nello schermo, così la pillola non finisce sotto l'obiettivo
-            float bob = 0.12f * Mathf.Sin(Time.time * 2.4f + _phase);
-            Vector3 world = transform.position + Vector3.up * (1.55f + bob);
-            Vector3 sp = _cam.WorldToScreenPoint(world);
-            if (sp.z > 0 && sp.y > Screen.height * 0.72f)
-                sp = _cam.WorldToScreenPoint(transform.position + Vector3.up * (1.05f + bob * 0.5f));
-            bool show = avail && !(HasCard && near) && sp.z > 0 && sp.x > 0 && sp.x < Screen.width && sp.y > 0 && sp.y < Screen.height;
+            // #272: Kaia sul pad → la colonna va oltre il bordo, lato opposto alla camera, in 0,15 s.
+            // Il bob si spegne insieme allo spostamento, così a regime il rettangolo non rientra su di lei.
+            // A riposo resta la proiezione storica: durante il ricentro NonnoIntro Kaia è lontana dal pad
+            // e il solver non deve aggiungere WorldToScreenPoint nello stesso LateUpdate della camera.
+            var feet = nina ? nina.transform.position : transform.position;
+            bool onPad = nina && PricePillLayout.WithinRadius(transform.position, feet, Radius);
+            float goal = onPad ? 1f : 0f;
+            if (goal != _dodgeGoal) { _dodgeFrom = _dodge; _dodgeT = 0f; _dodgeGoal = goal; }
+            if (_dodge != _dodgeGoal)
+            {
+                _dodgeT += Time.deltaTime;
+                _dodge = Mathf.Lerp(_dodgeFrom, _dodgeGoal, PricePillLayout.Smooth(_dodgeT / PricePillLayout.DodgeSeconds));
+            }
+            float bob = (1f - _dodge) * 0.12f * Mathf.Sin(Time.time * 2.4f + _phase);
+            int sw, sh;
+            Vector3 sp;
+            if (_dodge <= 0.0001f)
+            {
+                sp = _cam.WorldToScreenPoint(transform.position + Vector3.up * (PricePillLayout.RestHeight + bob));
+                if (sp.z > 0f && sp.y > Screen.height * PricePillLayout.HighScreenFrac)
+                    sp = _cam.WorldToScreenPoint(transform.position + Vector3.up * (PricePillLayout.HighHeight + bob * 0.5f));
+                sw = Screen.width;
+                sh = Screen.height;
+                _restScreen.x = sp.x; _restScreen.y = sp.y; _restValid = sp.z > 0f;
+            }
+            else
+            {
+                sw = Screen.width > 1 ? Screen.width : _cam.pixelWidth;
+                sh = Screen.height > 1 ? Screen.height : _cam.pixelHeight;
+                Vector3 restSp = PricePillLayout.ProjectRest(_cam, transform.position, 0f, sh);
+                _restScreen.x = restSp.x; _restScreen.y = restSp.y; _restValid = restSp.z > 0f;
+                int othersN = 0;
+                for (int i = 0; i < _liveN; i++)
+                {
+                    var o = _live[i];
+                    if (!o || o == this || !o._restValid) continue;
+                    _otherBuf[othersN++] = o._restScreen;
+                    if (othersN == _otherBuf.Length) break;
+                }
+                sp = PricePillLayout.AnchorScreen(_cam, transform.position, Radius, feet, _dodge, bob, sw, sh, _otherBuf, othersN);
+            }
+            bool show = avail && !(HasCard && near) && sp.z > 0 && sp.x > 0 && sp.x < sw && sp.y > 0 && sp.y < sh;
             _chipCol.style.display = show ? DisplayStyle.Flex : DisplayStyle.None;
             if (!show || _chip.panel == null) return;
             _chevron.EnableInClassList("poi-chevron--on", _active);
@@ -219,15 +274,20 @@ namespace UltimoMiglio.Gameplay
             const float hudTopReserve = 206f; // fondo fumetto Ada (106 dp) + 8 + pillola 44 + barra LN 22 (#94) + freccia 26: la colonna non entra mai nella fascia alta HUD
             // Pad alto sullo schermo: niente clamp che stacca la pillola dal pad. La colonna si ribalta SOTTO il pad
             // (freccia ▲ verso il pad, pillola sotto), così indica sempre il pad e non entra nella fascia alta.
-            bool flip = p.y < hudTopReserve;
-            if (flip) { var pad = UltimoMiglio.UI.SafeAreaUtil.ScreenToPanel(_chip.panel, _cam.WorldToScreenPoint(transform.position)); p.y = Mathf.Max(pad.y + 10f, hudTopReserve - 70f); }
+            // #272: durante lo spostamento la colonna resta sopra l'ancora (niente ribaltamento sulla testa di Kaia).
+            bool dodgeOn = _dodge > 0.001f;
+            bool flip = !dodgeOn && p.y < hudTopReserve;
+            if (flip) { var padPt = UltimoMiglio.UI.SafeAreaUtil.ScreenToPanel(_chip.panel, _cam.WorldToScreenPoint(transform.position)); p.y = Mathf.Max(padPt.y + 10f, hudTopReserve - 70f); }
             _chipCol.EnableInClassList("poi-chip-col--flip", flip);
             float panelW = _chip.panel.visualTree.worldBound.width;
-            if (panelW < 1f) panelW = Screen.width;
+            if (panelW < 1f) panelW = sw;
             float halfChip = 70f; // pillola ~140px, anchor al centro (translate -50%)
             const float edgePad = 10f;
-            if (p.x < halfChip + edgePad) p.x = halfChip + edgePad;
-            if (p.x > panelW - halfChip - edgePad) p.x = panelW - halfChip - edgePad;
+            if (!dodgeOn)
+            {
+                if (p.x < halfChip + edgePad) p.x = halfChip + edgePad;
+                if (p.x > panelW - halfChip - edgePad) p.x = panelW - halfChip - edgePad;
+            }
             _chipCol.style.left = p.x; _chipCol.style.top = p.y;
             _chip.style.scale = new Scale(Vector3.one * (_active ? 1.08f : 1f));
             // Chip sopra il world-layer ma sotto i controlli: porta in cima al world-layer
